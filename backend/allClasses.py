@@ -19,10 +19,10 @@ CORS(app, supports_credentials=True)
 
 ################## User Class Creation ##################
 
-class User(db.model):
+class User(db.Model):
     __tablename__ = 'user'
 
-    user_ID = db.column(db.Integer, nullable=False, primary_key=True)
+    user_ID = db.Column(db.Integer, nullable=False, primary_key=True)
     user_Name = db.Column(db.String(255), nullable=False)
     user_Email = db.Column(db.String(155), nullable=False)
     user_Password = db.Column(db.String(50), nullable=False)
@@ -45,13 +45,13 @@ class User(db.model):
 
 ################## External User Class Creation ##################
 
-class ExternalUser(db.model):
+class ExternalUser(db.Model):
     __tablename__ = 'externaluser'
 
-    external_ID = db.column(db.Integer, nullable=False, primary_key=True)
+    external_ID = db.Column(db.Integer, nullable=False, primary_key=True)
     user_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'),  nullable=False)
     organisation_Name = db.Column(db.String(255), nullable=False)
-    is_Alumni = db.Column(db.boolean, nullable=False)
+    is_Alumni = db.Column(db.Boolean, nullable=False)
 
     def __init__(self, external_ID, user_ID, organisation_Name, is_Alumni):
         self.external_ID = external_ID
@@ -68,10 +68,10 @@ class ExternalUser(db.model):
         
 ################## Course Category Class Creation ##################
 
-class CourseCategory(db.model):
+class CourseCategory(db.Model):
     __tablename__ = 'coursecategory'
 
-    coursecat_ID = db.column(db.Integer, nullable=False, primary_key=True)
+    coursecat_ID = db.Column(db.Integer, nullable=False, primary_key=True)
     coursecat_Name = db.Column(db.String(10), nullable=False)
 
 

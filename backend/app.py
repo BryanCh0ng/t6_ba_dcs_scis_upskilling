@@ -13,7 +13,7 @@ api = Api(
     title="SCIS-UPSKILLING-Backend",
     description="",
 )
-api.add_namespace(value)
+#api.add_namespace(value)
 
 
 CORS(app, supports_credentials=True)
