@@ -1,7 +1,7 @@
 <template>
   <div id="contactus">
     <!-- CONTACT US FORM -->
-    <div class="container-fluid mt-5">
+    <div class="container mt-5">
       <h2 class="text-center">Contact Us</h2>
 
       <p v-if="subjectError" class="text-danger">{{ subjectError }}</p>
