@@ -8,6 +8,14 @@ const routes = [
         meta: {
             title: 'Home',
         },
+    },
+    {
+      path: '/contactUs',
+      name: 'ContactUs',
+      component: () => import('../views/ContactUs.vue'),
+      meta: {
+          title: 'Contact Us',
+      },
     }
     // },
     // {
