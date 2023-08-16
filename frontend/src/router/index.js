@@ -16,6 +16,14 @@ const routes = [
       meta: {
           title: 'Contact Us',
       },
+    },
+    {
+      path: '/createCourse',
+      name: 'CreateCourse',
+      component: () => import('../views/CreateCourse.vue'),
+      meta: {
+          title: 'Create Course',
+      },
     }
     // },
     // {
