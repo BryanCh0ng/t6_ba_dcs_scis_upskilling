@@ -314,7 +314,7 @@
     <div v-if="showSuccessModal" class="modal-backdrop">
       <div class="modal-content">
         <p>
-          Your message has been successfully sent. We appreciate your feedback!
+          The course has been successfully created and is now available for registration.
         </p>
         <button @click="hideSuccessModal" class="btn btn-secondary close-btn">
           Close
