@@ -18,7 +18,7 @@
           <!-- Dropdown Button -->
           <select
             v-model="selectedCategory"
-            class="form-select border-0 shadow-sm px-4 field"
+            class="form-select border-0 shadow-sm px-4 field text-muted"
           >
             <option disabled value="">Course Category</option>
             <!--<option v-for="course in courses" :key="course.id" :value="course.id">{{ course.name }}</option>-->
@@ -46,7 +46,7 @@
           />-->
           <select
             v-model="selectedInstructor"
-            class="form-select border-0 shadow-sm px-4 field"
+            class="form-select border-0 shadow-sm px-4 field text-muted"
           >
             <option disabled value="">Instructor</option>
             <!--<option v-for="course in courses" :key="course.id" :value="course.id">{{ course.name }}</option>-->
@@ -109,10 +109,12 @@
               v-model="startTime"
               placeholder="Start Time"
               time-picker
-              class="form-control shadow-sm"
+              class="form-control border-0 shadow-sm"
               input-class-name="dp-custom-input"
               required
-            />
+              ><template #input-icon>
+                <font-awesome-icon icon="fa-regular fa-clock" style="padding-left:10px;"/></template
+            ></VueDatePicker>
           </div>
           <!--End Time-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
@@ -131,7 +133,9 @@
               class="form-control border-0 shadow-sm"
               input-class-name="dp-custom-input"
               required
-            />
+              ><template #input-icon>
+                <font-awesome-icon icon="fa-regular fa-clock" style="padding-left:10px;"/></template
+            ></VueDatePicker>
           </div>
         </div>
         <div class="row mb-4">
@@ -140,7 +144,7 @@
             <!-- Dropdown Button -->
             <select
               v-model="selectedFormat"
-              class="form-select border-0 shadow-sm px-4 field"
+              class="form-select border-0 shadow-sm px-4 field text-muted"
             >
               <option disabled hidden value="">Course Format</option>
               <option
@@ -226,7 +230,9 @@
               class="form-control border-0 shadow-sm"
               input-class-name="dp-custom-input"
               required
-            />
+              ><template #input-icon>
+                <font-awesome-icon icon="fa-regular fa-clock" style="padding-left:10px;"/></template
+            ></VueDatePicker>
           </div>
         </div>
         <div class="row mb-4">
@@ -267,7 +273,9 @@
               class="form-control border-0 shadow-sm"
               input-class-name="dp-custom-input"
               required
-            />
+            ><template #input-icon>
+                <font-awesome-icon icon="fa-regular fa-clock" style="padding-left:10px;"/></template>
+            </VueDatePicker>
           </div>
         </div>
         <div class="row">
@@ -276,7 +284,7 @@
             <!-- Dropdown Button -->
             <select
               v-model="selectedFee"
-              class="form-select border-0 shadow-sm px-4 field"
+              class="form-select border-0 shadow-sm px-4 field text-muted"
             >
               <option disabled value="">Course Fee</option>
               <!--<option v-for="course in courses" :key="course.id" :value="course.id">{{ course.name }}</option>-->
@@ -287,7 +295,7 @@
             <!-- Dropdown Button -->
             <select
               v-model="selectedTemplate"
-              class="form-select border-0 shadow-sm px-4 field"
+              class="form-select border-0 shadow-sm px-4 field text-muted"
             >
               <option disabled value="">Feedback Template</option>
               <!--<option v-for="course in courses" :key="course.id" :value="course.id">{{ course.name }}</option>-->
@@ -330,7 +338,7 @@ export default {
       courseDesc: "",
       selectedInstructor: "",
       startDate: null,
-      datePickerFormat: 'yyyy-MM-dd',
+      datePickerFormat: "yyyy-MM-dd",
       endDate: null,
       startTime: "",
       endTime: "",
@@ -349,7 +357,7 @@ export default {
       closingTime: "",
       selectedFee: "",
       selectedTemplate: "",
-      showSuccessModal: false
+      showSuccessModal: false,
     };
   },
   methods: {
@@ -401,7 +409,6 @@ export default {
   right: 20px;
   width: 150px;
 }
-
 </style>
 
 <style lang="scss">
@@ -418,5 +425,4 @@ export default {
     color: black;
   }
 }
-
 </style>
