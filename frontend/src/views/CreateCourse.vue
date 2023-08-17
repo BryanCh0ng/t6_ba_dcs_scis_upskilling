@@ -6,6 +6,7 @@
 import CourseForm from "../components/CourseForm.vue"
 
 export default {
+    name: "CreateCourse",
     data() {
         return {
             status: true
@@ -13,6 +14,9 @@ export default {
     },
     components: {
         CourseForm
+    },
+    created() {
+        document.title = "Create Course";
     }
 };
 
