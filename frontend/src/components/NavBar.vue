@@ -1,13 +1,11 @@
 <template>
   <div class="content">
-    <!-- NAV BAR -->
     <nav class="navbar navbar-expand-md">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand no-underline" href="#">
           <img src="../assets/smulogo.png" title="smu logo" class="navlogo" />
           <span class="system-name">
             <span class="vertical-line"></span>
-            <!-- Vertical line -->
             Upskilling Engagement <br />System
           </span>
         </a>
@@ -22,63 +20,39 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse navcontent" id="navbarNav">
           <ul class="navbar-nav ms-auto navbar-menu">
-            <!-- Default Navigation Items (Visible when not logged in) -->
-            <li class="nav-item" v-if="!isLoggedIn">
-              <a class="nav-link" href="#">View Courses</a>
-            </li>
-            <li class="nav-item" v-if="!isLoggedIn">
-              <a class="nav-link" href="#">Propose Course</a>
-            </li>
-
-            <!-- User-Role Specific Navigation Items (Visible after login) -->
-            <li class="nav-item" v-if="userRole === 'student'">
-              <a class="nav-link" href="#">Recommendations</a>
-            </li>
-            <li class="nav-item" v-if="userRole === 'student'">
-              <a class="nav-link" href="#">View Courses</a>
-            </li>
-            <li class="nav-item" v-if="userRole === 'student'">
-              <a class="nav-link" href="#">Propose Course</a>
-            </li>
-
+            <!-- Navigation Links -->
             <li
+              v-for="link in navigationLinks"
+              :key="link.path"
               class="nav-item"
-              v-if="userRole === 'instructor' || userRole === 'trainer'"
             >
-              <a class="nav-link" href="#">Voting Campaign</a>
-            </li>
-            <li
-              class="nav-item"
-              v-if="userRole === 'instructor' || userRole === 'trainer'"
-            >
-              <a class="nav-link" href="#">Propose Course</a>
-            </li>
-
-            <li class="nav-item" v-if="userRole === 'admin'">
-              <a class="nav-link" href="#">All Proposals</a>
-            </li>
-            <li class="nav-item" v-if="userRole === 'admin'">
-              <a class="nav-link" href="#">Voting Campaign</a>
-            </li>
-            <li class="nav-item" v-if="userRole === 'admin'">
-              <a class="nav-link" href="#">Create Course</a>
-            </li>
-
-            <!-- Common Navigation Item (Visible for all) -->
-            <li class="nav-item">
-              <a class="nav-link" href="#">Contact Us</a>
+              <a
+                :class="{ active: isActiveLink(link.path) }"
+                class="nav-link"
+                :href="link.path"
+                >{{ link.label }}</a
+              >
             </li>
 
             <!-- Login Button (Visible when not logged in) -->
             <li class="nav-item" v-if="!isLoggedIn">
-              <button type="button" class="btn loginbtn">Login</button>
+              <button
+                type="button"
+                class="btn loginbtn"
+                @click="redirectToLogin"
+              >
+                Login
+              </button>
             </li>
 
             <!-- User Info and Role-Specific Dropdown (Visible when logged in) -->
             <li class="nav-item" v-if="isLoggedIn">
+              <!-- Dropdown for displaying user information and actions -->
               <div class="nav-link dropdown">
+                <!-- Dropdown toggle button -->
                 <span
                   class="dropdown-toggle btn dropdownbtn"
                   id="userDropdown"
@@ -89,48 +63,25 @@
                   {{ username }}
                   <!-- Display the user's name -->
                 </span>
-                <div v-if="showUserDropdown" class="dropdown-content">
+                <!-- Dropdown content container -->
+                <div  v-if="showUserDropdown" 
+                  class="dropdown-content"
+                  :class="{ 'admin-dropdown': userRole === 'admin' }"
+                >
                   <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                    <!-- Role-specific items -->
-                    <li v-if="userRole === 'student'">
-                      <a class="dropdown-item" href="#">Profile</a>
-                    </li>
-
+                    <!-- Loop through role-specific dropdown items -->
                     <li
-                      v-if="userRole === 'instructor' || userRole === 'trainer'"
+                      v-for="(item, index) in roleSpecificDropdownItems"
+                      :key="index"
                     >
-                      <a class="dropdown-item" href="#">Profile</a>
-                    </li>
-                    <li
-                      v-if="userRole === 'instructor' || userRole === 'trainer'"
-                    >
-                      <a class="dropdown-item" href="#">Blacklist</a>
-                    </li>
-                    <li
-                      v-if="userRole === 'instructor' || userRole === 'trainer'"
-                    >
-                      <a class="dropdown-item" href="#">Dashboard</a>
-                    </li>
-
-                    <li v-if="userRole === 'admin'">
-                      <a class="dropdown-item" href="#">Profile</a>
-                    </li>
-
-                    <li v-if="userRole === 'admin'">
-                      <a class="dropdown-item" href="#">Academic Management</a>
-                    </li>
-                    <li v-if="userRole === 'admin'">
-                      <a class="dropdown-item" href="#">Feedback Template</a>
-                    </li>
-                    <li v-if="userRole === 'admin'">
-                      <a class="dropdown-item" href="#">Dashboard</a>
-                    </li>
-
-                    <!-- Add Logout item at the end -->
-                    <li>
-                      <a @click="logout" class="dropdown-item" href="#"
-                        >Logout</a
+                      <a
+                        :class="{ active: isActiveLink(item.path) }"
+                        class="nav-link"
+                        :href="item.path"
+                        @click="item.action ? item.action() : null"
                       >
+                        {{ item.label }}
+                      </a>
                     </li>
                   </ul>
                 </div>
@@ -144,24 +95,102 @@
 </template>
 
 <script>
-// import { axiosClient } from '../api/axiosClient'; 
+
+// import { axiosClient } from "../api/axiosClient";
 
 export default {
   data() {
     return {
       userRole: "", // Set the user's role here dynamically
-      isLoggedIn: false, // Set to true when user is logged in
-      showUserDropdown: false, // Initialized as false to hide the dropdown content
+      isLoggedIn: false, // Set to true when the user is logged in
+      showUserDropdown: false,
     };
   },
+  computed: {
+    navigationLinks() {
+      const links = [];
+
+      if (this.isLoggedIn) {
+        if (this.userRole === "student") {
+          links.push(
+            { path: "/recommendations", label: "Recommendations" },
+            { path: "/viewCourses", label: "View Courses" },
+            { path: "/proposeCourse", label: "Propose Course" }
+          );
+        } else if (
+          this.userRole === "instructor" ||
+          this.userRole === "trainer"
+        ) {
+          links.push(
+            { path: "/votingCampaign", label: "Voting Campaign" },
+            { path: "/proposeCourse", label: "Propose Course" }
+          );
+        } else if (this.userRole === "admin") {
+          links.push(
+            { path: "/allProposal", label: "All Proposal" },
+            { path: "/votingCampaign", label: "Voting Campaign" },
+            { path: "/createCourse", label: "Create Course" }
+          );
+        }
+        // Add the common links for logged-in users
+        links.push({ path: "/contactUs", label: "Contact Us" });
+      } else {
+        // Add the default links for users who are not logged in
+        links.push(
+          { path: "/viewcourses", label: "View Courses" },
+          { path: "/proposecourse", label: "Propose Course" },
+          { path: "/contactUs", label: "Contact Us" }
+        );
+      }
+
+      return links;
+    },
+    roleSpecificDropdownItems() {
+      const items = [];
+
+      if (this.userRole === "student") {
+        items.push(
+          { path: "/profile", label: "Profile" },
+        );
+      } else if (
+        this.userRole === "instructor" || this.userRole === "trainer"
+      ) {
+        items.push(
+          { path: "/profile", label: "Profile" },
+          { path: "/blacklist", label: "Blacklist" },
+          { path: "/dashboard", label: "Dashboard" }
+        );
+      } else if (this.userRole === "admin") {
+        items.push(
+          { path: "/profile", label: "Profile" },
+          { path: "/academicManagement", label: "Academic Management" },
+          { path: "/feedbackTemplate", label: "Feedback Template" },
+          { path: "/dashboard", label: "Dashboard" }
+        );
+      }
+
+      // Add Logout item at the end
+      items.push({ label: "Logout", action: this.logout });
+
+      return items;
+    },
+  },
+  
   methods: {
+    isActiveLink(linkPath) {
+      return this.$route.path === linkPath;
+    },
+    redirectToLogin() {
+      window.location.href = "/login";
+    },
+    // need to add in redirect link
     logout() {
-      // Reset the userRole and isLoggedIn properties
       this.userRole = "";
       this.isLoggedIn = false;
     },
     toggleUserDropdown() {
-      this.showUserDropdown = !this.showUserDropdown; // Toggle the dropdown content visibility
+      console.log("Toggling user dropdown");
+      this.showUserDropdown = !this.showUserDropdown;
     },
   },
   // created() {
@@ -219,27 +248,22 @@ export default {
   margin-left: 5px;
 }
 
-.navbar a:before {
-  content: "";
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  background-color: #8a704c;
-  visibility: hidden;
-  transition: all 0.3s ease-in-out 0s;
-}
-
-.navcontent a:hover:before,
-.navcontent li:hover > a:before,
-.navcontent .active:before {
-  visibility: visible;
-  width: 95%; /* width of the underline */
-  height: 3px;
-}
-
 .navbar a:hover,
 .navbar a:active {
   font-weight: bold; /* Make the text bold when focused or active */
+  text-decoration: underline;
+}
+
+.navbar a.active {
+  font-weight: bold; /* Make the text bold for active links */
+  position: relative; /* Add position relative to enable absolute positioning of the line */
+  text-decoration: underline;
+}
+
+/* Remove underline for the system name */
+.no-underline,
+.no-underline.hover {
+  text-decoration: none !important;
 }
 
 .navlogo {
@@ -265,10 +289,12 @@ export default {
 .loginbtn,
 .logoutbtn,
 .loginbtn:hover,
-.logoutbtn:hover {
+.logoutbtn:hover,
+.loginbtn:focus,
+.logoutbtn:focus {
   width: 130px;
-  background-color: #151c55;
-  color: #ffffff;
+  background-color: #151c55 !important;
+  color: #ffffff !important;
 }
 
 .custom-toggler.navbar-toggler {
@@ -309,11 +335,15 @@ export default {
 .dropdown-content {
   position: absolute;
   top: 80%; /* This will position the content below the dropdown button */
-  left: -95px; /* Adjust left or right value based on your design */
+  left: -22px; /* Adjust left or right value based on your design */
   background-color: white;
   color: #151c55;
   z-index: 1;
   font-size: 18px;
+}
+
+.admin-dropdown {
+  left: -110px;
 }
 
 .dropdown-menu {
@@ -343,7 +373,24 @@ export default {
 
   .dropdown-content {
     top: 82%;
-    left: -104px;
+    left: -30px;
+  }
+
+  .admin-dropdown {
+    left: -102px;
+  }
+  #navbarNav {
+    border: 4px solid #151c55;
+    border-radius: 5px;
+    padding: 10px 15px;
+    background-color: white;
+    color: #151c55;
+    z-index: 1;
+    transform: translateY(-8px); /* Fine-tune the vertical position */
+  }
+
+  .custom-toggler {
+    transform: translateY(8px);
   }
 }
 </style>
