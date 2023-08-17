@@ -1,6 +1,10 @@
 <template>
   <div id="courseform">
-    <div class="container">
+    <div class="container-fluid mt-5">
+      <h2 v-if="status" class="text-center">Create Course For Registration</h2>
+
+      <h2 v-else class="text-center">Edit Course</h2>
+
       <form @submit.prevent="submitForm">
         <!--Course Name-->
         <div class="form-group mt-5 mb-4">
@@ -113,7 +117,9 @@
               input-class-name="dp-custom-input"
               required
               ><template #input-icon>
-                <font-awesome-icon icon="fa-regular fa-clock" style="padding-left:10px;"/></template
+                <font-awesome-icon
+                  icon="fa-regular fa-clock"
+                  style="padding-left: 10px" /></template
             ></VueDatePicker>
           </div>
           <!--End Time-->
@@ -134,7 +140,9 @@
               input-class-name="dp-custom-input"
               required
               ><template #input-icon>
-                <font-awesome-icon icon="fa-regular fa-clock" style="padding-left:10px;"/></template
+                <font-awesome-icon
+                  icon="fa-regular fa-clock"
+                  style="padding-left: 10px" /></template
             ></VueDatePicker>
           </div>
         </div>
@@ -231,7 +239,9 @@
               input-class-name="dp-custom-input"
               required
               ><template #input-icon>
-                <font-awesome-icon icon="fa-regular fa-clock" style="padding-left:10px;"/></template
+                <font-awesome-icon
+                  icon="fa-regular fa-clock"
+                  style="padding-left: 10px" /></template
             ></VueDatePicker>
           </div>
         </div>
@@ -273,8 +283,11 @@
               class="form-control border-0 shadow-sm"
               input-class-name="dp-custom-input"
               required
-            ><template #input-icon>
-                <font-awesome-icon icon="fa-regular fa-clock" style="padding-left:10px;"/></template>
+              ><template #input-icon>
+                <font-awesome-icon
+                  icon="fa-regular fa-clock"
+                  style="padding-left: 10px"
+              /></template>
             </VueDatePicker>
           </div>
         </div>
@@ -303,18 +316,40 @@
           </div>
         </div>
         <button
+          v-if="status"
           type="submit"
           class="btn btn-block shadow-sm w-100 mt-5 field submitbtn"
         >
           Submit
         </button>
+
+        <div v-else class="row">
+          <div class="col-md-6 form-group">
+            <button
+              type="button"
+              class="btn btn-block shadow-sm w-100 mt-5 field submitbtn"
+            >
+              Cancel
+            </button>
+          </div>
+
+          <div class="col-md-6 form-group mt-4 mt-md-0">
+            <button
+              type="submit"
+              class="btn btn-block shadow-sm w-100 mt-5 field submitbtn"
+            >
+              Save
+            </button>
+          </div>
+        </div>
       </form>
     </div>
     <!-- Success modal -->
     <div v-if="showSuccessModal" class="modal-backdrop">
       <div class="modal-content">
         <p>
-          The course has been successfully created and is now available for registration.
+          The course has been successfully created and is now available for
+          registration.
         </p>
         <button @click="hideSuccessModal" class="btn btn-secondary close-btn">
           Close
@@ -337,8 +372,8 @@ export default {
       selectedCategory: "",
       courseDesc: "",
       selectedInstructor: "",
-      startDate: null,
       datePickerFormat: "yyyy-MM-dd",
+      startDate: null,
       endDate: null,
       startTime: "",
       endTime: "",
@@ -392,6 +427,12 @@ export default {
         (this.closingTime = ""),
         (this.selectedFee = ""),
         (this.selectedTemplate = "");
+    },
+  },
+  props: {
+    status: {
+      type: Boolean,
+      required: true,
     },
   },
 };
