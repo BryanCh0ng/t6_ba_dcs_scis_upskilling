@@ -27,6 +27,14 @@ const routes = [
     },
   },
   {
+    path: '/forgotPassword',
+    name: 'ForgotPassword',
+    component: () => import('../views/ForgotPassword.vue'),
+    meta: {
+      title: 'Forgot Password',
+    },
+  },
+  {
     path: '/contactUs',
     name: 'ContactUs',
     component: () => import('../views/ContactUs.vue'),

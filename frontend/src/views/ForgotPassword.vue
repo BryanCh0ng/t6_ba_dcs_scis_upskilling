@@ -21,52 +21,22 @@
                   <!-- Error Message -->
                   <error-message :error-message="errorMessage" />
 
-                  <!-- Login Form -->
+                  <!-- Reset Password Form -->
                   <form @submit.prevent="onSubmit">
                     <input-field
                       v-model="email"
                       type="email"
                       placeholder="Email Address"
                     />
-                    <div>
-                      <div class="input-group password-field">
-                        <input
-                          v-model="password"
-                          :type="showPassword ? 'text' : 'password'"
-                          placeholder="Password"
-                          class="form-control border-0 shadow-sm px-4 field"
-                        />
-                        <div class="input-group-append">
-                          <div class="input-group-text eye-icon-container">
-                            <span
-                              @click="togglePasswordVisibility"
-                              class="eye-icon"
-                            >
-                              <font-awesome-icon
-                                :icon="
-                                  showPassword
-                                    ? ['fas', 'eye']
-                                    : ['fas', 'eye-slash']
-                                "
-                              />
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <router-link to="/forgotPassword" id="forgotpsd">Forgot password?</router-link>
-                    </div>
 
                     <button
                       type="submit"
                       class="btn btn-block shadow-sm w-100 mt-5 field submitbtn"
-                    >
-                      Sign In
+                    >Reset Password
                     </button>
                     <p class="text-center mt-2">
-                      Don't have an account?
-                      <router-link to="/register">Sign Up</router-link>
+                      Back to
+                      <router-link to="/login">Sign In</router-link>
                     </p>
                   </form>
                 </div>
@@ -99,16 +69,13 @@ export default {
   data() {
     return {
       email: "",
-      password: "",
       errorMessage: "",
-      showPassword: false,
     };
   },
 
   validations() {
     return {
       email: { required, email },
-      password: { required},
     };
   },
   components: {
@@ -123,8 +90,8 @@ export default {
       this.errorMessage = ""; // Reset error message
 
       // Check for empty fields
-      if (!this.email || !this.password) {
-        this.errorMessage = "Please ensure all fields are filled.";
+      if (!this.email) {
+        this.errorMessage = "Please ensure the email field is filled.";
         return;
       }
       
@@ -133,30 +100,25 @@ export default {
         return;
       }
 
-      this.performLogin();
+      this.performReset();
     },
 
-    async performLogin() {
+    async performReset() {
       try {
         // Will need to update the flask api endpoint
         // Send login request
-        // const response = await axiosClient.post("/login", {
+        // const response = await axiosClient.post("/reset", {
         //   email: this.email,
-        //   password: this.password,
         // });
 
-        console.log("Login successful");
+        console.log("Reset send");
         // console.log(response.data);
       } catch (error) {
-        this.errorMessage = "Login failed. Please check your credentials.";
-        console.log("Login error:", error.message);
+        this.errorMessage = "Reset failed. Please check your credentials.";
+        console.log("Reset error:", error.message);
       }
     },
 
-    // Visibility of the password
-    togglePasswordVisibility() {
-      this.showPassword = !this.showPassword;
-    },
   },
 };
 </script>
@@ -195,35 +157,5 @@ body {
 #logo {
   width: 380px;
   margin-bottom: 40px;
-}
-
-#forgotpsd {
-  float: right;
-}
-
-/* For the visibility of the password */
-.password-toggle {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  color: black;
-}
-
-.eye-icon-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%; /* Match the height of the input field */
-  padding-right: 8px; /* Add spacing between the input and the icon */
-  cursor: pointer;
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 0px;
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-  background-color: white;
-  border: 0px;
-  width: 40px;
 }
 </style>
