@@ -365,7 +365,9 @@ import "@vuepic/vue-datepicker/dist/main.css";
 
 export default {
   name: "CourseForm",
-  components: { VueDatePicker },
+  components: { 
+    VueDatePicker 
+  },
   data() {
     return {
       courseName: "",
