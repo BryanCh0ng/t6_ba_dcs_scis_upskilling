@@ -1,0 +1,107 @@
+<template>
+    <div id="searchfitler">
+        <div class="container mt-5 mb-5">
+            <form>
+                <div class="row">
+                    <div class="col-sm">
+                        <input-field v-model="courseName" type="text" placeholder="Course Name"/>
+                    </div>
+                    <div class="col-sm">
+                        <dropdown-field
+                        v-model="category"
+                        :default-placeholder="'Course Category'">
+                        <!-- <option value="Student">Student</option>
+                        <option value="Instructor">Instructor</option>
+                        <option value="Trainer">External Trainer</option> -->
+                        <option v-for="option in categoryDropdownOptions" :key="option" :value="option">{{ option }}</option>
+                        </dropdown-field>
+                    </div>
+                    <div class="col-sm">
+                        <dropdown-field
+                        v-model="coursetype"
+                        :default-placeholder="'Course Type'">
+                        <option value="allcourse">All Course</option>
+                        <option value="interest">Hop on</option>
+                        <option value="register">Shout out</option>
+                        </dropdown-field>
+                    </div>
+                    <div class="col-sm">
+                        <div class="d-flex justify-content-between">
+                            <button @click="resetFilter" class="btn" id="resetbtn">Clear All</button>
+                            <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</template>
+
+<script>
+// import { axiosClient } from "../api/axiosClient";
+import DropdownField from "./DropdownField.vue";
+import InputField from "./InputField.vue";
+
+export default({
+    name: "SearchFilter",
+    data() {
+        return {
+            courseName: "",
+            category: "",
+            coursetype: "",
+            categoryDropdownOptions: [],
+        };
+    },
+    components: {
+        DropdownField,
+        InputField,
+    },
+    methods: {
+        async fetchCategoryDropdownOptions() {
+            try {
+                // flask api endpoint to get fetch course category
+                // const response = await axiosClient.get('');
+                // this.categoryDropdownOptions = response.data;
+            } catch (error) {
+                console.error('Error fetching dropdown options:', error);
+            }
+        },
+        
+        resetFilter() {
+            this.courseName = "";
+            this.category = "";
+            this.coursetype = "";
+        },
+        searchFilter() {
+        //     console.log(this.courseName);
+        //     console.log(this.category);
+        //     console.log(this.coursetype);
+
+            // reset filter when user clicks search
+            this.resetFilter();
+        }
+    },
+    props: {
+        statusApiEndpoint: String,
+    }
+})
+</script>
+
+<style scoped>
+    button {
+        width: 48%;
+        height: 45px;
+        border-radius: 10px;
+    }
+
+    #searchbtn {
+        background-color: #151c55;
+        color: #FFFFFF;
+    }
+
+    #resetbtn {
+        background-color: transparent;
+        border: 4px solid #616161;
+    }
+
+</style>
