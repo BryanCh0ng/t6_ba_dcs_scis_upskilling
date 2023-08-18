@@ -8,17 +8,17 @@ const routes = [
         meta: {
             title: 'Home',
         },
-    }
-    // },
-    // {
-    //     path: '/deleteCourse',
-    //     name: 'Delete Courses',
-    //     component: () => import('../components/DeleteCourse.vue'),
-    //     meta: {
-    //         requiresAdminAuth: true,
-    //         title: 'Delete Courses',
-    //     },
-    // },
+    },
+    
+    {
+        path: '/deleteCourse',
+        name: 'Delete Courses',
+        component: () => import('../components/DeleteCourse.vue'),
+        meta: {
+            //requiresAdminAuth: true,
+            title: 'Delete Courses',
+        },
+    },
     // {
     //     path: '/login',
     //     name: 'Login',
