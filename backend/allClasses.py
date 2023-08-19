@@ -80,6 +80,8 @@ class CourseCategory(db.Model):
         self.coursecat_Name = coursecat_Name
 
     
+    def get_coursecatID(self):
+        return self.coursecat_ID
     def json(self):
         columns = self.__mapper__.column_attrs.keys()
         result = {}
