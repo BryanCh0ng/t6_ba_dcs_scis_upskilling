@@ -2,20 +2,14 @@
   <div id="contactus">
     <!-- CONTACT US FORM -->
     <div class="container mt-5">
-      <h2 class="text-center">Contact Us</h2>
+      <h2 class="text-center mb-4">Contact Us</h2>
 
-      <p v-if="subjectError" class="text-danger">{{ subjectError }}</p>
+      <!-- Error Message -->
+      <error-message :error-message="errorMessage" />
 
       <form @submit.prevent="submitForm">
         <div class="form-group mt-5 mb-4">
-          <input
-            v-model="subject"
-            type="text"
-            placeholder="Subject"
-            required
-            autofocus=""
-            class="form-control border-0 shadow-sm px-4 field"
-          />
+          <input-field v-model="subject" type="text" placeholder="Subject" />
         </div>
         <div class="form-group">
           <textarea
@@ -23,7 +17,6 @@
             class="form-control border-0 shadow-sm px-4 field"
             placeholder="Message"
             style="height: 200px"
-            required
           ></textarea>
         </div>
 
@@ -51,20 +44,53 @@
 
 <script>
 // import { axiosClient } from "../api/axiosClient";
+import ErrorMessage from "../components/ErrorMessage.vue";
+import InputField from "../components/InputField.vue";
+import { required } from "@vuelidate/validators";
+import { useVuelidate } from "@vuelidate/core";
 
 export default {
+  setup() {
+    const v$ = useVuelidate(); // Initialize Vuelidate
+    return { v$ };
+  },
+
   data() {
     return {
       subject: "",
-      subjectError: "", // Error message for subject field
+      errorMessage: "", // Error message for subject field
       message: "",
       showSuccessModal: false,
     };
   },
+
+  validations() {
+    return {
+      subject: { required},
+      message: { required},
+    };
+  },
+  components: {
+    ErrorMessage,
+    InputField,
+  },
   methods: {
     submitForm() {
-      // Clear previous error messages
-      // this.subjectError = "";
+      // Trigger Vuelidate validation
+      this.v$.$touch();
+
+      this.errorMessage = ""; // Reset error message
+
+      // Check for empty fields
+      if (!this.subject || !this.message) {
+        this.errorMessage = "Please ensure all fields are filled.";
+        return;
+      }
+      
+      if (this.v$.$invalid) {
+        this.errorMessage = "Please fix the validation errors.";
+        return;
+      }
 
       // const formData = {
       //   subject: this.subject,
@@ -88,12 +114,10 @@ export default {
       //     }
       //   });
 
-
       // Test Simulate a successful submission
-        setTimeout(() => {
-          this.showSuccessModal = true;
-        }, 1000); // Show modal after 1 second (simulating response)
-        
+      setTimeout(() => {
+        this.showSuccessModal = true;
+      }, 1000); // Show modal after 1 second (simulating response)
     },
     hideSuccessModal() {
       this.showSuccessModal = false;
