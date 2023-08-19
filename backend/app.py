@@ -6,6 +6,7 @@ from flask_restx import Api, Resource
 from allClasses import *
 from os import environ
 from core_features.course import api as course
+from core_features.coursecat import api as coursecat
 
 app = Flask(__name__)
 api = Api(
@@ -16,6 +17,7 @@ api = Api(
     description="",
 )
 api.add_namespace(course)
+api.add_namespace(coursecat)
 
 
 CORS(app, supports_credentials=True)

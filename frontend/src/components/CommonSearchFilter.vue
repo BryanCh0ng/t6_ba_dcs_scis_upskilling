@@ -42,6 +42,7 @@
 // import { axiosClient } from "../api/axiosClient";
 import DropdownField from "./DropdownField.vue";
 import InputField from "./InputField.vue";
+import CourseService from "@/api/services/CourseService.js"
 
 export default({
     name: "SearchFilter",
@@ -58,7 +59,15 @@ export default({
         DropdownField,
         InputField,
     },
+    async mounted() {
+    await this.getAllCourses();
+    await this.searchFilterCourses();
+    },
     methods: {
+        async getAllCourses() {
+        let response = await CourseService.getAllCourses();
+        this.courseList = response.data.course;
+        },
         async fetchCategoryDropdownOptions() {
             try {
                 // flask api endpoint to get fetch course category

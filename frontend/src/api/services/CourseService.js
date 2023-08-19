@@ -20,12 +20,11 @@ class CourseService extends BaseApiService {
             return this.handleError(error);
         }
     }
-    async deleteCourse(courseDetails) {
+    async searchFilterCourses(courseId, coursecatId) {
         try {
-            let course = await axiosClient.delete("/course/delete_course", { params: { course_id: courseId } })
-            .then(response => {
-              console.log("Deleted post with ID ${course_id}");
-            })
+            let courses = await axiosClient.get("/course/retrieve_all_courses_filter_search", { params: { course_id: courseId, coursecat_id: coursecatId } })
+            return courses.data
+            
 
         } catch (error) {
             return this.handleError(error);
@@ -33,4 +32,4 @@ class CourseService extends BaseApiService {
     }
 }
 
-// export default new CourseService();
+export default new CourseService();

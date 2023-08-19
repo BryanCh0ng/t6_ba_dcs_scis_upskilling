@@ -32,6 +32,7 @@
 // import { axiosClient } from "../api/axiosClient";
 import InputField from "./InputField.vue";
 import DropdownField from "./DropdownField.vue";
+import CourseService from "@/api/services/CourseService.js"
 
 export default({
     name: "SearchFilter",
@@ -45,7 +46,15 @@ export default({
         InputField,
         DropdownField,
     },
+    async mounted() {
+    await this.getAllCourses();
+    await this.searchFilterCourses();
+    },
     methods: {
+        async getAllCourses() {
+        let response = await CourseService.getAllCourses();
+        this.courseList = response.data.course;
+        }
         resetFilter() {
             this.courseName = "";
             this.category = "";
