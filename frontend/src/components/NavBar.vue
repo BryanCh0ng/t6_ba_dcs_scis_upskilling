@@ -64,7 +64,8 @@
                   <!-- Display the user's name -->
                 </span>
                 <!-- Dropdown content container -->
-                <div  v-if="showUserDropdown" 
+                <div
+                  v-if="showUserDropdown"
                   class="dropdown-content"
                   :class="{ 'admin-dropdown': userRole === 'admin' }"
                 >
@@ -95,7 +96,6 @@
 </template>
 
 <script>
-
 // import { axiosClient } from "../api/axiosClient";
 
 export default {
@@ -149,12 +149,9 @@ export default {
       const items = [];
 
       if (this.userRole === "student") {
-        items.push(
-          { path: "/profile", label: "Profile" },
-        );
-      } else if (
-        this.userRole === "instructor" || this.userRole === "trainer"
-      ) {
+        items.push({ path: "/profile", label: "Profile" });
+      } else if (this.userRole === "instructor" || this.userRole === "trainer") 
+      {
         items.push(
           { path: "/profile", label: "Profile" },
           { path: "/blacklist", label: "Blacklist" },
@@ -175,7 +172,6 @@ export default {
       return items;
     },
   },
-  
   methods: {
     isActiveLink(linkPath) {
       return this.$route.path === linkPath;
@@ -287,11 +283,8 @@ export default {
 
 /* login button */
 .loginbtn,
-.logoutbtn,
 .loginbtn:hover,
-.logoutbtn:hover,
-.loginbtn:focus,
-.logoutbtn:focus {
+.loginbtn:focus {
   width: 130px;
   background-color: #151c55 !important;
   color: #ffffff !important;
@@ -314,11 +307,11 @@ export default {
 
 .dropdown-toggle.btn.dropdownbtn {
   width: 130px;
-  background-color: transparent; /* Remove the background color */
+  background-color: transparent;
   color: #151c55;
-  border: 4px solid #151c55; /* Add border style */
-  border-radius: 5px; /* Add border radius for a rounded look */
-  padding: 5px 10px; /* Adjust padding for better spacing */
+  border: 4px solid #151c55;
+  border-radius: 5px;
+  padding: 5px 10px;
   position: relative;
   padding-left: 90px;
 }
@@ -336,8 +329,6 @@ export default {
   position: absolute;
   top: 80%; /* This will position the content below the dropdown button */
   left: -22px; /* Adjust left or right value based on your design */
-  background-color: white;
-  color: #151c55;
   z-index: 1;
   font-size: 18px;
 }
@@ -349,6 +340,7 @@ export default {
 .dropdown-menu {
   border: 4px solid #151c55;
   border-radius: 5px;
+  background-color: transparent;
 }
 
 /* Add this style to make the dropdown content stack vertically */
@@ -368,29 +360,28 @@ export default {
 @media (max-width: 768px) {
   .dropdown {
     bottom: 120%;
+    left: 5px;
     transform: translateY(-10px);
   }
 
   .dropdown-content {
-    top: 82%;
-    left: -30px;
-  }
-
-  .admin-dropdown {
-    left: -102px;
-  }
-  #navbarNav {
-    border: 4px solid #151c55;
-    border-radius: 5px;
-    padding: 10px 15px;
-    background-color: white;
-    color: #151c55;
+    position: absolute;
+    transform: translateY(5px);
+    left: -27px; /* Adjust left or right value based on your design */
     z-index: 1;
-    transform: translateY(-8px); /* Fine-tune the vertical position */
+    font-size: 18px;
   }
 
   .custom-toggler {
     transform: translateY(8px);
+  }
+
+  .dropdown-menu {
+    border: 0px;
+  }
+
+  .admin-dropdown{
+    right: 10px;
   }
 }
 </style>
