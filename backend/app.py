@@ -4,6 +4,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_restx import Api, Resource
 from allClasses import *
+from os import environ
+from core_features.course import api as course
+from core_features.coursecat import api as coursecat
 
 app = Flask(__name__)
 api = Api(
@@ -13,7 +16,8 @@ api = Api(
     title="SCIS-UPSKILLING-Backend",
     description="",
 )
-#api.add_namespace(value)
+api.add_namespace(course)
+api.add_namespace(coursecat)
 
 
 CORS(app, supports_credentials=True)
@@ -30,6 +34,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 # ==================== TEST FUNCTIONS ====================#test_parser = api.parser()
+test_parser = api.parser()
 test_parser.add_argument("number1", help="First number to add")
 test_parser.add_argument("number2", help="Second number to add")
 @api.route("/test_endpoint", methods=["GET","POST"])
@@ -52,3 +57,5 @@ class Test(Resource):
                     "message": "Error bro"
                 }), 404
 # ====================  FUNCTIONS ====================#        
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
