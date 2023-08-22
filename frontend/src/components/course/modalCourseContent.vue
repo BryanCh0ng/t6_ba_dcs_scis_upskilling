@@ -44,6 +44,11 @@
               Available Slots: <br> <strong>{{ course.available_slots }}</strong>
             </div>
           </div>
+          <div class="pt-3 row" v-if="regCountExists">
+            <div class="col-6">
+              Registration Count: <br> <strong>{{ course.reg_count }}</strong>
+            </div>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -62,7 +67,12 @@ export default {
     courseAction
   },
   props: {
-    course: Object,
+    course: Object
+  },
+  computed: {
+    regCountExists() {
+      return this.course.reg_count !== null && this.course.reg_count !== undefined;
+    }
   }
 };
 </script>

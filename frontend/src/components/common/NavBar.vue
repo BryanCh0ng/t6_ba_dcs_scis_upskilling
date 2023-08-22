@@ -4,7 +4,7 @@
     <nav class="navbar navbar-expand-md">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">
-          <img src="../assets/smulogo.png" title="smu logo" class="navlogo" />
+          <!-- <img src="../assets/smulogo.png" title="smu logo" class="navlogo" /> -->
           <span class="system-name">
             <span class="vertical-line"></span>
             <!-- Vertical line -->

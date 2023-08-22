@@ -1,6 +1,5 @@
 <template>
   <div>
-    <search-filter :role="role"></search-filter>
 
     <div class="pt-5 container col-12 table-responsive">
       <h5 class="pb-3">Courses Available for Registration</h5>
@@ -78,19 +77,17 @@
 </template>
 
 <script>
-import searchFilter from "../../components/searchFilter.vue"
 import courseAction from '../../components/course/courseAction.vue';
 import courseCategoryBadge from '../../components/course/courseCategoryBadge.vue';
-import sortIcon from '../../components/sort-icon.vue';
+import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 
 export default {
   components: {
-    searchFilter, 
     courseAction,
     courseCategoryBadge,
     sortIcon,
-    modalCourseContent,
+    modalCourseContent
   },
   data() {
     return {
@@ -134,19 +131,9 @@ export default {
       ],
       sortColumn: 'name',
       sortDirection: 'asc',
-      role: 'admin',
-      selectedCourse: null
+      role: 'student',
+      selectedCourse: null,
     }
-  },
-  computed: {
-    pageCount() {
-      return Math.ceil(this.items.length / this.perPage);
-    },
-    paginatedItems() {
-      const startIndex = (this.currentPage - 1) * this.perPage;
-      const endIndex = startIndex + this.perPage;
-      return this.items.slice(startIndex, endIndex);
-    },
   },
   methods: {
     openModal(course) {

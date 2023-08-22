@@ -4,7 +4,7 @@ const routes = [
     {
         path: '/',
         name: 'Home',
-        component: () => import('../components/HelloWorld.vue'),
+        component: () => import('../components/common/HelloWorld.vue'),
         meta: {
             title: 'Home',
         },
@@ -23,6 +23,14 @@ const routes = [
       component: () => import('../views/course/viewCourse.vue'),
       meta: {
           title: 'View Course',
+      },
+    },
+    {
+      path: '/adminViewCourseReg',
+      name: 'adminViewCourseReg',
+      component: () => import('../views/course/adminViewCourseReg.vue'),
+      meta: {
+          title: 'Admin View Course (Registered)',
       },
     }
     // },
