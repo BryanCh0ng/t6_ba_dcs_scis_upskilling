@@ -27,42 +27,96 @@
                   <form @submit.prevent="onSubmit">
                     <dropdown-field
                       v-model="role"
-                      :default-placeholder="'Select a Role'">
+                      :default-placeholder="'Select a Role'"
+                    >
                       <option value="Student">Student</option>
                       <option value="Instructor">Instructor</option>
                       <option value="Trainer">External Trainer</option>
                     </dropdown-field>
 
-                    <input-field v-model="fullName" type="text" placeholder="Full Name"/>
+                    <input-field
+                      v-model="fullName"
+                      type="text"
+                      placeholder="Full Name"
+                    />
 
-                    <input-field v-model="email" type="email" placeholder="Email Address"/>
+                    <input-field
+                      v-model="email"
+                      type="email"
+                      placeholder="Email Address"
+                    />
 
                     <div v-if="role === 'Trainer'">
-                      <input-field v-model="organizationName" type="text" placeholder="Organization Name"/>
-                      <dropdown-field v-model="alumni" :default-placeholder="'Are you an alumni?'">
+                      <input-field
+                        v-model="organizationName"
+                        type="text"
+                        placeholder="Organization Name"
+                      />
+                      <dropdown-field
+                        v-model="alumni"
+                        :default-placeholder="'Are you an alumni?'"
+                      >
                         <option value="1">Yes</option>
                         <option value="0">No</option>
                       </dropdown-field>
                     </div>
 
                     <div>
-                      <div class="input-group password-field">
-                        <input v-model="password" :type="showPassword ? 'text' : 'password'" placeholder="Password" class="form-control border-0 shadow-sm px-4 field"/>
+                      <div class="input-group password-field mb-3">
+                        <input
+                          v-model="password"
+                          :type="showPassword ? 'text' : 'password'"
+                          placeholder="Password"
+                          class="form-control border-0 shadow-sm px-4 field"
+                        />
                         <div class="input-group-append">
                           <div class="input-group-text eye-icon-container">
-                            <span @click="togglePasswordVisibility" class="eye-icon">
-                              <font-awesome-icon :icon="
+                            <span
+                              @click="togglePasswordVisibility"
+                              class="eye-icon"
+                            >
+                              <font-awesome-icon
+                                :icon="
                                   showPassword
                                     ? ['fas', 'eye']
                                     : ['fas', 'eye-slash']
-                                "/>
+                                "
+                              />
                             </span>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                    <div class="input-group password-field">
+                      <input
+                        v-model="confirmpassword"
+                        :type="showConfirmPassword ? 'text' : 'password'"
+                        placeholder="Confirm New Password"
+                        class="form-control border-0 shadow-sm px-4 field"
+                      />
+                      <div class="input-group-append">
+                        <div class="input-group-text eye-icon-container">
+                          <span
+                            @click="toggleConfirmPasswordVisibility"
+                            class="eye-icon"
+                          >
+                            <font-awesome-icon
+                              :icon="
+                                showConfirmPassword
+                                  ? ['fas', 'eye']
+                                  : ['fas', 'eye-slash']
+                              "
+                            />
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      class="btn btn-block shadow-sm w-100 mt-5 field submitbtn"
+                    >
                       Sign Up
                     </button>
                     <p class="text-center mt-2">
@@ -102,9 +156,11 @@ export default {
       fullName: "",
       email: "",
       password: "",
+      confirmpassword: "",
       organizationName: "",
       alumni: "",
       showPassword: false,
+      showConfirmPassword: false,
       errorMessage: "",
     };
   },
@@ -114,6 +170,7 @@ export default {
       fullName: { required },
       email: { required, email },
       password: { required, minLength: minLength(8) },
+      confirmpassword: { required, minLength: minLength(8) },
     };
   },
   components: {
@@ -166,6 +223,10 @@ export default {
         return;
       }
 
+      if (this.confirmpassword != this.password) {
+        this.errorMessage = "Password and Confirm Password do not match.";
+      }
+
       this.performRegister();
     },
     async performRegister() {
@@ -191,6 +252,9 @@ export default {
     },
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
+    },
+    toggleConfirmPasswordVisibility() {
+      this.showConfirmPassword = !this.showConfirmPassword;
     },
   },
 };
@@ -224,7 +288,12 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.4); /* Adjust the color and opacity as needed */
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.4
+  ); /* Adjust the color and opacity as needed */
 }
 
 #logo {

@@ -32,7 +32,7 @@
                     <button
                       type="submit"
                       class="btn btn-block shadow-sm w-100 mt-5 field submitbtn"
-                    >Reset Password
+                    >Request reset link
                     </button>
                     <p class="text-center mt-2">
                       Back to
@@ -91,7 +91,7 @@ export default {
 
       // Check for empty fields
       if (!this.email) {
-        this.errorMessage = "Please ensure the email field is filled.";
+        this.errorMessage = "Please ensure the email field is filled and is valid.";
         return;
       }
       
@@ -100,10 +100,10 @@ export default {
         return;
       }
 
-      this.performReset();
+      this.sendResetLink();
     },
 
-    async performReset() {
+    async sendResetLink() {
       try {
         // Will need to update the flask api endpoint
         // Send login request
