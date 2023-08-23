@@ -39,7 +39,7 @@
   cursor: pointer;
 }
 
-.btn-secondary, .btn-secondary:hover, .btn-secondary:focus {
+.btn-secondary, .btn-secondary:hover, .btn-secondary:focus, .btn-primary, .btn-primary:hover, .btn-primary:focus {
   color: white;
   padding: 10px;
   border-radius: 10px;
@@ -64,4 +64,36 @@
   padding: 25px;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* --------------------------- TEXT ----------------------------------- */
+
+.text-grey {
+  color: grey
+}
+
+.two-lines {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
+
+.font-weight-bold {
+  font-weight: 500;
+}
+
+.bg-light-blue {
+  background-color: #007E94 !important;
+}
+
+.btn-blue-green {
+  background-color: #009490 !important;
+}
+
+.btn-edit {
+  background-color: #151c55 ;
+  color: #FFFFFF;
 }

@@ -8,11 +8,13 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { fas, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons'
 // import { far } from '@fortawesome/free-regular-svg-icons'
 import { fab } from '@fortawesome/free-brands-svg-icons'
-import "./assets/style.css" // css
+import "./assets/css/style.css" // css
+import { VuePaginate } from 'vue-paginate';
 
 library.add(fas, fab, faEye, faEyeSlash)
 
 createApp(App)
     .use(router)
+    .use(VuePaginate)
     .component('font-awesome-icon', FontAwesomeIcon)
     .mount('#app')
