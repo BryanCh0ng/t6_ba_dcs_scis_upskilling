@@ -124,7 +124,7 @@ class GetCourse(Resource):
 
 create_course_model = api.model("create_course_model", {
     "course_ID" : fields.Integer(description="Course ID", required=True),
-    "cousre_Name" : fields.String(description="Course Name", required=True),
+    "course_Name" : fields.String(description="Course Name", required=True),
     "course_Desc" : fields.String(description="Course Description", required=True),
     "coursecat_ID" : fields.Integer(description="Course Category ID", required=True)
 })
