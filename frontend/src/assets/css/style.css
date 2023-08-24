@@ -31,7 +31,14 @@
 }
 
 /* --------------------------- BUTTONS ----------------------------------- */
-.btn-success, .btn-success:hover, .btn-success:focus {
+.btn {
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.btn-success, .btn-success:hover, .btn-success:focus, .btn-success:active, .btn-success:focus-visible {
   background-color: #007E94;
   color: white;
   padding: 10px;
@@ -44,6 +51,14 @@
   padding: 10px;
   border-radius: 10px;
   cursor: pointer;
+}
+
+.btn-deactivate {
+  background-color: #eb0913 !important;
+}
+
+.btn-activate {
+  background-color: #11a633 !important;
 }
 
 /* --------------------------- MODAL ----------------------------------- */
@@ -96,4 +111,18 @@
 .btn-edit {
   background-color: #151c55 !important;
   color: #FFFFFF !important;
+}
+
+.nav-link:hover {
+  cursor: pointer;
+}
+
+.nav-pills, .nav-link.active, .nav-pills, .show>.nav-link, .nav-link {
+  color: #151C55 !important;
+}
+
+.nav-pills {
+  --bs-nav-pills-link-active-bg: white;
+  color: #151C55;
+  font-weight: 700;
 }

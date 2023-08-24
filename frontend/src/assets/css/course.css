@@ -1,7 +1,11 @@
-.course-row {
+.modal-course-cat {
+  margin-left:5px;
+}
+
+.view-course-details, .view-feedback-analysis {
   cursor: pointer;
 }
 
-.modal-course-cat {
-  margin-left:5px;
+.reject-reason-label {
+  margin-left: 10px;
 }

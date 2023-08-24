@@ -26,11 +26,19 @@ const routes = [
       },
     },
     {
-      path: '/adminViewCourseReg',
-      name: 'adminViewCourseReg',
-      component: () => import('../views/course/adminViewCourseReg.vue'),
+      path: '/adminViewCourse',
+      name: 'adminViewCourse',
+      component: () => import('../views/course/adminViewCourse.vue'),
       meta: {
-          title: 'Admin View Course (Registered)',
+          title: 'Admin View Course',
+      },
+    },
+    {
+      path: '/adminViewProposedCourse',
+      name: 'adminViewProposedCourse',
+      component: () => import('../views/course/adminViewProposedCourse.vue'),
+      meta: {
+          title: 'Admin View Proposed Course',
       },
     }
     // },
