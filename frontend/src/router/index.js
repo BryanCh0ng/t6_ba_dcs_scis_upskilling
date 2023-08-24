@@ -12,7 +12,7 @@ const routes = [
     {
       path: '/blacklistfilter',
       name: 'blacklist',
-      component: () => import('../components/BlacklistAttendanceSearchFilter.vue'),
+      component: () => import('../components/search/BlacklistAttendanceSearchFilter.vue'),
       meta: {
           title: 'Blacklist Attendencec Search Filter',
       },
@@ -20,7 +20,7 @@ const routes = [
   {
     path: '/commonsearchfilter',
     name: 'commonsearchfilter',
-    component: () => import('../components/CommonSearchFilter.vue'),
+    component: () => import('../components/search/CommonSearchFilter.vue'),
     meta: {
         title: 'common search filter',
     },

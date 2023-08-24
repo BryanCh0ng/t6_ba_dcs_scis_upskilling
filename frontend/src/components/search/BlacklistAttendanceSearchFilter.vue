@@ -17,7 +17,7 @@
 
 <script>
 // import { axiosClient } from "../api/axiosClient";
-import InputField from "./InputField.vue";
+import InputField from "../InputField.vue";
 
 export default({
     name: "SearchFilter",

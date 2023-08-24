@@ -4,17 +4,10 @@
             <form>
                 <div class="row">
                     <div class="col-sm">
-                        <input-field v-model="courseName" type="text" placeholder="Course Name"/>
+                        <input-field v-model="instructorName" type="text" placeholder="Instructor Name"/>
                     </div>
                     <div class="col-sm">
-                        <dropdown-field
-                        v-model="category"
-                        :default-placeholder="'Course Category'">
-                        <!-- <option value="Student">Student</option>
-                        <option value="Instructor">Instructor</option>
-                        <option value="Trainer">External Trainer</option> -->
-                        <option v-for="option in categoryDropdownOptions" :key="option" :value="option">{{ option }}</option>
-                        </dropdown-field>
+                        <input-field v-model="organizationName" type="text" placeholder="Organization Name"/>
                     </div>
                     <div class="col-sm col-lg-3">
                         <div class="d-flex justify-content-between">
@@ -29,39 +22,27 @@
 </template>
 
 <script>
-// import { axiosClient } from "../api/axiosClient";
-import InputField from "./InputField.vue";
-import DropdownField from "./DropdownField.vue";
-import CourseService from "@/api/services/CourseService.js"
+import InputField from "../InputField.vue";
 
 export default({
     name: "SearchFilter",
     data() {
         return {
-            courseName: "",
-            categoryDropdownOptions: [],
+            instructorName: "",
+            organizationName: "",
         };
     },
     components: {
         InputField,
-        DropdownField,
-    },
-    async mounted() {
-    await this.getAllCourses();
-    await this.searchFilterCourses();
     },
     methods: {
-        async getAllCourses() {
-        let response = await CourseService.getAllCourses();
-        this.courseList = response.data.course;
-        }
         resetFilter() {
-            this.courseName = "";
-            this.category = "";
+            this.instructorName = "";
+            this.organizationName = "";
         },
         searchFilter() {
-        //     console.log(this.courseName);
-        //     console.log(this.category);
+        //     console.log(this.instructorName);
+        //     console.log(this.organizationName);
 
             // reset filter when user clicks search
             this.resetFilter();

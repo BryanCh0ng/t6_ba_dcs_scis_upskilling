@@ -10,9 +10,6 @@
                         <dropdown-field
                         v-model="category"
                         :default-placeholder="'Course Category'">
-                        <!-- <option value="Student">Student</option>
-                        <option value="Instructor">Instructor</option>
-                        <option value="Trainer">External Trainer</option> -->
                         <option v-for="option in categoryDropdownOptions" :key="option" :value="option">{{ option }}</option>
                         </dropdown-field>
                     </div>
@@ -39,8 +36,9 @@
 
 <script>
 // import { axiosClient } from "../api/axiosClient";
-import DropdownField from "./DropdownField.vue";
-import InputField from "./InputField.vue";
+import DropdownField from "../DropdownField.vue";
+import InputField from "../InputField.vue";
+import CourseCategoryService from "@/api/services/CourseCategoryService.js"
 
 export default({
     name: "SearchFilter",
@@ -56,14 +54,16 @@ export default({
         DropdownField,
         InputField,
     },
+    async mounted() {
+        await this.fetchCategoryDropdownOptions(); // Fetch category options using the new service
+    },
     methods: {
         async fetchCategoryDropdownOptions() {
             try {
-                // flask api endpoint to get fetch course category
-                // const response = await axiosClient.get('');
-                // this.categoryDropdownOptions = response.data;
+                const categoryOptions = await CourseCategoryService.getAllCourseCategory(); // Use the CourseCategoryService
+                this.categoryDropdownOptions = categoryOptions;
             } catch (error) {
-                console.error('Error fetching dropdown options:', error);
+                console.error('Error fetching category dropdown options:', error);
             }
         },
         
