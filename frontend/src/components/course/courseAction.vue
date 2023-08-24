@@ -8,6 +8,8 @@
   <button class="btn btn-activate approve text-light font-weight-bold text-nowrap" v-else-if="status == 'Approve'">Approve</button>
   <button class="btn btn-danger reject text-light font-weight-bold text-nowrap" v-else-if="status == 'Reject'">Reject</button>
   <button class="btn btn-info open_for_voting text-light font-weight-bold text-nowrap" v-else-if="status == 'Open for Voting'">Open for Voting</button>
+  <button class="btn btn-danger close text-light font-weight-bold text-nowrap" v-else-if="status == 'Close'">Close</button>
+  <button class="btn btn-success open_for_registration text-light font-weight-bold text-nowrap" v-else-if="status == 'Open for Registration'">Open for Registration</button>
 </template>
   
 <script>

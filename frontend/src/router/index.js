@@ -40,6 +40,14 @@ const routes = [
       meta: {
           title: 'Admin View Proposed Course',
       },
+    },
+    {
+      path: '/adminVotingCampaign',
+      name: 'adminVotingCampaign',
+      component: () => import('../views/course/adminVotingCampaign.vue'),
+      meta: {
+          title: 'Admin View Voting Campaign',
+      },
     }
     // },
     // {

@@ -32,15 +32,7 @@
               <tbody>
                 <tr v-for="(course, key) in displayedCourses" :key="key">
                   <td class="name">
-                    <div class="col-12 d-flex align-items-center">
-                      <div class="text-nowrap">{{ course.name }}</div>
-                      <div class="ms-2">
-                        <course-category-badge :category="course.category"></course-category-badge>
-                      </div>
-                    </div>
-                    <div class="col-12 text-grey two-lines">
-                      {{ course.description }}
-                    </div>
+                    <course-name-desc :name="course.name" :category="course.category" :description="course.description"></course-name-desc>
                   </td>
                   <td class="reg_count">
                     {{ course.reg_count }}
@@ -71,7 +63,7 @@
             <p>No records found</p>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentPage" :totalItems="courses.length" :items-per-page="1" @page-change="handlePageChange" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-if="courses.length/itemsPerPage > 0" v-model="localCurrentPage" :totalItems="courses.length" :items-per-page="1" @page-change="handlePageChange" class="justify-content-center pagination-container"/>
       </div>
   
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'instructors' }">
@@ -110,7 +102,7 @@
             <p>No records found</p>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentPage" :totalItems="instructors.length" :items-per-page="1" @page-change="handlePageChange" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-if="instructors.length/itemsPerPage > 0" v-model="localCurrentPage" :totalItems="instructors.length" :items-per-page="1" @page-change="handlePageChange" class="justify-content-center pagination-container"/>
       </div>
     </div>
   </div>
@@ -118,18 +110,18 @@
   
 <script>
 import courseAction from '../../components/course/courseAction.vue';
-import courseCategoryBadge from '../../components/course/courseCategoryBadge.vue';
 import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
+import courseNameDesc from '../../components/course/courseNameDesc.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 
 export default {
   components: {
     courseAction,
-    courseCategoryBadge,
     sortIcon,
     modalCourseContent,
-    VueAwesomePaginate
+    VueAwesomePaginate,
+    courseNameDesc
   },
   data() {
     return {
