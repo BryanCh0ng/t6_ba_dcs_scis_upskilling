@@ -24,26 +24,13 @@
         <div class="collapse navbar-collapse navcontent" id="navbarNav">
           <ul class="navbar-nav ms-auto navbar-menu">
             <!-- Navigation Links -->
-            <li
-              v-for="link in navigationLinks"
-              :key="link.path"
-              class="nav-item"
-            >
-              <a
-                :class="{ active: isActiveLink(link.path) }"
-                class="nav-link"
-                :href="link.path"
-                >{{ link.label }}</a
-              >
+            <li v-for="link in navigationLinks" :key="link.path" class="nav-item">
+              <a :class="{ active: isActiveLink(link.path) }" class="nav-link" :href="link.path">{{ link.label }}</a>
             </li>
 
             <!-- Login Button (Visible when not logged in) -->
             <li class="nav-item" v-if="!isLoggedIn">
-              <button
-                type="button"
-                class="btn loginbtn"
-                @click="redirectToLogin"
-              >
+              <button type="button" class="btn loginbtn" @click="redirectToLogin">
                 Login
               </button>
             </li>
@@ -53,34 +40,16 @@
               <!-- Dropdown for displaying user information and actions -->
               <div class="nav-link dropdown">
                 <!-- Dropdown toggle button -->
-                <span
-                  class="dropdown-toggle btn dropdownbtn"
-                  id="userDropdown"
-                  role="button"
-                  @click="toggleUserDropdown"
-                  aria-expanded="false"
-                >
-                  {{ username }}
-                  <!-- Display the user's name -->
+                <span class="dropdown-toggle btn dropdownbtn" id="userDropdown" role="button" @click="toggleUserDropdown" aria-expanded="false">
+                  {{ username }} <!-- Display the user's name -->
                 </span>
+
                 <!-- Dropdown content container -->
-                <div
-                  v-if="showUserDropdown"
-                  class="dropdown-content"
-                  :class="{ 'admin-dropdown': userRole === 'admin' }"
-                >
+                <div v-if="showUserDropdown" class="dropdown-content" :class="{ 'admin-dropdown': userRole === 'admin' }">
                   <ul class="dropdown-menu" aria-labelledby="userDropdown">
                     <!-- Loop through role-specific dropdown items -->
-                    <li
-                      v-for="(item, index) in roleSpecificDropdownItems"
-                      :key="index"
-                    >
-                      <a
-                        :class="{ active: isActiveLink(item.path) }"
-                        class="nav-link"
-                        :href="item.path"
-                        @click="item.action ? item.action() : null"
-                      >
+                    <li v-for="(item, index) in roleSpecificDropdownItems" :key="index">
+                      <a :class="{ active: isActiveLink(item.path) }" class="nav-link" :href="item.path" @click="item.action ? item.action() : null">
                         {{ item.label }}
                       </a>
                     </li>
@@ -246,17 +215,16 @@ export default {
 
 .navbar a:hover,
 .navbar a:active {
-  font-weight: bold; /* Make the text bold when focused or active */
+  font-weight: bold;
   text-decoration: underline;
 }
 
 .navbar a.active {
-  font-weight: bold; /* Make the text bold for active links */
-  position: relative; /* Add position relative to enable absolute positioning of the line */
+  font-weight: bold;
+  position: relative; 
   text-decoration: underline;
 }
 
-/* Remove underline for the system name */
 .no-underline,
 .no-underline.hover {
   text-decoration: none !important;
@@ -271,7 +239,6 @@ export default {
   display: flex;
   align-items: center;
   margin-left: 10px;
-  /* Add some spacing between the logo and the system name */
   font-weight: bold;
 }
 
@@ -281,7 +248,6 @@ export default {
   margin-right: 10px;
 }
 
-/* login button */
 .loginbtn,
 .loginbtn:hover,
 .loginbtn:focus {
@@ -327,8 +293,8 @@ export default {
 
 .dropdown-content {
   position: absolute;
-  top: 80%; /* This will position the content below the dropdown button */
-  left: -22px; /* Adjust left or right value based on your design */
+  top: 80%; 
+  left: -22px; 
   z-index: 1;
   font-size: 18px;
 }
@@ -343,13 +309,12 @@ export default {
   background-color: transparent;
 }
 
-/* Add this style to make the dropdown content stack vertically */
 .dropdown-content ul {
   display: flex;
   flex-direction: column;
-  align-items: flex-end; /* Align items to the start of the column */
-  padding: 0; /* Reset padding to avoid unexpected spacing */
-  margin: 0; /* Reset margin to avoid unexpected spacing */
+  align-items: flex-end; 
+  padding: 0; 
+  margin: 0;
 }
 
 .dropdown-content li {
@@ -367,7 +332,7 @@ export default {
   .dropdown-content {
     position: absolute;
     transform: translateY(5px);
-    left: -27px; /* Adjust left or right value based on your design */
+    left: -27px;
     z-index: 1;
     font-size: 18px;
   }

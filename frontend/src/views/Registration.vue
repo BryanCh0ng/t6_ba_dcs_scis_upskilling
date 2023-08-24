@@ -2,142 +2,64 @@
   <div class="full-screen-container" id="login">
     <div class="content">
       <div class="row no-gutter">
-        <!-- The image half -->
-        <div class="col-md-6 d-none d-md-flex bg-image">
-          <div class="overlay"></div>
-        </div>
+        
+        <image-half></image-half>
 
-        <!-- The content half -->
-        <div class="col-md-6 bg-light">
-          <div class="login-form d-flex align-items-center py-5">
-            <!-- Login Form -->
-            <div class="container">
-              <div class="row">
-                <div class="col-lg-10 col-xl-7 mx-auto">
-                  <div class="text-center">
-                    <img
-                      src="../assets/smulogo.png"
-                      title="smu logo"
-                      id="logo"
-                    />
-                  </div>
+        <!-- Form content half -->
+        <form-container>
+          <!-- <template v-slot:logo>
+            <img src="../assets/smulogo.png" title="smu logo" id="logo"/>
+          </template> -->
+            <error-message :error-message="errorMessage" />
 
-                  <error-message :error-message="errorMessage" />
+            <form @submit.prevent="onSubmit">
+              <dropdown-field v-model="role" :default-placeholder="'Select a Role'">
+                <option value="Student">Student</option>
+                <option value="Instructor">Instructor</option>
+                <option value="Trainer">External Trainer</option>
+              </dropdown-field>
 
-                  <form @submit.prevent="onSubmit">
-                    <dropdown-field
-                      v-model="role"
-                      :default-placeholder="'Select a Role'"
-                    >
-                      <option value="Student">Student</option>
-                      <option value="Instructor">Instructor</option>
-                      <option value="Trainer">External Trainer</option>
-                    </dropdown-field>
+              <input-field v-model="fullName" type="text" placeholder="Full Name"/>
 
-                    <input-field
-                      v-model="fullName"
-                      type="text"
-                      placeholder="Full Name"
-                    />
+              <input-field v-model="email" type="email" placeholder="Email Address"/>
 
-                    <input-field
-                      v-model="email"
-                      type="email"
-                      placeholder="Email Address"
-                    />
+              <div v-if="role === 'Trainer'">
+                <input-field v-model="organizationName" type="text" placeholder="Organization Name"/>
 
-                    <div v-if="role === 'Trainer'">
-                      <input-field
-                        v-model="organizationName"
-                        type="text"
-                        placeholder="Organization Name"
-                      />
-                      <dropdown-field
-                        v-model="alumni"
-                        :default-placeholder="'Are you an alumni?'"
-                      >
-                        <option value="1">Yes</option>
-                        <option value="0">No</option>
-                      </dropdown-field>
-                    </div>
-
-                    <div>
-                      <div class="input-group password-field mb-3">
-                        <input
-                          v-model="password"
-                          :type="showPassword ? 'text' : 'password'"
-                          placeholder="Password"
-                          class="form-control border-0 shadow-sm px-4 field"
-                        />
-                        <div class="input-group-append">
-                          <div class="input-group-text eye-icon-container">
-                            <span
-                              @click="togglePasswordVisibility"
-                              class="eye-icon"
-                            >
-                              <font-awesome-icon
-                                :icon="
-                                  showPassword
-                                    ? ['fas', 'eye']
-                                    : ['fas', 'eye-slash']
-                                "
-                              />
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="input-group password-field">
-                      <input
-                        v-model="confirmpassword"
-                        :type="showConfirmPassword ? 'text' : 'password'"
-                        placeholder="Confirm New Password"
-                        class="form-control border-0 shadow-sm px-4 field"
-                      />
-                      <div class="input-group-append">
-                        <div class="input-group-text eye-icon-container">
-                          <span
-                            @click="toggleConfirmPasswordVisibility"
-                            class="eye-icon"
-                          >
-                            <font-awesome-icon
-                              :icon="
-                                showConfirmPassword
-                                  ? ['fas', 'eye']
-                                  : ['fas', 'eye-slash']
-                              "
-                            />
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <button
-                      type="submit"
-                      class="btn btn-block shadow-sm w-100 mt-5 field submitbtn"
-                    >
-                      Sign Up
-                    </button>
-                    <p class="text-center mt-2">
-                      Already have an account?
-                      <router-link to="/login">Sign In</router-link>
-                    </p>
-                  </form>
-                </div>
+                <dropdown-field v-model="alumni" :default-placeholder="'Are you an alumni?'">
+                  <option value="1">Yes</option>
+                  <option value="0">No</option>
+                </dropdown-field>
               </div>
-            </div>
-          </div>
-        </div>
+
+              <password-field :value="password" placeholder="Password" @update:value="password = $event" class="mb-3"/>
+
+              <password-field :value="confirmpassword" placeholder="Confirm Password" @update:value="confirmpassword = $event"/>
+
+              <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                Sign Up
+              </button>
+
+              <p class="text-center mt-2">
+                Already have an account?<router-link to="/login">Sign In</router-link>
+              </p>
+            </form>
+        </form-container>
+        
       </div>
     </div>
+    <success-modal :show="showSuccessModal" :message="successMessage" @close="hideSuccessModal"/>
   </div>
 </template>
 
 <script>
+import ImageHalf from "../components/ImageHalf.vue";
+import SuccessModal from "../components/SuccessModal.vue";
+import FormContainer from "../components/CommonFormContainer.vue";
 import ErrorMessage from "../components/ErrorMessage.vue";
 import DropdownField from "../components/DropdownField.vue";
 import InputField from "../components/InputField.vue";
+import PasswordField from "../components/PasswordField.vue";
 import { required, email, minLength } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 // import { axiosClient } from "../api/axiosClient";
@@ -159,9 +81,9 @@ export default {
       confirmpassword: "",
       organizationName: "",
       alumni: "",
-      showPassword: false,
-      showConfirmPassword: false,
       errorMessage: "",
+      showSuccessModal: false,
+      successMessage: "Your account has been successfully created."
     };
   },
   validations() {
@@ -174,9 +96,13 @@ export default {
     };
   },
   components: {
+    ImageHalf,
+    SuccessModal,
+    FormContainer,
     ErrorMessage,
     DropdownField,
     InputField,
+    PasswordField,
   },
   methods: {
     onSubmit() {
@@ -189,6 +115,7 @@ export default {
       //   fullName: this.fullName,
       //   email: this.email,
       //   password: this.password,
+      //   confirmpassword: this.confirmpassword,
       //   organizationName: this.organizationName,
       //   alumni: this.alumni,
       // });
@@ -223,8 +150,9 @@ export default {
         return;
       }
 
-      if (this.confirmpassword != this.password) {
+      if (this.confirmpassword !== this.password) {
         this.errorMessage = "Password and Confirm Password do not match.";
+        return;
       }
 
       this.performRegister();
@@ -238,7 +166,7 @@ export default {
         //   password: this.password,
         // });
 
-        console.log("Register successful");
+        this.showSuccessModal = true;
         // console.log(response.data);
       } catch (error) {
         this.errorMessage = "Register failed. Please check your credentials.";
@@ -250,11 +178,9 @@ export default {
         this.role = ""; // Clear the placeholder value when the user interacts
       }
     },
-    togglePasswordVisibility() {
-      this.showPassword = !this.showPassword;
-    },
-    toggleConfirmPasswordVisibility() {
-      this.showConfirmPassword = !this.showConfirmPassword;
+    hideSuccessModal() {
+      this.showSuccessModal = false;
+      this.$router.push('/login');
     },
   },
 };
@@ -268,62 +194,5 @@ export default {
 
 body {
   overflow: hidden;
-}
-
-.login-form,
-.image {
-  min-height: 100vh;
-}
-
-.bg-image {
-  background-image: url("../assets/smu_building.jpg");
-  background-size: cover;
-  background-position: center center;
-  position: relative; /* Add this to make the overlay relative to the .bg-image div */
-}
-
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(
-    0,
-    0,
-    0,
-    0.4
-  ); /* Adjust the color and opacity as needed */
-}
-
-#logo {
-  width: 380px;
-  margin-bottom: 40px;
-}
-
-/* For the visibility of the password */
-.password-toggle {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  color: black;
-}
-
-.eye-icon-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%; /* Match the height of the input field */
-  padding-right: 8px; /* Add spacing between the input and the icon */
-  cursor: pointer;
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 0px;
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-  background-color: white;
-  border: 0px;
-  width: 40px;
 }
 </style>

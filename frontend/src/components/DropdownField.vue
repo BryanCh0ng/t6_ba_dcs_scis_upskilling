@@ -13,11 +13,11 @@ import { ref, watch } from 'vue';
 
 export default {
   props: {
-    modelValue: String, // Change prop name to match v-model binding
+    modelValue: String, 
     defaultPlaceholder: String,
   },
   setup(props, { emit }) {
-    const selectedValue = ref(props.modelValue || ''); // Set initial value
+    const selectedValue = ref(props.modelValue || '');
 
     watch(
       () => props.modelValue,
@@ -38,7 +38,6 @@ export default {
 </script>
 
 <style scoped>
-/* Styles specific to DropdownField component */
 .dropdown-field {
   position: relative;
   /* display: inline-block; */
@@ -50,6 +49,6 @@ export default {
   right: 10px;
   transform: translateY(-50%);
   pointer-events: none;
-  color: #999; /* Adjust the color as needed */
+  color: #999;
 }
 </style>
