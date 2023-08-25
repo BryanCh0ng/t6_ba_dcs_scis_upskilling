@@ -2,6 +2,7 @@ import datetime
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from sqlalchemy import Time
 import os
 
 app = Flask(__name__)
@@ -306,8 +307,8 @@ class RunCourse(db.Model):
     rcourse_ID = db.Column(db.Integer, nullable=False, primary_key=True)
     run_Startdate = db.Column(db.Date, nullable=False)
     run_Enddate = db.Column(db.Date, nullable=False)
-    run_Starttime = db.Column(db.String(10), nullable=False)
-    run_Endtime = db.Column(db.String(10), nullable=False)
+    run_Starttime = db.Column(Time, nullable=False)
+    run_Endtime = db.Column(Time, nullable=False)
     instructor_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'), nullable=False)
     course_Format = db.Column(db.String(20), nullable=False)
     course_Venue = db.Column(db.String(255), nullable=False)
@@ -318,8 +319,8 @@ class RunCourse(db.Model):
     class_Duration = db.Column(db.Integer, nullable=False)
     reg_Startdate = db.Column(db.Date, nullable=False)
     reg_Enddate = db.Column(db.Date, nullable=False)
-    reg_Starttime = db.Column(db.String(10), nullable=False)
-    reg_Endtime = db.Column(db.String(10), nullable=False)
+    reg_Starttime = db.Column(Time, nullable=False)
+    reg_Endtime = db.Column(Time, nullable=False)
     template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'), nullable=False)
     course_ID = db.Column(db.Integer, db.ForeignKey('course.course_ID'), nullable=False)
     course_Status = db.Column(db.String(255), nullable=False)

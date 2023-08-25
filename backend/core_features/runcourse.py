@@ -27,14 +27,14 @@ class GetAllRunCourses(Resource):
         
         db.session.close()
         if len(runCourseList):
-            # for course in runCourseList:
-            #     course.run_starttime = course.run_Starttime.strftime('%H:%M:%S')
+            for course in runCourseList:
+                course.run_Starttime = course.run_Starttime.strftime('%H:%M:%S')
 
-            #     course.run_endtime = course.run_Endtime.strftime('%H:%M:%S')
+                course.run_Endtime = course.run_Endtime.strftime('%H:%M:%S')
 
-            #     course.reg_Starttime = course.run_Endtime.strftime('%H:%M:%S')
+                course.reg_Starttime = course.reg_Starttime.strftime('%H:%M:%S')
 
-            #     course.reg_Endtime = course.run_Endtime.strftime('%H:%M:%S')
+                course.reg_Endtime = course.reg_Endtime.strftime('%H:%M:%S')
                
             return jsonify(
                 {
