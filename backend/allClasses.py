@@ -94,14 +94,14 @@ class Course(db.Model):
     __tablename__ = 'course'
 
     course_ID = db.Column(db.Integer, nullable=False, primary_key=True)
-    cousre_Name = db.Column(db.String(255), nullable=False)
+    course_Name = db.Column(db.String(255), nullable=False)
     course_Desc = db.Column(db.String(800), nullable=False)
     coursecat_ID = db.Column(db.Integer, db.ForeignKey('coursecategory.coursecat_ID'), nullable=False)
 
 
     def __init__(self, course_ID, cousre_Name, course_Desc, coursecat_ID):
         self.course_ID = course_ID
-        self.cousre_Name = cousre_Name
+        self.course_Name = cousre_Name
         self.course_Desc = course_Desc
         self.coursecat_ID = coursecat_ID        
 
@@ -457,6 +457,27 @@ class Blacklist(db.Model):
 
 
 
+    def json(self):
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            result[column] = getattr(self, column)
+        return result
+
+class Message(db.Model):
+    __tablename__ = 'message'
+
+    msg_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
+    user_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'),  nullable=False)
+    msg_Subject = db.Column(db.String(255), nullable=False)
+    msg_Body = db.Column(db.String(800), nullable=False)
+
+    def __init__(self, user_ID, msg_Subject, msg_Body):
+        self.user_ID = user_ID
+        self.msg_Subject = msg_Subject
+        self.msg_Body = msg_Body
+
+    
     def json(self):
         columns = self.__mapper__.column_attrs.keys()
         result = {}
