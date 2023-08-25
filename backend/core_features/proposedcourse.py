@@ -20,7 +20,10 @@ class GetAllProposedCourses(Resource):
     def get(self):
         arg = retrieve_all_proposedcourses.parse_args().get("course_id")
         course_id = arg if arg else ""
-        proposedCourseList = ProposedCourse.query.filter(ProposedCourse.course_ID.like(course_id)).all()
+        if course_id == "":
+            proposedCourseList = ProposedCourse.query.filter(ProposedCourse.course_ID.contains(course_id)).all()
+        else:
+            proposedCourseList = ProposedCourse.query.filter(ProposedCourse.course_ID.like(course_id)).all()
         db.session.close()
         if len(proposedCourseList):
             return jsonify(
