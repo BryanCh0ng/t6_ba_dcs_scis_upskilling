@@ -1010,3 +1010,17 @@ CREATE TABLE IF NOT EXISTS `blacklist`(
 INSERT INTO blacklist VALUES 
 	(1, 56), 
 	(2, 57);
+
+DROP TABLE IF EXISTS `contactus`;
+CREATE TABLE IF NOT EXISTS `contactus` (
+    contactus_id int NOT NULL AUTO_INCREMENT,
+    user_id int NOT NULL,
+    subject varchar(255) NOT NULL,
+    message varchar(1000) NOT NULL,
+    PRIMARY KEY (`contactus_id`),
+	FOREIGN KEY (user_id) REFERENCES user(user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO contactus VALUES 
+    (1, 1, "question", "question"),
+    (2, 2, "question", "question");
