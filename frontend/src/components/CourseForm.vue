@@ -246,6 +246,7 @@
 <script>
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import CourseCategoryService from "@/api/services/CourseCategoryService.js"
 
 export default {
   name: "CourseForm",
@@ -282,12 +283,17 @@ export default {
       showSuccessModal: false,
     };
   },
-  mounted() {
-    this.fetchCourseCategories();
-    this.fetchFeedbackTemplate();
+  async mounted() {
+    await this.fetchCourseCategories();
   },
   methods: {
-    
+    async fetchCourseCategories() {
+      try {
+        this.courseCats = await CourseCategoryService.getAllCourseCategory(); // Use the CourseCategoryService
+      } catch (error) {
+        console.error('Error fetching course categories:', error);
+      }
+    },
     submitForm() {
       //Conduct Form validation here
 
