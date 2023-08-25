@@ -4,7 +4,7 @@ const routes = [
     {
         path: '/',
         name: 'Home',
-        component: () => import('../components/HelloWorld.vue'),
+        component: () => import('../components/common/HelloWorld.vue'),
         meta: {
             title: 'Home',
         },
@@ -18,11 +18,19 @@ const routes = [
       },
     },
     {
-      path: '/viewCourse',
-      name: 'viewCourse',
-      component: () => import('../views/course/viewCourse.vue'),
+      path: '/studentViewCourse',
+      name: 'studentViewCourse',
+      component: () => import('../views/course/studentViewCourse.vue'),
       meta: {
           title: 'View Course',
+      },
+    },
+    {
+      path: '/studentViewRecommendations',
+      name: 'studentViewRecommendations',
+      component: () => import('../views/course/studentViewRecommendations.vue'),
+      meta: {
+          title: 'View Recommendations',
       },
     }
     // },
