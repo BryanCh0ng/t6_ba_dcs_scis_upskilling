@@ -16,43 +16,41 @@ retrieve_all_courses.add_argument("course_name", help="Enter course name")
 @api.route("/get_all_courses")
 @api.doc(description="Get all courses")
 class GetAllCourses(Resource):
-    @api.expect(retrieve_all_courses)
-    def get(self):
-        arg = retrieve_all_courses.parse_args().get("course_name")
-        course_Name = arg if arg else ""
-        courseList = Course.query.filter(Course.course_Name.contains(course_Name)).all()
-        db.session.close()
-        if len(courseList):
-            return jsonify(
-                {
-                    "code": 200,
-                    "data": {
-                        "course": [course.json() for course in courseList]
-                    }
-                }
-            )
-
-        return json.loads(json.dumps({"message": "There is no such course"}, default=str)), 404
+	@api.expect(retrieve_all_courses)
+	def get(self):
+		arg = retrieve_all_courses.parse_args().get("course_name")
+		course_Name = arg if arg else ""
+		courseList = Course.query.filter(Course.course_Name.contains(course_Name)).all()
+		db.session.close()
+		if len(courseList):
+			return jsonify(
+				{
+					"code": 200,
+					"data": {
+						"course": [course.json() for course in courseList]
+					}
+				}
+			)
+		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
 
 retrieve_all_courses_hr = api.parser()
 @api.route("/get_all_courses_admin")
 @api.doc(description="Get all courses (Admin)")
 class GetAllCoursesHR(Resource):
-    @api.expect(retrieve_all_courses_hr)
-    def get(self):
-        courseList = Course.query.all()
-        db.session.close()
-        if len(courseList):
-            return jsonify(
-                {
-                    "code": 200,
-                    "data": {
-                        "course": [course.json() for course in courseList]
-                    }
-                }
-            )
-
-        return json.loads(json.dumps({"message": "There is no such course"}, default=str)), 404
+	@api.expect(retrieve_all_courses_hr)
+	def get(self):
+		courseList = Course.query.all()
+		db.session.close()
+		if len(courseList):
+			return jsonify(
+				{
+					"code": 200,
+					"data": {
+						"course": [course.json() for course in courseList]
+					}
+				}
+			)
+		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
 
 retrieve_all_courses_filter_search = api.parser()
 retrieve_all_courses_filter_search.add_argument("course_name", help="Enter course name")
@@ -60,26 +58,25 @@ retrieve_all_courses_filter_search.add_argument("coursecat_id", help="Enter cour
 @api.route("/retrieve_all_courses_filter_search")
 @api.doc(description="Get all courses filter + search")
 class GetAllCoursesFilterSearch(Resource):
-    @api.expect(retrieve_all_courses_filter_search)
-    def get(self):
-        arg = retrieve_all_courses.parse_args().get("course_name")
-        course_Name = arg if arg else ""
-        arg2 = retrieve_all_courses_filter_search.parse_args().get("coursecat_id")
-        coursecat_ID = arg2 if arg2 else ""
-        courseList = Course.query.filter(Course.course_Name.contains(course_Name), Course.coursecat_ID.contains(coursecat_ID)).all()
-        db.session.close()
-        if len(courseList):
-            return jsonify(
-                {
-                    "code": 200,
-                    "data": {
-                        "course": [course.json() for course in courseList]
+	@api.expect(retrieve_all_courses_filter_search)
+	def get(self):
+		arg = retrieve_all_courses.parse_args().get("course_name")
+		course_Name = arg if arg else ""
+		arg2 = retrieve_all_courses_filter_search.parse_args().get("coursecat_id")
+		coursecat_ID = arg2 if arg2 else ""
+		courseList = Course.query.filter(Course.course_Name.contains(course_Name), Course.coursecat_ID.contains(coursecat_ID)).all()
+		db.session.close()
+		if len(courseList):
+			return jsonify(
+				{
+					"code": 200,
+					"data": {
+						"course": [course.json() for course in courseList]
 
-                    }
-                }
-            )
-
-        return json.loads(json.dumps({"message": "There is no such course" }, default=str)), 404
+					}
+				}
+			)
+		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
 
 delete_course = api.parser()
 delete_course.add_argument("course_id", help="Enter course id")

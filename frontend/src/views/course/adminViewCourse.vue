@@ -110,6 +110,7 @@ import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
 import courseDateTime from '../../components/course/courseDateTime.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
+import { getAllCourseDetails } from '../../scripts/course/GetAllCourseDetails.js';
 
 export default {
   components: {
@@ -210,7 +211,11 @@ export default {
       const endIndex = startIndex + this.itemsPerPage;
       return this.instructors.slice(startIndex, endIndex);
     }
-  }
+  },
+  created() {
+    const response = getAllCourseDetails();
+    console.log(response)
+  },
   }
 </script>
 
