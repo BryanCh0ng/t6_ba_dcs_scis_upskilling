@@ -38,12 +38,7 @@
                     {{ course.reg_count }}
                   </td>
                   <td class="closing_date">
-                    <div class="col-12">
-                      {{ course.closing_date }}
-                    </div>
-                    <div class="col-12 text-grey">
-                      {{ course.closing_time }}
-                    </div>
+                    <course-date-time :date="course.closing_date" :time="course.closing_time"></course-date-time>
                   </td>
                   <td>{{ course.status }}</td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
@@ -63,7 +58,7 @@
             <p>No records found</p>
           </div>
         </div>
-        <vue-awesome-paginate v-if="courses.length/itemsPerPage > 0" v-model="localCurrentPage" :totalItems="courses.length" :items-per-page="1" @page-change="handlePageChange" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-if="courses.length/itemsPerPage > 0" v-model="localCurrentPageCourses" :totalItems="courses.length" :items-per-page="1" @page-change="handlePageChangeCourses" class="justify-content-center pagination-container"/>
       </div>
   
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'instructors' }">
@@ -102,7 +97,7 @@
             <p>No records found</p>
           </div>
         </div>
-        <vue-awesome-paginate v-if="instructors.length/itemsPerPage > 0" v-model="localCurrentPage" :totalItems="instructors.length" :items-per-page="1" @page-change="handlePageChange" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-if="instructors.length/itemsPerPage > 0" v-model="localCurrentPageInstructors" :totalItems="instructors.length" :items-per-page="1" @page-change="handlePageChangeInstructors" class="justify-content-center pagination-container"/>
       </div>
     </div>
   </div>
@@ -113,6 +108,7 @@ import courseAction from '../../components/course/courseAction.vue';
 import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
+import courseDateTime from '../../components/course/courseDateTime.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 
 export default {
@@ -121,7 +117,8 @@ export default {
     sortIcon,
     modalCourseContent,
     VueAwesomePaginate,
-    courseNameDesc
+    courseNameDesc,
+    courseDateTime
   },
   data() {
     return {
@@ -179,7 +176,8 @@ export default {
       sortDirection: 'asc',
       selectedCourse: null,
       itemsPerPage: 1,
-      localCurrentPage: 1,
+      localCurrentPageCourses: 1,
+      localCurrentPageInstructors: 1,
       activeTab: 'courses'
     }
   },
@@ -192,19 +190,23 @@ export default {
       this.selectedCourse = null;
       this.showModal = false;
     },
-    handlePageChange(newPage) {
-      this.localCurrentPage = newPage;
+    handlePageChangeInstructors(newPage) {
+      this.localCurrentPageInstructors = newPage;
+      this.$emit('page-change', newPage);
+    },
+    handlePageChangeCourses(newPage) {
+      this.localCurrentPageCourses = newPage;
       this.$emit('page-change', newPage);
     },
   },
   computed: {
     displayedCourses() {
-      const startIndex = (this.localCurrentPage - 1) * this.itemsPerPage;
+      const startIndex = (this.localCurrentPageCourses - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
       return this.courses.slice(startIndex, endIndex);
     },
     displayedInstructors() {
-      const startIndex = (this.localCurrentPage - 1) * this.itemsPerPage;
+      const startIndex = (this.localCurrentPageInstructors - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
       return this.instructors.slice(startIndex, endIndex);
     }

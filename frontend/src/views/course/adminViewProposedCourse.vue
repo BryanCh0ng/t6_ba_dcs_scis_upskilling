@@ -53,7 +53,7 @@
             <p>No records found</p>
           </div>
         </div>
-        <vue-awesome-paginate v-if="pending_courses.length/itemsPerPage > 0" v-model="localCurrentPage" :totalItems="pending_courses.length" :items-per-page="1" @page-change="handlePageChange" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-if="pending_courses.length/itemsPerPage > 0" v-model="localCurrentPagePending" :totalItems="pending_courses.length" :items-per-page="1" @page-change="handlePageChangePending" class="justify-content-center pagination-container"/>
       </div>
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'approved_rejected' }">
         <div class="pt-5 container col-12 table-responsive">
@@ -98,7 +98,7 @@
             <p>No records found</p>
           </div>
         </div>
-        <vue-awesome-paginate v-if="proposed_courses.length/itemsPerPage > 0" v-model="localCurrentPage" :totalItems="proposed_courses.length" :items-per-page="1" @page-change="handlePageChange" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-if="proposed_courses.length/itemsPerPage > 0" v-model="localCurrentPageProposed" :totalItems="proposed_courses.length" :items-per-page="1" @page-change="handlePageChangeProposed" class="justify-content-center pagination-container"/>
       </div>
     </div>
     <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
@@ -166,7 +166,8 @@ export default {
       sortDirection: 'asc',
       selectedCourse: null,
       itemsPerPage: 1,
-      localCurrentPage: 1,
+      localCurrentPagePending: 1,
+      localCurrentPageProposed: 1,
       activeTab: 'submitted'
     }
   },
@@ -179,8 +180,12 @@ export default {
       this.selectedCourse = null;
       this.showModal = false;
     },
-    handlePageChange(newPage) {
-      this.localCurrentPage = newPage;
+    handlePageChangePending(newPage) {
+      this.localCurrentPagePending = newPage;
+      this.$emit('page-change', newPage);
+    },
+    handlePageChangeProposed(newPage) {
+      this.localCurrentPageProposed = newPage;
       this.$emit('page-change', newPage);
     },
     openReject() {
@@ -192,12 +197,12 @@ export default {
   },
   computed: {
     displayedPendingCourses() {
-      const startIndex = (this.localCurrentPage - 1) * this.itemsPerPage;
+      const startIndex = (this.localCurrentPagePending - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
       return this.pending_courses.slice(startIndex, endIndex);
     },
     displayedProposedCourses() {
-      const startIndex = (this.localCurrentPage - 1) * this.itemsPerPage;
+      const startIndex = (this.localCurrentPageProposed - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
       return this.proposed_courses.slice(startIndex, endIndex);
     }
