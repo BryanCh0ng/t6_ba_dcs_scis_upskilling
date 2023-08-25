@@ -34,13 +34,13 @@
                     <course-name-desc :name="reg_course.name" :category="reg_course.category" :description="reg_course.description"></course-name-desc>
                   </td>
                   <td class="start_date">
-                    <course-date :date="reg_course.start_date" :time="reg_course.start_time"></course-date>
+                    <course-date-time :date="reg_course.start_date" :time="reg_course.start_time"></course-date-time>
                   </td>
                   <td class="end_date">
-                    <course-date :date="reg_course.end_date" :time="reg_course.end_time"></course-date>
+                    <course-date-time :date="reg_course.end_date" :time="reg_course.end_time"></course-date-time>
                   </td>
                   <td class="closing_date">
-                    <course-date :date="reg_course.closing_date" :time="reg_course.closing_time"></course-date>
+                    <course-date-time :date="reg_course.closing_date" :time="reg_course.closing_time"></course-date-time>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(reg_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                   <td><course-action :status="reg_course.status" :id="reg_course.id"></course-action></td>
@@ -168,7 +168,7 @@ import courseAction from '../../components/course/courseAction.vue';
 import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
-import courseDate from '../../components/course/courseDate.vue';
+import courseDateTime from '../../components/course/courseDateTime.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 
 export default {
@@ -178,7 +178,7 @@ export default {
     modalCourseContent,
     VueAwesomePaginate,
     courseNameDesc,
-    courseDate
+    courseDateTime
   },
   data() {
     return {

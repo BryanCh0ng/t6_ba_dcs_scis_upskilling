@@ -25,13 +25,13 @@
                 <course-name-desc :name="course.name" :category="course.category" :description="course.description"></course-name-desc>
               </td>
               <td class="start_date">
-                <course-date :date="course.start_date" :time="course.start_time"></course-date>
+                <course-date-time :date="course.start_date" :time="course.start_time"></course-date-time>
               </td>
               <td class="end_date">
-                <course-date :date="course.end_date" :time="course.end_time"></course-date>
+                <course-date-time :date="course.end_date" :time="course.end_time"></course-date-time>
               </td>
               <td class="closing_date">
-                <course-date :date="course.closing_date" :time="course.closing_time"></course-date>
+                <course-date-time :date="course.closing_date" :time="course.closing_time"></course-date-time>
               </td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
               <td><course-action :status="course.status" :id="course.id"></course-action></td>
@@ -59,7 +59,7 @@ import courseAction from '../../components/course/courseAction.vue';
 import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
-import courseDate from '../../components/course/courseDate.vue';
+import courseDateTime from '../../components/course/courseDateTime.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 
 export default {
@@ -69,7 +69,7 @@ export default {
     modalCourseContent,
     courseNameDesc,
     VueAwesomePaginate,
-    courseDate
+    courseDateTime
   },
   data() {
     return {
