@@ -28,14 +28,6 @@
         </div>
         <!--Instructor Name-->
         <div class="form-group mb-4">
-          <!--<input
-            v-model="instructorName"
-            type="text"
-            placeholder="Instructor Name"
-            required
-            autofocus=""
-            class="form-control border-0 shadow-sm px-4 field"
-          />-->
           <select v-model="selectedInstructor" class="form-select border-0 shadow-sm px-4 field text-muted">
             <option disabled value="">Instructor</option>
             <!--<option v-for="course in courses" :key="course.id" :value="course.id">{{ course.name }}</option>-->
@@ -44,28 +36,12 @@
         <div class="row mb-4">
           <!--Start Date-->
           <div class="col-md-6 form-group">
-            <!--<input
-              v-model="startDate"
-              type="text"
-              placeholder="Start Date"
-              required
-              autofocus=""
-              class="form-control border-0 shadow-sm px-4 field"
-            />-->
             <VueDatePicker v-model="startDate" placeholder="Start Date" :enable-time-picker="false"
               class="form-control border-0 shadow-sm" input-class-name="dp-custom-input" :format="datePickerFormat"
               required></VueDatePicker>
           </div>
           <!--End Date-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <!--<input
-              v-model="endDate"
-              type="text"
-              placeholder="End Date"
-              required
-              autofocus=""
-              class="form-control border-0 shadow-sm px-4 field"
-            />-->
             <VueDatePicker v-model="endDate" placeholder="End Date" :enable-time-picker="false"
               class="form-control border-0 shadow-sm" input-class-name="dp-custom-input" :format="datePickerFormat"
               required></VueDatePicker>
@@ -74,28 +50,12 @@
         <div class="row mb-4">
           <!--Start Time-->
           <div class="col-md-6 form-group">
-            <!--<input
-              v-model="startTime"
-              type="text"
-              placeholder="Start Time"
-              required
-              autofocus=""
-              class="form-control border-0 shadow-sm px-4 field"
-            />-->
             <VueDatePicker v-model="startTime" placeholder="Start Time" time-picker
               class="form-control border-0 shadow-sm" input-class-name="dp-custom-input" required><template #input-icon>
                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template></VueDatePicker>
           </div>
           <!--End Time-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <!--<input
-              v-model="endTime"
-              type="text"
-              placeholder="End Time"
-              required
-              autofocus=""
-              class="form-control border-0 shadow-sm px-4 field"
-            />-->
             <VueDatePicker v-model="endTime" placeholder="End Time" time-picker class="form-control border-0 shadow-sm"
               input-class-name="dp-custom-input" required><template #input-icon>
                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template></VueDatePicker>
@@ -133,28 +93,12 @@
         <div class="row mb-4">
           <!--Opening Date For Registration-->
           <div class="col-md-6 form-group">
-            <!--<input
-              v-model="openingDate"
-              type="text"
-              placeholder="Opening Date For Registration"
-              required
-              autofocus=""
-              class="form-control border-0 shadow-sm px-4 field"
-            />-->
             <VueDatePicker v-model="openingDate" placeholder="Opening Date For Registration" :enable-time-picker="false"
               class="form-control border-0 shadow-sm" input-class-name="dp-custom-input" :format="datePickerFormat"
               required></VueDatePicker>
           </div>
           <!--Opening Time For Registration-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <!--<input
-              v-model="OpeningTime"
-              type="text"
-              placeholder="Opening Time For Registration"
-              required
-              autofocus=""
-              class="form-control border-0 shadow-sm px-4 field"
-            />-->
             <VueDatePicker v-model="openingTime" placeholder="Opening Time For Registration" time-picker
               class="form-control border-0 shadow-sm" input-class-name="dp-custom-input" required><template #input-icon>
                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template></VueDatePicker>
@@ -163,28 +107,12 @@
         <div class="row mb-4">
           <!--Closing Date For Registration-->
           <div class="col-md-6 form-group">
-            <!--<input
-              v-model="closingDate"
-              type="text"
-              placeholder="Closing Date For Registration"
-              required
-              autofocus=""
-              class="form-control border-0 shadow-sm px-4 field"
-            />-->
             <VueDatePicker v-model="closingDate" placeholder="Closing Date For Registration" :enable-time-picker="false"
               class="form-control border-0 shadow-sm" input-class-name="dp-custom-input" :format="datePickerFormat"
               required></VueDatePicker>
           </div>
           <!--Closing Time For Registration-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <!--<input
-              v-model="closingTime"
-              type="text"
-              placeholder="Closing Time For Registration"
-              required
-              autofocus=""
-              class="form-control border-0 shadow-sm px-4 field"
-            />-->
             <VueDatePicker v-model="closingTime" placeholder="Closing Time For Registration" time-picker
               class="form-control border-0 shadow-sm" input-class-name="dp-custom-input" required><template #input-icon>
                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template>
@@ -194,11 +122,8 @@
         <div class="row">
           <!--Course Fee-->
           <div class="col-md-6 form-group">
-            <!-- Dropdown Button -->
-            <select v-model="selectedFee" class="form-select border-0 shadow-sm px-4 field text-muted">
-              <option disabled value="">Course Fee</option>
-              <!--<option v-for="course in courses" :key="course.id" :value="course.id">{{ course.name }}</option>-->
-            </select>
+            <input v-model="courseFee" type="text" placeholder="Course Fee" required autofocus=""
+            class="form-control border-0 shadow-sm px-4 field" />
           </div>
           <!--Feedback Template-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
@@ -278,7 +203,7 @@ export default {
       openingTime: "",
       closingDate: null,
       closingTime: "",
-      selectedFee: "",
+      courseFee: "",
       selectedTemplate: "",
       showSuccessModal: false,
     };
@@ -324,7 +249,7 @@ export default {
         (this.openingTime = ""),
         (this.closingDate = ""),
         (this.closingTime = ""),
-        (this.selectedFee = ""),
+        (this.courseFee = ""),
         (this.selectedTemplate = "");
     },
   },
