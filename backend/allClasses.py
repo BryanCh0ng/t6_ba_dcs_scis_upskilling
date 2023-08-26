@@ -246,7 +246,7 @@ class TemplateAttribute(db.Model):
         return result
     
 ##################  Likert Scale Class Creation ##################
-class LikeryScale(db.Model):
+class LikertScale(db.Model):
     __tablename__ = 'likertscale'
 
     likert_Scale_ID = db.Column(db.Integer, nullable=False, primary_key=True)
@@ -455,6 +455,33 @@ class Blacklist(db.Model):
     def __init__(self, blacklist_ID, user_ID ):
         self.blacklist_ID = blacklist_ID
         self.user_ID = user_ID
+        
+
+
+
+    def json(self):
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            result[column] = getattr(self, column)
+        return result
+        
+##################  Contact Us Class Creation ##################
+class ContactUs(db.Model):
+    __tablename__ = 'contactus'
+
+    contactus_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    user_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'),  nullable=False)
+    subject = db.Column(db.String(255), nullable=False)
+    message = db.Column(db.String(1000), nullable=False)
+    
+
+
+    def __init__(self, contactus_ID, user_ID, subject, message):
+        self.contactus_ID = contactus_ID
+        self.user_ID = user_ID
+        self.subject = subject
+        self.message = message
         
 
 

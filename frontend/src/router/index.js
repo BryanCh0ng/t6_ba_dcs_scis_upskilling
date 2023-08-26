@@ -25,6 +25,23 @@ const routes = [
         title: 'common search filter',
     },
   },
+  {
+      path: '/contactUs',
+      name: 'ContactUs',
+      component: () => import('../views/ContactUs.vue'),
+      meta: {
+          title: 'Contact Us',
+      },
+    },
+    {
+      path: '/viewCourse',
+      name: 'viewCourse',
+      component: () => import('../views/course/viewCourse.vue'),
+      meta: {
+          title: 'View Course',
+      },
+    }
+    // },
     // {
     //     path: '/deleteCourse',
     //     name: 'Delete Courses',
