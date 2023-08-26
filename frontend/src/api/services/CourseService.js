@@ -21,7 +21,7 @@ class CourseService extends BaseApiService {
   async getCourseById(courseId) {
     try {
       let course = await axiosClient.get("/course/get_course_by_id", { params: { course_id: courseId } });
-      return course.data
+      return course
     } catch (error) {
       return this.handleError(error);
     }

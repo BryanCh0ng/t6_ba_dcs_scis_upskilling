@@ -10,7 +10,7 @@
     </ul>
     <div class="tab-content ">
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'submitted' }">
-        <div class="pt-5 container col-12 table-responsive">
+        <div class="pt-5 container col-12 table-responsive" v-if="!loading">
           <h5 class="pb-3">Pending Proposals</h5>
           <div v-if="pending_courses.length > 0">
             <table class="table">
@@ -40,13 +40,13 @@
                     </div>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(pending_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action status="Approve" :id="pending_course.id"></course-action></td>
-                  <td><course-action status="Reject" :id="pending_course.id" @click="openReject(pending_course)" data-bs-toggle="modal" data-bs-target="#rejected_modal"></course-action></td>
+                  <td><course-action status="Approved" :id="pending_course.id"></course-action></td>
+                  <td><course-action status="Rejected" :id="pending_course.id" @click="openReject(pending_course)" data-bs-toggle="modal" data-bs-target="#rejected_modal"></course-action></td>
                 </tr>
               </tbody>
             </table>
             <div class="modal fade" id="rejected_modal" tabindex="-1" aria-hidden="true">
-              <div class="modal-dialog modal-lg"><reject-proposal-modal  @close-modal="closeReject"/></div>
+              <div class="modal-dialog modal-lg"><reject-proposal-modal @close-modal="closeReject"/></div>
             </div>
           </div>
           <div v-else>
@@ -98,7 +98,7 @@
             <p>No records found</p>
           </div>
         </div>
-        <vue-awesome-paginate v-if="proposed_courses.length/itemsPerPage > 0" v-model="localCurrentPageProposed" :totalItems="proposed_courses.length" :items-per-page="1" @page-change="handlePageChangeProposed" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-if="proposed_courses.length/itemsPerPage > 0" v-model="localCurrentPageProposed" :totalItems="proposed_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeProposed" class="justify-content-center pagination-container"/>
       </div>
     </div>
     <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
@@ -114,6 +114,7 @@ import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import rejectProposalModal from '../../components/course/rejectProposalModal.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
+import { getAllProposedPendingCourseByStatus } from '../../scripts/proposedcourse/proposedcourse.js';
 
 export default {
   components: {
@@ -126,49 +127,16 @@ export default {
   },
   data() {
     return {
-      proposed_courses: [
-        {
-        id: 1,
-        name: "Course Name 1",
-        category: "SCIS",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
-        proposed_date: "Aug 20, 2023",
-        status: 'Approved',
-        },
-        {
-        id: 2,
-        name: "Course Name 2",
-        category: "LKCSB",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
-        proposed_date: "Aug 12, 2023",
-        status: 'Rejected',
-        },
-      ],
-      pending_courses: [
-      {
-        id: 12,
-        name: "Course Name 12",
-        category: "SCIS",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
-        proposed_date: "Aug 6, 2023",
-        status: 'Approved',
-        },
-        {
-        id: 14,
-        name: "Course Name 14",
-        category: "SCIS",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
-        proposed_date: "Aug 3, 2023",
-        status: 'Approved',
-        },
-      ],
+      proposed_courses: [],
+      pending_courses: [],
       sortColumn: 'name',
       sortDirection: 'asc',
       selectedCourse: null,
-      itemsPerPage: 1,
+      itemsPerPage: 10,
       localCurrentPagePending: 1,
       localCurrentPageProposed: 1,
-      activeTab: 'submitted'
+      activeTab: 'submitted',
+      loading: true
     }
   },
   methods: {
@@ -205,6 +173,18 @@ export default {
       const startIndex = (this.localCurrentPageProposed - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
       return this.proposed_courses.slice(startIndex, endIndex);
+    }
+  },
+  async created() {
+    try {
+      const pending_results = await getAllProposedPendingCourseByStatus('Pending');
+      console.log(pending_results)
+      if (pending_results.code === 200) {
+        this.pending_courses = pending_results.course;
+      }
+      this.loading = false;
+    } catch (error) {
+      console.error("Error fetching course details:", error);
     }
   }
   }

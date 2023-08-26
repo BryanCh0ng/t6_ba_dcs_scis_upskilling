@@ -1,9 +1,12 @@
+// services
 import CourseService from "../../api/services/CourseService.js"
-import ProposedCourseService from "../../api/services/proposedCourseService.js"
-import RunCourseService from "../../api/services/runCourseService.js"
-import CourseCategoryService from "../../api/services/CourseCategoryService.js"
-import RegistrationService from "../../api/services/RegistrationService.js"
-import {convertDate, convertTime} from "../common/convertDateTime.js"
+
+// scripts
+import { convertDate, convertTime } from "../common/convertDateTime.js"
+import { getRegCount } from "../registration/registration.js"
+import { getRunCourseDetails } from "../runcourse/runcourse.js"
+import { getProposedCourseDetails } from "../proposedcourse/proposedcourse.js"
+import { getCategory } from "../coursecat/coursecat.js"
 
 async function getAllCourseDetails() {
   var response  = await CourseService.getAllCoursesAdmin(); 
@@ -52,25 +55,10 @@ async function getAllCourseDetails() {
   }
 }
 
-async function getProposedCourseDetails(courseID) {
-  var proposed_course_response = await ProposedCourseService.getProposedCourseByCourseId(courseID);
-  return proposed_course_response
+async function getCourseDetails(courseID) {
+  var course_response = await CourseService.getCourseById(courseID);
+  return course_response;
 }
 
-async function getRunCourseDetails(courseID) {
-  var run_course_response = await RunCourseService.getRunCourseByCourseId(courseID);
-  return run_course_response
-}
-
-async function getCategory(cat_id) {
-  var category_response = await CourseCategoryService.getCategoryById(cat_id);
-  return category_response.coursecat_Name
-}
-
-async function getRegCount(course_id) {
-  var reg_count_response = await RegistrationService.getRegCount(course_id);
-  return reg_count_response.data.reg_count
-}
-
-export { getAllCourseDetails };
+export { getAllCourseDetails, getCourseDetails };
  

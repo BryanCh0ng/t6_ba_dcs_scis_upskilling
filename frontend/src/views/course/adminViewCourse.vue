@@ -5,7 +5,7 @@
         <a class="nav-link" :class="{ 'active': activeTab === 'courses' }" @click="activeTab = 'courses'">All Courses</a>
       </li> 
       <li class="nav-item">
-        <a class="nav-link" :class="{ 'active': activeTab === 'instructors' }" @click="activeTab = 'instructors'">All Instructors</a>
+        <a class="nav-link" :class="{ 'active': activeTab === 'instructors_trainers' }" @click="activeTab = 'instructors_trainers'">All Instructors/Trainers</a>
       </li>
     </ul>
     <div class="tab-content ">
@@ -64,15 +64,17 @@
         <vue-awesome-paginate v-if="courses.length/itemsPerPage > 0" v-model="localCurrentPageCourses" :totalItems="courses.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeCourses" class="justify-content-center pagination-container"/>
       </div>
   
-      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'instructors' }">
+      <div class="tab-pane fade" :class="{ 'show active': activeTab === 'instructors_trainers' }">
         <div class="pt-5 container col-12 table-responsive">
-          <h5 class="pb-3">All Instructors Database</h5>
-          <div v-if="instructors.length > 0">
+          <h5 class="pb-3">All Instructors/Trainers Database</h5>
+          <div v-if="instructors_trainers.length > 0">
             <table class="table">
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                    <a href="" class="text-decoration-none text-dark">Instructor Name <sort-icon :sortColumn="sortColumn === 'instructor_name'" :sortDirection="sortDirection"/></a></th>
+                    <a href="" class="text-decoration-none text-dark">Name <sort-icon :sortColumn="sortColumn === 'user_name'" :sortDirection="sortDirection"/></a></th>
+                  <th scope="col">
+                    <a href="" class="text-decoration-none text-dark">Role <sort-icon :sortColumn="sortColumn === 'user_role'" :sortDirection="sortDirection"/></a></th>
                   <th scope="col">
                     <a href="" class="text-decoration-none text-dark">Organization <sort-icon :sortColumn="sortColumn === 'organization'" :sortDirection="sortDirection"/></a></th>
                   <th scope="col">
@@ -81,15 +83,18 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(instructor, key) in displayedInstructors" :key="key">
-                  <td class="instructor_name">
-                    {{ instructor.name }}
+                <tr v-for="(instructor_trainer, key) in displayedInstructorsTrainers" :key="key">
+                  <td class="user_name">
+                    {{ instructor_trainer.user_Name }}
+                  </td>
+                  <td class="user_role">
+                    {{ instructor_trainer.role_Name }}
                   </td>
                   <td class="orgnanization">
-                    {{ instructor.organization }}
+                    {{ instructor_trainer.organisation_Name }}
                   </td>
                   <td class="ratings">
-                    {{ instructor.ratings }}
+                    {{ instructor_trainer.ratings }}
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
                 </tr>
@@ -100,7 +105,7 @@
             <p>No records found</p>
           </div>
         </div>
-        <vue-awesome-paginate v-if="instructors.length/itemsPerPage > 0" v-model="localCurrentPageInstructors" :totalItems="instructors.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeInstructors" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-if="instructors_trainers.length/itemsPerPage > 0" v-model="localCurrentPageInstructorsTrainers" :totalItems="instructors_trainers.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeInstructors" class="justify-content-center pagination-container"/>
       </div>
     </div>
   </div>
@@ -113,7 +118,8 @@ import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
 import courseDateTime from '../../components/course/courseDateTime.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
-import { getAllCourseDetails } from '../../scripts/course/getAllCourseDetails.js';
+import { getAllCourseDetails } from '../../scripts/course/course.js';
+import { getAllInstructors, getAllTrainers } from '../../scripts/user/user.js';
 
 export default {
   components: {
@@ -127,24 +133,13 @@ export default {
   data() {
     return {
       courses: [],
-      instructors: [
-        {
-          name: 'ABC',
-          organization: 'Org',
-          ratings: '4.6/5'
-        },
-        {
-          name: 'BDE',
-          organization: 'Org',
-          ratings: '4.6/5'
-        }
-      ],
+      instructors_trainers: [],
       sortColumn: 'name',
       sortDirection: 'asc',
       selectedCourse: null,
       itemsPerPage: 10,
       localCurrentPageCourses: 1,
-      localCurrentPageInstructors: 1,
+      localCurrentPageInstructorsTrainers: 1,
       activeTab: 'courses',
       loading: true
     }
@@ -173,20 +168,31 @@ export default {
       const endIndex = startIndex + this.itemsPerPage;
       return this.courses.slice(startIndex, endIndex);
     },
-    displayedInstructors() {
-      const startIndex = (this.localCurrentPageInstructors - 1) * this.itemsPerPage;
+    displayedInstructorsTrainers() {
+      const startIndex = (this.localCurrentPageInstructorsTrainers - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
-      return this.instructors.slice(startIndex, endIndex);
+      return this.instructors_trainers.slice(startIndex, endIndex);
     }
   },
   async created() {
     try {
       const results = await getAllCourseDetails();
+      console.log(results)
       if (results.code === 200) {
         this.courses = results.courses;
       }
+      const instructor_results = await getAllInstructors();
+      const trainer_results = await getAllTrainers();
+      console.log(instructor_results)
+      console.log(trainer_results)
+      if (instructor_results.code === 200) {
+        this.instructors_trainers = this.instructors_trainers.concat(instructor_results.instructor);
+      }
+      if (trainer_results.code === 200) {
+        this.instructors_trainers = this.instructors_trainers.concat(trainer_results.trainer);
+      }
+      console.log(this.instructors_trainers)
       this.loading = false;
-      console.log(results);
     } catch (error) {
       console.error("Error fetching course details:", error);
     }

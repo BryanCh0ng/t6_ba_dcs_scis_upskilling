@@ -18,6 +18,14 @@ class ProposedCourseService extends BaseApiService {
       return this.handleError(error);
     }
   }
+  async getProposedCourseByStatus(pcourse_status) {
+    try {
+      let proposed_course_by_status = await axiosClient.get("/proposedcourse/get_proposed_course_by_pcourse_status", { params: { pcourse_status: pcourse_status } });
+      return proposed_course_by_status.data
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
 }
 
 export default new ProposedCourseService();
