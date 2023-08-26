@@ -471,11 +471,13 @@ class Message(db.Model):
     user_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'),  nullable=False)
     msg_Subject = db.Column(db.String(255), nullable=False)
     msg_Body = db.Column(db.String(800), nullable=False)
+    msg_Datetime = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self, user_ID, msg_Subject, msg_Body):
+    def __init__(self, user_ID, msg_Subject, msg_Body, msg_Datetime):
         self.user_ID = user_ID
         self.msg_Subject = msg_Subject
         self.msg_Body = msg_Body
+        self.msg_Datetime = msg_Datetime
 
     
     def json(self):

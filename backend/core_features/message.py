@@ -14,7 +14,8 @@ api = Namespace('message', description='Contact us page related operations')
 create_msg_model = api.model("create_msg_model", {
     "user_ID" : fields.Integer(description="User ID", required=True),
     "msg_Subject" : fields.String(description="Message subject", required=True),
-    "msg_Body" : fields.String(description="Message body", required=True)
+    "msg_Body" : fields.String(description="Message body", required=True),
+    "msg_Datetime" : fields.DateTime(description="Message date & time", required=True)
 })
 
 @api.route("/create_new_msg", methods=["POST"])

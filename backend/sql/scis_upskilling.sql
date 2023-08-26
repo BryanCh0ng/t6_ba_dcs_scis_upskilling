@@ -1017,9 +1017,10 @@ CREATE TABLE IF NOT EXISTS `message`(
 	user_id int NOT NULL,
 	msg_subject varchar(255) NOT NULL,
 	msg_body varchar(800) NOT NULL,
+    msg_datetime datetime NOT NULL,
 	PRIMARY KEY (`msg_id`),
     FOREIGN KEY (user_id) REFERENCES user(user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO message VALUES
-    (1, 1, "Test", "Testing the contact us function");
+    (1, 1, "Test", "Testing the contact us function", "2023-08-25 17:00:00");
