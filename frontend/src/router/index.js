@@ -27,6 +27,14 @@ const routes = [
     },
   },
   {
+    path: '/registerform',
+    name: 'Register Form',
+    component: () => import('../views/RegistrationForm.vue'),
+    meta: {
+      title: 'Register Form',
+    },
+  },
+  {
     path: '/forgotPassword',
     name: 'ForgotPassword',
     component: () => import('../views/ForgotPassword.vue'),
