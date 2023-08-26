@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_restx import Api, Resource
 from allClasses import *
-from core_features.message import api as message
+from core_features.contactus import api as contactus
 
 app = Flask(__name__)
 api = Api(
@@ -14,7 +14,7 @@ api = Api(
     title="SCIS-UPSKILLING-Backend",
     description="",
 )
-api.add_namespace(message)
+api.add_namespace(contactus)
 
 
 CORS(app, supports_credentials=True)

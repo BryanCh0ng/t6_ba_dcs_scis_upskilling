@@ -1,9 +1,10 @@
-from flask import request, jsonify
+from flask import request, jsonify, sessions
 from flask_restx import Namespace, Resource, fields
 from allClasses import *
 import json
+from datetime import datetime
 
-api = Namespace('message', description='Contact us page related operations')
+api = Namespace('contactus', description='Contact us page related operations')
 
 # ==================== CONTACT US FUNCTIONS ====================#
 # get_all_msg()
@@ -20,7 +21,7 @@ class GetAllMsg(Resource):
     def get(self):
         arg = get_all_msg.parse_args().get("msg_ID")
         msg_ID = arg if arg else ""
-        msg_List = Message.query.filter(Message.msg_ID.contains(msg_ID)).all()
+        msg_List = ContactUs.query.filter(ContactUs.msg_ID.contains(msg_ID)).all()
         db.session.close()
 
         if len(msg_List):
@@ -54,7 +55,9 @@ class CreateNewMsg(Resource):
     @api.expect(create_msg_model)
     def post(self):
         data = request.get_json()
-        msg = Message(**data)
+        current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        data["msg_Datetime"] = current_datetime
+        msg = ContactUs(**data)
 
         try:
             db.session.add(msg)

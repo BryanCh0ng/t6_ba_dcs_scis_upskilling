@@ -48,6 +48,7 @@ import ErrorMessage from "../components/ErrorMessage.vue";
 import InputField from "../components/InputField.vue";
 import { required } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
+import ContactUsService from "../api/services/contactService.js"
 
 export default {
   setup() {
@@ -75,7 +76,7 @@ export default {
     InputField,
   },
   methods: {
-    submitForm() {
+    async submitForm() {
       // Trigger Vuelidate validation
       this.v$.$touch();
 
@@ -92,32 +93,22 @@ export default {
         return;
       }
 
-      // const formData = {
-      //   subject: this.subject,
-      //   message: this.message,
-      // };
+      const formData = {
+        // will need get user_ID from session
+        user_ID: 1, 
+        msg_Subject: this.subject,
+        msg_Body: this.message,
+        msg_Datetime: new Date().toISOString(), // Current datetime
+      };
 
-      // // Need to add in flask api endpoint
-      // axiosClient
-      //   .post("", formData)
-      //   .then((response) => {
-      //     console.log("Form submitted successfully:", response.data);
-      //     this.showSuccessModal = true;
-      //     this.resetForm();
-      //   })
-      //   .catch((error) => {
-      //     if (error.response) {
-      //       // Handle server response error
-      //       if (error.response.status === 400) {
-      //         this.subjectError = "Please provide a valid subject.";
-      //       }
-      //     }
-      //   });
-
-      // Test Simulate a successful submission
-      setTimeout(() => {
+      try {
+        const response = await ContactUsService.createNewMsg(formData);
+        console.log('API Response:', response);
         this.showSuccessModal = true;
-      }, 1000); // Show modal after 1 second (simulating response)
+        this.resetForm();
+      } catch (error) {
+        console.error('Error submitting form:', error);
+      }
     },
     hideSuccessModal() {
       this.showSuccessModal = false;

@@ -2,14 +2,14 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-DROP DATABASE IF EXISTS `t6_ba_dcs_scis_upskilling`;
+DROP DATABASE IF EXISTS `scis_upskilling`;
 
-CREATE DATABASE `t6_ba_dcs_scis_upskilling` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `t6_ba_dcs_scis_upskilling`;
+CREATE DATABASE `scis_upskilling` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `scis_upskilling`;
 
 -- --------------------------------------------------------
 
--- Database: t6_ba_dcs_scis_upskilling
+-- Database: scis_upskilling
 
 -- --------------------------------------------------------
 
@@ -1012,15 +1012,15 @@ INSERT INTO blacklist VALUES
 	(2, 57);
 
 DROP TABLE IF EXISTS `contactus`;
-CREATE TABLE IF NOT EXISTS `contactus` (
-    contactus_id int NOT NULL AUTO_INCREMENT,
-    user_id int NOT NULL,
-    subject varchar(255) NOT NULL,
-    message varchar(1000) NOT NULL,
-    PRIMARY KEY (`contactus_id`),
-	FOREIGN KEY (user_id) REFERENCES user(user_id)
+CREATE TABLE IF NOT EXISTS `contactus`(
+	msg_id int NOT NULL AUTO_INCREMENT,
+	user_id int NOT NULL,
+	msg_subject varchar(255) NOT NULL,
+	msg_body varchar(1000) NOT NULL,
+    msg_datetime datetime NOT NULL,
+	PRIMARY KEY (`msg_id`),
+    FOREIGN KEY (user_id) REFERENCES user(user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO contactus VALUES 
-    (1, 1, "question", "question"),
-    (2, 2, "question", "question");
+INSERT INTO contactus VALUES
+    (1, 1, "Test", "Testing the contact us function", "2023-08-25 17:00:00");
