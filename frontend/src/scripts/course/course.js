@@ -39,8 +39,8 @@ async function getAllCourseDetails() {
           var proposed_course_details = proposed_course_response.data['course']
           course_details.push({ ...course, ...proposed_course_details[0], 
             status: proposed_course_details[0].pcourse_Status, 
+            course_cat: await getCategory(course.coursecat_ID),
             reg_count: reg_count, 
-            course_cat: await getCategory(course.coursecat_ID)
           })
         }
         else {
@@ -57,7 +57,14 @@ async function getAllCourseDetails() {
 
 async function getCourseDetails(courseID) {
   var course_response = await CourseService.getCourseById(courseID);
-  return course_response;
+  var course_details = []
+  if (course_response.code == 200) {
+    var coursecat = await getCategory(course_response['data']['course'][0].coursecat_ID)
+    course_details.push({ ...course_response['data']['course'][0], course_cat: coursecat})
+
+  }
+  var results = {code: course_response.code, course: course_details}
+  return results;
 }
 
 export { getAllCourseDetails, getCourseDetails };

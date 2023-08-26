@@ -42,3 +42,24 @@ class GetAllTrainers(Resource):
 				}
 			)
 		return json.loads(json.dumps({"message": "There is no trainers", "code": 404}, default=str))
+	
+retrieve_user = api.parser()
+retrieve_user.add_argument("user_id", help="Enter user id")
+@api.route("/get_user_by_id")
+@api.doc(description="Get user by user id")
+class GetUser(Resource):
+    @api.expect(retrieve_user)
+    def get(self):
+        user_ID = retrieve_user.parse_args().get("user_id")
+        user = User.query.filter_by(user_ID=user_ID).first()
+        db.session.close()
+        if user:
+          return jsonify(
+            {
+            "code": 200,
+            "data": {
+              "user": [user.json()]
+            }
+          }
+        )
+        return json.loads(json.dumps({"message": "There is no such user", "code": 404}, default=str))

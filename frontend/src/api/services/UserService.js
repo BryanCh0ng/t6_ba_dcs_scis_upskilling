@@ -18,6 +18,14 @@ class UserService extends BaseApiService {
       return this.handleError(error);
     }
   }
+  async getUserById(user_id) {
+    try {
+      let user = await axiosClient.get("/user/get_user_by_id", { params: { user_id: user_id } });
+      return user.data
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
 }
 
 export default new UserService();

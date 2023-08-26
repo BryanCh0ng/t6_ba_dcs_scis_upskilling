@@ -41,6 +41,12 @@ async function getAllTrainers() {
   }
 }
 
+async function getUserDetails(userID) {
+  var user_response = await UserService.getUserById(userID);
+  console.log(user_response)
+  return user_response;
+}
 
-export { getAllInstructors, getAllTrainers };
+
+export { getAllInstructors, getAllTrainers, getUserDetails };
  

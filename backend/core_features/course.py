@@ -114,7 +114,14 @@ class GetCourse(Resource):
         course = Course.query.filter_by(course_ID=courseID).first()
         db.session.close()
         if course:
-            return json.loads(json.dumps(course.json())), 200
+           return jsonify(
+							{
+							"code": 200,
+							"data": {
+								"course": [course.json()]
+							}
+						}
+					)
 
         return json.loads(json.dumps({"message": "There is no such course"})), 404
 

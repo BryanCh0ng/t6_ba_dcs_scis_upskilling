@@ -29,7 +29,7 @@
               <tbody>
                 <tr v-for="(pending_course, key) in displayedPendingCourses" :key="key">
                   <td class="name">
-                    <course-name-desc :name="pending_course.name" :category="pending_course.category" :description="pending_course.description"></course-name-desc>
+                    <course-name-desc :name="pending_course.course_Name" :category="pending_course.course_cat" :description="pending_course.course_Desc"></course-name-desc>
                   </td>
                   <td class="reg_count">
                     {{ pending_course.owner }}
@@ -40,8 +40,8 @@
                     </div>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(pending_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action status="Approved" :id="pending_course.id"></course-action></td>
-                  <td><course-action status="Rejected" :id="pending_course.id" @click="openReject(pending_course)" data-bs-toggle="modal" data-bs-target="#rejected_modal"></course-action></td>
+                  <td><course-action status="Approved" :id="pending_course.course_ID"></course-action></td>
+                  <td><course-action status="Rejected" :id="pending_course.course_ID" @click="openReject(pending_course)" data-bs-toggle="modal" data-bs-target="#rejected_modal"></course-action></td>
                 </tr>
               </tbody>
             </table>
@@ -53,7 +53,7 @@
             <p>No records found</p>
           </div>
         </div>
-        <vue-awesome-paginate v-if="pending_courses.length/itemsPerPage > 0" v-model="localCurrentPagePending" :totalItems="pending_courses.length" :items-per-page="1" @page-change="handlePageChangePending" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-if="pending_courses.length/itemsPerPage > 0" v-model="localCurrentPagePending" :totalItems="pending_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageChangePending" class="justify-content-center pagination-container"/>
       </div>
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'approved_rejected' }">
         <div class="pt-5 container col-12 table-responsive">
@@ -77,7 +77,7 @@
               <tbody>
                 <tr v-for="(proposed_course, key) in displayedProposedCourses" :key="key">
                   <td class="name">
-                    <course-name-desc :name="proposed_course.name" :category="proposed_course.category" :description="proposed_course.description"></course-name-desc>
+                    <course-name-desc :name="proposed_course.course_Name" :category="proposed_course.course_cat" :description="proposed_course.course_Desc"></course-name-desc>
                   </td>
                   <td class="reg_count">
                     {{ proposed_course.owner }}
@@ -89,7 +89,7 @@
                   </td>
                   <td>{{ proposed_course.status }}</td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action v-if="proposed_course.status == 'Approved'" status="Open for Voting" :id="proposed_course.id"></course-action></td>
+                  <td><course-action v-if="proposed_course.pcourse_Status == 'Approved'" status="Open for Voting" :id="proposed_course.course_ID"></course-action></td>
                 </tr>
               </tbody>
             </table>
@@ -181,6 +181,16 @@ export default {
       console.log(pending_results)
       if (pending_results.code === 200) {
         this.pending_courses = pending_results.course;
+      }
+      const approved_results = await getAllProposedPendingCourseByStatus('Approved');
+      console.log(approved_results)
+      if (approved_results.code === 200) {
+        this.proposed_courses = this.proposed_courses.concat(approved_results.course);
+      }
+      const rejected_results = await getAllProposedPendingCourseByStatus('Rejected');
+      console.log(rejected_results)
+      if (rejected_results.code === 200) {
+        this.proposed_courses = this.proposed_courses.concat(rejected_results.course);
       }
       this.loading = false;
     } catch (error) {
