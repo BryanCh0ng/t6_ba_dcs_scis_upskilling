@@ -94,14 +94,14 @@ class Course(db.Model):
     __tablename__ = 'course'
 
     course_ID = db.Column(db.Integer, nullable=False, primary_key=True)
-    cousre_Name = db.Column(db.String(255), nullable=False)
+    course_Name = db.Column(db.String(255), nullable=False)
     course_Desc = db.Column(db.String(800), nullable=False)
     coursecat_ID = db.Column(db.Integer, db.ForeignKey('coursecategory.coursecat_ID'), nullable=False)
 
 
     def __init__(self, course_ID, cousre_Name, course_Desc, coursecat_ID):
         self.course_ID = course_ID
-        self.cousre_Name = cousre_Name
+        self.course_Name = cousre_Name
         self.course_Desc = course_Desc
         self.coursecat_ID = coursecat_ID        
 

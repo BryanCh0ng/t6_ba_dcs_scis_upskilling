@@ -2,14 +2,14 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-DROP DATABASE IF EXISTS `scis_upskilling`;
+DROP DATABASE IF EXISTS `t6_ba_dcs_scis_upskilling`;
 
-CREATE DATABASE `scis_upskilling` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `scis_upskilling`;
+CREATE DATABASE `t6_ba_dcs_scis_upskilling` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `t6_ba_dcs_scis_upskilling`;
 
 -- --------------------------------------------------------
 
--- Database: scis_upskilling
+-- Database: t6_ba_dcs_scis_upskilling
 
 -- --------------------------------------------------------
 
