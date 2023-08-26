@@ -10,6 +10,36 @@ api = Namespace('message', description='Contact us page related operations')
 # create_new_msg()
 # update_msg()
 
+# get_all_msg()
+get_all_msg = api.parser()
+get_all_msg.add_argument("msg_ID", help="Enter message ID")
+@api.route("/get_all_msg")
+@api.doc(description="Gets all messages")
+class GetAllMsg(Resource):
+    @api.expect(get_all_msg)
+    def get(self):
+        arg = get_all_msg.parse_args().get("msg_ID")
+        msg_ID = arg if arg else ""
+        msg_List = Message.query.filter(Message.msg_ID.contains(msg_ID)).all()
+        db.session.close()
+
+        if len(msg_List):
+            return jsonify(
+                {
+                    "code": 200,
+                    "data": {
+                        "msg_list": [msg.json() for msg in msg_List]
+                    }
+                }
+            )
+        
+        return jsonify(
+            {
+                "code": 404,
+                "message": "No such message exists"
+            }
+        )
+
 # create_new_msg()
 create_msg_model = api.model("create_msg_model", {
     "user_ID" : fields.Integer(description="User ID", required=True),
