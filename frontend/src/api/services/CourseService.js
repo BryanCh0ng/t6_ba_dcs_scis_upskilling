@@ -31,140 +31,213 @@ class CourseService extends BaseApiService {
         }
     }
     // Student - Registration - course name, course cat, status
-    async searchCourseRegistrationInfo(queryParams) {
+    async searchCourseRegistrationInfo(user_ID, course_Name, coursecat_ID, reg_Status) {
         try {
-            let registrationInfo = await axiosClient.get("/course/get_course_registration_info_filter_search", { params: queryParams });
-            return registrationInfo.data;
-
+            let response = await axiosClient.get("/course/get_course_registration_info_filter_search", {
+                params: {
+                    user_ID: user_ID,
+                    course_Name: course_Name,
+                    coursecat_ID: coursecat_ID,
+                    reg_Status: reg_Status
+                }
+            });
+            console.log(response.data)
+            return response.data;
         } catch (error) {
             return this.handleError(error);
         }
     }
     // Student - Vote - course name, course cat, status
-    async searchCourseVoteInfo(queryParams) {
+    async searchCourseVoteInfo(user_ID, course_Name, coursecat_ID, vote_Status) {
         try {
-            let voteInfo = await axiosClient.get("/course/get_course_vote_info_filter_search", { params: queryParams });
-            return voteInfo.data;
-
+            let response = await CourseService.get("/course/get_course_vote_info_filter_search", {
+                params: {
+                    user_ID: user_ID,
+                    course_Name: course_Name,
+                    coursecat_ID: coursecat_ID,
+                    vote_Status: vote_Status
+                }
+            });
+            return response.data;
         } catch (error) {
             return this.handleError(error);
         }
-    }
+    }    
     // Student/Instructor/Trainer - Proposed - course name, course cat, status
-    async searchProposedInfo(queryParams) {
+    async searchProposedInfo(user_ID, course_Name, coursecat_ID, pcourse_Status) {
         try {
-            let proposedInfo = await axiosClient.get("/course/get_proposed_courses_filter_search", { params: queryParams });
-            return proposedInfo.data;
-
+            let response = await axiosClient.get("/course/get_proposed_courses_filter_search", {
+                params: {
+                    user_ID: user_ID,
+                    course_Name: course_Name,
+                    coursecat_ID: coursecat_ID,
+                    pcourse_Status: pcourse_Status
+                }
+            });
+            return response.data;
         } catch (error) {
             return this.handleError(error);
         }
     }
+    
     // Student - Completed - course name, course cat
-    async searchCompletedInfo(queryParams) {
+    async searchCompletedInfo(user_ID, course_Name, coursecat_ID) {
         try {
-            let completedInfo = await axiosClient.get("/course/get_completed_courses_filter_search", { params: queryParams });
-            return completedInfo.data;
-
+            let response = await axiosClient.get("/course/get_completed_courses_filter_search", {
+                params: {
+                    user_ID: user_ID,
+                    course_Name: course_Name,
+                    coursecat_ID: coursecat_ID
+                }
+            });
+            return response.data;
         } catch (error) {
             return this.handleError(error);
         }
-    }
+    }    
 
     // Instructor/Trainer - VotingCampaign - course name, course cat
-    async searchVotingCampaignInfo(queryParams) {
+    async searchVotingCampaignInfo(course_Name, coursecat_ID) {
         try {
-            let votingInfo = await axiosClient.get("/course/get_voting_campaign_courses_filter_search", { params: queryParams });
-            return votingInfo.data;
-
+            let response = await axiosClient.get("/course/get_voting_campaign_courses_filter_search", {
+                params: {
+                    course_Name: course_Name,
+                    coursecat_ID: coursecat_ID
+                }
+            });
+            return response.data;
         } catch (error) {
             return this.handleError(error);
         }
     }
+    
 
     // Instructor/Trainer - Assigned Course
-    async searchInstructorAssignedCourseInfo(queryParams) {
+    async searchInstructorAssignedCourseInfo(instructor_ID, course_Name, coursecat_ID, runcourse_Status) {
         try {
-            let instructorAssignedInfo = await axiosClient.get("/course/get_instructor_assigned_courses_filter_search", { params: queryParams });
-            return instructorAssignedInfo.data;
-
+            let response = await axiosClient.get("/course/get_instructor_assigned_courses_filter_search", {
+                params: {
+                    instructor_ID: instructor_ID,
+                    course_Name: course_Name,
+                    coursecat_ID: coursecat_ID,
+                    runcourse_Status: runcourse_Status
+                }
+            });
+            return response.data;
         } catch (error) {
             return this.handleError(error);
         }
     }
+    
 
-    // Instructor/Trainer - Assigned Course
-    async searchInstructorProposedCourseInfo(queryParams) {
+    // Instructor/Trainer - Proposed Course
+    async searchInstructorProposedCourseInfo(instructor_ID, course_Name, coursecat_ID, pcourse_Status) {
         try {
-            let instructorProposedInfo = await axiosClient.get("/course/get_instructor_proposed_courses_filter_search", { params: queryParams });
-            return instructorProposedInfo.data;
-
+            let response = await axiosClient.get("/course/get_instructor_proposed_courses_filter_search", {
+                params: {
+                    instructor_ID: instructor_ID,
+                    course_Name: course_Name,
+                    coursecat_ID: coursecat_ID,
+                    pcourse_Status: pcourse_Status
+                }
+            });
+            return response.data;
         } catch (error) {
             return this.handleError(error);
         }
     }
 
     // Instructor/Trainer - Completed/Taught Course
-    async searchInstructorCompletedCourseInfo(queryParams) {
+    async searchInstructorCompletedCourseInfo(instructor_ID, course_Name, coursecat_ID) {
         try {
-            let instructorCompletedInfo = await axiosClient.get("/course/get_instructor_taught_courses_filter_search", { params: queryParams });
-            return instructorCompletedInfo.data;
-
+            let response = await axiosClient.get("/course/get_instructor_taught_courses_filter_search", {
+                params: {
+                    instructor_ID: instructor_ID,
+                    course_Name: course_Name,
+                    coursecat_ID: coursecat_ID
+                }
+            });
+            return response.data;
         } catch (error) {
             return this.handleError(error);
         }
     }
-
+    
     // Admin - All Proposal - Submitted
-    async searchAdminAllProposalInfo(queryParams) {
+    async searchAllSubmittedProposedCoursesAdmin(course_Name, coursecat_ID) {
         try {
-            let adminAllProposalInfo = await axiosClient.get("/course/get_all_submitted_proposed_courses_admin", { params: queryParams });
-            return adminAllProposalInfo.data;
-
+            let response = await axiosClient.get("/course/get_all_submitted_proposed_courses_admin", {
+                params: {
+                    course_Name: course_Name,
+                    coursecat_ID: coursecat_ID
+                }
+            });
+            return response.data;
         } catch (error) {
             return this.handleError(error);
         }
     }
 
     // Admin - All Proposal - Approved/Rejected
-    async searchAdminAllApprovedRejectedProposalInfo(queryParams) {
+    async searchAllApprovedRejectedProposedCoursesAdmin(course_Name, coursecat_ID, pcourse_Status) {
         try {
-            let adminAllApprovedRejectedProposalInfo = await axiosClient.get("/course/get_all_app_reg_proposed_courses_admin", { params: queryParams });
-            return adminAllApprovedRejectedProposalInfo.data;
-
+            let response = await axiosClient.get("/course/get_all_app_reg_proposed_courses_admin", {
+                params: {
+                    course_Name: course_Name,
+                    coursecat_ID: coursecat_ID,
+                    pcourse_Status: pcourse_Status
+                }
+            });
+            return response.data;
         } catch (error) {
             return this.handleError(error);
         }
     }
+    
 
     // Admin - All Voting Campaign
-    async searchAdminVotingCampaignInfo(queryParams) {
+    async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, vote_Status) {
         try {
-            let adminVotingCampaignInfo = await axiosClient.get("/course/get_all_voting_courses_admin", { params: queryParams });
-            return adminVotingCampaignInfo.data;
-
+            let response = await axiosClient.get("/course/get_all_voting_courses_admin", {
+                params: {
+                    course_Name: course_Name,
+                    coursecat_ID: coursecat_ID,
+                    vote_Status: vote_Status
+                }
+            });
+            return response.data;
         } catch (error) {
             return this.handleError(error);
         }
-    }
+    }    
 
     // Admin - All Courses
-    async searchAdminAllCoursesInfo(queryParams) {
+    async searchAllCoursesAdmin(course_Name, coursecat_ID, course_Status) {
         try {
-            let adminAllCoursesInfo = await axiosClient.get("/course/get_all_courses_with_registration_count", { params: queryParams });
-            return adminAllCoursesInfo.data;
-
+            let response = await axiosClient.get("/course/get_all_courses_with_registration_count", {
+                params: {
+                    course_Name: course_Name,
+                    coursecat_ID: coursecat_ID,
+                    course_Status: course_Status
+                }
+            });
+            return response.data;
         } catch (error) {
             return this.handleError(error);
         }
     }
+    
 
     // Admin - All Instructors
-    async searchAdminAllInstructorsInfo(queryParams) {
+    async getAllInstructorsAndTrainers(user_Name, organization_Name) {
         try {
-            let adminAllInstructorsInfo = await axiosClient.get("/course/get_all_instructors_and_trainers", { params: queryParams });
-            return adminAllInstructorsInfo.data;
-
+            let instructorsAndTrainers = await axiosClient.get("/course/get_all_instructors_and_trainers", {
+                params: {
+                  user_Name: user_Name,
+                  organization_name: organization_Name
+                }
+            });
+            return instructorsAndTrainers.data;
         } catch (error) {
             return this.handleError(error);
         }

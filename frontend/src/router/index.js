@@ -40,7 +40,7 @@ const routes = [
       meta: {
           title: 'View Course',
       },
-    }
+    },
     // },
     // {
     //     path: '/deleteCourse',

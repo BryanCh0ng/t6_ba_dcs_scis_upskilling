@@ -466,6 +466,7 @@ retrieve_instructor_courses_filter_search = api.parser()
 retrieve_instructor_courses_filter_search.add_argument("instructor_id", help="Enter instructor ID")
 retrieve_instructor_courses_filter_search.add_argument("course_name", help="Enter course name")
 retrieve_instructor_courses_filter_search.add_argument("coursecat_id", help="Enter course category id")
+retrieve_instructor_courses_filter_search.add_argument("runcourse_status", help="Enter run course status")
 
 @api.route("/get_instructor_assigned_courses_filter_search")
 @api.doc(description="Get courses taught by an instructor with search options")
@@ -477,6 +478,7 @@ class GetInstructorCourses(Resource):
         # instructor_id = session.get("user_id")
         course_name = args.get("course_name", "")
         course_category_id = args.get("coursecat_id", "")
+        runcourse_status = args.get("runcourse_status", "")
 
         UserInstructor = aliased(User)
         # RunCourseAlias = aliased(RunCourse)
@@ -501,6 +503,8 @@ class GetInstructorCourses(Resource):
             query = query.filter(Course.course_Name.contains(course_name))
         if course_category_id:
             query = query.filter(Course.coursecat_ID == course_category_id)
+        if runcourse_status:
+            query = query.filter(RunCourse.runcourse_Status == runcourse_status)
 
         results = query.all()
         db.session.close()
@@ -918,7 +922,9 @@ class GetAllInstructorsAndTrainers(Resource):
         if instructor_name:
             query = query.filter(User.user_Name.contains(instructor_name))
         if organization_name:
-            query = query.filter(ExternalUser.organisation_Name == organization_name)
+            query = query.filter(ExternalUser.organisation_Name.like(f"%{organization_name}%"))
+
+
         
         results = query.all()
 

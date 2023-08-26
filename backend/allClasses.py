@@ -80,8 +80,6 @@ class CourseCategory(db.Model):
         self.coursecat_Name = coursecat_Name
 
     
-    def get_coursecatID(self):
-        return self.coursecat_ID
     def json(self):
         columns = self.__mapper__.column_attrs.keys()
         result = {}
@@ -101,9 +99,9 @@ class Course(db.Model):
     coursecat_ID = db.Column(db.Integer, db.ForeignKey('coursecategory.coursecat_ID'), nullable=False)
 
 
-    def __init__(self, course_ID, course_Name, course_Desc, coursecat_ID):
+    def __init__(self, course_ID, cousre_Name, course_Desc, coursecat_ID):
         self.course_ID = course_ID
-        self.course_Name = course_Name
+        self.course_Name = cousre_Name
         self.course_Desc = course_Desc
         self.coursecat_ID = coursecat_ID        
 
@@ -278,7 +276,7 @@ class Feedback(db.Model):
     feedback_ID = db.Column(db.Integer, nullable=False, primary_key=True)
     feedback_Template_ID = db.Column(db.Integer,  nullable=False)
     submitted_By = db.Column(db.Integer,  nullable=False)
-    template_Attribute_ID = db.Column(db.Integer ,db.ForeignKey('templateattribute.template_Attribute_ID'), nullable=False) 
+    template_Attribute_ID = db.Column(db.Integer ,db.ForeignKey('templateattribute.template_attribute_ID'), nullable=False) 
     answer = db.Column(db.String(255), nullable=False) 
     course_ID = db.Column(db.Integer, db.ForeignKey('course.course_ID'), nullable=False) 
 
@@ -465,27 +463,23 @@ class Blacklist(db.Model):
         for column in columns:
             result[column] = getattr(self, column)
         return result
-        
-##################  Contact Us Class Creation ##################
+
 class ContactUs(db.Model):
     __tablename__ = 'contactus'
 
-    contactus_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    msg_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     user_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'),  nullable=False)
-    subject = db.Column(db.String(255), nullable=False)
-    message = db.Column(db.String(1000), nullable=False)
-    
+    msg_Subject = db.Column(db.String(255), nullable=False)
+    msg_Body = db.Column(db.String(800), nullable=False)
+    msg_Datetime = db.Column(db.DateTime, nullable=False)
 
-
-    def __init__(self, contactus_ID, user_ID, subject, message):
-        self.contactus_ID = contactus_ID
+    def __init__(self, user_ID, msg_Subject, msg_Body, msg_Datetime):
         self.user_ID = user_ID
-        self.subject = subject
-        self.message = message
-        
+        self.msg_Subject = msg_Subject
+        self.msg_Body = msg_Body
+        self.msg_Datetime = msg_Datetime
 
-
-
+    
     def json(self):
         columns = self.__mapper__.column_attrs.keys()
         result = {}
