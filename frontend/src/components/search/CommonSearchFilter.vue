@@ -10,16 +10,13 @@
                         <dropdown-field
                         v-model="category"
                         :default-placeholder="'Course Category'">
-                        <option v-for="option in categoryDropdownOptions" :key="option" :value="option">{{ option }}</option>
+                        <option v-for="option in categoryDropdownOptions" :key="option.coursecat_ID" :value="option.coursecat_ID">{{ option.coursecat_Name }}</option>
                         </dropdown-field>
                     </div>
                     <div class="col-sm">
                         <dropdown-field
                         v-model="status"
                         :default-placeholder="'Status'">
-                        <!-- <option value="Student">Student</option>
-                        <option value="Instructor">Instructor</option>
-                        <option value="Trainer">External Trainer</option> -->
                         <option v-for="option in statusDropdownOptions" :key="option" :value="option">{{ option }}</option>
                         </dropdown-field>
                     </div>
@@ -53,6 +50,9 @@ export default({
             statusDropdownOptions: [],
         };
     },
+    props: {
+        statusOptions: Array, 
+    },
     components: {
         DropdownField,
         InputField,
@@ -61,6 +61,7 @@ export default({
         await this.getAllCourses();
         // await this.searchFilterCourses();
         await this.fetchCategoryDropdownOptions();
+        this.statusDropdownOptions = this.statusOptions;
     },
     methods: {
         async getAllCourses() {
@@ -75,31 +76,18 @@ export default({
                 console.error('Error fetching category dropdown options:', error);
             }
         },
-        async fetchStatusDropdownOptions() {
-            try {
-                // can change it in the view page using this component file
-                // const response = await axiosClient.get(this.statusApiEndpoint);
-                // this.statusDropdownOptions = response.data;
-            } catch (error) {
-                console.error('Error fetching dropdown options:', error);
-            }
-        },
         resetFilter() {
+            console.log(this.status);
             this.courseName = "";
             this.category = "";
             this.status = "";
         },
-        searchFilter() {
-        //     console.log(this.courseName);
-        //     console.log(this.category);
-        //     console.log(this.status);
+        async searchFilter() {
+            
 
             // reset filter when user clicks search
             this.resetFilter();
         }
-    },
-    props: {
-        statusApiEndpoint: String,
     }
 })
 </script>

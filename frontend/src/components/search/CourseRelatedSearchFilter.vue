@@ -10,7 +10,7 @@
                         <dropdown-field
                         v-model="category"
                         :default-placeholder="'Course Category'">
-                        <option v-for="option in categoryDropdownOptions" :key="option" :value="option">{{ option }}</option>
+                        <option v-for="option in categoryDropdownOptions" :key="option.coursecat_ID" :value="option.coursecat_ID">{{ option.coursecat_Name }}</option>
                         </dropdown-field>
                     </div>
                     <div class="col-sm col-lg-3">
