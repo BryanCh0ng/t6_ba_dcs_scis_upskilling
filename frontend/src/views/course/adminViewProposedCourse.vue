@@ -87,9 +87,9 @@
                       {{ proposed_course.proposed_date }}
                     </div>
                   </td>
-                  <td>{{ proposed_course.status }}</td>
+                  <td>{{ proposed_course.pcourse_Status }}</td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action v-if="proposed_course.pcourse_Status == 'Approved'" status="Open for Voting" :id="proposed_course.course_ID"></course-action></td>
+                  <td><course-action :status="proposed_course.pcourse_Status" :id="proposed_course.course_ID"></course-action></td>
                 </tr>
               </tbody>
             </table>
