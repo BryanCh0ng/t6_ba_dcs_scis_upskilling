@@ -8,7 +8,7 @@
       <form @submit.prevent="onSubmit">
         <!--Course Name-->
         <div class="form-group mt-5 mb-4">
-          <input v-model="formData.courseName" type="text" placeholder="Course Name" autofocus
+          <input v-model="formData.courseName" type="text" placeholder="Course Name" required autofocus
             :class="{ 'form-control': true, 'border-0': !v$?.formData.courseName?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseName?.$error }" />
           <div v-if="v$?.formData.courseName?.$error" class="text-danger">
             <span v-for="error in v$?.formData.courseName?.$errors" :key="error.$uid">{{ error.$message }}</span>
@@ -28,7 +28,7 @@
         <div class="form-group mb-4">
           <textarea v-model="formData.courseDescription"
             :class="{ 'form-control': true, 'border-0': !v$?.formData.courseDescription?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseDescription?.$error }"
-            placeholder="Course Description" style="height: 200px"></textarea>
+            placeholder="Course Description" style="height: 200px" required></textarea>
           <div v-if="v$?.formData.courseDescription?.$error" class="text-danger">
             <span v-for="error in v$?.formData.courseDescription?.$errors" :key="error.$uid">{{ error.$message }}</span>
           </div>
@@ -47,7 +47,7 @@
           <div class="col-md-6 form-group">
             <VueDatePicker v-model="formData.startDate" placeholder="Start Date" :enable-time-picker="false"
               :class="{ 'form-control': true, 'border-0': !v$?.formData.startDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.startDate?.$error }"
-              input-class-name="dp-custom-input" :format="datePickerFormat">
+              input-class-name="dp-custom-input" :format="datePickerFormat" required>
             </VueDatePicker>
             <div v-if="v$?.formData.startDate?.$error" class="text-danger">
               <span v-for="error in v$?.formData.startDate?.$errors" :key="error.$uid">{{ error.$message }}</span>
@@ -57,7 +57,7 @@
           <div class="col-md-6 form-group mt-4 mt-md-0">
             <VueDatePicker v-model="formData.endDate" placeholder="End Date" :enable-time-picker="false"
               :class="{ 'form-control': true, 'border-0': !v$?.formData.endDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.endDate?.$error }"
-              input-class-name="dp-custom-input" :format="datePickerFormat">
+              input-class-name="dp-custom-input" :format="datePickerFormat" required>
             </VueDatePicker>
             <div v-if="v$?.formData.endDate?.$error" class="text-danger">
               <span v-for="error in v$?.formData.endDate?.$errors" :key="error.$uid">{{ error.$message }}</span>
@@ -67,7 +67,7 @@
         <div class="row mb-4">
           <!--Start Time-->
           <div class="col-md-6 form-group">
-            <VueDatePicker v-model="formData.startTime" placeholder="Start Time" time-picker
+            <VueDatePicker v-model="formData.startTime" placeholder="Start Time" time-picker required
               :class="{ 'form-control': true, 'border-0': !v$?.formData.startTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.startTime?.$error }"
               input-class-name="dp-custom-input"><template #input-icon>
                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template></VueDatePicker>
@@ -77,7 +77,7 @@
           </div>
           <!--End Time-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <VueDatePicker v-model="formData.endTime" placeholder="End Time" time-picker
+            <VueDatePicker v-model="formData.endTime" placeholder="End Time" time-picker required
               :class="{ 'form-control': true, 'border-0': !v$?.formData.endTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.endTime?.$error }"
               input-class-name="dp-custom-input"><template #input-icon>
                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template></VueDatePicker>
@@ -98,7 +98,7 @@
           </div>
           <!--Venue-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <input v-model="formData.venue" type="text" placeholder="Venue" autofocus
+            <input v-model="formData.venue" type="text" placeholder="Venue" required autofocus
               :class="{ 'form-control': true, 'border-0': !v$?.formData.venue?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.venue?.$error }" />
             <div v-if="v$?.formData.venue?.$error" class="text-danger">
               <span v-for="error in v$?.formData.venue?.$errors" :key="error.$uid">{{ error.$message }}</span>
@@ -108,7 +108,7 @@
         <div class="row mb-4">
           <!--Course Size-->
           <div class="col-md-6 form-group">
-            <input v-model="formData.courseSize" type="text" placeholder="Course Size" autofocus
+            <input v-model="formData.courseSize" type="text" placeholder="Course Size" required autofocus
               :class="{ 'form-control': true, 'border-0': !v$?.formData.courseSize?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseSize?.$error }" />
             <div v-if="v$?.formData.courseSize?.$error" class="text-danger">
               <span v-for="error in v$?.formData.courseSize?.$errors" :key="error.$uid">{{ error.$message }}</span>
@@ -116,7 +116,7 @@
           </div>
           <!--Minimum Slots-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <input v-model="formData.minimumSlots" type="text" placeholder="Minimum Slots" autofocus
+            <input v-model="formData.minimumSlots" type="text" placeholder="Minimum Slots" required autofocus
               :class="{ 'form-control': true, 'border-0': !v$?.formData.minimumSlots?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.minimumSlots?.$error }" />
             <div v-if="v$?.formData.minimumSlots?.$error" class="text-danger">
               <span v-for="error in v$?.formData.minimumSlots?.$errors" :key="error.$uid">{{ error.$message }}</span>
@@ -129,14 +129,14 @@
             <VueDatePicker v-model="formData.openingDate" placeholder="Opening Date For Registration"
               :enable-time-picker="false"
               :class="{ 'form-control': true, 'border-0': !v$?.formData.openingDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.openingDate?.$error }"
-              input-class-name="dp-custom-input" :format="datePickerFormat"></VueDatePicker>
+              input-class-name="dp-custom-input" :format="datePickerFormat" required></VueDatePicker>
             <div v-if="v$?.formData.openingDate?.$error" class="text-danger">
               <span v-for="error in v$?.formData.openingDate?.$errors" :key="error.$uid">{{ error.$message }}</span>
             </div>
           </div>
           <!--Opening Time For Registration-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <VueDatePicker v-model="formData.openingTime" placeholder="Opening Time For Registration" time-picker
+            <VueDatePicker v-model="formData.openingTime" placeholder="Opening Time For Registration" time-picker required
               :class="{ 'form-control': true, 'border-0': !v$?.formData.openingTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.openingTime?.$error }"
               input-class-name="dp-custom-input"><template #input-icon>
                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template></VueDatePicker>
@@ -151,14 +151,14 @@
             <VueDatePicker v-model="formData.closingDate" placeholder="Closing Date For Registration"
               :enable-time-picker="false"
               :class="{ 'form-control': true, 'border-0': !v$?.formData.closingDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.closingDate?.$error }"
-              input-class-name="dp-custom-input" :format="datePickerFormat"></VueDatePicker>
+              input-class-name="dp-custom-input" :format="datePickerFormat" required></VueDatePicker>
             <div v-if="v$?.formData.closingDate?.$error" class="text-danger">
               <span v-for="error in v$?.formData.closingDate?.$errors" :key="error.$uid">{{ error.$message }}</span>
             </div>
           </div>
           <!--Closing Time For Registration-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <VueDatePicker v-model="formData.closingTime" placeholder="Closing Time For Registration" time-picker
+            <VueDatePicker v-model="formData.closingTime" placeholder="Closing Time For Registration" time-picker required
               :class="{ 'form-control': true, 'border-0': !v$?.formData.closingTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.closingTime?.$error }"
               input-class-name="dp-custom-input"><template #input-icon>
                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template>
@@ -171,7 +171,7 @@
         <div class="row">
           <!--Course Fee-->
           <div class="col-md-6 form-group">
-            <input v-model="formData.courseFee" type="text" placeholder="Course Fee" autofocus
+            <input v-model="formData.courseFee" type="text" placeholder="Course Fee" required autofocus
               :class="{ 'form-control': true, 'border-0': !v$?.formData.courseFee?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseFee?.$error }" />
             <div v-if="v$?.formData.courseFee?.$error" class="text-danger">
               <span v-for="error in v$?.formData.courseFee?.$errors" :key="error.$uid">{{ error.$message }}</span>
@@ -431,7 +431,7 @@ export default {
   validations() {
     return {
       formData: {
-        courseName: { required: helpers.withMessage('Please provide a valid course Name', required), currency: currencyValidatorWithMessage },
+        courseName: { required: helpers.withMessage('Please provide a valid course Name', required) },
         selectedCategory: { required: helpers.withMessage('Please select a valid course category', required) },
         courseDescription: { required: helpers.withMessage('Please provide a valid course description', required) },
         selectedInstructor: { required: helpers.withMessage('Please select a valid instructor', required) },
@@ -441,8 +441,8 @@ export default {
         endTime: { required: helpers.withMessage('Please select a valid end time', required), endTimeGreaterThanStartTime: endTimeGreaterThanStartTimeValidatorWithMessage },
         selectedFormat: { required: helpers.withMessage('Please select a valid course format', required) },
         venue: { required: helpers.withMessage('Please provide a valid venue', required) },
-        courseSize: { required: helpers.withMessage('Please provide a valid course size', required), numeric },
-        minimumSlots: { required: helpers.withMessage('Please provide a valid minimum slots', required), numeric },
+        courseSize: { required: helpers.withMessage('Please provide a valid course size', required), numeric: helpers.withMessage('Please provide a valid numeric value', numeric) },
+        minimumSlots: { required: helpers.withMessage('Please provide a valid minimum slots', required), numeric: helpers.withMessage('Please provide a valid numeric value', numeric) },
         openingDate: { required: helpers.withMessage('Please select a valid opening date for registration', required), dateFromToday: dateFromTodayValidatorWithMessage },
         openingTime: { required: helpers.withMessage('Please select a valid opening time for registration', required) },
         closingDate: { required: helpers.withMessage('Please select a valid closing date for registration', required), closingDateFromOpeningDate: closingDateFromOpeningDateValidatorWithMessage },
