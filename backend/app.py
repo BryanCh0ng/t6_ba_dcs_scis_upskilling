@@ -9,11 +9,6 @@ from core_features.course import api as course
 from core_features.coursecat import api as coursecat
 from core_features.proposedcourse import api as proposedcourse
 from core_features.runcourse import api as runcourse
-from core_features.registration import api as registration
-from core_features.user import api as user
-from core_features.externaluser import api as externaluser
-from core_features.votecourse import api as votecourse
-from core_features.interest import api as interest
 
 app = Flask(__name__)
 api = Api(
@@ -27,11 +22,6 @@ api.add_namespace(course)
 api.add_namespace(coursecat)
 api.add_namespace(proposedcourse)
 api.add_namespace(runcourse)
-api.add_namespace(registration)
-api.add_namespace(user)
-api.add_namespace(externaluser)
-api.add_namespace(votecourse)
-api.add_namespace(interest)
 
 CORS(app, supports_credentials=True)
 # ==================== CONNECTING TO DATABASE ====================#

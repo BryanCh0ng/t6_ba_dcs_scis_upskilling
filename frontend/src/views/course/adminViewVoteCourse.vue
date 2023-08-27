@@ -121,9 +121,7 @@ export default {
   async created() {
     try {
       let response = await CourseService.searchAllVotingCoursesAdmin(null, null, null)
-      console.log(response.data)
       this.vote_courses = response.data
-      console.log(this.vote_courses)
     } catch (error) {
       console.error("Error fetching course details:", error);
     }

@@ -1,6 +1,10 @@
 <template>
   <div>
-    <div class="pt-5 container col-12 table-responsive" v-if="!loading">
+    <search-filter
+        :status-options="statusOptions"
+        :search-api="searchAllInstructorsRelatedAdmin"
+        @search-complete="handleSearchComplete" />
+    <div class="container col-12 table-responsive">
       <h5 class="pb-3">All Instructors/Trainers Database</h5>
       <div v-if="instructors_trainers.length > 0">
         <table class="table">
@@ -44,85 +48,69 @@
   </div>
 </template>
     
-  <script>
-  import sortIcon from '../../components/common/sort-icon.vue';
-  import { VueAwesomePaginate } from 'vue-awesome-paginate';
-  import { getAllInstructors, getAllTrainers } from '../../scripts/user.js';
-  
-  export default {
-    components: {
-      sortIcon,
-      VueAwesomePaginate,
-    },
-    data() {
-      return {
-        instructors_trainers: [
-          {
-          "role_Name": "Instructors",
-          "user_Email": "christina.lee@smu.edu.sg",
-          "user_ID": 4,
-          "user_Name": "Christina Lee",
-          "user_Password": "christina"
-        },
-        {
-          "role_Name": "Instructor",
-          "user_Email": "jennifer.smith@smu.edu.sg",
-          "user_ID": 41,
-          "user_Name": "Jennifer Smith",
-          "user_Password": "jennifer"
-        },
-        {
-          "role_Name": "Instructor",
-          "user_Email": "robert.johnson@smu.edu.sg",
-          "user_ID": 42,
-          "user_Name": "Robert Johnson",
-          "user_Password": "robert"
-        },
-        {
-          "role_Name": "Instructor",
-          "user_Email": "michelle.williams@smu.edu.sg",
-          "user_ID": 43,
-          "user_Name": "Michelle Williams",
-          "user_Password": "michelle"
-        },
-        {
-          "role_Name": "Instructor",
-          "user_Email": "daniel.brown@smu.edu.sg",
-          "user_ID": 44,
-          "user_Name": "Daniel Brown",
-          "user_Password": "danielb"
-        },
-        {
-          "role_Name": "Instructor",
-          "user_Email": "laura.davis@smu.edu.sg",
-          "user_ID": 45,
-          "user_Name": "Laura Davis",
-          "user_Password": "laura"
-        }
-        ],
-        sortColumn: 'name',
-        sortDirection: 'asc',
-        itemsPerPage: 10,
-        localCurrentPageInstructorsTrainers: 1,
-        loading: true
-      }
-    },
-    methods: {
-      handlePageChangeInstructors(newPage) {
-        this.localCurrentPageInstructors = newPage;
-        this.$emit('page-change', newPage);
-      },
-    },
-    computed: {
-      displayedInstructorsTrainers() {
-        const startIndex = (this.localCurrentPageInstructorsTrainers - 1) * this.itemsPerPage;
-        const endIndex = startIndex + this.itemsPerPage;
-        return this.instructors_trainers.slice(startIndex, endIndex);
-      }
-    },
+<script>
+import sortIcon from '../../components/common/sort-icon.vue';
+import { VueAwesomePaginate } from 'vue-awesome-paginate';
+import SearchFilter from "@/components/search/InstructorRelatedSearchFilter.vue";
+import CourseService from "@/api/services/CourseService.js";
+
+export default {
+  components: {
+    sortIcon,
+    VueAwesomePaginate,
+    SearchFilter
+  },
+  data() {
+    return {
+      instructors_trainers: [],
+      sortColumn: 'name',
+      sortDirection: 'asc',
+      itemsPerPage: 10,
+      localCurrentPageInstructorsTrainers: 1
     }
-  </script>
-  
+  },
+  methods: {
+    handlePageChangeInstructors(newPage) {
+      this.localCurrentPageInstructors = newPage;
+      this.$emit('page-change', newPage);
+    },
+    async handleSearchComplete(searchResults) {
+      console.log(searchResults)
+      this.courses = searchResults;
+    },
+    async searchAllInstructorsRelatedAdmin(user_ID, course_Name, coursecat_ID, status) {
+      try {
+        let response = await CourseService.searchInstructorProposedCourseInfo(
+          user_ID,
+          course_Name,
+          coursecat_ID,
+          status
+        );
+        this.vote_courses = response.data;
+        return this.vote_courses;
+      } catch (error) {
+        console.error("Error fetching info:", error);
+        throw error;
+      }
+    }
+  },
+  computed: {
+    displayedInstructorsTrainers() {
+      const startIndex = (this.localCurrentPageInstructorsTrainers - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      return this.instructors_trainers.slice(startIndex, endIndex);
+    }
+  },
+  async created() {
+    try {
+      let response = await CourseService.getAllInstructorsAndTrainers(null, null)
+      this.instructors_trainers = response.data
+    } catch (error) {
+      console.error("Error fetching course details:", error);
+    }
+  }
+  }
+</script>
   
 <style>
   @import '../../assets/css/paginate.css';
