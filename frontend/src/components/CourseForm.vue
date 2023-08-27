@@ -5,41 +5,39 @@
 
       <h2 v-else class="text-center">Edit Course</h2>
 
-      <form ref="courseForm" @submit.prevent="submitForm">
+      <form @submit.prevent="onSubmit">
         <!--Course Name-->
         <div class="form-group mt-5 mb-4">
-          <!--<input v-model="courseName" type="text" placeholder="Course Name" required autofocus=""
-            class="form-control border-0 shadow-sm px-4 field" />-->
-          <input-field v-model="course.courseName" type="text" placeholder="Course Name"></input-field>
+          <input v-model="formData.courseName" type="text" placeholder="Course Name" autofocus
+            :class="{ 'form-control': true, 'border-0': !v$?.formData.courseName?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseName?.$error }" />
+          <div v-if="v$?.formData.courseName?.$error" class="text-danger">
+            <span v-for="error in v$?.formData.courseName?.$errors" :key="error.$uid">{{ error.$message }}</span>
+          </div>
         </div>
         <!--Course Category-->
         <div class="form-group mb-4">
-          <!-- Dropdown Button -->
-          <!--<select v-model="selectedCategory" class="form-select border-0 shadow-sm px-4 field text-muted">
-            <option disabled hidden value="">Course Category</option>
-            <option v-for="courseCat in courseCats" :key="courseCat.coursecat_ID" :value="courseCat.coursecat_Name">
-              {{ courseCat.coursecat_Name }}
-            </option>
-          </select>-->
-          <dropdown-field v-model="course.selectedCategory" :default-placeholder="'Course Category'">
-            <option v-for="courseCategory in course.courseCategories" :key="courseCategory.coursecat_ID" :value="courseCategory.coursecat_Name">
+          <dropdown-field v-model="formData.selectedCategory" :default-placeholder="'Course Category'"
+            :errors="v$?.formData.selectedCategory?.$errors[0]?.$message">
+            <option v-for="courseCategory in formData.courseCategories" :key="courseCategory.coursecat_ID"
+              :value="courseCategory.coursecat_Name">
               {{ courseCategory.coursecat_Name }}
             </option>
           </dropdown-field>
         </div>
         <!--Course Description-->
         <div class="form-group mb-4">
-          <textarea v-model="course.courseDescription" class="form-control border-0 shadow-sm px-4 field"
-            placeholder="Course Description" style="height: 200px" required></textarea>
+          <textarea v-model="formData.courseDescription"
+            :class="{ 'form-control': true, 'border-0': !v$?.formData.courseDescription?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseDescription?.$error }"
+            placeholder="Course Description" style="height: 200px"></textarea>
+          <div v-if="v$?.formData.courseDescription?.$error" class="text-danger">
+            <span v-for="error in v$?.formData.courseDescription?.$errors" :key="error.$uid">{{ error.$message }}</span>
+          </div>
         </div>
         <!--Instructor Name-->
         <div class="form-group mb-4">
-          <!--<select v-model="selectedInstructor" class="form-select border-0 shadow-sm px-4 field text-muted">
-            <option disabled hidden value="">Instructor</option>
-            <option v-for="instructor in instructors" :key="instructor.id" :value="instructor.name">{{ instructor.name }}</option>
-          </select>-->
-          <dropdown-field v-model="course.selectedInstructor" :default-placeholder="'Instructor'">
-            <option v-for="instructor in course.instructors" :key="instructor.id" :value="instructor.name">
+          <dropdown-field v-model="formData.selectedInstructor" :default-placeholder="'Instructor'"
+            :errors="v$?.formData.selectedInstructor?.$errors[0]?.$message">
+            <option v-for="instructor in formData.instructors" :key="instructor.id" :value="instructor.name">
               {{ instructor.name }}
             </option>
           </dropdown-field>
@@ -47,113 +45,144 @@
         <div class="row mb-4">
           <!--Start Date-->
           <div class="col-md-6 form-group">
-            <VueDatePicker v-model="course.startDate" placeholder="Start Date" :enable-time-picker="false"
-              class="form-control border-0 shadow-sm" input-class-name="dp-custom-input" :format="datePickerFormat"
-              required></VueDatePicker>
+            <VueDatePicker v-model="formData.startDate" placeholder="Start Date" :enable-time-picker="false"
+              :class="{ 'form-control': true, 'border-0': !v$?.formData.startDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.startDate?.$error }"
+              input-class-name="dp-custom-input" :format="datePickerFormat">
+            </VueDatePicker>
+            <div v-if="v$?.formData.startDate?.$error" class="text-danger">
+              <span v-for="error in v$?.formData.startDate?.$errors" :key="error.$uid">{{ error.$message }}</span>
+            </div>
           </div>
           <!--End Date-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <VueDatePicker v-model="course.endDate" placeholder="End Date" :enable-time-picker="false"
-              class="form-control border-0 shadow-sm" input-class-name="dp-custom-input" :format="datePickerFormat"
-              required></VueDatePicker>
+            <VueDatePicker v-model="formData.endDate" placeholder="End Date" :enable-time-picker="false"
+              :class="{ 'form-control': true, 'border-0': !v$?.formData.endDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.endDate?.$error }"
+              input-class-name="dp-custom-input" :format="datePickerFormat">
+            </VueDatePicker>
+            <div v-if="v$?.formData.endDate?.$error" class="text-danger">
+              <span v-for="error in v$?.formData.endDate?.$errors" :key="error.$uid">{{ error.$message }}</span>
+            </div>
           </div>
         </div>
         <div class="row mb-4">
           <!--Start Time-->
           <div class="col-md-6 form-group">
-            <VueDatePicker v-model="course.startTime" placeholder="Start Time" time-picker
-              class="form-control border-0 shadow-sm" input-class-name="dp-custom-input" required><template #input-icon>
+            <VueDatePicker v-model="formData.startTime" placeholder="Start Time" time-picker
+              :class="{ 'form-control': true, 'border-0': !v$?.formData.startTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.startTime?.$error }"
+              input-class-name="dp-custom-input"><template #input-icon>
                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template></VueDatePicker>
+            <div v-if="v$?.formData.startTime?.$error" class="text-danger">
+              <span v-for="error in v$?.formData.startTime?.$errors" :key="error.$uid">{{ error.$message }}</span>
+            </div>
           </div>
           <!--End Time-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <VueDatePicker v-model="course.endTime" placeholder="End Time" time-picker class="form-control border-0 shadow-sm"
-              input-class-name="dp-custom-input" required><template #input-icon>
+            <VueDatePicker v-model="formData.endTime" placeholder="End Time" time-picker
+              :class="{ 'form-control': true, 'border-0': !v$?.formData.endTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.endTime?.$error }"
+              input-class-name="dp-custom-input"><template #input-icon>
                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template></VueDatePicker>
+            <div v-if="v$?.formData.endTime?.$error" class="text-danger">
+              <span v-for="error in v$?.formData.endTime?.$errors" :key="error.$uid">{{ error.$message }}</span>
+            </div>
           </div>
         </div>
         <div class="row mb-4">
           <!--Course Format-->
           <div class="col-md-6 form-group">
-            <!-- Dropdown Button -->
-            <!--<select v-model="selectedFormat" class="form-select border-0 shadow-sm px-4 field text-muted">
-              <option disabled hidden value="">Course Format</option>
-              <option v-for="format in formats" :key="format.id" :value="format.name">
-                {{ format.name }}
-              </option>
-            </select>-->
-            <dropdown-field v-model="course.selectedFormat" :default-placeholder="'Course Format'">
-              <option v-for="courseFormat in course.courseFormats" :key="courseFormat.id" :value="courseFormat.name">
+            <dropdown-field v-model="formData.selectedFormat" :default-placeholder="'Course Format'"
+              :errors="v$?.formData.selectedFormat?.$errors[0]?.$message">
+              <option v-for="courseFormat in formData.courseFormats" :key="courseFormat.id" :value="courseFormat.name">
                 {{ courseFormat.name }}
               </option>
             </dropdown-field>
           </div>
           <!--Venue-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <!--<input v-model="venue" type="text" placeholder="Venue" required autofocus=""
-              class="form-control border-0 shadow-sm px-4 field" />-->
-            <input-field v-model="course.venue" type="text" placeholder="Venue"></input-field>
+            <input v-model="formData.venue" type="text" placeholder="Venue" autofocus
+              :class="{ 'form-control': true, 'border-0': !v$?.formData.venue?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.venue?.$error }" />
+            <div v-if="v$?.formData.venue?.$error" class="text-danger">
+              <span v-for="error in v$?.formData.venue?.$errors" :key="error.$uid">{{ error.$message }}</span>
+            </div>
           </div>
         </div>
         <div class="row mb-4">
           <!--Course Size-->
           <div class="col-md-6 form-group">
-            <!--<input v-model="courseSize" type="text" placeholder="Course Size" required autofocus=""
-              class="form-control border-0 shadow-sm px-4 field" />-->
-            <input-field v-model="course.courseSize" type="text" placeholder="Course Size"></input-field>
+            <input v-model="formData.courseSize" type="text" placeholder="Course Size" autofocus
+              :class="{ 'form-control': true, 'border-0': !v$?.formData.courseSize?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseSize?.$error }" />
+            <div v-if="v$?.formData.courseSize?.$error" class="text-danger">
+              <span v-for="error in v$?.formData.courseSize?.$errors" :key="error.$uid">{{ error.$message }}</span>
+            </div>
           </div>
           <!--Minimum Slots-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <!--<input v-model="minSlots" type="text" placeholder="Min Slots" required autofocus=""
-              class="form-control border-0 shadow-sm px-4 field" />-->
-            <input-field v-model="course.minimumSlots" type="text" placeholder="Minimum Slots"></input-field>
+            <input v-model="formData.minimumSlots" type="text" placeholder="Minimum Slots" autofocus
+              :class="{ 'form-control': true, 'border-0': !v$?.formData.minimumSlots?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.minimumSlots?.$error }" />
+            <div v-if="v$?.formData.minimumSlots?.$error" class="text-danger">
+              <span v-for="error in v$?.formData.minimumSlots?.$errors" :key="error.$uid">{{ error.$message }}</span>
+            </div>
           </div>
         </div>
         <div class="row mb-4">
           <!--Opening Date For Registration-->
           <div class="col-md-6 form-group">
-            <VueDatePicker v-model="course.openingDate" placeholder="Opening Date For Registration" :enable-time-picker="false"
-              class="form-control border-0 shadow-sm" input-class-name="dp-custom-input" :format="datePickerFormat"
-              required></VueDatePicker>
+            <VueDatePicker v-model="formData.openingDate" placeholder="Opening Date For Registration"
+              :enable-time-picker="false"
+              :class="{ 'form-control': true, 'border-0': !v$?.formData.openingDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.openingDate?.$error }"
+              input-class-name="dp-custom-input" :format="datePickerFormat"></VueDatePicker>
+            <div v-if="v$?.formData.openingDate?.$error" class="text-danger">
+              <span v-for="error in v$?.formData.openingDate?.$errors" :key="error.$uid">{{ error.$message }}</span>
+            </div>
           </div>
           <!--Opening Time For Registration-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <VueDatePicker v-model="course.openingTime" placeholder="Opening Time For Registration" time-picker
-              class="form-control border-0 shadow-sm" input-class-name="dp-custom-input" required><template #input-icon>
+            <VueDatePicker v-model="formData.openingTime" placeholder="Opening Time For Registration" time-picker
+              :class="{ 'form-control': true, 'border-0': !v$?.formData.openingTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.openingTime?.$error }"
+              input-class-name="dp-custom-input"><template #input-icon>
                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template></VueDatePicker>
+            <div v-if="v$?.formData.openingTime?.$error" class="text-danger">
+              <span v-for="error in v$?.formData.openingTime?.$errors" :key="error.$uid">{{ error.$message }}</span>
+            </div>
           </div>
         </div>
         <div class="row mb-4">
           <!--Closing Date For Registration-->
           <div class="col-md-6 form-group">
-            <VueDatePicker v-model="course.closingDate" placeholder="Closing Date For Registration" :enable-time-picker="false"
-              class="form-control border-0 shadow-sm" input-class-name="dp-custom-input" :format="datePickerFormat"
-              required></VueDatePicker>
+            <VueDatePicker v-model="formData.closingDate" placeholder="Closing Date For Registration"
+              :enable-time-picker="false"
+              :class="{ 'form-control': true, 'border-0': !v$?.formData.closingDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.closingDate?.$error }"
+              input-class-name="dp-custom-input" :format="datePickerFormat"></VueDatePicker>
+            <div v-if="v$?.formData.closingDate?.$error" class="text-danger">
+              <span v-for="error in v$?.formData.closingDate?.$errors" :key="error.$uid">{{ error.$message }}</span>
+            </div>
           </div>
           <!--Closing Time For Registration-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <VueDatePicker v-model="course.closingTime" placeholder="Closing Time For Registration" time-picker
-              class="form-control border-0 shadow-sm" input-class-name="dp-custom-input" required><template #input-icon>
+            <VueDatePicker v-model="formData.closingTime" placeholder="Closing Time For Registration" time-picker
+              :class="{ 'form-control': true, 'border-0': !v$?.formData.closingTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.closingTime?.$error }"
+              input-class-name="dp-custom-input"><template #input-icon>
                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template>
             </VueDatePicker>
+            <div v-if="v$?.formData.closingTime?.$error" class="text-danger">
+              <span v-for="error in v$?.formData.closingTime?.$errors" :key="error.$uid">{{ error.$message }}</span>
+            </div>
           </div>
         </div>
         <div class="row">
           <!--Course Fee-->
           <div class="col-md-6 form-group">
-            <!--<input v-model="courseFee" type="text" placeholder="Course Fee" required autofocus=""
-            class="form-control border-0 shadow-sm px-4 field" />-->
-            <input-field v-model="course.courseFee" type="text" placeholder="Course Fee"></input-field>
+            <input v-model="formData.courseFee" type="text" placeholder="Course Fee" autofocus
+              :class="{ 'form-control': true, 'border-0': !v$?.formData.courseFee?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseFee?.$error }" />
+            <div v-if="v$?.formData.courseFee?.$error" class="text-danger">
+              <span v-for="error in v$?.formData.courseFee?.$errors" :key="error.$uid">{{ error.$message }}</span>
+            </div>
           </div>
           <!--Feedback Template-->
           <div class="col-md-6 form-group mt-4 mt-md-0">
-            <!-- Dropdown Button -->
-            <!--<select v-model="selectedTemplate" class="form-select border-0 shadow-sm px-4 field text-muted">
-              <option disabled hidden value="">Feedback Template</option>
-              <option v-for="template in templates" :key="template.id" :value="template.name">{{ template.name }}</option>
-            </select>-->
-            <dropdown-field v-model="course.selectedTemplate" :default-placeholder="'Feedback Template'">
-              <option v-for="feedbackTemplate in course.feedbackTemplates" :key="feedbackTemplate.id" :value="feedbackTemplate.name">
+            <dropdown-field v-model="formData.selectedTemplate" :default-placeholder="'Feedback Template'"
+              :errors="v$?.formData.selectedTemplate?.$errors[0]?.$message">
+              <option v-for="feedbackTemplate in formData.feedbackTemplates" :key="feedbackTemplate.id"
+                :value="feedbackTemplate.name">
                 {{ feedbackTemplate.name }}
               </option>
             </dropdown-field>
@@ -179,29 +208,178 @@
       </form>
     </div>
     <!-- Success modal -->
-    <success-modal :show="showSuccessModal" :message="successMessage" @close="hideSuccessModal"/>
+    <success-modal :show="showSuccessModal" :message="successMessage" @close="hideSuccessModal" />
   </div>
 </template>
 
 <script>
-import InputField from "../components/InputField.vue";
+//import InputField from "../components/InputField.vue";
 import DropdownField from "../components/DropdownField.vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import SuccessModal from "../components/SuccessModal.vue";
 import "@vuepic/vue-datepicker/dist/main.css";
-import CourseCategoryService from "@/api/services/CourseCategoryService.js"
+import CourseCategoryService from "@/api/services/CourseCategoryService.js";
+import { useVuelidate } from "@vuelidate/core";
+import { required, numeric, helpers } from "@vuelidate/validators";
+//import ErrorMessage from "../components/ErrorMessage.vue";
+
+//Validating the date fields
+
+//Function: Check whether the selected date is greater than the closingDate 
+const validateStartDateGreaterThanClosingDate = function (value) {
+  if (value === null || this.formData.closingDate === null) {
+    return true;
+  }
+
+  return value > this.formData.closingDate;
+};
+
+const startDateGreaterThanClosingDateValidator = helpers.withParams(
+  { type: 'startDateGreaterThanClosingDate' },
+  validateStartDateGreaterThanClosingDate
+);
+
+const startDateGreaterThanClosingDateValidatorWithMessage = helpers.withMessage(
+  'Please select a start date after the selected closing date for registration',
+  startDateGreaterThanClosingDateValidator
+)
+
+//Function: Check whether the selected date is equal to or greater than the startDate
+const validateEndDateFromStartDate = function (value) {
+  if (value === null || this.formData.startDate === null) {
+    return true;
+  }
+
+  return value >= this.formData.startDate;
+};
+
+const endDateFromStartDateValidator = helpers.withParams(
+  { type: 'endDateFromStartDate' },
+  validateEndDateFromStartDate
+);
+
+const endDateFromStartDateValidatorWithMessage = helpers.withMessage(
+  'Please select an end date that falls on or after the selected start date',
+  endDateFromStartDateValidator
+)
+
+//Function: Check whether the selected date is equal to or greater than today's date 
+// Define the custom validation function
+const validateDateFromToday = (value) => {
+  if (!value) {
+    return true; // Field is empty, so no validation needed
+  }
+  const selectedDate = new Date(value);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Set today's time to midnight
+
+  return selectedDate >= today;
+};
+
+// Create a custom validator using withParams and withMessage
+const dateFromTodayValidator = helpers.withParams(
+  { type: 'dateFromToday' },
+  validateDateFromToday
+);
+const dateFromTodayValidatorWithMessage = helpers.withMessage(
+  'Please select an opening date for registration from today onwards.',
+  dateFromTodayValidator
+);
+
+//Function: Check whether the selected date is equal to or greater than the openingDate 
+const validateClosingDateFromOpeningDate = function (value) {
+  if (value === null || this.formData.openingDate === null) {
+    return true;
+  }
+
+  return value >= this.formData.openingDate;
+};
+
+const closingDateFromOpeningDateValidator = helpers.withParams(
+  { type: 'closingDateFromOpeningDate' },
+  validateClosingDateFromOpeningDate
+);
+
+const closingDateFromOpeningDateValidatorWithMessage = helpers.withMessage(
+  'Please select a closing date for registration that falls on or after the selected opening date for registration',
+  closingDateFromOpeningDateValidator
+)
+
+
+//Validating the time fields 
+
+//Function: Check whether the selected time is greater than the startTime
+const validateEndTimeGreaterThanStartTime = function (value) {
+  if (value === null || this.formData.startTime === null) {
+    return true;
+  }
+  return value > this.formData.startTime;
+};
+
+const endTimeGreaterThanStartTimeValidator = helpers.withParams(
+  { type: 'endTimeGreaterThanStartTime' },
+  validateEndTimeGreaterThanStartTime
+);
+
+const endTimeGreaterThanStartTimeValidatorWithMessage = helpers.withMessage(
+  'Please select an end time later than the selected start time',
+  endTimeGreaterThanStartTimeValidator
+)
+
+//Function: Check whether the selected time is greater than the openingTime
+const validateClosingTimeGreaterThanOpeningTime = function (value) {
+  if (value === null || this.formData.openingTime === null) {
+    return true;
+  }
+  return value > this.formData.openingTime;
+};
+
+const closingTimeGreaterThanOpeningTimeValidator = helpers.withParams(
+  { type: 'closingTimeGreaterThanOpeningTime' },
+  validateClosingTimeGreaterThanOpeningTime
+);
+
+const closingTimeGreaterThanOpeningTimeValidatorWithMessage = helpers.withMessage(
+  'Please select a closing time For registration later than the selected opening time for registration',
+  closingTimeGreaterThanOpeningTimeValidator
+)
+
+
+//Validating the currency field
+
+//Function: Check whether the entered value matches the currency regex pattern
+const validateCurrency = (value) => {
+  if (!value) {
+    return true;
+  }
+  const currencyRegex = /^\d+(\.\d{1,2})?$/;
+  return currencyRegex.test(value);
+};
+
+const currencyValidator = helpers.withParams(
+  { type: 'currency' },
+  validateCurrency
+);
+const currencyValidatorWithMessage = helpers.withMessage(
+  'Please enter a valid currency amount.',
+  currencyValidator
+);
 
 export default {
   name: "CourseForm",
-  components: {
-    VueDatePicker,
-    InputField,
-    DropdownField,
-    SuccessModal
+  props: {
+    status: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  setup() {
+    const v$ = useVuelidate(); // Initialize Vuelidate
+    return { v$ };
   },
   data() {
     return {
-      course: {
+      formData: {
         courseName: "",
         selectedCategory: "",
         courseCategories: [],
@@ -209,14 +387,14 @@ export default {
         selectedInstructor: "",
         //To be removed 
         instructors: [
-          { id: 1, name: "Miss Tan"},
-          { id: 2, name: "Miss Lee"}
+          { id: 1, name: "Miss Tan" },
+          { id: 2, name: "Miss Lee" }
         ],
         datePickerFormat: "yyyy-MM-dd",
         startDate: null,
         endDate: null,
-        startTime: "",
-        endTime: "",
+        startTime: null,
+        endTime: null,
         selectedFormat: "", // Holds the selected course format ID
         courseFormats: [
           { id: 1, name: "Online" },
@@ -227,21 +405,52 @@ export default {
         courseSize: "",
         minimumSlots: "",
         openingDate: null,
-        openingTime: "",
+        openingTime: null,
         closingDate: null,
-        closingTime: "",
+        closingTime: null,
         courseFee: "",
         selectedTemplate: "",
         //To be removed
         feedbackTemplates: [
-          { id: 1, name: "Template 1"},
-          { id: 2, name: "Template 2"}
+          { id: 1, name: "Template 1" },
+          { id: 2, name: "Template 2" }
         ]
       },
       showSuccessModal: false,
       successMessage: "The course has been successfully created and is now available for registration.",
-      formIsValid: false
+      errorMessage: ""
     };
+  },
+  components: {
+    VueDatePicker,
+    //InputField,
+    DropdownField,
+    SuccessModal
+    //ErrorMessage
+  },
+  validations() {
+    return {
+      formData: {
+        courseName: { required: helpers.withMessage('Please provide a valid course Name', required), currency: currencyValidatorWithMessage },
+        selectedCategory: { required: helpers.withMessage('Please select a valid course category', required) },
+        courseDescription: { required: helpers.withMessage('Please provide a valid course description', required) },
+        selectedInstructor: { required: helpers.withMessage('Please select a valid instructor', required) },
+        startDate: { required: helpers.withMessage('Please select a valid start date', required), startDateGreaterThanClosingDate: startDateGreaterThanClosingDateValidatorWithMessage },
+        endDate: { required: helpers.withMessage('Please select a valid end date', required), endDateFromStartDate: endDateFromStartDateValidatorWithMessage },
+        startTime: { required: helpers.withMessage('Please select a valid start time', required) },
+        endTime: { required: helpers.withMessage('Please select a valid end time', required), endTimeGreaterThanStartTime: endTimeGreaterThanStartTimeValidatorWithMessage },
+        selectedFormat: { required: helpers.withMessage('Please select a valid course format', required) },
+        venue: { required: helpers.withMessage('Please provide a valid venue', required) },
+        courseSize: { required: helpers.withMessage('Please provide a valid course size', required), numeric },
+        minimumSlots: { required: helpers.withMessage('Please provide a valid minimum slots', required), numeric },
+        openingDate: { required: helpers.withMessage('Please select a valid opening date for registration', required), dateFromToday: dateFromTodayValidatorWithMessage },
+        openingTime: { required: helpers.withMessage('Please select a valid opening time for registration', required) },
+        closingDate: { required: helpers.withMessage('Please select a valid closing date for registration', required), closingDateFromOpeningDate: closingDateFromOpeningDateValidatorWithMessage },
+        closingTime: { required: helpers.withMessage('Please select a valid closing time for registration', required), closingTimeGreaterThanOpeningTime: closingTimeGreaterThanOpeningTimeValidatorWithMessage },
+        courseFee: { required: helpers.withMessage('Please provide a valid course fee', required), currency: currencyValidatorWithMessage },
+        selectedTemplate: { requiredL: helpers.withMessage('Please select a valid feedback template', required) }
+      }
+    }
   },
   async mounted() {
     await this.fetchCourseCategories();
@@ -251,52 +460,70 @@ export default {
   methods: {
     async fetchCourseCategories() {
       try {
-        this.course.courseCategories = await CourseCategoryService.getAllCourseCategory(); // Use the CourseCategoryService
+        this.formData.courseCategories = await CourseCategoryService.getAllCourseCategory(); // Use the CourseCategoryService
       } catch (error) {
         console.error('Error fetching course categories:', error);
       }
     },
-    validateForm() {
-      this.formIsValid = 
-        this.courseName.trim() !== "" &&
-        this.selectedCategory !== "" &&
-        this.courseDesc.trim() !== "" &&
-        this.selectedInstructor !== "" &&
-        this.startDate !== null &&
-        this.endDate !== null &&
-        this.startTime.trim() !== "" &&
-        this.endTime.trim() !== "" &&
-        this.selectedFormat !== "" &&
-        this.venue.trim() !== "" &&
-        this.courseSize.trim() !== "" &&
-        this.minSlots.trim() !== "" &&
-        this.openingDate !== null &&
-        this.openingTime.trim() !== "" &&
-        this.closingDate !== null &&
-        this.closingTime.trim() !== "" &&
-        this.courseFee.trim() !== "" &&
-        this.selectedTemplate !== "";
-    },
-    submitForm() {
-      //Conduct Form validation here
-      this.$refs.courseForm.reset();
+    async resetForm() {
+      this.formData = {
+        courseName: "",
+        selectedCategory: "",
+        courseCategories: [],
+        courseDescription: "",
+        selectedInstructor: "",
+        //To be removed 
+        instructors: [
+          { id: 1, name: "Miss Tan" },
+          { id: 2, name: "Miss Lee" }
+        ],
+        datePickerFormat: "yyyy-MM-dd",
+        startDate: null,
+        endDate: null,
+        startTime: null,
+        endTime: null,
+        selectedFormat: "", // Holds the selected course format ID
+        courseFormats: [
+          { id: 1, name: "Online" },
+          { id: 2, name: "Face-to-Face" },
+          // Add more course format here
+        ],
+        venue: "",
+        courseSize: "",
+        minimumSlots: "",
+        openingDate: null,
+        openingTime: null,
+        closingDate: null,
+        closingTime: null,
+        courseFee: "",
+        selectedTemplate: "",
+        //To be removed
+        feedbackTemplates: [
+          { id: 1, name: "Template 1" },
+          { id: 2, name: "Template 2" }
+        ]
+      }
 
-      // Test Simulate a successful submission
-      setTimeout(() => {
+      await this.fetchCourseCategories();
+    },
+    onSubmit() {
+      this.v$.$touch();
+
+      if (!this.v$.$invalid) {
+        // Form is valid, submit or perform further actions
+        console.log('Form submitted successfully');
+        //Create the course service
         this.showSuccessModal = true;
-      }, 1000); // Show modal after 1 second (simulating response)
+      } else {
+        // Form has validation errors
+        console.log('Form has validation errors');
+      }
     },
     hideSuccessModal() {
       this.showSuccessModal = false;
-      //this.resetForm();
+      this.resetForm();
     }
-  },
-  props: {
-    status: {
-      type: Boolean,
-      required: true,
-    },
-  },
+  }
 };
 </script>
 
@@ -314,5 +541,4 @@ export default {
     /* Change the placeholder color here */
     color: black;
   }
-}
-</style>
+}</style>
