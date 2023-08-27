@@ -46,7 +46,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # app.config['SQLALCHEMY_MAX_OVERFLOW'] = 0
 
 db = SQLAlchemy(app)
-# ==================== TEST FUNCTIONS ====================#test_parser = api.parser()
+# ==================== TEST FUNCTIONS ====================#
 test_parser = api.parser()
 test_parser.add_argument("number1", help="First number to add")
 test_parser.add_argument("number2", help="Second number to add")
