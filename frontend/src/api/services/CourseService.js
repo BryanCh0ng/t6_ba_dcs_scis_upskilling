@@ -4,9 +4,16 @@ import BaseApiService from "../BaseApiService";
 class CourseService extends BaseApiService {
     async getAllCourses(filter) {
         try {
-            let courses = await axiosClient.get("/course/get_all_courses", {params: {skill_name: filter}});
+            let courses = await axiosClient.get("/course/get_all_courses", { params: { skill_name: filter } });
             return courses.data
-
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+    async getAllCoursesAdmin() {
+        try {
+            let courses = await axiosClient.get("/course/get_all_courses_admin");
+            return courses.data
         } catch (error) {
             return this.handleError(error);
         }
@@ -15,7 +22,6 @@ class CourseService extends BaseApiService {
         try {
             let course = await axiosClient.get("/course/get_course_by_id", { params: { course_id: courseId } });
             return course.data
-
         } catch (error) {
             return this.handleError(error);
         }
@@ -24,12 +30,19 @@ class CourseService extends BaseApiService {
         try {
             let courses = await axiosClient.get("/course/retrieve_all_courses_filter_search", { params: { course_id: courseId, coursecat_id: coursecatId } })
             return courses.data
-            
-
         } catch (error) {
             return this.handleError(error);
         }
     }
+    async deleteCourse(course_ID) {
+        try {
+            let deleteCourse = await axiosClient.delete("/course/delete_Course", { params: { course_id: course_ID } });
+            return deleteCourse.data
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
     // Student - Registration - course name, course cat, status
     async searchCourseRegistrationInfo(user_ID, course_Name, coursecat_ID, reg_Status) {
         try {
@@ -67,7 +80,7 @@ class CourseService extends BaseApiService {
         } catch (error) {
             return this.handleError(error);
         }
-    }    
+    }
     // Student/Instructor/Trainer - Proposed - course name, course cat, status
     async searchProposedInfo(user_ID, course_Name, coursecat_ID, pcourse_Status) {
         try {
@@ -84,7 +97,7 @@ class CourseService extends BaseApiService {
             return this.handleError(error);
         }
     }
-    
+
     // Student - Completed - course name, course cat
     async searchCompletedInfo(user_ID, course_Name, coursecat_ID) {
         try {
@@ -99,7 +112,7 @@ class CourseService extends BaseApiService {
         } catch (error) {
             return this.handleError(error);
         }
-    }    
+    }
 
     // Instructor/Trainer - VotingCampaign - course name, course cat
     async searchVotingCampaignInfo(course_Name, coursecat_ID) {
@@ -115,7 +128,7 @@ class CourseService extends BaseApiService {
             return this.handleError(error);
         }
     }
-    
+
 
     // Instructor/Trainer - Assigned Course
     async searchInstructorAssignedCourseInfo(instructor_ID, course_Name, coursecat_ID, runcourse_Status) {
@@ -133,7 +146,7 @@ class CourseService extends BaseApiService {
             return this.handleError(error);
         }
     }
-    
+
 
     // Instructor/Trainer - Proposed Course
     async searchInstructorProposedCourseInfo(instructor_ID, course_Name, coursecat_ID, pcourse_Status) {
@@ -167,7 +180,7 @@ class CourseService extends BaseApiService {
             return this.handleError(error);
         }
     }
-    
+
     // Admin - All Proposal - Submitted
     async searchAllSubmittedProposedCoursesAdmin(course_Name, coursecat_ID) {
         try {
@@ -201,7 +214,7 @@ class CourseService extends BaseApiService {
             return this.handleError(error);
         }
     }
-    
+
 
     // Admin - All Voting Campaign
     async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, vote_Status) {
@@ -217,12 +230,12 @@ class CourseService extends BaseApiService {
         } catch (error) {
             return this.handleError(error);
         }
-    }    
+    }
 
     // Admin - All Courses
     async searchAllCoursesAdmin(course_Name, coursecat_ID, course_Status) {
         try {
-            
+
             let response = await axiosClient.get("/course/get_all_courses_with_registration_count", {
                 params: {
                     course_name: course_Name,
@@ -236,7 +249,7 @@ class CourseService extends BaseApiService {
             return this.handleError(error);
         }
     }
-    
+
 
     // Admin - All Instructors
     async getAllInstructorsAndTrainers(user_Name, organization_Name) {
@@ -252,7 +265,6 @@ class CourseService extends BaseApiService {
             return this.handleError(error);
         }
     }
-
 }
 
 export default new CourseService();

@@ -1,6 +1,6 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-SET time_zone = "+00:00";
+-- SET time_zone = "+00:00";
 
 DROP DATABASE IF EXISTS `scis_upskilling`;
 
@@ -694,8 +694,8 @@ CREATE TABLE IF NOT EXISTS `runcourse`(
 	rcourse_id int NOT NULL AUTO_INCREMENT,
 	run_startdate date NOT NULL,
 	run_enddate date NOT NULL,
-	run_starttime time NOT NULL,
-	run_endtime time NOT NULL,
+	run_starttime varchar(10) NOT NULL,
+	run_endtime varchar(10) NOT NULL,
 	instructor_id int NOT NULL,
 	course_format varchar(20) NOT NULL,
 	course_venue varchar(255), -- can be null for those online courses
@@ -706,8 +706,8 @@ CREATE TABLE IF NOT EXISTS `runcourse`(
 	class_duration int NOT NULL,
 	reg_startdate date NOT NULL,
 	reg_enddate date NOT NULL,
-	reg_starttime time NOT NULL,
-	reg_endtime time NOT NULL,
+	reg_starttime varchar(10) NOT NULL,
+	reg_endtime varchar(10) NOT NULL,
 	template_id int NOT NULL,
 	course_id int NOT NULL,
 	course_status varchar(255) NOT NULL,

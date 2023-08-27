@@ -1,22 +1,21 @@
 <template>
   <div>
-    <search-filter :role="role"></search-filter>
 
     <div class="pt-5 container col-12 table-responsive">
-      <h5 class="pb-3">Courses Available for Registration</h5>
+      <h5 class="pb-3">Courses Available for Registration & Indicate Interest</h5>
 
       <div v-if="courses.length > 0">
         <table class="table">
           <thead>
             <tr class="text-nowrap">
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Course Name / Description <sort-icon :role="role" :sortColumn="sortColumn === 'name'" :sortDirection="sortDirection"/></a></th>
+                <a href="" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'name'" :sortDirection="sortDirection"/></a></th>
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Course Start Date <sort-icon :role="role" :sortColumn="sortColumn === 'start_date'" :sortDirection="sortDirection"/></a></th>
+                <a href="" class="text-decoration-none text-dark">Course Start Date <sort-icon :sortColumn="sortColumn === 'start_date'" :sortDirection="sortDirection"/></a></th>
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Course End Date <sort-icon :role="role" :sortColumn="sortColumn === 'end_date'" :sortDirection="sortDirection"/></a></th>
+                <a href="" class="text-decoration-none text-dark">Course End Date <sort-icon :sortColumn="sortColumn === 'end_date'" :sortDirection="sortDirection"/></a></th>
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Closing Date <sort-icon :role="role" :sortColumn="sortColumn === 'closing_date'" :sortDirection="sortDirection"/></a></th>
+                <a href="" class="text-decoration-none text-dark">Closing Date <sort-icon :sortColumn="sortColumn === 'closing_date'" :sortDirection="sortDirection"/></a></th>
               <th scope="col">Action</th>
             </tr>
           </thead>
@@ -57,7 +56,7 @@
                   {{ course.closing_time }}
                 </div>
               </td>
-              <td><course-action :action="course.action"></course-action></td>
+              <td><course-action :status="course.status" :id="course.id"></course-action></td>
             </tr>
           </tbody>
         </table>
@@ -78,19 +77,17 @@
 </template>
 
 <script>
-import searchFilter from "../../components/searchFilter.vue"
 import courseAction from '../../components/course/courseAction.vue';
 import courseCategoryBadge from '../../components/course/courseCategoryBadge.vue';
-import sortIcon from '../../components/sort-icon.vue';
+import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 
 export default {
   components: {
-    searchFilter, 
     courseAction,
     courseCategoryBadge,
     sortIcon,
-    modalCourseContent,
+    modalCourseContent
   },
   data() {
     return {
@@ -106,11 +103,10 @@ export default {
           end_time: "6.30 pm",
           closing_date: "Aug 20, 2023",
           closing_time: "6.30 pm",
-          action: "hopOn",
           fee: 50,
           venue: 'SCIS SR-2',
           format: 'Physical',
-          status: 'Available',
+          status: 'Active',
           available_slots: 13
         },
         {
@@ -118,35 +114,19 @@ export default {
           name: "Course Name 2",
           category: "LKCSB",
           description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
+          status: 'Vote',
           start_date: "Aug 20, 2023",
           start_time: "6.30 pm",
           end_date: "Aug 20, 2023",
           end_time: "6.30 pm",
           closing_date: "Aug 20, 2023",
           closing_time: "6.30 pm",
-          action: "shoutOut",
-          fee: 100,
-          venue: 'SCIS SR-5',
-          format: 'Online',
-          status: 'nil',
-          available_slots: 15
         },
       ],
       sortColumn: 'name',
       sortDirection: 'asc',
-      role: 'admin',
-      selectedCourse: null
+      selectedCourse: null,
     }
-  },
-  computed: {
-    pageCount() {
-      return Math.ceil(this.items.length / this.perPage);
-    },
-    paginatedItems() {
-      const startIndex = (this.currentPage - 1) * this.perPage;
-      const endIndex = startIndex + this.perPage;
-      return this.items.slice(startIndex, endIndex);
-    },
   },
   methods: {
     openModal(course) {

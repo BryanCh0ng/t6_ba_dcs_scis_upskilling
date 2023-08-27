@@ -4,7 +4,7 @@ const routes = [
     {
         path: '/',
         name: 'Home',
-        component: () => import('../components/HelloWorld.vue'),
+        component: () => import('../components/common/HelloWorld.vue'),
         meta: {
             title: 'Home',
         },
@@ -42,13 +42,29 @@ const routes = [
       },
     },
     {
-        path: '/searchTryout',
-        name: 'viewCourse',
-        component: () => import('../views/searchTryout.vue'),
-        meta: {
-            title: 'View Course',
-        },
+      path: '/adminViewCourse',
+      name: 'adminViewCourse',
+      component: () => import('../views/course/adminViewCourse.vue'),
+      meta: {
+          title: 'Admin View Course',
       },
+    },
+    {
+      path: '/adminViewProposedCourse',
+      name: 'adminViewProposedCourse',
+      component: () => import('../views/course/adminViewProposedCourse.vue'),
+      meta: {
+          title: 'Admin View Proposed Course',
+      },
+    },
+    {
+      path: '/adminVotingCampaign',
+      name: 'adminVotingCampaign',
+      component: () => import('../views/course/adminVotingCampaign.vue'),
+      meta: {
+          title: 'Admin View Voting Campaign',
+      },
+    }
     // },
     // {
     //     path: '/deleteCourse',
