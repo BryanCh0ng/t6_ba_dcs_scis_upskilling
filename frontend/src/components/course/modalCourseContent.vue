@@ -6,11 +6,11 @@
     <div class="modal-body pt-1"> 
       <div class="modal-title pt-3">
         <h5>{{ course.course_Name }}
-          <course-category-badge :category="course.course_cat" class="align-items-center modal-course-cat"></course-category-badge>
+          <course-category-badge :category="course.coursecat_Name" class="align-items-center modal-course-cat"></course-category-badge>
         </h5>
       </div>
       <div>{{ course.course_Desc }}</div>
-      <div v-if="course.status == 'Active'">
+      <div v-if="status == 'Active'">
         <div class="pt-4 row">
           <div class="col-6">
             Course Start Date: <br> <strong>{{ course.reg_Startdate }}</strong>
@@ -40,7 +40,7 @@
             Available Slots: <br> <strong>{{ course.course_Size }}</strong>
           </div>
           <div class="col-6">
-            Min Slots: <br> <strong>${{ course.course_Minsize }}</strong>
+            Min Slots: <br> <strong>{{ course.course_Minsize }}</strong>
           </div>
         </div>
         <div class="pt-3 row">
@@ -48,7 +48,7 @@
             Fee: <br> <strong>${{ course.course_Fee }}</strong>
           </div>
           <div class="col-6">
-            Registration Count: <br> <strong>{{ course.reg_count }}</strong>
+            Registration Count: <br> <strong>{{ course.registration_count }}</strong>
           </div>
         </div>
       </div>
@@ -64,7 +64,8 @@ export default {
     courseCategoryBadge
   },
   props: {
-    course: Object
+    course: Object,
+    status: String
   }
 };
 </script>

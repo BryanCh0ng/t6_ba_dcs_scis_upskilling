@@ -993,13 +993,13 @@ class GetAllVotingCoursesAdmin(Resource):
         if results:
             result_data = []
             for result in results:
-                course_info = {
+                voting_course_info = {
                     **result[0].json(),
                     "coursecat_Name": result[1],
                     "vote_Status": result[2],
-                    "vote_count": result[3]
+                    "vote_Count": result[3]
                 }
-                result_data.append(course_info)
+                result_data.append(voting_course_info)
 
             return jsonify({"code": 200, "data": result_data})
 
@@ -1058,9 +1058,9 @@ class GetAllCoursesWithRegistrationCount(Resource):
 
                 course_info = {
                     **result[0].json(),
-                    "coursecat_Name": result[1]
-                    **modified_run_course
-                    
+                    "coursecat_Name": result[1],
+                    **modified_run_course,
+                    "registration_count": result[3]
                 }
                 result_data.append(course_info)
             return jsonify({"code": 200, "data": result_data})
