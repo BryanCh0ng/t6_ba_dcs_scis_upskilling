@@ -789,7 +789,8 @@ INSERT INTO registration VALUES
 	(40, 2, 5, 'Pending'),
 	(42, 2, 55, 'Pending'),
 	(43, 1, 25, 'Dropped'),
-	(44, 2, 1, 'Dropped');
+	(44, 2, 1, 'Dropped'),
+    (45, 11, 1, 'Dropped');
 
 DROP TABLE IF EXISTS `lesson`;
 CREATE TABLE IF NOT EXISTS `lesson`(
@@ -1012,15 +1013,15 @@ INSERT INTO blacklist VALUES
 	(2, 57);
 
 DROP TABLE IF EXISTS `contactus`;
-CREATE TABLE IF NOT EXISTS `contactus` (
-    contactus_id int NOT NULL AUTO_INCREMENT,
-    user_id int NOT NULL,
-    subject varchar(255) NOT NULL,
-    message varchar(1000) NOT NULL,
-    PRIMARY KEY (`contactus_id`),
-	FOREIGN KEY (user_id) REFERENCES user(user_id)
+CREATE TABLE IF NOT EXISTS `contactus`(
+	msg_id int NOT NULL AUTO_INCREMENT,
+	user_id int NOT NULL,
+	msg_subject varchar(255) NOT NULL,
+	msg_body varchar(1000) NOT NULL,
+    msg_datetime datetime NOT NULL,
+	PRIMARY KEY (`msg_id`),
+    FOREIGN KEY (user_id) REFERENCES user(user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO contactus VALUES 
-    (1, 1, "question", "question"),
-    (2, 2, "question", "question");
+INSERT INTO contactus VALUES
+    (1, 1, "Test", "Testing the contact us function", "2023-08-25 17:00:00");

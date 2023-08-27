@@ -464,27 +464,23 @@ class Blacklist(db.Model):
         for column in columns:
             result[column] = getattr(self, column)
         return result
-        
-##################  Contact Us Class Creation ##################
+
 class ContactUs(db.Model):
     __tablename__ = 'contactus'
 
-    contactus_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    msg_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     user_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'),  nullable=False)
-    subject = db.Column(db.String(255), nullable=False)
-    message = db.Column(db.String(1000), nullable=False)
-    
+    msg_Subject = db.Column(db.String(255), nullable=False)
+    msg_Body = db.Column(db.String(800), nullable=False)
+    msg_Datetime = db.Column(db.DateTime, nullable=False)
 
-
-    def __init__(self, contactus_ID, user_ID, subject, message):
-        self.contactus_ID = contactus_ID
+    def __init__(self, user_ID, msg_Subject, msg_Body, msg_Datetime):
         self.user_ID = user_ID
-        self.subject = subject
-        self.message = message
-        
+        self.msg_Subject = msg_Subject
+        self.msg_Body = msg_Body
+        self.msg_Datetime = msg_Datetime
 
-
-
+    
     def json(self):
         columns = self.__mapper__.column_attrs.keys()
         result = {}

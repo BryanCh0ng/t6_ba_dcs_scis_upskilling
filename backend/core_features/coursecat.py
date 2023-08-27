@@ -16,23 +16,23 @@ retrieve_all_coursecat.add_argument("coursecat_name", help="Enter course categor
 @api.route("/get_all_coursecat")
 @api.doc(description="Get all course categories")
 class GetAllCoursecat(Resource):
-  @api.expect(retrieve_all_coursecat)
-  def get(self):
-    arg = retrieve_all_coursecat.parse_args().get("coursecat_name")
-    coursecat_Name = arg if arg else ""
-    coursecatList = CourseCategory.query.filter(CourseCategory.coursecat_Name.contains(coursecat_Name)).all()
-    db.session.close()
-    if len(coursecatList):
-      return jsonify(
-        {
-          "code": 200,
-          "data": {
-            "course": [coursecat.json() for coursecat in coursecatList]
-          }
-        }
-      )
+    @api.expect(retrieve_all_coursecat)
+    def get(self):
+        arg = retrieve_all_coursecat.parse_args().get("coursecat_name")
+        coursecat_Name = arg if arg else ""
+        coursecatList = CourseCategory.query.filter(CourseCategory.coursecat_Name.contains(coursecat_Name)).all()
+        db.session.close()
+        if len(coursecatList):
+            return jsonify(
+                {
+                    "code": 200,
+                    "data": {
+                        "course": [coursecat.json() for coursecat in coursecatList]
+                    }
+                }
+            )
 
-    return json.loads(json.dumps({"message": "There is no such course category"}, default=str)), 404
+        return json.loads(json.dumps({"message": "There is no such course category"}, default=str)), 404
 
 
 retrieve_coursecat = api.parser()
@@ -48,5 +48,5 @@ class GetCoursecat(Resource):
         if coursecat:
             return json.loads(json.dumps(coursecat.json())), 200
 
-        return json.loads(json.dumps({"message": "There is no such course category", "code": 404}, default=str))
+        return json.loads(json.dumps({"message": "There is no such course category"})), 404
 

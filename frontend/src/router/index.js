@@ -10,6 +10,22 @@ const routes = [
         },
     },
     {
+      path: '/blacklistfilter',
+      name: 'blacklist',
+      component: () => import('../components/search/BlacklistAttendanceSearchFilter.vue'),
+      meta: {
+          title: 'Blacklist Attendencec Search Filter',
+      },
+  },
+  {
+    path: '/commonsearchfilter',
+    name: 'commonsearchfilter',
+    component: () => import('../components/search/CommonSearchFilter.vue'),
+    meta: {
+        title: 'common search filter',
+    },
+  },
+  {
       path: '/contactUs',
       name: 'ContactUs',
       component: () => import('../views/ContactUs.vue'),
@@ -48,14 +64,22 @@ const routes = [
       meta: {
           title: 'Admin View Vote Course',
       },
-    }
+    },
+    {
+      path: '/searchTryout',
+      name: 'viewCourse',
+      component: () => import('../views/searchTryout.vue'),
+      meta: {
+          title: 'View Course',
+      },
+    },
     // },
     // {
     //     path: '/deleteCourse',
     //     name: 'Delete Courses',
     //     component: () => import('../components/DeleteCourse.vue'),
     //     meta: {
-    //         requiresAdminAuth: true,
+    //         //requiresAdminAuth: true,
     //         title: 'Delete Courses',
     //     },
     // },
@@ -182,17 +206,17 @@ const router = createRouter({
     routes
 })
 
-router.beforeEach((to, _from, next) => {
-    if (to.matched.some(record => record.meta.requiresAuth)) {
-      sessionStorage.getItem("role") ? next() : next({ path: '/', });
+// router.beforeEach((to, _from, next) => {
+//     if (to.matched.some(record => record.meta.requiresAuth)) {
+//       sessionStorage.getItem("role") ? next() : next({ path: '/', });
 
-    } else if (to.matched.some(record => record.meta.isAuth)) {
-      sessionStorage.getItem("role") ? next({path: '/student'}) : next();
+//     } else if (to.matched.some(record => record.meta.isAuth)) {
+//       sessionStorage.getItem("role") ? next({path: '/student'}) : next();
 
-    } else {
-      next();
+//     } else {
+//       next();
 
-    }
-  });
+//     }
+//   });
 
 export default router
