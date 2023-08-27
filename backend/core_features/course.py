@@ -962,7 +962,7 @@ class GetAllVotingCoursesAdmin(Resource):
         args = retrieve_all_voting_courses_admin.parse_args()
         course_name = args.get("course_name", "")
         course_category_id = args.get("coursecat_id", "")
-        vote_status = args.get("vote_status", "")
+        status = args.get("vote_status", "")
 
         vote_counts_subquery = db.session.query(
             VoteCourse.course_ID,
@@ -984,8 +984,8 @@ class GetAllVotingCoursesAdmin(Resource):
             query = query.filter(Course.course_Name.contains(course_name))
         if course_category_id:
             query = query.filter(Course.coursecat_ID == course_category_id)
-        if vote_status:
-            query = query.filter(VoteCourse.vote_Status == vote_status)
+        if status:
+            query = query.filter(VoteCourse.vote_Status == status)
 
         results = query.all()
         db.session.close()

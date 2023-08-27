@@ -251,15 +251,16 @@ class CourseService extends BaseApiService {
 
 
     // Admin - All Voting Campaign
-    async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, vote_Status) {
+    async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, status) {
         try {
             let response = await axiosClient.get("/course/get_all_voting_courses_admin", {
                 params: {
                     course_name: course_Name,
                     coursecat_id: coursecat_ID,
-                    vote_status: vote_Status
+                    vote_status: status
                 }
             });
+            console.log("Response data:", response.data);
             return response.data;
         } catch (error) {
             return this.handleError(error);

@@ -84,9 +84,6 @@ export default({
                 console.log("Error fetching info:", error);
             }
             
-
-            // reset filter when user clicks search
-            this.resetFilter();
         }
     }
 })

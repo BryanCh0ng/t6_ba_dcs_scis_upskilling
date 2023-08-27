@@ -92,7 +92,7 @@ export default({
                 const status = this.status;
 
                 let searchResults;
-                console.log(status)
+                console.log(course_Name, coursecat_ID)
                 
                 // Use the searchApi function from the parent component
                 searchResults = await this.searchApi(user_ID, course_Name, coursecat_ID, status);
@@ -105,8 +105,6 @@ export default({
                 console.log("Error fetching info:", error);
             }
 
-            // reset filter when user clicks search
-            this.resetFilter();
         }
     }
 })

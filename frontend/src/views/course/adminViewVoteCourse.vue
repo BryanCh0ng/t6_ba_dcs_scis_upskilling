@@ -55,7 +55,7 @@ import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
-import SearchFilter from "@/components/search/CourseRelatedSearchFilter.vue";
+import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 
 export default {
@@ -74,7 +74,8 @@ export default {
       sortDirection: 'asc',
       selectedCourse: null,
       itemsPerPage: 10,
-      localCurrentPage: 1
+      localCurrentPage: 1,
+      statusOptions: ["Ongoing", "Offered", "Closed"],
     }
   },
   methods: {
@@ -90,14 +91,18 @@ export default {
       this.localCurrentPage = newPage;
       this.$emit('page-change', newPage);
     },
-    async searchAllVotingCoursesAdmin(user_ID, course_Name, coursecat_ID, status) {
+    async handleSearchComplete(searchResults) {
+      this.vote_courses = searchResults;
+    },
+    async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, status) {
+      console.log("vote status",status)
       try {
-        let response = await CourseService.searchInstructorProposedCourseInfo(
-          user_ID,
+        let response = await CourseService.searchAllVotingCoursesAdmin(
           course_Name,
           coursecat_ID,
           status
         );
+        console.log(response.data)
         this.vote_courses = response.data;
         return this.vote_courses;
       } catch (error) {
@@ -111,7 +116,7 @@ export default {
       const startIndex = (this.localCurrentPage - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
       return this.vote_courses.slice(startIndex, endIndex);
-    },
+    }
   },
   async created() {
     try {

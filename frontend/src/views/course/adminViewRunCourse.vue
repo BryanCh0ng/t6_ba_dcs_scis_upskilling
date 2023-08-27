@@ -2,7 +2,7 @@
   <div>
     <search-filter
       :status-options="statusOptions"
-      :search-api="searchInstructorProposedCourseInfo" 
+      :search-api="searchAllCoursesAdmin" 
       @search-complete="handleSearchComplete" />
     <div class="container col-12 table-responsive">
       <h5 class="pb-3">All Run Courses</h5>
@@ -66,7 +66,7 @@ import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
 import courseDateTime from '../../components/course/courseDateTime.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
-import SearchFilter from "@/components/search/CommonSearchFilter.vue";
+import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 import {convertDate, convertTime} from '@/scripts/common/convertDateTime.js'
 
@@ -87,7 +87,8 @@ export default {
       sortDirection: 'asc',
       selectedCourse: null,
       itemsPerPage: 10,
-      localCurrentPageCourses: 1
+      localCurrentPageCourses: 1,
+      statusOptions: ["Active", "Inactive", "Retired"],
     }
   },
   methods: {
@@ -107,9 +108,9 @@ export default {
       console.log(searchResults)
       this.courses = searchResults;
     },
-    async searchInstructorProposedCourseInfo(user_ID, course_Name, coursecat_ID, status) {
+    async searchAllCoursesAdmin(user_ID, course_Name, coursecat_ID, status) {
       try {
-        let response = await CourseService.searchInstructorProposedCourseInfo(
+        let response = await CourseService.searchAllCoursesAdmin(
           user_ID,
           course_Name,
           coursecat_ID,
