@@ -9,3 +9,7 @@
 .recommendation-title {
   font-weight:inherit;
 }
+
+.reject-reason-label {
+  margin-left: 10px;
+}

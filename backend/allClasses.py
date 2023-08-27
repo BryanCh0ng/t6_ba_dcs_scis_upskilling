@@ -2,6 +2,7 @@ import datetime
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from sqlalchemy import Time
 import os
 
 app = Flask(__name__)
@@ -244,7 +245,7 @@ class TemplateAttribute(db.Model):
         return result
     
 ##################  Likert Scale Class Creation ##################
-class LikeryScale(db.Model):
+class LikertScale(db.Model):
     __tablename__ = 'likertscale'
 
     likert_Scale_ID = db.Column(db.Integer, nullable=False, primary_key=True)
@@ -306,8 +307,8 @@ class RunCourse(db.Model):
     rcourse_ID = db.Column(db.Integer, nullable=False, primary_key=True)
     run_Startdate = db.Column(db.Date, nullable=False)
     run_Enddate = db.Column(db.Date, nullable=False)
-    run_Starttime = db.Column(db.Time, nullable=False)
-    run_Endtime = db.Column(db.Time, nullable=False)
+    run_Starttime = db.Column(Time, nullable=False)
+    run_Endtime = db.Column(Time, nullable=False)
     instructor_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'), nullable=False)
     course_Format = db.Column(db.String(20), nullable=False)
     course_Venue = db.Column(db.String(255), nullable=False)
@@ -318,8 +319,8 @@ class RunCourse(db.Model):
     class_Duration = db.Column(db.Integer, nullable=False)
     reg_Startdate = db.Column(db.Date, nullable=False)
     reg_Enddate = db.Column(db.Date, nullable=False)
-    reg_Starttime = db.Column(db.Time, nullable=False)
-    reg_Endtime = db.Column(db.Time, nullable=False)
+    reg_Starttime = db.Column(Time, nullable=False)
+    reg_Endtime = db.Column(Time, nullable=False)
     template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'), nullable=False)
     course_ID = db.Column(db.Integer, db.ForeignKey('course.course_ID'), nullable=False)
     course_Status = db.Column(db.String(255), nullable=False)
@@ -457,6 +458,29 @@ class Blacklist(db.Model):
 
 
 
+    def json(self):
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            result[column] = getattr(self, column)
+        return result
+
+class ContactUs(db.Model):
+    __tablename__ = 'contactus'
+
+    msg_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
+    user_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'),  nullable=False)
+    msg_Subject = db.Column(db.String(255), nullable=False)
+    msg_Body = db.Column(db.String(800), nullable=False)
+    msg_Datetime = db.Column(db.DateTime, nullable=False)
+
+    def __init__(self, user_ID, msg_Subject, msg_Body, msg_Datetime):
+        self.user_ID = user_ID
+        self.msg_Subject = msg_Subject
+        self.msg_Body = msg_Body
+        self.msg_Datetime = msg_Datetime
+
+    
     def json(self):
         columns = self.__mapper__.column_attrs.keys()
         result = {}

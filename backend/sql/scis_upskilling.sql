@@ -1,6 +1,6 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-SET time_zone = "+00:00";
+-- SET time_zone = "+00:00";
 
 DROP DATABASE IF EXISTS `scis_upskilling`;
 
@@ -694,8 +694,8 @@ CREATE TABLE IF NOT EXISTS `runcourse`(
 	rcourse_id int NOT NULL AUTO_INCREMENT,
 	run_startdate date NOT NULL,
 	run_enddate date NOT NULL,
-	run_starttime time NOT NULL,
-	run_endtime time NOT NULL,
+	run_starttime varchar(10) NOT NULL,
+	run_endtime varchar(10) NOT NULL,
 	instructor_id int NOT NULL,
 	course_format varchar(20) NOT NULL,
 	course_venue varchar(255), -- can be null for those online courses
@@ -706,8 +706,8 @@ CREATE TABLE IF NOT EXISTS `runcourse`(
 	class_duration int NOT NULL,
 	reg_startdate date NOT NULL,
 	reg_enddate date NOT NULL,
-	reg_starttime time NOT NULL,
-	reg_endtime time NOT NULL,
+	reg_starttime varchar(10) NOT NULL,
+	reg_endtime varchar(10) NOT NULL,
 	template_id int NOT NULL,
 	course_id int NOT NULL,
 	course_status varchar(255) NOT NULL,
@@ -789,7 +789,8 @@ INSERT INTO registration VALUES
 	(40, 2, 5, 'Pending'),
 	(42, 2, 55, 'Pending'),
 	(43, 1, 25, 'Dropped'),
-	(44, 2, 1, 'Dropped');
+	(44, 2, 1, 'Dropped'),
+    (45, 11, 1, 'Dropped');
 
 DROP TABLE IF EXISTS `lesson`;
 CREATE TABLE IF NOT EXISTS `lesson`(
@@ -1010,3 +1011,17 @@ CREATE TABLE IF NOT EXISTS `blacklist`(
 INSERT INTO blacklist VALUES 
 	(1, 56), 
 	(2, 57);
+
+DROP TABLE IF EXISTS `contactus`;
+CREATE TABLE IF NOT EXISTS `contactus`(
+	msg_id int NOT NULL AUTO_INCREMENT,
+	user_id int NOT NULL,
+	msg_subject varchar(255) NOT NULL,
+	msg_body varchar(1000) NOT NULL,
+    msg_datetime datetime NOT NULL,
+	PRIMARY KEY (`msg_id`),
+    FOREIGN KEY (user_id) REFERENCES user(user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO contactus VALUES
+    (1, 1, "Test", "Testing the contact us function", "2023-08-25 17:00:00");
