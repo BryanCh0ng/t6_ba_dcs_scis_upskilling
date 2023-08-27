@@ -789,7 +789,8 @@ INSERT INTO registration VALUES
 	(40, 2, 5, 'Pending'),
 	(42, 2, 55, 'Pending'),
 	(43, 1, 25, 'Dropped'),
-	(44, 2, 1, 'Dropped');
+	(44, 2, 1, 'Dropped'),
+    (45, 11, 1, 'Dropped');
 
 DROP TABLE IF EXISTS `lesson`;
 CREATE TABLE IF NOT EXISTS `lesson`(

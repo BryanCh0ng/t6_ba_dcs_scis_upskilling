@@ -50,6 +50,9 @@ export default({
         // await this.searchFilterCourses();
         await this.fetchCategoryDropdownOptions();
     },
+    props: {
+        searchApi: Function,
+    },
     methods: {
         async getAllCourses() {
             let response = await CourseService.getAllCourses();
@@ -67,9 +70,22 @@ export default({
             this.courseName = "";
             this.category = "";
         },
-        searchFilter() {
-        //     console.log(this.courseName);
-        //     console.log(this.category);
+        async searchFilter() {
+            try {
+                const user_ID = 3;
+                // const user_ID = this.getUserIDFromSession()
+                const course_Name = this.courseName;
+                const coursecat_ID = this.category;
+
+                let searchResults;
+
+                searchResults = await this.searchApi(user_ID, course_Name, coursecat_ID);
+
+                this.$emit("search-complete", searchResults);
+            } catch (error) {
+                console.log("Error fetching info:", error);
+            }
+            
 
             // reset filter when user clicks search
             this.resetFilter();

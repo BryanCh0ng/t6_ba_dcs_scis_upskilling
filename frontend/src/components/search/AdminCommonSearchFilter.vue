@@ -85,7 +85,7 @@ export default({
         },
         async searchFilter() {
             try {
-                const user_ID = 1;
+                // const user_ID = 1;
                 // const user_ID = this.getUserIDFromSession()
                 const course_Name = this.courseName;
                 const coursecat_ID = this.category;
@@ -94,8 +94,9 @@ export default({
                 let searchResults;
                 console.log(status)
                 
+                
                 // Use the searchApi function from the parent component
-                searchResults = await this.searchApi(user_ID, course_Name, coursecat_ID, status);
+                searchResults = await this.searchApi(course_Name, coursecat_ID, status);
                 
 
                 

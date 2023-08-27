@@ -1,5 +1,5 @@
 <template>
-    <div id="commonsearchfilter">
+    <div id="searchfitler">
         <div class="container mt-5 mb-5">
             <form>
                 <div class="row">
@@ -13,14 +13,7 @@
                         <option v-for="option in categoryDropdownOptions" :key="option.coursecat_ID" :value="option.coursecat_ID">{{ option.coursecat_Name }}</option>
                         </dropdown-field>
                     </div>
-                    <div class="col-sm">
-                        <dropdown-field
-                        v-model="status"
-                        :default-placeholder="'Status'">
-                        <option v-for="option in statusDropdownOptions" :key="option" :value="option">{{ option }}</option>
-                        </dropdown-field>
-                    </div>
-                    <div class="col-sm">
+                    <div class="col-sm col-lg-3">
                         <div class="d-flex justify-content-between">
                             <button @click="resetFilter" class="btn" id="resetbtn">Clear All</button>
                             <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
@@ -34,8 +27,8 @@
 
 <script>
 // import { axiosClient } from "../api/axiosClient";
-import DropdownField from "../DropdownField.vue";
 import InputField from "../InputField.vue";
+import DropdownField from "../DropdownField.vue";
 import CourseService from "@/api/services/CourseService.js"
 import CourseCategoryService from "@/api/services/CourseCategoryService.js"
 
@@ -45,24 +38,20 @@ export default({
         return {
             courseName: "",
             category: "",
-            status: "",
             categoryDropdownOptions: [],
-            statusDropdownOptions: [],
         };
     },
-    props: {
-        statusOptions: Array, 
-        searchApi: Function,
-    },
     components: {
-        DropdownField,
         InputField,
+        DropdownField,
     },
     async mounted() {
         await this.getAllCourses();
         // await this.searchFilterCourses();
         await this.fetchCategoryDropdownOptions();
-        this.statusDropdownOptions = this.statusOptions;
+    },
+    props: {
+        searchApi: Function,
     },
     methods: {
         async getAllCourses() {
@@ -78,32 +67,23 @@ export default({
             }
         },
         resetFilter() {
-            console.log(this.status);
             this.courseName = "";
             this.category = "";
-            this.status = "";
         },
         async searchFilter() {
             try {
-                const user_ID = 1;
-                // const user_ID = this.getUserIDFromSession()
                 const course_Name = this.courseName;
                 const coursecat_ID = this.category;
-                const status = this.status;
 
                 let searchResults;
-                console.log(status)
-                
-                // Use the searchApi function from the parent component
-                searchResults = await this.searchApi(user_ID, course_Name, coursecat_ID, status);
-                
 
-                
-                // Emit the search-complete event to the parent component
+                searchResults = await this.searchApi(course_Name, coursecat_ID);
+
                 this.$emit("search-complete", searchResults);
             } catch (error) {
                 console.log("Error fetching info:", error);
             }
+            
 
             // reset filter when user clicks search
             this.resetFilter();

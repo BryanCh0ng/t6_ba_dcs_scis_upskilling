@@ -41,6 +41,14 @@ const routes = [
           title: 'View Course',
       },
     },
+    {
+        path: '/searchTryout',
+        name: 'viewCourse',
+        component: () => import('../views/searchTryout.vue'),
+        meta: {
+            title: 'View Course',
+        },
+      },
     // },
     // {
     //     path: '/deleteCourse',

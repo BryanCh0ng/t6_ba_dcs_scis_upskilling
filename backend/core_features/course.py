@@ -5,6 +5,8 @@ import json
 from sqlalchemy.orm import aliased
 from sqlalchemy import func, and_  
 from datetime import datetime
+import logging
+app.logger.setLevel(logging.DEBUG)
 
 api = Namespace('course', description='Course related operations')
 
@@ -175,11 +177,13 @@ class GetCourseRegistrationInfo(Resource):
     @api.expect(retrieve_registration_info_filter_search)
     def get(self):
         args = retrieve_registration_info_filter_search.parse_args()
-        user_id = args.get("user_id")
+        user_ID = args.get("user_id")
         # user_id = session.get("user_id")
-        course_name = args.get("course_name", "")
-        course_category_id = args.get("coursecat_id", "")
-        reg_status = args.get("reg_status", "")
+        course_Name = args.get("course_name", "")
+        coursecat_ID = args.get("coursecat_id", "")
+        reg_Status = args.get("reg_status", "")
+
+        app.logger.debug(reg_Status)
 
         query = db.session.query(
             Course,
@@ -190,15 +194,15 @@ class GetCourseRegistrationInfo(Resource):
             Registration, RunCourse.rcourse_ID == Registration.rcourse_ID
         ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)
 
-        if user_id:
-            query = query.filter(Registration.user_ID == user_id)
-        if course_name:
-            query = query.filter(Course.course_Name.contains(course_name))
-        if course_category_id:
-            query = query.filter(Course.coursecat_ID == course_category_id)
-        if reg_status:
-            query = query.filter(Registration.reg_Status == reg_status)
-
+        if user_ID:
+            query = query.filter(Registration.user_ID == user_ID)
+        if course_Name:
+            query = query.filter(Course.course_Name.contains(course_Name))
+        if coursecat_ID:
+            query = query.filter(Course.coursecat_ID == coursecat_ID)
+        if reg_Status:
+            query = query.filter(Registration.reg_Status == reg_Status)
+        
         results = query.all()
         db.session.close()
 
@@ -222,7 +226,8 @@ class GetCourseRegistrationInfo(Resource):
                 course_info["runCourse"]["reg_Endtime"] = result[2].reg_Endtime.strftime('%H:%M:%S')
 
                 result_data.append(course_info)
-
+            app.logger.debug("Debug message")
+            # app.logger.debug(result_data)
             return jsonify({"code": 200, "data": result_data})
 
         return jsonify({"code": 404, "message": "No matching course registration information found"})
@@ -242,11 +247,13 @@ class GetCourseInterestInfo(Resource):
     @api.expect(retrieve_vote_info_filter_search)
     def get(self):
         args = retrieve_vote_info_filter_search.parse_args()
-        user_id = args.get("user_id")
+        user_ID = args.get("user_id")
         # user_id = session.get("user_id")
-        course_name = args.get("course_name", "")
-        course_category_id = args.get("coursecat_id", "")
-        vote_status = args.get("vote_status", "")
+        course_Name = args.get("course_name", "")
+        coursecat_ID = args.get("coursecat_id", "")
+        vote_Status = args.get("vote_status", "")
+
+        app.logger.debug(user_ID)
 
         query = db.session.query(
             Course,
@@ -256,14 +263,14 @@ class GetCourseInterestInfo(Resource):
             Interest, VoteCourse.vote_ID == Interest.vote_ID
         ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)
 
-        if user_id:
-            query = query.filter(Interest.user_ID == user_id)
-        if course_name:
-            query = query.filter(Course.course_Name.contains(course_name))
-        if course_category_id:
-            query = query.filter(Course.coursecat_ID == course_category_id)
-        if vote_status:
-            query = query.filter(VoteCourse.vote_Status == vote_status)
+        if user_ID:
+            query = query.filter(Interest.user_ID == user_ID)
+        if course_Name:
+            query = query.filter(Course.course_Name.contains(course_Name))
+        if coursecat_ID:
+            query = query.filter(Course.coursecat_ID == coursecat_ID)
+        if vote_Status:
+            query = query.filter(VoteCourse.vote_Status == vote_Status)
 
         results = query.all()
         db.session.close()
@@ -687,8 +694,7 @@ class GetAllProposedCoursesAdmin(Resource):
         query = db.session.query(
             ProposedCourse,
             User.user_Name.label("submitted_by_name"),
-            Course.course_Name,
-            Course.course_Desc,
+            Course,
             CourseCategory.coursecat_Name
         ).select_from(ProposedCourse) \
         .join(User, ProposedCourse.submitted_By == User.user_ID) \
@@ -711,9 +717,8 @@ class GetAllProposedCoursesAdmin(Resource):
                 proposed_course_info = {
                     "proposedCourse": result[0].json(),
                     "submitted_by_name": result[1],
-                    "course_Name": result[2],
-                    "course_Desc": result[3],
-                    "coursecat_Name": result[4]
+                    "course": result[2].json(),
+                    "coursecat_Name": result[3]
                 }
                 result_data.append(proposed_course_info)
 
@@ -737,6 +742,8 @@ class GetAllProposedCoursesAdmin(Resource):
         course_name = args.get("course_name", "")
         course_category_id = args.get("coursecat_id", "")
         pcourse_status = args.get("pcourse_status", "")
+
+        app.logger.debug(pcourse_status)
 
         query = db.session.query(
             ProposedCourse,
@@ -802,8 +809,7 @@ class GetAllVotingCoursesAdmin(Resource):
         .group_by(VoteCourse.course_ID).subquery()
 
         query = db.session.query(
-            Course.course_Name,
-            Course.course_Desc,
+            Course,
             CourseCategory.coursecat_Name,
             VoteCourse.vote_Status,
             vote_counts_subquery.c.vote_count
@@ -826,11 +832,10 @@ class GetAllVotingCoursesAdmin(Resource):
             result_data = []
             for result in results:
                 voting_course_info = {
-                    "course_Name": result[0],
-                    "course_Desc": result[1],
-                    "coursecat_Name": result[2],
-                    "vote_Status": result[3],
-                    "vote_Count": result[4]
+                    "course": result[0].json(),
+                    "coursecat_Name": result[1],
+                    "vote_Status": result[2],
+                    "vote_Count": result[3]
                 }
                 result_data.append(voting_course_info)
 
