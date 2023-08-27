@@ -62,7 +62,13 @@ export default {
   },
   data() {
     return {
-      vote_courses: [],
+      vote_courses: [
+        {
+          "course_ID": 4,
+        "vote_ID": 4,
+        "vote_Status": "Offered"
+        }
+      ],
       sortColumn: 'name',
       sortDirection: 'asc',
       selectedCourse: null,
@@ -92,17 +98,17 @@ export default {
       return this.vote_courses.slice(startIndex, endIndex);
     },
   },
-  async created() {
-    try {
-      const vote_results = await getAllVoteCourse();
-      if (vote_results.code === 200) {
-        this.vote_courses = vote_results.course;
-      }
-      this.loading = false;
-    } catch (error) {
-      console.error("Error fetching course details:", error);
-    }
-  }
+  // async created() {
+  //   try {
+  //     const vote_results = await getAllVoteCourse();
+  //     if (vote_results.code === 200) {
+  //       this.vote_courses = vote_results.course;
+  //     }
+  //     this.loading = false;
+  //   } catch (error) {
+  //     console.error("Error fetching course details:", error);
+  //   }
+  // }
   }
 </script>
 

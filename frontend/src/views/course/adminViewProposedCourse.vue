@@ -11,7 +11,7 @@
     <div class="tab-content ">
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'submitted' }">
         <div class="pt-5 container col-12 table-responsive" v-if="!loading">
-          <h5 class="pb-3">Pending Proposals</h5>
+          <h5 class="pb-3">Proposed Course</h5>
           <div v-if="pending_courses.length > 0">
             <table class="table">
               <thead>

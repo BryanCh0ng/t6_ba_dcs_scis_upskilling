@@ -26,11 +26,11 @@ const routes = [
       },
     },
     {
-      path: '/adminViewCourse',
-      name: 'adminViewCourse',
-      component: () => import('../views/course/adminViewCourse.vue'),
+      path: '/adminViewRunCourse',
+      name: 'adminViewRunCourse',
+      component: () => import('../views/course/adminViewRunCourse.vue'),
       meta: {
-          title: 'Admin View Course',
+          title: 'Admin View Run Course',
       },
     },
     {
@@ -42,11 +42,11 @@ const routes = [
       },
     },
     {
-      path: '/adminVotingCampaign',
-      name: 'adminVotingCampaign',
-      component: () => import('../views/course/adminVotingCampaign.vue'),
+      path: '/adminViewVoteCourse',
+      name: 'adminViewVoteCourse',
+      component: () => import('../views/course/adminViewVoteCourse.vue'),
       meta: {
-          title: 'Admin View Voting Campaign',
+          title: 'Admin View Vote Course',
       },
     }
     // },
