@@ -1,6 +1,11 @@
 <template>
   <div>
-    <div class="pt-5 container col-12 table-responsive" v-if="!loading">
+    <search-filter
+      :status-options="statusOptions"
+      :search-api="searchAllVotingCoursesAdmin"
+      @search-complete="handleSearchComplete" />
+
+    <div class="container col-12 table-responsive">
       <h5 class="pb-3">Courses Available for Students to Indicate Interest</h5>
       <div v-if="vote_courses.length > 0">
         <table class="table">
@@ -19,10 +24,10 @@
           <tbody>
             <tr v-for="(vote_course, key) in displayedVoteCourses" :key="key">
             <td class="name">
-              <course-name-desc :name="vote_course.course_Name" :category="vote_course.course_cat" :description="vote_course.course_Desc"></course-name-desc>
+              <course-name-desc :name="vote_course.course_Name" :category="vote_course.coursecat_Name" :description="vote_course.course_Desc"></course-name-desc>
             </td>
             <td class="current_interest">
-                {{ vote_course.interest_count }}
+                {{ vote_course.vote_Count }}
             </td>
             <td>{{ vote_course.vote_Status }}</td>
             <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(vote_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
@@ -50,6 +55,8 @@ import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
+import SearchFilter from "@/components/search/CourseRelatedSearchFilter.vue";
+import CourseService from "@/api/services/CourseService.js";
 
 export default {
   components: {
@@ -57,23 +64,17 @@ export default {
     sortIcon,
     modalCourseContent,
     VueAwesomePaginate,
-    courseNameDesc
+    courseNameDesc,
+    SearchFilter
   },
   data() {
     return {
-      vote_courses: [
-        {
-          "course_ID": 4,
-        "vote_ID": 4,
-        "vote_Status": "Offered"
-        }
-      ],
+      vote_courses: [],
       sortColumn: 'name',
       sortDirection: 'asc',
       selectedCourse: null,
       itemsPerPage: 10,
-      localCurrentPage: 1,
-      loading: true
+      localCurrentPage: 1
     }
   },
   methods: {
@@ -89,6 +90,21 @@ export default {
       this.localCurrentPage = newPage;
       this.$emit('page-change', newPage);
     },
+    async searchAllVotingCoursesAdmin(user_ID, course_Name, coursecat_ID, status) {
+      try {
+        let response = await CourseService.searchInstructorProposedCourseInfo(
+          user_ID,
+          course_Name,
+          coursecat_ID,
+          status
+        );
+        this.vote_courses = response.data;
+        return this.vote_courses;
+      } catch (error) {
+        console.error("Error fetching info:", error);
+        throw error;
+      }
+    }
   },
   computed: {
     displayedVoteCourses() {
@@ -97,17 +113,16 @@ export default {
       return this.vote_courses.slice(startIndex, endIndex);
     },
   },
-  // async created() {
-  //   try {
-  //     const vote_results = await getAllVoteCourse();
-  //     if (vote_results.code === 200) {
-  //       this.vote_courses = vote_results.course;
-  //     }
-  //     this.loading = false;
-  //   } catch (error) {
-  //     console.error("Error fetching course details:", error);
-  //   }
-  // }
+  async created() {
+    try {
+      let response = await CourseService.searchAllVotingCoursesAdmin(null, null, null)
+      console.log(response.data)
+      this.vote_courses = response.data
+      console.log(this.vote_courses)
+    } catch (error) {
+      console.error("Error fetching course details:", error);
+    }
+  }
   }
 </script>
 

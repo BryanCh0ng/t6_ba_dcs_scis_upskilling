@@ -962,7 +962,7 @@ class GetAllVotingCoursesAdmin(Resource):
             result_data = []
             for result in results:
                 voting_course_info = {
-                    "course": result[0].json(),
+                    **result[0].json(),
                     "coursecat_Name": result[1],
                     "vote_Status": result[2],
                     "vote_Count": result[3]

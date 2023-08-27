@@ -4,7 +4,7 @@
       :status-options="statusOptions"
       :search-api="searchInstructorProposedCourseInfo" 
       @search-complete="handleSearchComplete" />
-    <div class="pt-5 container col-12 table-responsive">
+    <div class="container col-12 table-responsive">
       <h5 class="pb-3">All Run Courses</h5>
       <div v-if="courses.length > 0">
         <table class="table">
@@ -34,13 +34,13 @@
               <td class="closing_date">
                 <course-date-time :date="course.reg_Enddate" :time="course.reg_Endtime"></course-date-time>
               </td>
-              <td>{{ course.status }}</td>
+              <td>{{ course.course_Status }}</td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
               <div class="row d-flex flex-nowrap">
-                <td class="col row mx-1" v-if="course.course_status === 'Active'"><course-action status="Deactivate" :id="course.course_ID"></course-action></td>
-                <td class="col row mx-1" v-else-if="course.course_status === 'Inactive'"><course-action status="Activate" :id="course.course_ID"></course-action></td>
-                <td class="col row mx-1" v-else><course-action :status="course.course_status" :id="course.course_ID"></course-action></td>
+                <td class="col row mx-1" v-if="course.course_Status === 'Active'"><course-action status="Deactivate" :id="course.course_ID"></course-action></td>
+                <td class="col row mx-1" v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" :id="course.course_ID"></course-action></td>
+                <td class="col row mx-1" v-else><course-action :status="course.course_Status" :id="course.course_ID"></course-action></td>
                 <td class="col row mr-1"><course-action status="Edit" :id="course.course_ID"></course-action></td>
                 <td class="col row mx-1"><course-action status="Delete" :id="course.course_ID"></course-action></td>
               </div>
@@ -87,8 +87,7 @@ export default {
       sortDirection: 'asc',
       selectedCourse: null,
       itemsPerPage: 10,
-      localCurrentPageCourses: 1,
-      loading: true
+      localCurrentPageCourses: 1
     }
   },
   methods: {
@@ -123,7 +122,7 @@ export default {
         console.error("Error fetching info:", error);
         throw error;
       }
-    },
+    }
   },
   computed: {
     displayedCourses() {
@@ -135,7 +134,6 @@ export default {
   async created() {
     try {
       let response = await CourseService.searchAllCoursesAdmin(null, null, null)
-      console.log(response.data)
       this.courses = response.data
       this.courses.map(course => {
         course.reg_Enddate = convertDate(course.reg_Enddate)
@@ -147,7 +145,6 @@ export default {
         course.run_Endtime = convertTime(course.run_Endtime)
         course.run_Starttime = convertTime(course.run_Starttime)
       }); 
-      console.log(this.courses)
     } catch (error) {
       console.error("Error fetching course details:", error);
     }
