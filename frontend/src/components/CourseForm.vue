@@ -292,7 +292,7 @@ const validateClosingDateFromOpeningDate = function (value) {
     return true;
   }
 
-  return value >= this.formData.openingDate;
+  return value > this.formData.openingDate;
 };
 
 const closingDateFromOpeningDateValidator = helpers.withParams(
@@ -310,10 +310,26 @@ const closingDateFromOpeningDateValidatorWithMessage = helpers.withMessage(
 
 //Function: Check whether the selected time is greater than the startTime
 const validateEndTimeGreaterThanStartTime = function (value) {
-  if (value === null || this.formData.startTime === null) {
-    return true;
+  const allValuesFilled = (
+    value !== null &&
+    this.formData.startTime !== null &&
+    this.formData.startDate !== null &&
+    this.formData.endDate !== null
+  );
+
+  if (allValuesFilled) {
+    if (new Date(this.formData.startDate).toISOString().split('T')[0] === new Date(this.formData.endDate).toISOString().split('T')[0]) {
+      // Convert time values to seconds
+      const startTimeInSeconds = this.formData.startTime.hours * 3600 + this.formData.startTime.minutes * 60 + this.formData.startTime.seconds;
+      const endTimeInSeconds = value.hours * 3600 + value.minutes * 60 + value.seconds;
+
+      // Compare time values in seconds
+      return startTimeInSeconds < endTimeInSeconds;
+
+    }
   }
-  return value > this.formData.startTime;
+
+  return true; // Skip validation if any value is missing or start date doesn't equal end date
 };
 
 const endTimeGreaterThanStartTimeValidator = helpers.withParams(
@@ -324,24 +340,6 @@ const endTimeGreaterThanStartTimeValidator = helpers.withParams(
 const endTimeGreaterThanStartTimeValidatorWithMessage = helpers.withMessage(
   'Please select an end time later than the selected start time',
   endTimeGreaterThanStartTimeValidator
-)
-
-//Function: Check whether the selected time is greater than the openingTime
-const validateClosingTimeGreaterThanOpeningTime = function (value) {
-  if (value === null || this.formData.openingTime === null) {
-    return true;
-  }
-  return value > this.formData.openingTime;
-};
-
-const closingTimeGreaterThanOpeningTimeValidator = helpers.withParams(
-  { type: 'closingTimeGreaterThanOpeningTime' },
-  validateClosingTimeGreaterThanOpeningTime
-);
-
-const closingTimeGreaterThanOpeningTimeValidatorWithMessage = helpers.withMessage(
-  'Please select a closing time For registration later than the selected opening time for registration',
-  closingTimeGreaterThanOpeningTimeValidator
 )
 
 
@@ -446,7 +444,7 @@ export default {
         openingDate: { required: helpers.withMessage('Please select a valid opening date for registration', required), dateFromToday: dateFromTodayValidatorWithMessage },
         openingTime: { required: helpers.withMessage('Please select a valid opening time for registration', required) },
         closingDate: { required: helpers.withMessage('Please select a valid closing date for registration', required), closingDateFromOpeningDate: closingDateFromOpeningDateValidatorWithMessage },
-        closingTime: { required: helpers.withMessage('Please select a valid closing time for registration', required), closingTimeGreaterThanOpeningTime: closingTimeGreaterThanOpeningTimeValidatorWithMessage },
+        closingTime: { required: helpers.withMessage('Please select a valid closing time for registration', required) },
         courseFee: { required: helpers.withMessage('Please provide a valid course fee', required), currency: currencyValidatorWithMessage },
         selectedTemplate: { requiredL: helpers.withMessage('Please select a valid feedback template', required) }
       }
@@ -517,6 +515,14 @@ export default {
       } else {
         // Form has validation errors
         console.log('Form has validation errors');
+        //console.log(new Date(this.formData.startDate).getDate() === new Date(this.formData.endDate).getDate())
+        console.log(new Date(this.formData.startDate).toISOString().split('T')[0] )
+        console.log(new Date(this.formData.startDate).toISOString().split('T')[0] === new Date(this.formData.endDate).toISOString().split('T')[0])
+        console.log(this.formData.startDate)
+        console.log(this.formData.endDate)
+        console.log(this.formData.startTime)
+        console.log(this.formData.endTime)
+            
       }
     },
     hideSuccessModal() {
