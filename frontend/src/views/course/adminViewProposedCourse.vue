@@ -10,7 +10,11 @@
     </ul>
     <div class="tab-content ">
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'submitted' }">
-        <div class="pt-5 container col-12 table-responsive" v-if="!loading">
+        <search-filter
+        :status-options="statusOptions"
+        :search-api="searchAllPendingCoursesAdmin"
+        @search-complete="handleSearchComplete" />
+        <div class="container col-12 table-responsive">
           <h5 class="pb-3">Proposed Course</h5>
           <div v-if="pending_courses.length > 0">
             <table class="table">
@@ -29,10 +33,10 @@
               <tbody>
                 <tr v-for="(pending_course, key) in displayedPendingCourses" :key="key">
                   <td class="name">
-                    <course-name-desc :name="pending_course.course_Name" :category="pending_course.course_cat" :description="pending_course.course_Desc"></course-name-desc>
+                    <course-name-desc :name="pending_course.course_Name" :category="pending_course.coursecat_Name" :description="pending_course.course_Desc"></course-name-desc>
                   </td>
                   <td class="reg_count">
-                    {{ pending_course.owner }}
+                    {{ pending_course.submitted_by_name }}
                   </td>
                   <td class="closing_date">
                     <div class="col-12">
@@ -40,8 +44,8 @@
                     </div>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(pending_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action status="Approved" :id="pending_course.course_ID"></course-action></td>
-                  <td><course-action status="Rejected" :id="pending_course.course_ID" @click="openReject(pending_course)" data-bs-toggle="modal" data-bs-target="#rejected_modal"></course-action></td>
+                  <td><course-action status="pending_approve" :id="pending_course.course_ID"></course-action></td>
+                  <td><course-action status="pending_reject" :id="pending_course.course_ID" @click="openReject(pending_course)" data-bs-toggle="modal" data-bs-target="#rejected_modal"></course-action></td>
                 </tr>
               </tbody>
             </table>
@@ -56,7 +60,11 @@
         <vue-awesome-paginate v-if="pending_courses.length/itemsPerPage > 0" v-model="localCurrentPagePending" :totalItems="pending_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageChangePending" class="justify-content-center pagination-container"/>
       </div>
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'approved_rejected' }">
-        <div class="pt-5 container col-12 table-responsive">
+        <common-search-filter
+        :status-options="statusOptions"
+        :search-api="searchAllProposedCoursesAdmin"
+        @search-complete="handleSearchComplete" />
+        <div class="container col-12 table-responsive">
           <h5 class="pb-3">All Proposals</h5>
           <div v-if="proposed_courses.length > 0">
             <table class="table">
@@ -77,10 +85,10 @@
               <tbody>
                 <tr v-for="(proposed_course, key) in displayedProposedCourses" :key="key">
                   <td class="name">
-                    <course-name-desc :name="proposed_course.course_Name" :category="proposed_course.course_cat" :description="proposed_course.course_Desc"></course-name-desc>
+                    <course-name-desc :name="proposed_course.course_Name" :category="proposed_course.coursecat_Name" :description="proposed_course.course_Desc"></course-name-desc>
                   </td>
                   <td class="reg_count">
-                    {{ proposed_course.owner }}
+                    {{ proposed_course.submitted_by_name }}
                   </td>
                   <td class="closing_date">
                     <div class="col-12">
@@ -114,7 +122,9 @@ import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import rejectProposalModal from '../../components/course/rejectProposalModal.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
-import { getAllProposedPendingCourseByStatus } from '../../scripts/proposedcourse.js';
+import SearchFilter from "@/components/search/CourseRelatedSearchFilter.vue";
+import CommonSearchFilter from "@/components/search/CommonSearchFilter.vue";
+import CourseService from "@/api/services/CourseService.js";
 
 export default {
   components: {
@@ -123,7 +133,9 @@ export default {
     modalCourseContent,
     VueAwesomePaginate,
     rejectProposalModal,
-    courseNameDesc
+    courseNameDesc,
+    SearchFilter,
+    CommonSearchFilter
   },
   data() {
     return {
@@ -135,8 +147,7 @@ export default {
       itemsPerPage: 10,
       localCurrentPagePending: 1,
       localCurrentPageProposed: 1,
-      activeTab: 'submitted',
-      loading: true
+      activeTab: 'submitted'
     }
   },
   methods: {
@@ -161,6 +172,40 @@ export default {
     },
     closeReject() {
       this.showModal = false;
+    },
+    async handleSearchComplete(searchResults) {
+      console.log(searchResults)
+      this.courses = searchResults;
+    },
+    async searchAllPendingCoursesAdmin(user_ID, course_Name, coursecat_ID, status) {
+      try {
+        let response = await CourseService.searchInstructorProposedCourseInfo(
+          user_ID,
+          course_Name,
+          coursecat_ID,
+          status
+        );
+        this.vote_courses = response.data;
+        return this.vote_courses;
+      } catch (error) {
+        console.error("Error fetching info:", error);
+        throw error;
+      }
+    },
+    async searchAllProposedCoursesAdmin(user_ID, course_Name, coursecat_ID, status) {
+      try {
+        let response = await CourseService.searchInstructorProposedCourseInfo(
+          user_ID,
+          course_Name,
+          coursecat_ID,
+          status
+        );
+        this.vote_courses = response.data;
+        return this.vote_courses;
+      } catch (error) {
+        console.error("Error fetching info:", error);
+        throw error;
+      }
     }
   },
   computed: {
@@ -177,19 +222,16 @@ export default {
   },
   async created() {
     try {
-      const pending_results = await getAllProposedPendingCourseByStatus('Pending');
-      if (pending_results.code === 200) {
-        this.pending_courses = pending_results.course;
-      }
-      const approved_results = await getAllProposedPendingCourseByStatus('Approved');
-      if (approved_results.code === 200) {
-        this.proposed_courses = this.proposed_courses.concat(approved_results.course);
-      }
-      const rejected_results = await getAllProposedPendingCourseByStatus('Rejected');
-      if (rejected_results.code === 200) {
-        this.proposed_courses = this.proposed_courses.concat(rejected_results.course);
-      }
-      this.loading = false;
+      let pending_response = await CourseService.searchAllSubmittedProposedCoursesAdmin(null, null)
+      console.log(pending_response)
+      this.pending_courses = pending_response.data
+      console.log(this.pending_courses)
+  
+      let proposed_response = await CourseService.searchAllApprovedRejectedProposedCoursesAdmin(null, null, null)
+      console.log(proposed_response)
+      this.proposed_courses = proposed_response.data
+      console.log(this.proposed_courses)
+     
     } catch (error) {
       console.error("Error fetching course details:", error);
     }

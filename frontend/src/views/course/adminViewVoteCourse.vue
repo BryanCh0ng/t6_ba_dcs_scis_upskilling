@@ -90,6 +90,10 @@ export default {
       this.localCurrentPage = newPage;
       this.$emit('page-change', newPage);
     },
+    async handleSearchComplete(searchResults) {
+      console.log(searchResults)
+      this.courses = searchResults;
+    },
     async searchAllVotingCoursesAdmin(user_ID, course_Name, coursecat_ID, status) {
       try {
         let response = await CourseService.searchInstructorProposedCourseInfo(
@@ -116,9 +120,7 @@ export default {
   async created() {
     try {
       let response = await CourseService.searchAllVotingCoursesAdmin(null, null, null)
-      console.log(response.data)
       this.vote_courses = response.data
-      console.log(this.vote_courses)
     } catch (error) {
       console.error("Error fetching course details:", error);
     }

@@ -248,6 +248,14 @@ const routes = [
       },
     },
     {
+      path: '/adminViewInstructorsTrainers',
+      name: 'adminViewInstructorsTrainers',
+      component: () => import('../views/course/adminViewInstructorsTrainers.vue'),
+      meta: {
+          title: 'Admin View Instructors Trainers',
+      },
+    },
+    {
       path: '/searchTryout',
       name: 'viewCourse',
       component: () => import('../views/searchTryout.vue'),
