@@ -20,9 +20,7 @@ export default {
   setup(props) {
     const inputValue = ref(props.value);
     const inputType = ref(props.type);
-    const isPasswordInput = ref(props.type === 'password');
-    const showPassword = ref(false);
-
+    
     // Watch for changes in the prop value and update inputValue accordingly
     watch(() => props.value, (newValue) => {
       inputValue.value = newValue;
@@ -31,8 +29,7 @@ export default {
     return {
       inputValue,
       inputType,
-      isPasswordInput,
-      showPassword,
+      
     };
   },
   watch: {
