@@ -1,57 +1,117 @@
 <template>
   <div>
-    <div class="pt-5 container col-12 table-responsive">
-      <h5 class="pb-3">All Courses</h5>
-
-      <div v-if="courses.length > 0">
-        <table class="table">
-          <thead>
-            <tr class="text-nowrap">
-              <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Course Name / Description <sort-icon ::sortColumn="sortColumn === 'name'" :sortDirection="sortDirection"/></a></th>
-              <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Course Start Date <sort-icon :sortColumn="sortColumn === 'start_date'" :sortDirection="sortDirection"/></a></th>
-              <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Course End Date <sort-icon :sortColumn="sortColumn === 'end_date'" :sortDirection="sortDirection"/></a></th>
-              <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Closing Date <sort-icon :sortColumn="sortColumn === 'closing_date'" :sortDirection="sortDirection"/></a></th>
-              <th scope="col">Course Details</th>
-              <th scope="col">Action(s)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(course, key) in displayedCourses" :key="key">
-              <td class="name">
-                <course-name-desc :name="course.name" :category="course.category" :description="course.description"></course-name-desc>
-              </td>
-              <td class="start_date">
-                <course-date-time :date="course.start_date" :time="course.start_time"></course-date-time>
-              </td>
-              <td class="end_date">
-                <course-date-time :date="course.end_date" :time="course.end_time"></course-date-time>
-              </td>
-              <td class="closing_date">
-                <course-date-time :date="course.closing_date" :time="course.closing_time"></course-date-time>
-              </td>
-              <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-              <td><course-action :status="course.status" :id="course.id"></course-action></td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="modal fade" id="course_details_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-          <div class="modal-dialog modal-lg">
-            <modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" />
+  <ul class="nav nav-pills justify-content-center">
+    <li class="nav-item">
+      <a class="nav-link" :class="{ 'active': activeTab === 'course_reg' }" @click="activeTab = 'course_reg'">Courses Available to Register</a>
+    </li> 
+    <li class="nav-item">
+      <a class="nav-link" :class="{ 'active': activeTab === 'course_vote' }" @click="activeTab = 'course_vote'">Courses Available to Vote</a>
+    </li>
+  </ul>
+  <div class="tab-content ">
+    <div class="tab-pane fade" :class="{ 'show active': activeTab === 'course_reg' }">
+      <div class="pt-5 container col-12 table-responsive">
+        <h5 class="pb-3">All Courses Available to Register</h5>
+        <div v-if="run_courses.length > 0">
+          <table class="table">
+            <thead>
+              <tr class="text-nowrap">
+                <th scope="col">
+                  <a href="" class="text-decoration-none text-dark">Course Name / Description <sort-icon ::sortColumn="sortColumn === 'name'" :sortDirection="sortDirection"/></a></th>
+                <th scope="col">
+                  <a href="" class="text-decoration-none text-dark">Course Start Date <sort-icon :sortColumn="sortColumn === 'start_date'" :sortDirection="sortDirection"/></a></th>
+                <th scope="col">
+                  <a href="" class="text-decoration-none text-dark">Course End Date <sort-icon :sortColumn="sortColumn === 'end_date'" :sortDirection="sortDirection"/></a></th>
+                <th scope="col">
+                  <a href="" class="text-decoration-none text-dark">Closing Date <sort-icon :sortColumn="sortColumn === 'closing_date'" :sortDirection="sortDirection"/></a></th>
+                <th scope="col">Course Details</th>
+                <th scope="col">Action(s)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(course, key) in displayedRunCourses" :key="key">
+                <td class="name">
+                  <course-name-desc :name="course.name" :category="course.category" :description="course.description"></course-name-desc>
+                </td>
+                <td class="start_date">
+                  <course-date-time :date="course.start_date" :time="course.start_time"></course-date-time>
+                </td>
+                <td class="end_date">
+                  <course-date-time :date="course.end_date" :time="course.end_time"></course-date-time>
+                </td>
+                <td class="closing_date">
+                  <course-date-time :date="course.closing_date" :time="course.closing_time"></course-date-time>
+                </td>
+                <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
+                <td><course-action :status="course.status" :id="course.id"></course-action></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="modal fade" id="course_details_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" />
+            </div>
           </div>
         </div>
+        <div v-else>
+          <p>No records found</p>
+        </div>
       </div>
-
-      <div v-else>
-        <p>No records found</p>
-      </div>
+      <vue-awesome-paginate v-if="run_courses.length/itemsPerPage > 0" v-model="localCurrentPageRunCourse" :totalItems="run_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageChange" class="justify-content-center pagination-container"/>
     </div>
-    <vue-awesome-paginate v-if="courses.length/itemsPerPage > 0" v-model="localCurrentPage" :totalItems="courses.length" :items-per-page="1" @page-change="handlePageChange" class="justify-content-center pagination-container"/>
+    <div class="tab-pane fade" :class="{ 'show active': activeTab === 'course_vote' }">
+      <div class="pt-5 container col-12 table-responsive">
+        <h5 class="pb-3">Courses Available to Vote</h5>
+        <div v-if="vote_courses.length > 0">
+          <table class="table">
+            <thead>
+              <tr class="text-nowrap">
+                <th scope="col">
+                  <a href="" class="text-decoration-none text-dark">Course Name / Description <sort-icon ::sortColumn="sortColumn === 'name'" :sortDirection="sortDirection"/></a></th>
+                <th scope="col">
+                  <a href="" class="text-decoration-none text-dark">Course Start Date <sort-icon :sortColumn="sortColumn === 'start_date'" :sortDirection="sortDirection"/></a></th>
+                <th scope="col">
+                  <a href="" class="text-decoration-none text-dark">Course End Date <sort-icon :sortColumn="sortColumn === 'end_date'" :sortDirection="sortDirection"/></a></th>
+                <th scope="col">
+                  <a href="" class="text-decoration-none text-dark">Closing Date <sort-icon :sortColumn="sortColumn === 'closing_date'" :sortDirection="sortDirection"/></a></th>
+                <th scope="col">Course Details</th>
+                <th scope="col">Action(s)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(course, key) in displayVoteCourses" :key="key">
+                <td class="name">
+                  <course-name-desc :name="course.name" :category="course.category" :description="course.description"></course-name-desc>
+                </td>
+                <td class="start_date">
+                  <course-date-time :date="course.start_date" :time="course.start_time"></course-date-time>
+                </td>
+                <td class="end_date">
+                  <course-date-time :date="course.end_date" :time="course.end_time"></course-date-time>
+                </td>
+                <td class="closing_date">
+                  <course-date-time :date="course.closing_date" :time="course.closing_time"></course-date-time>
+                </td>
+                <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
+                <td><course-action :status="course.status" :id="course.id"></course-action></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="modal fade" id="course_details_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+              <modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" />
+            </div>
+          </div>
+        </div>
+        <div v-else>
+          <p>No records found</p>
+        </div>
+      </div>
+      <vue-awesome-paginate v-if="vote_courses.length/itemsPerPage > 0" v-model="localCurrentPageVoteCourse" :totalItems="vote_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageChange" class="justify-content-center pagination-container"/>
+    </div>
+    
   </div>
+</div>
 </template>
 
 <script>
@@ -73,7 +133,7 @@ export default {
   },
   data() {
     return {
-      courses: [
+      run_courses: [
         {
           id: 1,
           name: "Course Name 1",
@@ -109,19 +169,46 @@ export default {
           available_slots: 15
         },
       ],
+      vote_courses: [
+      {
+        id: 1,
+        name: "Course Name 1",
+        category: "SCIS",
+        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
+        closing_date: "Aug 20, 2023",
+        closing_time: "6.30 pm",
+        status: 'Active'
+      },
+      {
+        id: 2,
+        name: "Course Name 2",
+        category: "LKCSB",
+        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
+        closing_date: "Aug 20, 2023",
+        closing_time: "6.30 pm",
+        status: 'Vote'
+      },
+      ],
       sortColumn: 'name',
       sortDirection: 'asc',
       selectedCourse: null,
       itemsPerPage: 1,
-      localCurrentPage: 1,
+      localCurrentPageRunCourse: 1,
+      localCurrentPageVoteCourse: 1,
+      activeTab: 'course_reg'
     }
   },
   computed: {
-    displayedCourses() {
+    displayedRunCourses() {
+      const startIndex = (this.localCurrentPageRunCourse - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      return this.run_courses.slice(startIndex, endIndex);
+    },
+    displayVoteCourses() {
       const startIndex = (this.localCurrentPage - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
-      return this.courses.slice(startIndex, endIndex);
-    },
+      return this.run_courses.slice(startIndex, endIndex);
+    }
   },
   methods: {
     openModal(course) {
