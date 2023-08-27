@@ -1,11 +1,10 @@
 <template>
   <div>
-    <!-- Use the component with the desired API endpoint -->
     <search-filter
       :search-api="searchAllSubmittedProposedCoursesAdmin" 
       @search-complete="handleSearchComplete"
     />
-    <div v-if="searchResults">
+    <div v-if="hasSearchResults">
       <h2>Search Results:</h2>
       <ul>
         <li v-for="result in searchResults" :key="result.course.course_ID">
@@ -32,20 +31,22 @@ export default {
       searchResults: [],
     };
   },
+  computed: {
+    hasSearchResults() {
+      return this.searchResults && this.searchResults.length > 0;
+    },
+  },
   methods: {
     async handleSearchComplete(searchResults) {
       this.searchResults = searchResults;
     },
     async searchAllSubmittedProposedCoursesAdmin(course_Name, coursecat_ID) {
       try {
-        console.log(course_Name);
-        // Use the axiosClient or another HTTP client to make the API request
-        
+        // Assuming that course_Name and coursecat_ID are optional parameters
         let response = await CourseService.searchAllSubmittedProposedCoursesAdmin(
-            course_Name,
-            coursecat_ID,
+          course_Name,
+          coursecat_ID
         );
-          
         this.searchResults = response.data;
         return this.searchResults;
       } catch (error) {
@@ -53,6 +54,14 @@ export default {
         throw error;
       }
     },
+  },
+  async created() {
+    try {
+      // Perform the initial search when the component is created
+      await this.searchAllSubmittedProposedCoursesAdmin();
+    } catch (error) {
+      console.error("Error initializing search results:", error);
+    }
   },
 };
 </script>

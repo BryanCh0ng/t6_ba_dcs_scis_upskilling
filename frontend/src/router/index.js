@@ -82,6 +82,22 @@ const routes = [
       title: 'Contact Us',
     },
   },
+  {
+    path: '/adminViewRunCourse',
+    name: 'adminViewRunCourse',
+    component: () => import('../views/course/adminViewRunCourse.vue'),
+    meta: {
+      title: 'adminViewRunCourse',
+    },
+  },
+  {
+    path: '/searchTryout',
+    name: 'searchTryout',
+    component: () => import('../views/searchTryout.vue'),
+    meta: {
+      title: 'searchTryout',
+    },
+  },
   // },
   // {
   //     path: '/deleteCourse',

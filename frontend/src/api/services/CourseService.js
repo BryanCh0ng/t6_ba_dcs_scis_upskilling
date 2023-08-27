@@ -43,6 +43,40 @@ class CourseService extends BaseApiService {
         }
     }
 
+    // Student - Courses Available for Registration (Ongoing) with Filters
+    async searchUnregisteredActiveInfo(user_ID, course_Name, coursecat_ID) {
+        try {
+            let response = await axiosClient.get("/course/get_unregistered_active_courses", {
+                params: {
+                    user_id: user_ID,
+                    course_name: course_Name,
+                    coursecat_id: coursecat_ID
+                }
+            });
+            console.log(response.data);
+            return response.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+    // Student - Courses Available for Voting (Active) with Filters
+    async searchUnregisteredActiveInfo(user_ID, course_Name, coursecat_ID) {
+        try {
+            let response = await axiosClient.get("/course/get_unvoted_ongoing_courses", {
+                params: {
+                    user_id: user_ID,
+                    course_name: course_Name,
+                    coursecat_id: coursecat_ID
+                }
+            });
+            console.log(response.data);
+            return response.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
     // Student - Registration - course name, course cat, status
     async searchCourseRegistrationInfo(user_ID, course_Name, coursecat_ID, reg_Status) {
         try {
@@ -232,7 +266,7 @@ class CourseService extends BaseApiService {
         }
     }
 
-    // Admin - All Courses
+    // Admin - All Courses with Reg Count 
     async searchAllCoursesAdmin(course_Name, coursecat_ID, course_Status) {
         try {
 
@@ -260,6 +294,25 @@ class CourseService extends BaseApiService {
                 }
             });
             return instructorsAndTrainers.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+
+    // Admin - All Run Courses
+    async searchAllRunCourseAdmin(course_Name, coursecat_ID, course_Status) {
+        try {
+
+            let response = await axiosClient.get("/course/get_all_run_courses", {
+                params: {
+                    course_name: course_Name,
+                    coursecat_id: coursecat_ID,
+                    course_status: course_Status
+                }
+            });
+            console.log(response.data)
+            return response.data;
         } catch (error) {
             return this.handleError(error);
         }

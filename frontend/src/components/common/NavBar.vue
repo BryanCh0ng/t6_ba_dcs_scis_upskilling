@@ -130,6 +130,7 @@ export default {
         items.push(
           { path: "/profile", label: "Profile" },
           { path: "/allRunCourse", label: "All Run Course" },
+          { path: "/allAvailRegCourse", label: "All Available Registration Course" },
           { path: "/allInstructors", label: "All Instructors" },
           { path: "/feedbackTemplate", label: "Feedback Template" },
           { path: "/dashboard", label: "Dashboard" }
