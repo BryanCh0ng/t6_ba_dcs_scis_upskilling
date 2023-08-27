@@ -1,4 +1,4 @@
-import RunCourseService from "../../api/services/runCourseService.js"
+import RunCourseService from "../api/services/runCourseService.js"
 
 async function getRunCourseDetails(courseID) {
   var run_course_response = await RunCourseService.getRunCourseByCourseId(courseID);

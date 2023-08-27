@@ -1,6 +1,6 @@
-import UserService from "../../api/services/UserService.js"
+import UserService from "../api/services/UserService.js"
 
-import { getExternalUserDetails } from "../externaluser/externaluser.js"
+import { getExternalUserDetails } from "./externaluser.js"
 
 async function getAllInstructors() {
   var response  = await UserService.getAllInstructors();
@@ -24,10 +24,8 @@ async function getAllTrainers() {
     var all_trainers = response.data['trainer']
     for (const trainer of all_trainers) { 
       var external_user_details = await getExternalUserDetails(trainer.user_ID);
-      console.log(external_user_details)
       if (external_user_details.code == 200) {
         var trainer_details_data = external_user_details.data['externalUser']
-        console.log(trainer_details_data)
         trainer_details.push({ ...trainer, ...trainer_details_data[0], ratings: '4.5 / 5' })
       }
       else {
@@ -43,7 +41,6 @@ async function getAllTrainers() {
 
 async function getUserDetails(userID) {
   var user_response = await UserService.getUserById(userID);
-  console.log(user_response)
   return user_response;
 }
 

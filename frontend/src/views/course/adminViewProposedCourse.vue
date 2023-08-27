@@ -114,7 +114,7 @@ import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import rejectProposalModal from '../../components/course/rejectProposalModal.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
-import { getAllProposedPendingCourseByStatus } from '../../scripts/proposedcourse/proposedcourse.js';
+import { getAllProposedPendingCourseByStatus } from '../../scripts/proposedcourse.js';
 
 export default {
   components: {
@@ -178,17 +178,14 @@ export default {
   async created() {
     try {
       const pending_results = await getAllProposedPendingCourseByStatus('Pending');
-      console.log(pending_results)
       if (pending_results.code === 200) {
         this.pending_courses = pending_results.course;
       }
       const approved_results = await getAllProposedPendingCourseByStatus('Approved');
-      console.log(approved_results)
       if (approved_results.code === 200) {
         this.proposed_courses = this.proposed_courses.concat(approved_results.course);
       }
       const rejected_results = await getAllProposedPendingCourseByStatus('Rejected');
-      console.log(rejected_results)
       if (rejected_results.code === 200) {
         this.proposed_courses = this.proposed_courses.concat(rejected_results.course);
       }

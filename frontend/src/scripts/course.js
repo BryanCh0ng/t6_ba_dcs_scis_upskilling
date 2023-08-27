@@ -1,22 +1,21 @@
 // services
-import CourseService from "../../api/services/CourseService.js"
+import CourseService from "../api/services/CourseService.js"
 
 // scripts
-import { convertDate, convertTime } from "../common/convertDateTime.js"
-import { getRegCount } from "../registration/registration.js"
-import { getRunCourseDetails } from "../runcourse/runcourse.js"
-import { getProposedCourseDetails } from "../proposedcourse/proposedcourse.js"
-import { getCategory } from "../coursecat/coursecat.js"
+import { convertDate, convertTime } from "./common/convertDateTime.js"
+import { getRegCount } from "./registration.js"
+import { getRunCourseDetails } from "./runcourse.js"
+import { getProposedCourseDetails } from "./proposedcourse.js"
+import { getCategory } from "./coursecat.js"
 
 async function getAllCourseDetails() {
   var response  = await CourseService.getAllCoursesAdmin(); 
   var course_details = []
   if (response.code == 200) {
     var all_courses = response.data['course']
-    for (const course of all_courses) { 
+    for (const course of all_courses) {
       var run_course_response = await getRunCourseDetails(course.course_ID); 
-      var reg_count = 0;
-      reg_count = await getRegCount(course.course_ID)
+      var reg_count = await getRegCount(course.course_ID)
       if (run_course_response.code == 200) {
         var run_course_details = run_course_response.data['course']
         course_details.push({ ...course, ...run_course_details[0], 

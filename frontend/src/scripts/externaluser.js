@@ -1,4 +1,4 @@
-import ExternalUserService from "../../api/services/ExternalUserService.js"
+import ExternalUserService from "../api/services/ExternalUserService.js"
 
 async function getExternalUserDetails(user_id) {
 	var external_user_response = await ExternalUserService.getExternalUserDetails(user_id);

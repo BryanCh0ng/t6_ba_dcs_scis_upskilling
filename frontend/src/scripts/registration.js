@@ -1,4 +1,4 @@
-import RegistrationService from "../../api/services/RegistrationService.js"
+import RegistrationService from "../api/services/RegistrationService.js"
 
 async function getRegCount(course_id) {
   var reg_count_response = await RegistrationService.getRegCount(course_id);

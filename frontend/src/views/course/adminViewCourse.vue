@@ -65,7 +65,7 @@
       </div>
   
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'instructors_trainers' }">
-        <div class="pt-5 container col-12 table-responsive">
+        <div class="pt-5 container col-12 table-responsive" v-if="!loading">
           <h5 class="pb-3">All Instructors/Trainers Database</h5>
           <div v-if="instructors_trainers.length > 0">
             <table class="table">
@@ -118,8 +118,8 @@ import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
 import courseDateTime from '../../components/course/courseDateTime.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
-import { getAllCourseDetails } from '../../scripts/course/course.js';
-import { getAllInstructors, getAllTrainers } from '../../scripts/user/user.js';
+import { getAllCourseDetails } from '../../scripts/course.js';
+import { getAllInstructors, getAllTrainers } from '../../scripts/user.js';
 
 export default {
   components: {
@@ -177,21 +177,18 @@ export default {
   async created() {
     try {
       const results = await getAllCourseDetails();
-      console.log(results)
+
       if (results.code === 200) {
         this.courses = results.courses;
       }
       const instructor_results = await getAllInstructors();
       const trainer_results = await getAllTrainers();
-      console.log(instructor_results)
-      console.log(trainer_results)
       if (instructor_results.code === 200) {
         this.instructors_trainers = this.instructors_trainers.concat(instructor_results.instructor);
       }
       if (trainer_results.code === 200) {
         this.instructors_trainers = this.instructors_trainers.concat(trainer_results.trainer);
       }
-      console.log(this.instructors_trainers)
       this.loading = false;
     } catch (error) {
       console.error("Error fetching course details:", error);

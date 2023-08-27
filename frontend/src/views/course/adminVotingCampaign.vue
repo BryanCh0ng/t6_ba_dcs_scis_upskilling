@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="pt-5 container col-12 table-responsive">
+    <div class="pt-5 container col-12 table-responsive" v-if="!loading">
       <h5 class="pb-3">Courses Available for Students to Indicate Interest</h5>
       <div v-if="vote_courses.length > 0">
         <table class="table">
@@ -19,16 +19,17 @@
           <tbody>
             <tr v-for="(vote_course, key) in displayedVoteCourses" :key="key">
             <td class="name">
-              <course-name-desc :name="vote_course.name" :category="vote_course.category" :description="vote_course.description"></course-name-desc>
+              <course-name-desc :name="vote_course.course_Name" :category="vote_course.course_cat" :description="vote_course.course_Desc"></course-name-desc>
             </td>
             <td class="current_interest">
                 {{ vote_course.interest_count }}
             </td>
-            <td>{{ vote_course.status }}</td>
+            <td>{{ vote_course.vote_Status }}</td>
             <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(vote_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-            <td v-if="vote_course.status === 'Open'"><course-action status="Close" :id="vote_course.id"></course-action></td>
-            <td v-else-if="vote_course.status === 'Closed'"><course-action status="Open for Registration" :id="vote_course.id"></course-action></td>
-            </tr>
+            <td v-if="vote_course.vote_Status === 'Ongoing'"><course-action status="Close" :id="vote_course.course_ID"></course-action></td>
+            <td v-else-if="vote_course.vote_Status === 'Closed'"><course-action status="Open for Registration" :id="vote_course.course_ID"></course-action></td>
+            <td v-else><course-action status="Open for Voting" :id="vote_course.course_ID"></course-action></td>
+          </tr>
           </tbody>
         </table>
         <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
@@ -39,7 +40,7 @@
         <p>No records found</p>
       </div>
     </div>
-    <vue-awesome-paginate v-model="localCurrentPage" :totalItems="vote_courses.length" :items-per-page="1" @page-change="handlePageChange" class="justify-content-center pagination-container"/>
+    <vue-awesome-paginate v-model="localCurrentPage" :totalItems="vote_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageChange" class="justify-content-center pagination-container"/>
   </div>
 </template>
     
@@ -49,6 +50,7 @@ import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
+import { getAllVoteCourse } from '../../scripts/votecourse.js';
 
 export default {
   components: {
@@ -60,47 +62,13 @@ export default {
   },
   data() {
     return {
-      vote_courses: [
-        {
-        id: 1,
-        name: "Course Name 1",
-        category: "SCIS",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
-        start_date: "Aug 20, 2023",
-        start_time: "6.30 pm",
-        end_date: "Aug 20, 2023",
-        end_time: "6.30 pm",
-        closing_date: "Aug 20, 2023",
-        closing_time: "6.30 pm",
-        fee: 50,
-        venue: 'SCIS SR-2',
-        format: 'Physical',
-        status: 'Open',
-        interest_count: 13
-        },
-        {
-        id: 2,
-        name: "Course Name 2",
-        category: "LKCSB",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
-        start_date: "Aug 20, 2023",
-        start_time: "6.30 pm",
-        end_date: "Aug 20, 2023",
-        end_time: "6.30 pm",
-        closing_date: "Aug 20, 2023",
-        closing_time: "6.30 pm",
-        fee: 100,
-        venue: 'SCIS SR-5',
-        format: 'Online',
-        status: 'Close',
-        interest_count: 20
-        },
-      ],
+      vote_courses: [],
       sortColumn: 'name',
       sortDirection: 'asc',
       selectedCourse: null,
-      itemsPerPage: 1,
+      itemsPerPage: 10,
       localCurrentPage: 1,
+      loading: true
     }
   },
   methods: {
@@ -123,6 +91,17 @@ export default {
       const endIndex = startIndex + this.itemsPerPage;
       return this.vote_courses.slice(startIndex, endIndex);
     },
+  },
+  async created() {
+    try {
+      const vote_results = await getAllVoteCourse();
+      if (vote_results.code === 200) {
+        this.vote_courses = vote_results.course;
+      }
+      this.loading = false;
+    } catch (error) {
+      console.error("Error fetching course details:", error);
+    }
   }
   }
 </script>

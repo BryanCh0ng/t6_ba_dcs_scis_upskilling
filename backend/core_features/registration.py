@@ -15,18 +15,9 @@ class RetrieveRegCount(Resource):
     arg = retrieve_reg_count.parse_args().get("course_id")
     course_id = arg if arg else ""
     reg_count = Registration.query.filter(Registration.rcourse_ID.contains(course_id)).count()
-    
+
     db.session.close()
-    if reg_count == 0:
-      return jsonify(
-        {
-          "code": 200,
-          "data": {
-            "reg_count": 0
-          }
-        }
-      )
-    else:
+    if reg_count >= 0:
       return jsonify(
         {
           "code": 200,
@@ -35,4 +26,4 @@ class RetrieveRegCount(Resource):
           }
         }
       )
-    return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
+    return json.loads(json.dumps({"message": "registration count error", "code": 404}, default=str))
