@@ -996,7 +996,7 @@ class GetAllCoursesWithRegistrationCount(Resource):
             func.coalesce(func.count(Registration.reg_ID), 0).label("registration_count")
         ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).outerjoin(
             Registration, RunCourse.rcourse_ID == Registration.rcourse_ID
-        ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID).group_by(Course.course_ID)
+        ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID).group_by(Course.course_ID, RunCourse.rcourse_ID)
 
         if course_name:
             query = query.filter(Course.course_Name.contains(course_name))
@@ -1011,24 +1011,26 @@ class GetAllCoursesWithRegistrationCount(Resource):
         if results:
             result_data = []
             for result in results:
-                course_info = {
-                    "course": result[0].json(),
-                    "coursecat_Name": result[1],
-                    "runCourse": result[2].json(),
-                    "registration_count": result[3]
+                run_course_attrs = {
+                    "run_Startdate": result[2].run_Startdate.strftime('%Y-%m-%d'),
+                    "run_Enddate": result[2].run_Enddate.strftime('%Y-%m-%d'),
+                    "run_Starttime": result[2].run_Starttime.strftime('%H:%M:%S'),
+                    "run_Endtime": result[2].run_Endtime.strftime('%H:%M:%S'),
+                    "reg_Startdate": result[2].reg_Startdate.strftime('%Y-%m-%d'),
+                    "reg_Enddate": result[2].reg_Enddate.strftime('%Y-%m-%d'),
+                    "reg_Starttime": result[2].reg_Starttime.strftime('%H:%M:%S'),
+                    "reg_Endtime": result[2].reg_Endtime.strftime('%H:%M:%S'),
                 }
 
-                course_info["runCourse"]["run_Startdate"] = result[2].run_Startdate.strftime('%Y-%m-%d')
-                course_info["runCourse"]["run_Enddate"] = result[2].run_Enddate.strftime('%Y-%m-%d')
-                course_info["runCourse"]["run_Starttime"] = result[2].run_Starttime.strftime('%H:%M:%S')
-                course_info["runCourse"]["run_Endtime"] = result[2].run_Endtime.strftime('%H:%M:%S')
-                course_info["runCourse"]["reg_Startdate"] = result[2].reg_Startdate.strftime('%Y-%m-%d')
-                course_info["runCourse"]["reg_Enddate"] = result[2].reg_Enddate.strftime('%Y-%m-%d')
-                course_info["runCourse"]["reg_Starttime"] = result[2].reg_Starttime.strftime('%H:%M:%S')
-                course_info["runCourse"]["reg_Endtime"] = result[2].reg_Endtime.strftime('%H:%M:%S')
+                modified_run_course = {**result[2].json(), **run_course_attrs}
 
+                course_info = {
+                    **result[0].json(),
+                    "coursecat_Name": result[1],
+                    **modified_run_course,
+                    "registration_count": result[3]
+                }
                 result_data.append(course_info)
-
             return jsonify({"code": 200, "data": result_data})
 
         return jsonify({"code": 404, "message": "No courses found"})

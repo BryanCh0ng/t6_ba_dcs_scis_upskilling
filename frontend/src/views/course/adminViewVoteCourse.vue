@@ -50,7 +50,6 @@ import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
-import { getAllVoteCourse } from '../../scripts/votecourse.js';
 
 export default {
   components: {
