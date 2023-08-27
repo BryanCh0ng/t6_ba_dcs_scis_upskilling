@@ -104,9 +104,7 @@ export default {
   async created() {
     try {
       let response = await CourseService.getAllInstructorsAndTrainers(null, null)
-      console.log(response)
       this.instructors_trainers = response.data
-      console.log(this.instructors_trainers)
     } catch (error) {
       console.error("Error fetching course details:", error);
     }

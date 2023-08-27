@@ -223,15 +223,9 @@ export default {
   async created() {
     try {
       let pending_response = await CourseService.searchAllSubmittedProposedCoursesAdmin(null, null)
-      console.log(pending_response)
       this.pending_courses = pending_response.data
-      console.log(this.pending_courses)
-  
       let proposed_response = await CourseService.searchAllApprovedRejectedProposedCoursesAdmin(null, null, null)
-      console.log(proposed_response)
       this.proposed_courses = proposed_response.data
-      console.log(this.proposed_courses)
-     
     } catch (error) {
       console.error("Error fetching course details:", error);
     }
