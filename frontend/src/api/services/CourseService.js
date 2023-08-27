@@ -250,7 +250,6 @@ class CourseService extends BaseApiService {
         }
     }
 
-
     // Admin - All Instructors
     async getAllInstructorsAndTrainers(user_Name, organization_Name) {
         try {

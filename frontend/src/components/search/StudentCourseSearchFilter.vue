@@ -73,21 +73,21 @@ export default({
             this.coursetype = "";
         },
         searchFilter() {
-        //     console.log(this.courseName);
-        //     console.log(this.category);
-        //     console.log(this.coursetype);
-
-            // reset filter when user clicks search
-            this.resetFilter();
+            const filters = {
+                courseName: this.courseName,
+                category: this.category,
+                coursetype: this.coursetype,
+            };
+            this.$emit('apply-filters', filters);
         }
     },
 })
 </script>
 
 <style scoped>
-    button {
+    .btn {
         width: 48%;
-        height: 45px;
+        height: 50px;
         border-radius: 10px;
     }
 
@@ -99,6 +99,7 @@ export default({
     #resetbtn {
         background-color: transparent;
         border: 4px solid #616161;
+        color:black;
     }
 
 </style>

@@ -194,6 +194,108 @@ class EditCourse(Resource):
             return "Failed" + str(e), 500
 
 
+
+# Student - Courses Available for Registration (Ongoing) with Filters
+# retrieve_courses_available_for_registration = api.parser()
+# retrieve_courses_available_for_registration.add_argument("user_id", type=int, help="Enter user ID")
+# retrieve_courses_available_for_registration.add_argument("course_name", help="Enter course name")
+# retrieve_courses_available_for_registration.add_argument("coursecat_id", help="Enter course category id")
+
+# @api.route("/get_courses_available_for_registration")
+# @api.doc(description="Get courses available for registration")
+# class GetCoursesAvailableForRegistration(Resource):
+#     @api.expect(retrieve_courses_available_for_registration)
+#     def get(self):
+#         args = retrieve_courses_available_for_registration.parse_args()
+#         user_ID = args.get("user_id")
+#         course_Name = args.get("course_name", "")
+#         coursecat_ID = args.get("coursecat_id", "")
+
+#         query = db.session.query(
+#             Course,
+#             CourseCategory.coursecat_Name,
+#             RunCourse
+#         ).select_from(Course).join(
+#             RunCourse, Course.course_ID == RunCourse.course_ID
+#         ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID).join(
+#             Registration, RunCourse.rcourse_ID == Registration.rcourse_ID
+#         ).filter(Registration.reg_Status == "Ongoing")
+
+#         if user_ID:
+#             query = query.filter(Registration.user_ID == user_ID)
+#         if course_Name:
+#             query = query.filter(Course.course_Name.contains(course_Name))
+#         if coursecat_ID:
+#             query = query.filter(Course.coursecat_ID == coursecat_ID)
+
+#         results = query.all()
+#         db.session.close()
+
+#         if results:
+#             result_data = []
+#             for result in results:
+#                 course_info = {
+#                     "course": result[0].json(),
+#                     "coursecat_Name": result[1],
+#                     "runCourse": result[2].json(),
+#                 }
+#                 # Format date and time values here if needed
+#                 result_data.append(course_info)
+
+#             return jsonify({"code": 200, "data": result_data})
+
+#         return jsonify({"code": 404, "message": "No courses available for registration"})
+
+# Student - Courses Available for Voting with Filters
+# retrieve_courses_available_for_voting = api.parser()
+# retrieve_courses_available_for_voting.add_argument("user_id", type=int, help="Enter user ID")
+# retrieve_courses_available_for_voting.add_argument("course_name", help="Enter course name")
+# retrieve_courses_available_for_voting.add_argument("coursecat_id", help="Enter course category id")
+
+# @api.route("/get_courses_available_for_voting")
+# @api.doc(description="Get courses available for voting")
+# class GetCoursesAvailableForVoting(Resource):
+#     @api.expect(retrieve_courses_available_for_voting)
+#     def get(self):
+#         args = retrieve_courses_available_for_voting.parse_args()
+#         user_ID = args.get("user_id")
+#         course_Name = args.get("course_name", "")
+#         coursecat_ID = args.get("coursecat_id", "")
+
+#         query = db.session.query(
+#             Course,
+#             CourseCategory.coursecat_Name,
+#             VoteCourse
+#         ).select_from(Course).join(
+#             CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
+#         ).join(VoteCourse, Course.course_ID == VoteCourse.course_ID)
+
+#         if user_ID:
+#             query = query.filter(VoteCourse.user_ID == user_ID)
+#         if course_Name:
+#             query = query.filter(Course.course_Name.contains(course_Name))
+#         if coursecat_ID:
+#             query = query.filter(Course.coursecat_ID == coursecat_ID)
+
+#         results = query.all()
+#         db.session.close()
+
+#         if results:
+#             result_data = []
+#             for result in results:
+#                 course_info = {
+#                     "course": result[0].json(),
+#                     "coursecat_Name": result[1],
+#                     "voteCourse": result[2].json(),
+#                 }
+#                 result_data.append(course_info)
+
+#             return jsonify({"code": 200, "data": result_data})
+
+#         return jsonify({"code": 404, "message": "No courses available for voting"})
+
+
+
 # Student Registration Search - course name, course cat, status
 retrieve_registration_info_filter_search = api.parser()
 retrieve_registration_info_filter_search.add_argument("user_id", type=int, help="Enter user ID")
@@ -261,8 +363,6 @@ class GetCourseRegistrationInfo(Resource):
             return jsonify({"code": 200, "data": result_data})
 
         return jsonify({"code": 404, "message": "No matching course registration information found"})
-
-
 
 # Student - Vote - course name, course cat, status
 retrieve_vote_info_filter_search = api.parser()
@@ -873,7 +973,7 @@ class GetAllVotingCoursesAdmin(Resource):
 
         return jsonify({"code": 404, "message": "No voting courses found"})
 
-# Admin - All Courses
+# Admin - All Courses - All those in runcourse table
 retrieve_all_courses_admin = api.parser()
 retrieve_all_courses_admin.add_argument("course_name", help="Enter course name")
 retrieve_all_courses_admin.add_argument("coursecat_id", help="Enter course category id")

@@ -1,6 +1,6 @@
 <template>
     <div id="commonsearchfilter">
-        <div class="container mt-5 mb-5">
+        <div class="container mb-5">
             <form>
                 <div class="row">
                     <div class="col-sm">
@@ -114,9 +114,9 @@ export default({
 </script>
 
 <style scoped>
-    button {
+    .btn {
         width: 48%;
-        height: 45px;
+        height: 50px;
         border-radius: 10px;
     }
 
@@ -128,6 +128,7 @@ export default({
     #resetbtn {
         background-color: transparent;
         border: 4px solid #616161;
+        color:black;
     }
 
 </style>
