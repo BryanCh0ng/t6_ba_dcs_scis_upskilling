@@ -51,7 +51,8 @@
 <script>
 import sortIcon from '../../components/common/sort-icon.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
-import SearchFilter from "@/components/search/InstructorRelatedSearch.vue";
+import SearchFilter from "@/components/search/InstructorRelatedSearchFilter.vue";
+import CourseService from "@/api/services/CourseService.js";
 
 export default {
   components: {
