@@ -18,22 +18,11 @@
         </div>
       </form>
     </div>
-    <!-- Display search results here -->
-    <div v-if="searchedInstructors.length !== 0" class="mt-4">
-      <h3>Search Results</h3>
-      <ul>
-        <li v-for="(instructor, index) in searchedInstructors" :key="index">
-          <!-- Display instructor info here -->
-          {{ instructor.user_Name }} - {{ instructor.organisation_Name }}
-        </li>
-      </ul>
-    </div>
   </div>
 </template>
 
 <script>
 import InputField from "../InputField.vue";
-import CourseService from "@/api/services/CourseService.js"
 
 export default {
   name: "SearchFilter",
@@ -43,6 +32,9 @@ export default {
       organizationName: "",
       searchedInstructors: [],
     };
+  },
+  props: {
+        searchApi: Function,
   },
   components: {
     InputField,
@@ -58,14 +50,17 @@ export default {
         // Assign values to variables
         const user_Name = this.instructorName;
         const organizationName = this.organizationName;
-        console.log("user_Name:", user_Name);
-        console.log("organizationName:", organizationName);
+        // console.log("user_Name:", user_Name);
+        // console.log("organizationName:", organizationName);
+
+        let searchResults;
 
         // Call the API method from CourseService
-        const instructorsInfo = await CourseService.getAllInstructorsAndTrainers(user_Name, organizationName);
+        searchResults = await this.searchApi(user_Name, organizationName);
+        console.log(searchResults)
 
-        // Update the data with the retrieved results
-        this.searchedInstructors = instructorsInfo.data;
+        // Emit the search-complete event to the parent component
+        this.$emit("search-complete", searchResults);
 
       } catch (error) {
         console.error("Error fetching instructors info:", error);

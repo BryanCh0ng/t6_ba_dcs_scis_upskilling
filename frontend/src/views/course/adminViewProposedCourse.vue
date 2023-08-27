@@ -11,9 +11,9 @@
     <div class="tab-content ">
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'submitted' }">
         <search-filter
-        :status-options="statusOptions"
-        :search-api="searchAllPendingCoursesAdmin"
+        :search-api="searchAllSubmittedProposedCoursesAdmin"
         @search-complete="handleSearchComplete" />
+
         <div class="container col-12 table-responsive">
           <h5 class="pb-3">Proposed Course</h5>
           <div v-if="pending_courses.length > 0">
@@ -59,11 +59,14 @@
         </div>
         <vue-awesome-paginate v-if="pending_courses.length/itemsPerPage > 0" v-model="localCurrentPagePending" :totalItems="pending_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageChangePending" class="justify-content-center pagination-container"/>
       </div>
+
+      <!-- Approved Rejected -->
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'approved_rejected' }">
-        <common-search-filter
+        <common-search-filter class="mt-5"
         :status-options="statusOptions"
-        :search-api="searchAllProposedCoursesAdmin"
-        @search-complete="handleSearchComplete" />
+        :search-api="searchAllApprovedRejectedProposedCoursesAdmin"
+        @search-complete="handleSearchComplete2" />
+
         <div class="container col-12 table-responsive">
           <h5 class="pb-3">All Proposals</h5>
           <div v-if="proposed_courses.length > 0">
@@ -122,8 +125,8 @@ import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import rejectProposalModal from '../../components/course/rejectProposalModal.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
-import SearchFilter from "@/components/search/CourseRelatedSearchFilter.vue";
-import CommonSearchFilter from "@/components/search/CommonSearchFilter.vue";
+import SearchFilter from "@/components/search/ProposalCourseRelatedSearchFilter.vue";
+import CommonSearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 
 export default {
@@ -147,7 +150,8 @@ export default {
       itemsPerPage: 10,
       localCurrentPagePending: 1,
       localCurrentPageProposed: 1,
-      activeTab: 'submitted'
+      activeTab: 'submitted',
+      statusOptions: ["Approved", "Rejected"],
     }
   },
   methods: {
@@ -174,34 +178,38 @@ export default {
       this.showModal = false;
     },
     async handleSearchComplete(searchResults) {
-      console.log(searchResults)
-      this.courses = searchResults;
+      // console.log(searchResults)
+      this.pending_courses = searchResults;
     },
-    async searchAllPendingCoursesAdmin(user_ID, course_Name, coursecat_ID, status) {
+    async searchAllSubmittedProposedCoursesAdmin(course_Name, coursecat_ID) {
       try {
-        let response = await CourseService.searchInstructorProposedCourseInfo(
-          user_ID,
+        console.log(coursecat_ID)
+        let response = await CourseService.searchAllSubmittedProposedCoursesAdmin(
           course_Name,
-          coursecat_ID,
-          status
+          coursecat_ID
         );
-        this.vote_courses = response.data;
-        return this.vote_courses;
+        this.pending_courses = response.data;
+        return this.pending_courses;
       } catch (error) {
         console.error("Error fetching info:", error);
         throw error;
       }
     },
-    async searchAllProposedCoursesAdmin(user_ID, course_Name, coursecat_ID, status) {
+     async handleSearchComplete2(searchResults) {
+      // console.log(searchResults)
+      this.proposed_courses = searchResults;
+    },
+    async searchAllApprovedRejectedProposedCoursesAdmin(course_Name, coursecat_ID, status) {
       try {
-        let response = await CourseService.searchInstructorProposedCourseInfo(
-          user_ID,
+        console.log(status)
+        let response = await CourseService.searchAllApprovedRejectedProposedCoursesAdmin(
           course_Name,
           coursecat_ID,
           status
         );
-        this.vote_courses = response.data;
-        return this.vote_courses;
+        console.log(response.data)
+        this.proposed_courses = response.data;
+        return this.proposed_courses;
       } catch (error) {
         console.error("Error fetching info:", error);
         throw error;

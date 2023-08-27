@@ -66,7 +66,7 @@ export default({
                 console.error('Error fetching category dropdown options:', error);
             }
         },
-        resetFilter() {
+        async resetFilter() {
             this.courseName = "";
             this.category = "";
         },
@@ -74,6 +74,7 @@ export default({
             try {
                 const course_Name = this.courseName;
                 const coursecat_ID = this.category;
+                console.log(coursecat_ID)
 
                 let searchResults;
 

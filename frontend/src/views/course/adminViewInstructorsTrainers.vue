@@ -1,9 +1,9 @@
 <template>
   <div>
     <search-filter
-        :status-options="statusOptions"
-        :search-api="searchAllInstructorsRelatedAdmin"
+        :search-api="getAllInstructorsAndTrainers"
         @search-complete="handleSearchComplete" />
+
     <div class="container col-12 table-responsive">
       <h5 class="pb-3">All Instructors/Trainers Database</h5>
       <div v-if="instructors_trainers.length > 0">
@@ -78,16 +78,14 @@ export default {
       console.log(searchResults)
       this.courses = searchResults;
     },
-    async searchAllInstructorsRelatedAdmin(user_ID, course_Name, coursecat_ID, status) {
+    async getAllInstructorsAndTrainers(user_Name, organizationName) {
       try {
-        let response = await CourseService.searchInstructorProposedCourseInfo(
-          user_ID,
-          course_Name,
-          coursecat_ID,
-          status
+        let response = await CourseService.getAllInstructorsAndTrainers(
+          user_Name,
+          organizationName
         );
-        this.vote_courses = response.data;
-        return this.vote_courses;
+        this.instructors_trainers = response.data;
+        return this.instructors_trainers;
       } catch (error) {
         console.error("Error fetching info:", error);
         throw error;

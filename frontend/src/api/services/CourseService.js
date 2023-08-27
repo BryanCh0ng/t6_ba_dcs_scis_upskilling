@@ -231,18 +231,19 @@ class CourseService extends BaseApiService {
     }
 
     // Admin - All Proposal - Approved/Rejected
-    async searchAllApprovedRejectedProposedCoursesAdmin(course_Name, coursecat_ID, pcourse_Status) {
+    async searchAllApprovedRejectedProposedCoursesAdmin(course_Name, coursecat_ID, status) {
         try {
             console.log("course_Name:", course_Name);
             console.log("coursecat_ID:", coursecat_ID);
-            console.log("status:", pcourse_Status);
+            console.log("status:", status);
             let response = await axiosClient.get("/course/get_all_app_reg_proposed_courses_admin", {
                 params: {
                     course_name: course_Name,
                     coursecat_id: coursecat_ID,
-                    pcourse_status: pcourse_Status
+                    pcourse_status: status
                 }
             });
+            console.log(response.data)
             return response.data;
         } catch (error) {
             return this.handleError(error);

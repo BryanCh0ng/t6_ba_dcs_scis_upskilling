@@ -196,103 +196,128 @@ class EditCourse(Resource):
 
 
 # Student - Courses Available for Registration (Ongoing) with Filters
-# retrieve_courses_available_for_registration = api.parser()
-# retrieve_courses_available_for_registration.add_argument("user_id", type=int, help="Enter user ID")
-# retrieve_courses_available_for_registration.add_argument("course_name", help="Enter course name")
-# retrieve_courses_available_for_registration.add_argument("coursecat_id", help="Enter course category id")
+retrieve_unregistered_active_courses_filter = api.parser()
+retrieve_unregistered_active_courses_filter.add_argument("user_id", type=int, help="Enter user ID")
+retrieve_unregistered_active_courses_filter.add_argument("course_name", help="Enter course name")
+retrieve_unregistered_active_courses_filter.add_argument("coursecat_id", help="Enter course category id")
 
-# @api.route("/get_courses_available_for_registration")
-# @api.doc(description="Get courses available for registration")
-# class GetCoursesAvailableForRegistration(Resource):
-#     @api.expect(retrieve_courses_available_for_registration)
-#     def get(self):
-#         args = retrieve_courses_available_for_registration.parse_args()
-#         user_ID = args.get("user_id")
-#         course_Name = args.get("course_name", "")
-#         coursecat_ID = args.get("coursecat_id", "")
+@api.route("/get_unregistered_active_courses")
+@api.doc(description="Get unregistered active course information")
+class GetUnregisteredActiveCourses(Resource):
+    @api.expect(retrieve_unregistered_active_courses_filter)
+    def get(self):
+        args = retrieve_unregistered_active_courses_filter.parse_args()
+        user_ID = args.get("user_id")
 
-#         query = db.session.query(
-#             Course,
-#             CourseCategory.coursecat_Name,
-#             RunCourse
-#         ).select_from(Course).join(
-#             RunCourse, Course.course_ID == RunCourse.course_ID
-#         ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID).join(
-#             Registration, RunCourse.rcourse_ID == Registration.rcourse_ID
-#         ).filter(Registration.reg_Status == "Ongoing")
+        app.logger.debug(user_ID)
 
-#         if user_ID:
-#             query = query.filter(Registration.user_ID == user_ID)
-#         if course_Name:
-#             query = query.filter(Course.course_Name.contains(course_Name))
-#         if coursecat_ID:
-#             query = query.filter(Course.coursecat_ID == coursecat_ID)
+        # Get the courses that the user has already registered for
+        registered_course_ids = db.session.query(Registration.rcourse_ID).filter_by(user_ID=user_ID).subquery()
 
-#         results = query.all()
-#         db.session.close()
+        # Construct the query for unregistered courses with active course status
+        query = db.session.query(
+            Course,
+            CourseCategory.coursecat_Name,
+            RunCourse
+        ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).join(
+            CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
+        ).filter(
+            ~RunCourse.rcourse_ID.in_(registered_course_ids),
+            RunCourse.course_Status == "active"
+        )
 
-#         if results:
-#             result_data = []
-#             for result in results:
-#                 course_info = {
-#                     "course": result[0].json(),
-#                     "coursecat_Name": result[1],
-#                     "runCourse": result[2].json(),
-#                 }
-#                 # Format date and time values here if needed
-#                 result_data.append(course_info)
+        # Apply additional filters based on user inputs
+        course_Name = args.get("course_name", "")
+        coursecat_ID = args.get("coursecat_id", "")
 
-#             return jsonify({"code": 200, "data": result_data})
+        if course_Name:
+            query = query.filter(Course.course_Name.contains(course_Name))
+        if coursecat_ID:
+            query = query.filter(Course.coursecat_ID == coursecat_ID)
 
-#         return jsonify({"code": 404, "message": "No courses available for registration"})
+        results = query.all()
+        db.session.close()
 
-# Student - Courses Available for Voting with Filters
-# retrieve_courses_available_for_voting = api.parser()
-# retrieve_courses_available_for_voting.add_argument("user_id", type=int, help="Enter user ID")
-# retrieve_courses_available_for_voting.add_argument("course_name", help="Enter course name")
-# retrieve_courses_available_for_voting.add_argument("coursecat_id", help="Enter course category id")
+        if results:
+            result_data = []
+            for result in results:
+                run_course_attrs = {
+                    "run_Startdate": result[2].run_Startdate.strftime('%Y-%m-%d'),
+                    "run_Enddate": result[2].run_Enddate.strftime('%Y-%m-%d'),
+                    "run_Starttime": result[2].run_Starttime.strftime('%H:%M:%S'),
+                    "run_Endtime": result[2].run_Endtime.strftime('%H:%M:%S'),
+                    "reg_Startdate": result[2].reg_Startdate.strftime('%Y-%m-%d'),
+                    "reg_Enddate": result[2].reg_Enddate.strftime('%Y-%m-%d'),
+                    "reg_Starttime": result[2].reg_Starttime.strftime('%H:%M:%S'),
+                    "reg_Endtime": result[2].reg_Endtime.strftime('%H:%M:%S'),
+                }
 
-# @api.route("/get_courses_available_for_voting")
-# @api.doc(description="Get courses available for voting")
-# class GetCoursesAvailableForVoting(Resource):
-#     @api.expect(retrieve_courses_available_for_voting)
-#     def get(self):
-#         args = retrieve_courses_available_for_voting.parse_args()
-#         user_ID = args.get("user_id")
-#         course_Name = args.get("course_name", "")
-#         coursecat_ID = args.get("coursecat_id", "")
+                modified_run_course = {**result[2].json(), **run_course_attrs}
 
-#         query = db.session.query(
-#             Course,
-#             CourseCategory.coursecat_Name,
-#             VoteCourse
-#         ).select_from(Course).join(
-#             CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
-#         ).join(VoteCourse, Course.course_ID == VoteCourse.course_ID)
+                course_info = {
+                    **result[0].json(),
+                    "coursecat_Name": result[1],
+                    **modified_run_course
+                }
+                result_data.append(course_info)
+            return jsonify({"code": 200, "data": result_data})
 
-#         if user_ID:
-#             query = query.filter(VoteCourse.user_ID == user_ID)
-#         if course_Name:
-#             query = query.filter(Course.course_Name.contains(course_Name))
-#         if coursecat_ID:
-#             query = query.filter(Course.coursecat_ID == coursecat_ID)
+        return jsonify({"code": 404, "message": "No courses found"})
 
-#         results = query.all()
-#         db.session.close()
+# Student - Courses Available for Voting (Active) with Filters
+retrieve_unvoted_ongoing_courses_filter = api.parser()
+retrieve_unvoted_ongoing_courses_filter.add_argument("user_id", type=int, help="Enter user ID")
+retrieve_unvoted_ongoing_courses_filter.add_argument("course_name", help="Enter course name")
+retrieve_unvoted_ongoing_courses_filter.add_argument("coursecat_id", help="Enter course category id")
 
-#         if results:
-#             result_data = []
-#             for result in results:
-#                 course_info = {
-#                     "course": result[0].json(),
-#                     "coursecat_Name": result[1],
-#                     "voteCourse": result[2].json(),
-#                 }
-#                 result_data.append(course_info)
+@api.route("/get_unvoted_ongoing_courses")
+@api.doc(description="Get unvoted ongoing course information")
+class GetUnvotedOngoingCourses(Resource):
+    @api.expect(retrieve_unvoted_ongoing_courses_filter)
+    def get(self):
+        args = retrieve_unvoted_ongoing_courses_filter.parse_args()
+        user_ID = args.get("user_id", "")
+        course_Name = args.get("course_name", "")
+        coursecat_ID = args.get("coursecat_id", "")
 
-#             return jsonify({"code": 200, "data": result_data})
 
-#         return jsonify({"code": 404, "message": "No courses available for voting"})
+        app.logger.debug(user_ID)
+
+        # Get the courses that the user has already voted for
+        voted_course_ids = db.session.query(Interest.vote_ID).filter_by(user_ID=user_ID).subquery()
+
+        # Construct the query for unvoted courses with ongoing vote status
+        query = db.session.query(
+            Course,
+            CourseCategory.coursecat_Name,
+            VoteCourse.vote_Status
+        ).select_from(Course).join(VoteCourse, Course.course_ID == VoteCourse.course_ID).join(
+            CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
+        ).filter(
+            ~VoteCourse.vote_ID.in_(voted_course_ids),
+            VoteCourse.vote_Status == "ongoing"
+        )
+
+        if course_Name:
+            query = query.filter(Course.course_Name.contains(course_Name))
+        if coursecat_ID:
+            query = query.filter(Course.coursecat_ID == coursecat_ID)
+
+        results = query.all()
+        db.session.close()
+
+        if results:
+            result_data = []
+            for result in results:
+                course_info = {
+                    **result[0].json(),
+                    "coursecat_Name": result[1],
+                    "vote_Status": result[2]
+                }
+                result_data.append(course_info)
+            return jsonify({"code": 200, "data": result_data})
+
+        return jsonify({"code": 404, "message": "No courses found"})
 
 
 
@@ -341,22 +366,25 @@ class GetCourseRegistrationInfo(Resource):
         if results:
             result_data = []
             for result in results:
-                course_info = {
-                    "course": result[0].json(),
-                    "coursecat_Name": result[1],
-                    "runCourse": result[2].json(),
-                    "registration": result[3].json(),
+                run_course_attrs = {
+                    "run_Startdate": result[2].run_Startdate.strftime('%Y-%m-%d'),
+                    "run_Enddate": result[2].run_Enddate.strftime('%Y-%m-%d'),
+                    "run_Starttime": result[2].run_Starttime.strftime('%H:%M:%S'),
+                    "run_Endtime": result[2].run_Endtime.strftime('%H:%M:%S'),
+                    "reg_Startdate": result[2].reg_Startdate.strftime('%Y-%m-%d'),
+                    "reg_Enddate": result[2].reg_Enddate.strftime('%Y-%m-%d'),
+                    "reg_Starttime": result[2].reg_Starttime.strftime('%H:%M:%S'),
+                    "reg_Endtime": result[2].reg_Endtime.strftime('%H:%M:%S'),
                 }
 
-                course_info["runCourse"]["run_Startdate"] = result[2].run_Startdate.strftime('%Y-%m-%d')
-                course_info["runCourse"]["run_Enddate"] = result[2].run_Enddate.strftime('%Y-%m-%d')
-                course_info["runCourse"]["run_Starttime"] = result[2].run_Starttime.strftime('%H:%M:%S')
-                course_info["runCourse"]["run_Endtime"] = result[2].run_Endtime.strftime('%H:%M:%S')
-                course_info["runCourse"]["reg_Startdate"] = result[2].reg_Startdate.strftime('%Y-%m-%d')
-                course_info["runCourse"]["reg_Enddate"] = result[2].reg_Enddate.strftime('%Y-%m-%d')
-                course_info["runCourse"]["reg_Starttime"] = result[2].reg_Starttime.strftime('%H:%M:%S')
-                course_info["runCourse"]["reg_Endtime"] = result[2].reg_Endtime.strftime('%H:%M:%S')
+                modified_run_course = {**result[2].json(), **run_course_attrs}
 
+                course_info = {
+                    **result[0].json(),
+                    "coursecat_Name": result[1],
+                    **modified_run_course,
+                    **result[3].json()
+                }
                 result_data.append(course_info)
             app.logger.debug("Debug message")
             # app.logger.debug(result_data)
@@ -408,13 +436,12 @@ class GetCourseInterestInfo(Resource):
         if results:
             result_data = []
             for result in results:
-                interest_info = {
-                    "course": result[0].json(),
+                course_info = {
+                    **result[0].json(),
                     "coursecat_Name": result[1],
-                    "voteCourse": result[2],
+                    "vote_Status": result[2]
                 }
-
-                result_data.append(interest_info)
+                result_data.append(course_info)
 
             return jsonify({"code": 200, "data": result_data})
 
@@ -463,12 +490,12 @@ class GetProposedCourses(Resource):
         if results:
             result_data = []
             for result in results:
-                proposed_course_info = {
-                    "course": result[0].json(),
+                course_info = {
+                    **result[0].json(),
                     "coursecat_Name": result[1],
-                    "proposedCourse": result[2].json()
+                    **result[2].json()
                 }
-                result_data.append(proposed_course_info)
+                result_data.append(course_info)
             
             return jsonify({"code": 200, "data": result_data})
         
@@ -498,9 +525,9 @@ class GetCompletedCourses(Resource):
 
         query = db.session.query(
             Course,
+            RunCourse,
             UserInstructor.user_Name.label("instructor_name"),
             UserInstructor.user_Email.label("instructor_email"),
-            RunCourse
         ).select_from(RunCourse).join(Course, RunCourse.course_ID == Course.course_ID) \
             .join(Registration, RunCourse.rcourse_ID == Registration.rcourse_ID) \
             .join(UserInstructor, RunCourse.instructor_ID == UserInstructor.user_ID) \
@@ -521,22 +548,25 @@ class GetCompletedCourses(Resource):
         if results:
             result_data = []
             for result in results:
-                course_info = {
-                    "course": result[0].json(),
-                    "instructor_name": result[1],
-                    "instructor_email": result[2],
-                    "runCourse": result[3].json()
+                run_course_attrs = {
+                    "run_Startdate": result[1].run_Startdate.strftime('%Y-%m-%d'),
+                    "run_Enddate": result[1].run_Enddate.strftime('%Y-%m-%d'),
+                    "run_Starttime": result[1].run_Starttime.strftime('%H:%M:%S'),
+                    "run_Endtime": result[1].run_Endtime.strftime('%H:%M:%S'),
+                    "reg_Startdate": result[1].reg_Startdate.strftime('%Y-%m-%d'),
+                    "reg_Enddate": result[1].reg_Enddate.strftime('%Y-%m-%d'),
+                    "reg_Starttime": result[1].reg_Starttime.strftime('%H:%M:%S'),
+                    "reg_Endtime": result[1].reg_Endtime.strftime('%H:%M:%S'),
                 }
 
-                course_info["runCourse"]["run_Startdate"] = result[3].run_Startdate.strftime('%Y-%m-%d')
-                course_info["runCourse"]["run_Enddate"] = result[3].run_Enddate.strftime('%Y-%m-%d')
-                course_info["runCourse"]["run_Starttime"] = result[3].run_Starttime.strftime('%H:%M:%S')
-                course_info["runCourse"]["run_Endtime"] = result[3].run_Endtime.strftime('%H:%M:%S')
-                course_info["runCourse"]["reg_Startdate"] = result[3].reg_Startdate.strftime('%Y-%m-%d')
-                course_info["runCourse"]["reg_Enddate"] = result[3].reg_Enddate.strftime('%Y-%m-%d')
-                course_info["runCourse"]["reg_Starttime"] = result[3].reg_Starttime.strftime('%H:%M:%S')
-                course_info["runCourse"]["reg_Endtime"] = result[3].reg_Endtime.strftime('%H:%M:%S')
+                modified_run_course = {**result[1].json(), **run_course_attrs}
 
+                course_info = {
+                    **result[0].json(),
+                    **modified_run_course,
+                    "instructor_Name": result[2],
+                    "instructor_Email": result[3]
+                }
                 result_data.append(course_info)
 
             return jsonify({"code": 200, "data": result_data})
@@ -587,12 +617,12 @@ class GetVotingCampaignCourses(Resource):
         if results:
             result_data = []
             for result in results:
-                proposed_course_info = {
-                    "course": result[0].json(),
+                course_info = {
+                    **result[0].json(),
                     "coursecat_Name": result[1],
                     "vote_count": result[2]
                 }
-                result_data.append(proposed_course_info)
+                result_data.append(course_info)
             
             return jsonify({"code": 200, "data": result_data})
         
@@ -649,25 +679,27 @@ class GetInstructorCourses(Resource):
         if results:
             result_data = []
             for result in results:
-                instructor_course_info = {
-                    "instructor_Name": result[0],
-                    "instructor_Name": result[1],
-                    "runCourse": result[2].json(),
-                    "course": result[3].json(),
-                    "coursecat_Name": result[4]
+                run_course_attrs = {
+                    "run_Startdate": result[2].run_Startdate.strftime('%Y-%m-%d'),
+                    "run_Enddate": result[2].run_Enddate.strftime('%Y-%m-%d'),
+                    "run_Starttime": result[2].run_Starttime.strftime('%H:%M:%S'),
+                    "run_Endtime": result[2].run_Endtime.strftime('%H:%M:%S'),
+                    "reg_Startdate": result[2].reg_Startdate.strftime('%Y-%m-%d'),
+                    "reg_Enddate": result[2].reg_Enddate.strftime('%Y-%m-%d'),
+                    "reg_Starttime": result[2].reg_Starttime.strftime('%H:%M:%S'),
+                    "reg_Endtime": result[2].reg_Endtime.strftime('%H:%M:%S'),
                 }
 
-                # Convert time objects to formatted strings
-                instructor_course_info["runCourse"]["run_Startdate"] = result[2].run_Startdate.strftime('%Y-%m-%d')
-                instructor_course_info["runCourse"]["run_Enddate"] = result[2].run_Enddate.strftime('%Y-%m-%d')
-                instructor_course_info["runCourse"]["run_Starttime"] = result[2].run_Starttime.strftime('%H:%M:%S')
-                instructor_course_info["runCourse"]["run_Endtime"] = result[2].run_Endtime.strftime('%H:%M:%S')
-                instructor_course_info["runCourse"]["reg_Startdate"] = result[2].reg_Startdate.strftime('%Y-%m-%d')
-                instructor_course_info["runCourse"]["reg_Enddate"] = result[2].reg_Enddate.strftime('%Y-%m-%d')
-                instructor_course_info["runCourse"]["reg_Starttime"] = result[2].reg_Starttime.strftime('%H:%M:%S')
-                instructor_course_info["runCourse"]["reg_Endtime"] = result[2].reg_Endtime.strftime('%H:%M:%S')
+                modified_run_course = {**result[2].json(), **run_course_attrs}
 
-                result_data.append(instructor_course_info)
+                course_info = {
+                    "user_Name": result[0],
+                    "user_Email": result[1],
+                    **modified_run_course,
+                    **result[3].json(),
+                    "coursecat_Name": result[4]
+                }
+                result_data.append(course_info)
 
             return jsonify({"code": 200, "data": result_data})
 
@@ -723,13 +755,13 @@ class GetProposedCoursesByUser(Resource):
         if results:
             result_data = []
             for result in results:
-                proposed_course_info = {
-                    "course": result[0].json(),
+                course_info = {
+                    **result[0].json(),
                     "coursecat_Name": result[1],
-                    "proposedCourse": result[2].json(),
+                    **result[2].json(),
                     "vote_count": result[3]
                 }
-                result_data.append(proposed_course_info)
+                result_data.append(course_info)
             
             return jsonify({"code": 200, "data": result_data})
         
@@ -783,25 +815,27 @@ class GetInstructorTaughtCourses(Resource):
         if results:
             result_data = []
             for result in results:
-                instructor_course_info = {
-                    "instructor_Name": result[0],
-                    "instructor_Email": result[1],
-                    "runCourse": result[2].json(),
-                    "course": result[3].json(),
-                    "coursecat_Name": result[4]
+                run_course_attrs = {
+                    "run_Startdate": result[2].run_Startdate.strftime('%Y-%m-%d'),
+                    "run_Enddate": result[2].run_Enddate.strftime('%Y-%m-%d'),
+                    "run_Starttime": result[2].run_Starttime.strftime('%H:%M:%S'),
+                    "run_Endtime": result[2].run_Endtime.strftime('%H:%M:%S'),
+                    "reg_Startdate": result[2].reg_Startdate.strftime('%Y-%m-%d'),
+                    "reg_Enddate": result[2].reg_Enddate.strftime('%Y-%m-%d'),
+                    "reg_Starttime": result[2].reg_Starttime.strftime('%H:%M:%S'),
+                    "reg_Endtime": result[2].reg_Endtime.strftime('%H:%M:%S'),
                 }
 
-                # Convert time objects to formatted strings
-                instructor_course_info["runCourse"]["run_Startdate"] = result[2].run_Startdate.strftime('%Y-%m-%d')
-                instructor_course_info["runCourse"]["run_Enddate"] = result[2].run_Enddate.strftime('%Y-%m-%d')
-                instructor_course_info["runCourse"]["run_Starttime"] = result[2].run_Starttime.strftime('%H:%M:%S')
-                instructor_course_info["runCourse"]["run_Endtime"] = result[2].run_Endtime.strftime('%H:%M:%S')
-                instructor_course_info["runCourse"]["reg_Startdate"] = result[2].reg_Startdate.strftime('%Y-%m-%d')
-                instructor_course_info["runCourse"]["reg_Enddate"] = result[2].reg_Enddate.strftime('%Y-%m-%d')
-                instructor_course_info["runCourse"]["reg_Starttime"] = result[2].reg_Starttime.strftime('%H:%M:%S')
-                instructor_course_info["runCourse"]["reg_Endtime"] = result[2].reg_Endtime.strftime('%H:%M:%S')
+                modified_run_course = {**result[2].json(), **run_course_attrs}
 
-                result_data.append(instructor_course_info)
+                course_info = {
+                    "user_Name": result[0],
+                    "user_Email": result[1],
+                    **modified_run_course,
+                    **result[3].json(),
+                    "coursecat_Name": result[1]
+                }
+                result_data.append(course_info)
 
             return jsonify({"code": 200, "data": result_data})
 
@@ -818,8 +852,10 @@ class GetAllProposedCoursesAdmin(Resource):
     @api.expect(retrieve_all_submitted_proposed_courses_admin)
     def get(self):
         args = retrieve_all_submitted_proposed_courses_admin.parse_args()
-        course_name = args.get("course_name", "")
-        course_category_id = args.get("coursecat_id", "")
+        course_Name = args.get("course_name", "")
+        coursecat_ID = args.get("coursecat_id", "")
+
+        app.logger.debug(coursecat_ID)
 
         query = db.session.query(
             ProposedCourse,
@@ -833,24 +869,28 @@ class GetAllProposedCoursesAdmin(Resource):
         .filter(ProposedCourse.pcourse_Status != "Approved") \
         .filter(ProposedCourse.pcourse_Status != "Rejected")
 
-        if course_name:
-            query = query.filter(Course.course_Name.contains(course_name))
-        if course_category_id:
-            query = query.filter(Course.coursecat_ID == course_category_id)
+        if course_Name:
+            query = query.filter(Course.course_Name.contains(course_Name))
+        if coursecat_ID:
+            query = query.filter(Course.coursecat_ID == coursecat_ID)
 
         results = query.all()
         db.session.close()
 
+        app.logger.debug(results)
+
         if results:
             result_data = []
             for result in results:
-                proposed_course_info = {
+                course_info = {
                     **result[0].json(),
-                    "submitted_by_name": result[1],
+                    "submitted_by": result[1],
                     **result[2].json(),
                     "coursecat_Name": result[3]
                 }
-                result_data.append(proposed_course_info)
+               
+                result_data.append(course_info)
+                
 
             return jsonify({"code": 200, "data": result_data})
 
@@ -878,8 +918,7 @@ class GetAllProposedCoursesAdmin(Resource):
         query = db.session.query(
             ProposedCourse,
             User.user_Name.label("submitted_by_name"),
-            Course.course_Name,
-            Course.course_Desc,
+            Course,
             CourseCategory.coursecat_Name
         ).select_from(ProposedCourse) \
         .join(User, ProposedCourse.submitted_By == User.user_ID) \
@@ -906,10 +945,10 @@ class GetAllProposedCoursesAdmin(Resource):
                 proposed_course_info = {
                     **result[0].json(),
                     "submitted_by_name": result[1],
-                    "course_Name": result[2],
-                    "course_Desc": result[3],
-                    "coursecat_Name": result[4]
+                    **result[2].json(),
+                    "coursecat_Name": result[3]
                 }
+                app.logger.debug(proposed_course_info)
                 result_data.append(proposed_course_info)
 
             return jsonify({"code": 200, "data": result_data})
@@ -930,7 +969,7 @@ class GetAllVotingCoursesAdmin(Resource):
         args = retrieve_all_voting_courses_admin.parse_args()
         course_name = args.get("course_name", "")
         course_category_id = args.get("coursecat_id", "")
-        status = args.get("vote_status", "")
+        vote_status = args.get("vote_status", "")
 
         vote_counts_subquery = db.session.query(
             VoteCourse.course_ID,
@@ -952,8 +991,8 @@ class GetAllVotingCoursesAdmin(Resource):
             query = query.filter(Course.course_Name.contains(course_name))
         if course_category_id:
             query = query.filter(Course.coursecat_ID == course_category_id)
-        if status:
-            query = query.filter(VoteCourse.vote_Status == status)
+        if vote_status:
+            query = query.filter(VoteCourse.vote_Status == vote_status)
 
         results = query.all()
         db.session.close()
@@ -961,13 +1000,13 @@ class GetAllVotingCoursesAdmin(Resource):
         if results:
             result_data = []
             for result in results:
-                voting_course_info = {
+                course_info = {
                     **result[0].json(),
                     "coursecat_Name": result[1],
                     "vote_Status": result[2],
-                    "vote_Count": result[3]
+                    "vote_count": result[3]
                 }
-                result_data.append(voting_course_info)
+                result_data.append(course_info)
 
             return jsonify({"code": 200, "data": result_data})
 
@@ -1069,10 +1108,10 @@ class GetAllInstructorsAndTrainers(Resource):
             result_data = []
             for result in results:
                 instructor_trainer_info = {
-                    "user_ID": result.user_ID,
-                    "user_Name": result.user_Name,
-                    "user_Email": result.user_Email,
-                    "organisation_Name": result.organisation_Name
+                    "user_ID": result[0],
+                    "user_Name": result[1],
+                    "user_Email": result[2],
+                    "organisation_Name": result[3]
                 }
 
                 result_data.append(instructor_trainer_info)
@@ -1080,4 +1119,64 @@ class GetAllInstructorsAndTrainers(Resource):
             return jsonify({"code": 200, "data": result_data})
 
         return jsonify({"code": 404, "message": "No instructors or trainers found"})
-    
+
+
+# Admin - Get All Run Course
+retrieve_all_run_courses_admin = api.parser()
+retrieve_all_run_courses_admin.add_argument("course_name", help="Enter course name")
+retrieve_all_run_courses_admin.add_argument("coursecat_id", help="Enter course category id")
+retrieve_all_run_courses_admin.add_argument("course_status", help="Enter run course status")
+
+@api.route("/get_all_run_courses")
+@api.doc(description="Get all run courses")
+class GetAllCourses(Resource):
+    @api.expect(retrieve_all_run_courses_admin)
+    def get(self):
+        args = retrieve_all_courses_admin.parse_args()
+        course_name = args.get("course_name", "")
+        course_category_id = args.get("coursecat_id", "")
+        course_status = args.get("course_status", "")
+
+        query = db.session.query(
+            Course,
+            CourseCategory.coursecat_Name,
+            RunCourse,
+        ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).join(
+            CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
+        )
+
+        if course_name:
+            query = query.filter(Course.course_Name.contains(course_name))
+        if course_category_id:
+            query = query.filter(Course.coursecat_ID == course_category_id)
+        if course_status:
+            query = query.filter(RunCourse.course_Status == course_status)
+
+        results = query.all()
+        db.session.close()
+
+        if results:
+            result_data = []
+            for result in results:
+                run_course_attrs = {
+                    "run_Startdate": result[2].run_Startdate.strftime('%Y-%m-%d'),
+                    "run_Enddate": result[2].run_Enddate.strftime('%Y-%m-%d'),
+                    "run_Starttime": result[2].run_Starttime.strftime('%H:%M:%S'),
+                    "run_Endtime": result[2].run_Endtime.strftime('%H:%M:%S'),
+                    "reg_Startdate": result[2].reg_Startdate.strftime('%Y-%m-%d'),
+                    "reg_Enddate": result[2].reg_Enddate.strftime('%Y-%m-%d'),
+                    "reg_Starttime": result[2].reg_Starttime.strftime('%H:%M:%S'),
+                    "reg_Endtime": result[2].reg_Endtime.strftime('%H:%M:%S'),
+                }
+
+                modified_run_course = {**result[2].json(), **run_course_attrs}
+
+                course_info = {
+                    **result[0].json(),
+                    "coursecat_Name": result[1],
+                    **modified_run_course
+                }
+                result_data.append(course_info)
+            return jsonify({"code": 200, "data": result_data})
+
+        return jsonify({"code": 404, "message": "No courses found"})
