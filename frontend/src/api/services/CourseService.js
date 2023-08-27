@@ -61,7 +61,7 @@ class CourseService extends BaseApiService {
     }
 
     // Student - Courses Available for Voting (Active) with Filters
-    async searchUnregisteredActiveInfo(user_ID, course_Name, coursecat_ID) {
+    async searchUnvotedActiveInfo(user_ID, course_Name, coursecat_ID) {
         try {
             let response = await axiosClient.get("/course/get_unvoted_ongoing_courses", {
                 params: {
