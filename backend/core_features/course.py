@@ -1228,7 +1228,7 @@ deactivate_runcourse.add_argument("course_id", help="Enter course id")
 @api.doc(description="Cancel or deactivate a run course")
 class DeactivateCourse(Resource):
     @api.expect(deactivate_runcourse)
-    def put(self):
+    def post(self):
         try:
             args = deactivate_runcourse.parse_args()
             courseID = args.get("course_id")
@@ -1265,7 +1265,7 @@ retire_course.add_argument("course_id", help="Enter course id")
 @api.doc(description="Retire a course")
 class RetireCourse(Resource):
     @api.expect(retire_course)
-    def put(self):
+    def post(self):
         try:
             args = retire_course.parse_args()
             courseID = args.get("course_id")
@@ -1293,7 +1293,7 @@ activate_course.add_argument("course_id", help="Enter course id")
 @api.doc(description="Activate a course")
 class ActivateCourse(Resource):
     @api.expect(activate_course)
-    def put(self):
+    def post(self):
         try:
             args = activate_course.parse_args()
             courseID = args.get("course_id")

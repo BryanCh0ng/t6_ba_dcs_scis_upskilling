@@ -8,7 +8,7 @@
     <div class="container col-12 table-responsive">
       <h5 class="pb-3">All Instructors/Trainers Database</h5>
       <div v-if="instructors_trainers && instructors_trainers.length > 0">
-        <table class="table">
+        <table class="table bg-white">
           <thead>
             <tr class="text-nowrap">
               <th scope="col">
@@ -50,7 +50,7 @@
 </template>
     
 <script>
-import sortIcon from '../../components/common/sort-icon.vue';
+import sortIcon from '@/components/common/sort-icon.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/InstructorRelatedSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";

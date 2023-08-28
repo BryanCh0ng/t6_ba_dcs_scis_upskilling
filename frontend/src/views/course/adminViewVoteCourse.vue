@@ -8,7 +8,7 @@
     <div class="container col-12 table-responsive">
       <h5 class="pb-3">Courses Available for Students to Indicate Interest</h5>
       <div v-if="vote_courses && vote_courses.length > 0">
-        <table class="table">
+        <table class="table bg-white">
           <thead>
             <tr class="text-nowrap">
             <th scope="col">
@@ -31,9 +31,9 @@
             </td>
             <td>{{ vote_course.vote_Status }}</td>
             <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(vote_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-            <td v-if="vote_course.vote_Status === 'Ongoing'"><course-action status="Close" :id="vote_course.course_ID"></course-action></td>
-            <td v-else-if="vote_course.vote_Status === 'Closed'"><course-action status="Open for Registration" :id="vote_course.course_ID"></course-action></td>
-            <td v-else><course-action status="Open for Voting" :id="vote_course.course_ID"></course-action></td>
+            <td v-if="vote_course.vote_Status === 'Ongoing'"><course-action status="Close" :course="vote_course"></course-action></td>
+            <td v-else-if="vote_course.vote_Status === 'Closed'"><course-action status="Open for Registration" :course="vote_course"></course-action></td>
+            <td v-else><course-action status="Open for Voting" :course="vote_course"></course-action></td>
           </tr>
           </tbody>
         </table>
@@ -50,11 +50,11 @@
 </template>
     
 <script>
-import courseAction from '../../components/course/courseAction.vue';
-import sortIcon from '../../components/common/sort-icon.vue';
-import modalCourseContent from '../../components/course/modalCourseContent.vue';
+import courseAction from '@/components/course/courseAction.vue';
+import sortIcon from '@/components/common/sort-icon.vue';
+import modalCourseContent from '@/components/course/modalCourseContent.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
-import courseNameDesc from '../../components/course/courseNameDesc.vue';
+import courseNameDesc from '@/components/course/courseNameDesc.vue';
 import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 

@@ -334,7 +334,8 @@ class CourseService extends BaseApiService {
     // Cancel/Deactivate Button in adminViewRunCourse
     async deactivateRunCourse(course_ID) {
         try {
-            let deactivateRunCourse = await axiosClient.put("/course/deactivate_runcourse", { params: { course_id: course_ID } });
+            let deactivateRunCourse = await axiosClient.post("/course/deactivate_runcourse", { course_id: course_ID } );
+            console.log(deactivateRunCourse)
             return deactivateRunCourse.data
         } catch (error) {
             console.log("Cannot deactivate the course");
@@ -345,7 +346,7 @@ class CourseService extends BaseApiService {
     // Retire button in the adminViewRunCourse 
     async retireRunCourse(course_ID) {
         try {
-            let retireRunCourse = await axiosClient.put("/course/retire_course", { params: { course_id: course_ID } });
+            let retireRunCourse = await axiosClient.post("/course/retire_course", { course_id: course_ID });
             return retireRunCourse.data
         } catch (error) {
             console.log("Cannot retire the course");
@@ -356,7 +357,7 @@ class CourseService extends BaseApiService {
     // Activate button in the adminViewRunCourse 
     async activateRunCourse(course_ID) {
         try {
-            let activateRunCourse = await axiosClient.put("/course/activate_course", { params: { course_id: course_ID } });
+            let activateRunCourse = await axiosClient.post("/course/activate_course", { course_id: course_ID });
             return activateRunCourse.data
         } catch (error) {
             console.log("Cannot retire the course");
