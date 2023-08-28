@@ -21,7 +21,7 @@
 
               <input-field v-model="fullName" type="text" placeholder="Full Name"/>
 
-              <input-field v-model="email" type="email" placeholder="Email Address"/>
+              <!-- <input-field v-model="email" type="email" placeholder="Email Address" readonly/> -->
 
               <div v-if="role === 'Trainer'">
                 <input-field v-model="organizationName" type="text" placeholder="Organization Name"/>
@@ -62,7 +62,7 @@ import InputField from "../components/InputField.vue";
 import PasswordField from "../components/PasswordField.vue";
 import { required, email, minLength } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
-// import { axiosClient } from "../api/axiosClient";
+import { axiosClient } from "../api/axiosClient";
 
 export default {
   name: "RegistrationForm",
@@ -86,6 +86,11 @@ export default {
       successMessage: "Your account has been successfully created."
     };
   },
+
+  created() {
+    this.email = this.$route.query.email
+  },
+
   validations() {
     return {
       role: { required },
@@ -159,18 +164,21 @@ export default {
     },
     async performRegister() {
       try {
-        // Will need to update the flask api endpoint
-        // Send login request
-        // const response = await axiosClient.post("/login", {
-        //   email: this.email,
-        //   password: this.password,
-        // });
+        const response = await axiosClient.post("/login/register", {
+          role: this.role,
+          fullName: this.fullName,
+          email: this.email,
+          password: this.password,
+          confirmpassword: this.confirmpassword,
+          organizationName: this.organizationName,
+          alumni: this.alumni,
+        });
 
         this.showSuccessModal = true;
-        // console.log(response.data);
+        console.log(response.data);
       } catch (error) {
         this.errorMessage = "Register failed. Please check your credentials.";
-        console.log("Register error:", error.message);
+        console.log("Register error:", error.request.response);
       }
     },
     clearPlaceholder() {

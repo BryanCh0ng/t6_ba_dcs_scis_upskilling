@@ -40,6 +40,7 @@ import ErrorMessage from "../components/ErrorMessage.vue";
 import InputField from "../components/InputField.vue";
 import { required, email } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
+import { axiosClient } from "@/api/axiosClient";
 // import { axiosClient } from "../api/axiosClient";
 
 export default {
@@ -99,15 +100,12 @@ export default {
     },
     async sendRegLink() {
       try {
-        // Will need to update the flask api endpoint
-        // Send login request
-        // const response = await axiosClient.post("/login", {
-        //   email: this.email,
-        //   password: this.password,
-        // });
+        const response = await axiosClient.post("/login/verify_email", {
+          email: this.email
+        })
 
         this.showSuccessModal = true;
-        // console.log(response.data);
+        console.log(response.data);
       } catch (error) {
         this.errorMessage = "Sent Registration failed. Please check your credentials.";
         console.log("Sent Registration Link error:", error.message);

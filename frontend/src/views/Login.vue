@@ -45,6 +45,7 @@ import InputField from "../components/InputField.vue";
 import PasswordField from "../components/PasswordField.vue";
 import { required, email } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
+import { axiosClient } from "@/api/axiosClient";
 // import { axiosClient } from "../api/axiosClient";
 
 export default {
@@ -98,15 +99,15 @@ export default {
 
     async performLogin() {
       try {
-        // Will need to update the flask api endpoint
-        // Send login request
-        // const response = await axiosClient.post("/login", {
-        //   email: this.email,
-        //   password: this.password,
-        // });
+        const response = await axiosClient.post("/login/login", {
+          email: this.email,
+          password: this.password
+        })
+        
+        const role = await axiosClient.get("/login/get_role")
+        console.log(role.data)
 
-        console.log("Login successful");
-        // console.log(response.data);
+        console.log(response);
       } catch (error) {
         this.errorMessage = "Login failed. Please check your credentials.";
         console.log("Login error:", error.message);
