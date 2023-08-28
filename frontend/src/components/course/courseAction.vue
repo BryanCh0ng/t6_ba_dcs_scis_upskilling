@@ -44,11 +44,9 @@ export default {
         } else if (this.status == 'Deactivate') {
           response = await CourseService.deactivateRunCourse(this.course.course_ID);
         }
-        console.log(response)
         this.message = response.message;
         this.$emit('action-and-message-updated', {message: this.message, course: this.course});
       } catch (error) {
-        console.log(error);
         this.message = error.message;
         this.$emit('action-and-message-updated', {message: this.message, course: this.course});
       }
