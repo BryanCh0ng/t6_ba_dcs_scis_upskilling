@@ -47,7 +47,7 @@
           <div class="col-md-6 form-group">
             <VueDatePicker v-model="formData.startDate" placeholder="Start Date" :enable-time-picker="false"
               :class="{ 'form-control': true, 'border-0': !v$?.formData.startDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.startDate?.$error }"
-              input-class-name="dp-custom-input" :format="datePickerFormat" required>
+              input-class-name="dp-custom-input" :format="this.formData.datePickerFormat" required>
             </VueDatePicker>
             <div v-if="v$?.formData.startDate?.$error" class="text-danger">
               <span v-for="error in v$?.formData.startDate?.$errors" :key="error.$uid">{{ error.$message }}</span>
@@ -57,7 +57,7 @@
           <div class="col-md-6 form-group mt-4 mt-md-0">
             <VueDatePicker v-model="formData.endDate" placeholder="End Date" :enable-time-picker="false"
               :class="{ 'form-control': true, 'border-0': !v$?.formData.endDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.endDate?.$error }"
-              input-class-name="dp-custom-input" :format="datePickerFormat" required>
+              input-class-name="dp-custom-input" :format="this.formData.datePickerFormat" required>
             </VueDatePicker>
             <div v-if="v$?.formData.endDate?.$error" class="text-danger">
               <span v-for="error in v$?.formData.endDate?.$errors" :key="error.$uid">{{ error.$message }}</span>
@@ -129,7 +129,7 @@
             <VueDatePicker v-model="formData.openingDate" placeholder="Opening Date For Registration"
               :enable-time-picker="false"
               :class="{ 'form-control': true, 'border-0': !v$?.formData.openingDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.openingDate?.$error }"
-              input-class-name="dp-custom-input" :format="datePickerFormat" required></VueDatePicker>
+              input-class-name="dp-custom-input" :format="this.formData.datePickerFormat" required></VueDatePicker>
             <div v-if="v$?.formData.openingDate?.$error" class="text-danger">
               <span v-for="error in v$?.formData.openingDate?.$errors" :key="error.$uid">{{ error.$message }}</span>
             </div>
@@ -151,7 +151,7 @@
             <VueDatePicker v-model="formData.closingDate" placeholder="Closing Date For Registration"
               :enable-time-picker="false"
               :class="{ 'form-control': true, 'border-0': !v$?.formData.closingDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.closingDate?.$error }"
-              input-class-name="dp-custom-input" :format="datePickerFormat" required></VueDatePicker>
+              input-class-name="dp-custom-input" :format="this.formData.datePickerFormat" required></VueDatePicker>
             <div v-if="v$?.formData.closingDate?.$error" class="text-danger">
               <span v-for="error in v$?.formData.closingDate?.$errors" :key="error.$uid">{{ error.$message }}</span>
             </div>
@@ -188,6 +188,7 @@
             </dropdown-field>
           </div>
         </div>
+
         <button v-if="status" type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
           Submit
         </button>
@@ -226,6 +227,33 @@ import { required, numeric, helpers } from "@vuelidate/validators";
 //import ErrorMessage from "../components/ErrorMessage.vue";
 
 //Validating the date fields
+
+
+//Function: Check whether the entered numeric value is smaller than the courseSize
+const validateMinSlotsSmallerThanCourseSize = function (value) {
+  const numericRegex = /^[0-9]*$/;
+
+  if (value === null || this.formData.courseSize === null) {
+    return true;
+  }
+
+  if (!value.match(numericRegex) || !this.formData.courseSize.match(numericRegex)) {
+    return true; // Skip validation if either field is not numeric
+  }
+
+  return value < this.formData.courseSize;
+}
+
+const minSlotsSmallerThanCourseSizeValidator = helpers.withParams(
+  { type: 'minSlotsSmallerThanCourseSize' },
+  validateMinSlotsSmallerThanCourseSize
+);
+
+const minSlotsSmallerThanCourseSizeValidatorWithMessage = helpers.withMessage(
+  'Please select a minimum slot smaller than the selected course size',
+  minSlotsSmallerThanCourseSizeValidator
+)
+
 
 //Function: Check whether the selected date is greater than the closingDate 
 const validateStartDateGreaterThanClosingDate = function (value) {
@@ -385,13 +413,8 @@ export default {
         courseCategories: [],
         courseDescription: "",
         selectedInstructor: "",
-        //To be removed 
-        /*instructors: [
-          { id: 1, name: "Miss Tan" },
-          { id: 2, name: "Miss Lee" }
-        ],*/
         instructors: [],
-        datePickerFormat: "yyyy-MM-dd",
+        datePickerFormat: "dd/MM/yyyy",
         startDate: null,
         endDate: null,
         startTime: null,
@@ -411,11 +434,6 @@ export default {
         closingTime: null,
         courseFee: "",
         selectedTemplate: "",
-        //To be removed
-        /*feedbackTemplates: [
-          { id: 1, name: "Template 1" },
-          { id: 2, name: "Template 2" }
-        ]*/
         feedbackTemplates: []
       },
       showSuccessModal: false,
@@ -428,7 +446,6 @@ export default {
     //InputField,
     DropdownField,
     SuccessModal
-    //ErrorMessage
   },
   validations() {
     return {
@@ -444,7 +461,7 @@ export default {
         selectedFormat: { required: helpers.withMessage('Please select a valid course format', required) },
         venue: { required: helpers.withMessage('Please provide a valid venue', required) },
         courseSize: { required: helpers.withMessage('Please provide a valid course size', required), numeric: helpers.withMessage('Please provide a valid numeric value', numeric) },
-        minimumSlots: { required: helpers.withMessage('Please provide a valid minimum slots', required), numeric: helpers.withMessage('Please provide a valid numeric value', numeric) },
+        minimumSlots: { required: helpers.withMessage('Please provide a valid minimum slots', required), numeric: helpers.withMessage('Please provide a valid numeric value', numeric), minSlotsSmallerThanCourseSize: minSlotsSmallerThanCourseSizeValidatorWithMessage },
         openingDate: { required: helpers.withMessage('Please select a valid opening date for registration', required), dateFromToday: dateFromTodayValidatorWithMessage },
         openingTime: { required: helpers.withMessage('Please select a valid opening time for registration', required) },
         closingDate: { required: helpers.withMessage('Please select a valid closing date for registration', required), closingDateFromOpeningDate: closingDateFromOpeningDateValidatorWithMessage },
@@ -489,13 +506,8 @@ export default {
         courseCategories: [],
         courseDescription: "",
         selectedInstructor: "",
-        //To be removed 
-        /*instructors: [
-          { id: 1, name: "Miss Tan" },
-          { id: 2, name: "Miss Lee" }
-        ],*/
         instructors: [],
-        datePickerFormat: "yyyy-MM-dd",
+        datePickerFormat: "dd/MM/yyyy",
         startDate: null,
         endDate: null,
         startTime: null,
@@ -515,16 +527,13 @@ export default {
         closingTime: null,
         courseFee: "",
         selectedTemplate: "",
-        //To be removed
-        /*feedbackTemplates: [
-          { id: 1, name: "Template 1" },
-          { id: 2, name: "Template 2" }
-        ]*/
         feedbackTemplates: []
       }
 
       await this.fetchCourseCategories();
       await this.fetchInstructors();
+      await this.fetchFeedbackTemplates();
+
     },
     onSubmit() {
       this.v$.$touch();
