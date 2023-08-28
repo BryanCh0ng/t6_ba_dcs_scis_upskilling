@@ -96,10 +96,7 @@ export default({
                 
                 // Use the searchApi function from the parent component
                 searchResults = await this.searchApi(course_Name, coursecat_ID, status);
-                console.log(searchResults)
-
                 
-                // Emit the search-complete event to the parent component
                 this.$emit("search-complete", searchResults);
             } catch (error) {
                 console.log("Error fetching info:", error);

@@ -96,7 +96,7 @@ export default {
           );
         } else if (this.userRole === "admin") {
           links.push(
-            { path: "/allProposal", label: "All Proposal" },
+            { path: "/adminViewProposedCourse", label: "All Proposal" },
             { path: "/votingCampaign", label: "Voting Campaign" },
             { path: "/createCourse", label: "Create Course" }
           );
@@ -129,9 +129,10 @@ export default {
       } else if (this.userRole === "admin") {
         items.push(
           { path: "/profile", label: "Profile" },
-          { path: "/allRunCourse", label: "All Run Course" },
+          { path: "/adminViewRunCourse", label: "All Run Course DB" },
+          { path: "/adminViewVoteCourse", label: "All Vote Course DB" },
           { path: "/allAvailRegCourse", label: "All Available Registration Course" },
-          { path: "/allInstructors", label: "All Instructors" },
+          { path: "/adminViewInstructorsTrainers", label: "All Instructors DB" },
           { path: "/feedbackTemplate", label: "Feedback Template" },
           { path: "/dashboard", label: "Dashboard" }
         );

@@ -20,7 +20,7 @@ export default {
   computed: {
     showNavBar() {
       // Specify the routes where you want to show the navbar
-      const routesWithNavBar = ["ContactUs", "viewCourse","adminViewCourse", "adminViewProposedCourse","adminVotingCampaign"];
+      const routesWithNavBar = ["ContactUs", "viewCourse","adminViewRunCourse", "adminViewVoteCourse", "adminViewProposedCourse","adminVotingCampaign", "adminViewInstructorsTrainers"];
       return routesWithNavBar.includes(this.$route.name);
     }
   }

@@ -16,7 +16,7 @@
 
         <div class="container col-12 table-responsive">
           <h5 class="pb-3">Proposed Course</h5>
-          <div v-if="pending_courses.length > 0">
+          <div v-if="pending_courses && pending_courses.length > 0">
             <table class="table">
               <thead>
                 <tr class="text-nowrap">
@@ -53,7 +53,7 @@
               <div class="modal-dialog modal-lg"><reject-proposal-modal @close-modal="closeReject"/></div>
             </div>
           </div>
-          <div v-else>
+          <div v-else-if="pending_courses = []">
             <p>No records found</p>
           </div>
         </div>
@@ -69,7 +69,7 @@
 
         <div class="container col-12 table-responsive">
           <h5 class="pb-3">All Proposals</h5>
-          <div v-if="proposed_courses.length > 0">
+          <div v-if="proposed_courses && proposed_courses.length > 0">
             <table class="table">
               <thead>
                 <tr class="text-nowrap">
@@ -105,7 +105,7 @@
               </tbody>
             </table>
           </div>
-          <div v-else>
+          <div v-else-if="proposed_courses=[]">
             <p>No records found</p>
           </div>
         </div>

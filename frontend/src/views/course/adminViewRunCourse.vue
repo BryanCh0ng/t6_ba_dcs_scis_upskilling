@@ -6,7 +6,7 @@
       @search-complete="handleSearchComplete" />
     <div class="container col-12 table-responsive">
       <h5 class="pb-3">All Run Courses</h5>
-      <div v-if="courses.length > 0">
+      <div v-if="courses && courses.length > 0">
         <table class="table">
           <thead>
             <tr class="text-nowrap">
@@ -51,7 +51,7 @@
           <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" :status="selectedCourse.course_Status" @close-modal="closeModal" /></div>
         </div>
       </div>
-      <div v-else>
+      <div v-else-if="courses=[]">
         <p>No records found</p>
       </div>
     </div>
@@ -105,8 +105,9 @@ export default {
       this.$emit('page-change', newPage);
     },
     async handleSearchComplete(searchResults) {
-      console.log(searchResults)
-      this.courses = searchResults;
+      console.log("searchResults", searchResults);
+      this.courses = searchResults; // Always update the courses array
+      
     },
     async searchAllCoursesAdmin(user_ID, course_Name, coursecat_ID, status) {
       try {
@@ -130,7 +131,7 @@ export default {
       const startIndex = (this.localCurrentPageCourses - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
       return this.courses.slice(startIndex, endIndex);
-    }
+    },
   },
   async created() {
     try {

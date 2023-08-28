@@ -287,11 +287,12 @@ class CourseService extends BaseApiService {
     }
 
     // Admin - All Instructors
-    async getAllInstructorsAndTrainers(user_Name, organization_Name) {
+    async getAllInstructorsAndTrainers(user_Name, role_Name, organization_Name) {
         try {
             let instructorsAndTrainers = await axiosClient.get("/course/get_all_instructors_and_trainers", {
                 params: {
                     instructor_name: user_Name,
+                    role_name: role_Name,
                     organization_name: organization_Name
                 }
             });

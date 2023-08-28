@@ -7,7 +7,7 @@
 
     <div class="container col-12 table-responsive">
       <h5 class="pb-3">Courses Available for Students to Indicate Interest</h5>
-      <div v-if="vote_courses.length > 0">
+      <div v-if="vote_courses && vote_courses.length > 0">
         <table class="table">
           <thead>
             <tr class="text-nowrap">
@@ -27,7 +27,7 @@
               <course-name-desc :name="vote_course.course_Name" :category="vote_course.coursecat_Name" :description="vote_course.course_Desc"></course-name-desc>
             </td>
             <td class="current_interest">
-                {{ vote_course.vote_Count }}
+                {{ vote_course.vote_count }}
             </td>
             <td>{{ vote_course.vote_Status }}</td>
             <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(vote_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
@@ -41,7 +41,7 @@
           <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" /></div>
         </div>
       </div>
-      <div v-else>
+      <div v-else-if="vote_courses=[]">
         <p>No records found</p>
       </div>
     </div>
@@ -92,7 +92,8 @@ export default {
       this.$emit('page-change', newPage);
     },
     async handleSearchComplete(searchResults) {
-      this.vote_courses = searchResults;
+      console.log("searchResults", searchResults);
+      this.vote_courses = searchResults; // Always update the courses array
     },
     async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, status) {
       console.log("vote status",status)

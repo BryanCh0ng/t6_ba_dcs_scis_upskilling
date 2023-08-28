@@ -1012,7 +1012,7 @@ class GetAllVotingCoursesAdmin(Resource):
 
         return jsonify({"code": 404, "message": "No voting courses found"})
 
-# Admin - All Courses - All those in runcourse table
+# Admin - All Courses - All those in runcourse table with Reg Count
 retrieve_all_courses_admin = api.parser()
 retrieve_all_courses_admin.add_argument("course_name", help="Enter course name")
 retrieve_all_courses_admin.add_argument("coursecat_id", help="Enter course category id")
@@ -1077,6 +1077,7 @@ class GetAllCoursesWithRegistrationCount(Resource):
 # Admin - All Instructors
 retrieve_instructors_trainers = api.parser()
 retrieve_instructors_trainers.add_argument("instructor_name", help="Enter instructor name")
+retrieve_instructors_trainers.add_argument("role_name", help="Enter role name")
 retrieve_instructors_trainers.add_argument("organization_name", help="Enter organization")
 
 @api.route("/get_all_instructors_and_trainers")
@@ -1086,21 +1087,30 @@ class GetAllInstructorsAndTrainers(Resource):
     def get(self):
         args = retrieve_instructors_trainers.parse_args()
         instructor_name = args.get("instructor_name", "")
+        role_name = args.get("role_name")
         organization_name = args.get("organization_name", "")
 
         query = db.session.query(
             User.user_ID,
             User.user_Name,
             User.user_Email,
-            ExternalUser.organisation_Name
-        ).select_from(User).join(ExternalUser, User.user_ID == ExternalUser.user_ID)
+            db.func.ifnull(ExternalUser.organisation_Name, "SMU").label("organisation_Name"),
+            User.role_Name,
+        ).select_from(User).outerjoin(ExternalUser, User.user_ID == ExternalUser.user_ID)
 
+        # Add filtering for "Instructor" or "Trainer" roles
+        query = query.filter(User.role_Name.in_(["Instructor", "Trainer"]))
+
+        if organization_name == "SMU":
+            query = query.filter(ExternalUser.organisation_Name.is_(None))
+        elif organization_name:
+            query = query.filter(ExternalUser.organisation_Name.like(f"%{organization_name}%"))
+            
         if instructor_name:
             query = query.filter(User.user_Name.contains(instructor_name))
-        if organization_name:
-            query = query.filter(ExternalUser.organisation_Name.like(f"%{organization_name}%"))
-
-
+        
+        if role_name:
+            query = query.filter(User.role_Name == role_name)
         
         results = query.all()
 
@@ -1111,7 +1121,8 @@ class GetAllInstructorsAndTrainers(Resource):
                     "user_ID": result[0],
                     "user_Name": result[1],
                     "user_Email": result[2],
-                    "organisation_Name": result[3]
+                    "organisation_Name": result[3],
+                    "role_Name": result[4]
                 }
 
                 result_data.append(instructor_trainer_info)

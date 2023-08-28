@@ -91,13 +91,29 @@ const routes = [
     },
   },
   {
-    path: '/searchTryout',
-    name: 'searchTryout',
-    component: () => import('../views/searchTryout.vue'),
+    path: '/adminViewProposedCourse',
+    name: 'adminViewProposedCourse',
+    component: () => import('../views/course/adminViewProposedCourse.vue'),
     meta: {
-      title: 'searchTryout',
+        title: 'Admin View Proposed Course',
     },
   },
+  {
+    path: '/adminViewVoteCourse',
+    name: 'adminViewVoteCourse',
+    component: () => import('../views/course/adminViewVoteCourse.vue'),
+    meta: {
+        title: 'Admin View Vote Course',
+    },
+  },
+  {
+    path: '/adminViewInstructorsTrainers',
+    name: 'adminViewInstructorsTrainers',
+    component: () => import('../views/course/adminViewInstructorsTrainers.vue'),
+    meta: {
+        title: 'Admin View Instructors Trainers',
+    },
+  }
   // },
   // {
   //     path: '/deleteCourse',
@@ -214,55 +230,6 @@ const routes = [
   //     meta: {
   //         title: 'NotFound',
   //     },
-  // },
-    {
-      path: '/viewCourse',
-      name: 'viewCourse',
-      component: () => import('../views/course/viewCourse.vue'),
-      meta: {
-          title: 'View Course',
-      },
-    },
-    {
-      path: '/adminViewRunCourse',
-      name: 'adminViewRunCourse',
-      component: () => import('../views/course/adminViewRunCourse.vue'),
-      meta: {
-          title: 'Admin View Run Course',
-      },
-    },
-    {
-      path: '/adminViewProposedCourse',
-      name: 'adminViewProposedCourse',
-      component: () => import('../views/course/adminViewProposedCourse.vue'),
-      meta: {
-          title: 'Admin View Proposed Course',
-      },
-    },
-    {
-      path: '/adminViewVoteCourse',
-      name: 'adminViewVoteCourse',
-      component: () => import('../views/course/adminViewVoteCourse.vue'),
-      meta: {
-          title: 'Admin View Vote Course',
-      },
-    },
-    {
-      path: '/adminViewInstructorsTrainers',
-      name: 'adminViewInstructorsTrainers',
-      component: () => import('../views/course/adminViewInstructorsTrainers.vue'),
-      meta: {
-          title: 'Admin View Instructors Trainers',
-      },
-    },
-    {
-      path: '/searchTryout',
-      name: 'viewCourse',
-      component: () => import('../views/searchTryout.vue'),
-      meta: {
-          title: 'View Course',
-      },
-    },
     // },
     // {
     //     path: '/deleteCourse',

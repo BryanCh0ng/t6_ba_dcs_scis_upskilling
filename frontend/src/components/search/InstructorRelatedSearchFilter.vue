@@ -1,11 +1,16 @@
 <template>
   <div id="searchfilter">
-    <div class="container mt-5 mb-5">
+    <div class="container mb-5">
       <form>
         <div class="row">
           <div class="col-sm">
             <input-field v-model="instructorName" type="text" placeholder="Instructor Name"/>
           </div>
+          <div class="col-sm">
+            <dropdown-field v-model="role" :default-placeholder="'Role'">
+              <option v-for="option in statusDropdownOptions" :key="option" :value="option">{{ option }}</option>
+              </dropdown-field>
+            </div>
           <div class="col-sm">
             <input-field v-model="organizationName" type="text" placeholder="Organization Name"/>
           </div>
@@ -23,6 +28,7 @@
 
 <script>
 import InputField from "../InputField.vue";
+import DropdownField from "../DropdownField.vue";
 
 export default {
   name: "SearchFilter",
@@ -30,19 +36,27 @@ export default {
     return {
       instructorName: "",
       organizationName: "",
+      role: "",
       searchedInstructors: [],
+      statusDropdownOptions: [],
     };
   },
   props: {
         searchApi: Function,
+        statusOptions: Array, 
   },
   components: {
     InputField,
+    DropdownField,
+  },
+  async mounted() {
+    this.statusDropdownOptions = this.statusOptions;
   },
   methods: {
     async resetFilter() {
       this.instructorName = "";
       this.organizationName = "";
+      this.role = "";
       this.searchedInstructors = []; // Clear search results
     },
     async searchFilter() {
@@ -50,13 +64,14 @@ export default {
         // Assign values to variables
         const user_Name = this.instructorName;
         const organizationName = this.organizationName;
+        const role = this.role;
         // console.log("user_Name:", user_Name);
         // console.log("organizationName:", organizationName);
 
         let searchResults;
 
         // Call the API method from CourseService
-        searchResults = await this.searchApi(user_Name, organizationName);
+        searchResults = await this.searchApi(user_Name, role, organizationName);
         console.log(searchResults)
 
         // Emit the search-complete event to the parent component

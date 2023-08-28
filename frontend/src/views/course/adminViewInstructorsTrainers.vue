@@ -1,12 +1,13 @@
 <template>
   <div>
     <search-filter
+        :status-options="statusOptions"
         :search-api="getAllInstructorsAndTrainers"
         @search-complete="handleSearchComplete" />
 
     <div class="container col-12 table-responsive">
       <h5 class="pb-3">All Instructors/Trainers Database</h5>
-      <div v-if="instructors_trainers.length > 0">
+      <div v-if="instructors_trainers && instructors_trainers.length > 0">
         <table class="table">
           <thead>
             <tr class="text-nowrap">
@@ -40,7 +41,7 @@
           </tbody>
         </table>
       </div>
-      <div v-else>
+      <div v-else-if="instructors_trainers=[]">
         <p>No records found</p>
       </div>
     </div>
@@ -66,7 +67,8 @@ export default {
       sortColumn: 'name',
       sortDirection: 'asc',
       itemsPerPage: 10,
-      localCurrentPageInstructorsTrainers: 1
+      localCurrentPageInstructorsTrainers: 1,
+      statusOptions: ["Instructor", "Trainer"],
     }
   },
   methods: {
@@ -78,10 +80,11 @@ export default {
       console.log(searchResults)
       this.courses = searchResults;
     },
-    async getAllInstructorsAndTrainers(user_Name, organizationName) {
+    async getAllInstructorsAndTrainers(user_Name, role_Name, organizationName) {
       try {
         let response = await CourseService.getAllInstructorsAndTrainers(
           user_Name,
+          role_Name,
           organizationName
         );
         this.instructors_trainers = response.data;
@@ -101,7 +104,7 @@ export default {
   },
   async created() {
     try {
-      let response = await CourseService.getAllInstructorsAndTrainers(null, null)
+      let response = await CourseService.getAllInstructorsAndTrainers(null, null, null)
       this.instructors_trainers = response.data
     } catch (error) {
       console.error("Error fetching course details:", error);
