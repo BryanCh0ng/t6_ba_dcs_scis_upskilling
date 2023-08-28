@@ -224,7 +224,6 @@ export default {
     try {
       let pending_response = await CourseService.searchAllSubmittedProposedCoursesAdmin(null, null)
       this.pending_courses = pending_response.data
-      console.log(pending_response)
       let proposed_response = await CourseService.searchAllApprovedRejectedProposedCoursesAdmin(null, null, null)
       this.proposed_courses = proposed_response.data
     } catch (error) {

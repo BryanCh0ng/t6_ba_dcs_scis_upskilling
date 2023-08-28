@@ -49,7 +49,7 @@
           </tbody>
         </table>
         <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModalAction" /></div>
+          <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" /></div>
         </div>
 
         <div class="modal fade" id="after_action_modal" tabindex="-1" aria-hidden="true" ref="afterActionModal">
@@ -135,18 +135,13 @@ export default {
         throw error;
       }
     },
-    closeModalAction(){
-      this.showModal = false;
-    },
     handleActionData(actionData) {
       this.receivedMessage = actionData.message;
       this.actionCourse = actionData.course
-      console.log(actionData)
       const modalButtonElement = this.$el.querySelector('.invisible-btn')
       modalButtonElement.click();
     },
     async loadData() {
-      console.log('load');
       try {
         let response = await CourseService.searchAllCoursesAdmin(null, null, null)
         this.courses = response.data
