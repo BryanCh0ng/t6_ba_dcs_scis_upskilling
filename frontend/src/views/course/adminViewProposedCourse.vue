@@ -61,7 +61,6 @@
       </div>
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'approved_rejected' }">
         <common-search-filter
-        :status-options="statusOptions"
         :search-api="searchAllProposedCoursesAdmin"
         @search-complete="handleSearchComplete" />
         <div class="container col-12 table-responsive">

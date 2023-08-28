@@ -223,8 +223,7 @@ class GetUnregisteredActiveCourses(Resource):
             CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
         ).filter(
             ~RunCourse.rcourse_ID.in_(registered_course_ids),
-            RunCourse.course_Status == "Active",
-            RunCourse.runcourse_Status == "Ongoing"
+            RunCourse.course_Status == "active"
         )
 
         # Apply additional filters based on user inputs
@@ -296,7 +295,7 @@ class GetUnvotedOngoingCourses(Resource):
             CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
         ).filter(
             ~VoteCourse.vote_ID.in_(voted_course_ids),
-            VoteCourse.vote_Status == "Ongoing"
+            VoteCourse.vote_Status == "ongoing"
         )
 
         if course_Name:
@@ -853,8 +852,10 @@ class GetAllProposedCoursesAdmin(Resource):
     @api.expect(retrieve_all_submitted_proposed_courses_admin)
     def get(self):
         args = retrieve_all_submitted_proposed_courses_admin.parse_args()
-        course_name = args.get("course_name", "")
-        course_category_id = args.get("coursecat_id", "")
+        course_Name = args.get("course_name", "")
+        coursecat_ID = args.get("coursecat_id", "")
+
+        app.logger.debug(coursecat_ID)
 
         query = db.session.query(
             ProposedCourse,
@@ -868,13 +869,15 @@ class GetAllProposedCoursesAdmin(Resource):
         .filter(ProposedCourse.pcourse_Status != "Approved") \
         .filter(ProposedCourse.pcourse_Status != "Rejected")
 
-        if course_name:
-            query = query.filter(Course.course_Name.contains(course_name))
-        if course_category_id:
-            query = query.filter(Course.coursecat_ID == course_category_id)
+        if course_Name:
+            query = query.filter(Course.course_Name.contains(course_Name))
+        if coursecat_ID:
+            query = query.filter(Course.coursecat_ID == coursecat_ID)
 
         results = query.all()
         db.session.close()
+
+        app.logger.debug(results)
 
         if results:
             result_data = []
@@ -885,7 +888,9 @@ class GetAllProposedCoursesAdmin(Resource):
                     **result[2].json(),
                     "coursecat_Name": result[3]
                 }
+               
                 result_data.append(course_info)
+                
 
             return jsonify({"code": 200, "data": result_data})
 
@@ -943,6 +948,7 @@ class GetAllProposedCoursesAdmin(Resource):
                     **result[2].json(),
                     "coursecat_Name": result[3]
                 }
+                app.logger.debug(proposed_course_info)
                 result_data.append(proposed_course_info)
 
             return jsonify({"code": 200, "data": result_data})
@@ -1006,7 +1012,7 @@ class GetAllVotingCoursesAdmin(Resource):
 
         return jsonify({"code": 404, "message": "No voting courses found"})
 
-# Admin - All Courses - All those in runcourse table
+# Admin - All Courses - All those in runcourse table with Reg Count
 retrieve_all_courses_admin = api.parser()
 retrieve_all_courses_admin.add_argument("course_name", help="Enter course name")
 retrieve_all_courses_admin.add_argument("coursecat_id", help="Enter course category id")
@@ -1059,9 +1065,9 @@ class GetAllCoursesWithRegistrationCount(Resource):
 
                 course_info = {
                     **result[0].json(),
-                    "coursecat_Name": result[1]
-                    **modified_run_course
-                    
+                    "coursecat_Name": result[1],
+                    **modified_run_course,
+                    "registration_count": result[3]
                 }
                 result_data.append(course_info)
             return jsonify({"code": 200, "data": result_data})
@@ -1071,6 +1077,7 @@ class GetAllCoursesWithRegistrationCount(Resource):
 # Admin - All Instructors
 retrieve_instructors_trainers = api.parser()
 retrieve_instructors_trainers.add_argument("instructor_name", help="Enter instructor name")
+retrieve_instructors_trainers.add_argument("role_name", help="Enter role name")
 retrieve_instructors_trainers.add_argument("organization_name", help="Enter organization")
 
 @api.route("/get_all_instructors_and_trainers")
@@ -1080,21 +1087,30 @@ class GetAllInstructorsAndTrainers(Resource):
     def get(self):
         args = retrieve_instructors_trainers.parse_args()
         instructor_name = args.get("instructor_name", "")
+        role_name = args.get("role_name")
         organization_name = args.get("organization_name", "")
 
         query = db.session.query(
             User.user_ID,
             User.user_Name,
             User.user_Email,
-            ExternalUser.organisation_Name
-        ).select_from(User).join(ExternalUser, User.user_ID == ExternalUser.user_ID)
+            db.func.ifnull(ExternalUser.organisation_Name, "SMU").label("organisation_Name"),
+            User.role_Name,
+        ).select_from(User).outerjoin(ExternalUser, User.user_ID == ExternalUser.user_ID)
 
+        # Add filtering for "Instructor" or "Trainer" roles
+        query = query.filter(User.role_Name.in_(["Instructor", "Trainer"]))
+
+        if organization_name == "SMU":
+            query = query.filter(ExternalUser.organisation_Name.is_(None))
+        elif organization_name:
+            query = query.filter(ExternalUser.organisation_Name.like(f"%{organization_name}%"))
+            
         if instructor_name:
             query = query.filter(User.user_Name.contains(instructor_name))
-        if organization_name:
-            query = query.filter(ExternalUser.organisation_Name.like(f"%{organization_name}%"))
-
-
+        
+        if role_name:
+            query = query.filter(User.role_Name == role_name)
         
         results = query.all()
 
@@ -1105,7 +1121,8 @@ class GetAllInstructorsAndTrainers(Resource):
                     "user_ID": result[0],
                     "user_Name": result[1],
                     "user_Email": result[2],
-                    "organisation_Name": result[3]
+                    "organisation_Name": result[3],
+                    "role_Name": result[4]
                 }
 
                 result_data.append(instructor_trainer_info)

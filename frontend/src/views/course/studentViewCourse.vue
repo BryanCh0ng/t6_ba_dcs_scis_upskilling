@@ -11,13 +11,12 @@
   <div class="tab-content ">
     <div class="tab-pane fade" :class="{ 'show active': activeTab === 'course_reg' }">
       <search-filter
-      :status-options="statusOptions"
-      :search-api="searchAllRunCourseStudent"
+      :search-api="searchUnregisteredActiveInfo"
       @search-complete="handleSearchCompleteRun" />
   
       <div class="container col-12 table-responsive">
         <h5 class="pb-3">All Courses Available to Register</h5>
-        <div v-if="run_courses.length > 0">
+        <div v-if="run_courses && run_courses.length > 0">
           <table class="table">
             <thead>
               <tr class="text-nowrap">
@@ -58,7 +57,7 @@
             </div>
           </div>
         </div>
-        <div v-else>
+        <div v-else-if="run_courses=[]">
           <p>No records found</p>
         </div>
       </div>
@@ -66,13 +65,12 @@
     </div>
     <div class="tab-pane fade" :class="{ 'show active': activeTab === 'course_vote' }">
       <search-filter
-      :status-options="statusOptions"
-      :search-api="searchAllVoteCourseStudent"
+      :search-api="searchUnvotedActiveInfo"
       @search-complete="handleSearchCompleteVote" />
   
       <div class="container col-12 table-responsive">
         <h5 class="pb-3">Courses Available to Vote</h5>
-        <div v-if="vote_courses.length > 0">
+        <div v-if="vote_courses && vote_courses.length > 0">
           <table class="table">
             <thead>
               <tr class="text-nowrap">
@@ -98,7 +96,7 @@
             </div>
           </div>
         </div>
-        <div v-else>
+        <div v-else-if="vote_courses=[]">
           <p>No records found</p>
         </div>
       </div>
@@ -150,7 +148,7 @@ export default {
       return this.run_courses.slice(startIndex, endIndex);
     },
     displayVoteCourses() {
-      const startIndex = (this.localCurrentPage - 1) * this.itemsPerPage;
+      const startIndex = (this.localCurrentPageProposed - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
       return this.vote_courses.slice(startIndex, endIndex);
     }
@@ -169,18 +167,19 @@ export default {
       this.$emit('page-change', newPage);
     },
     async handleSearchCompleteRun(searchResults) {
+      console.log(searchResults)
       this.run_courses = searchResults;
     },
     async handleSearchCompleteVote(searchResults) {
       this.vote_courses = searchResults;
     },
-    async searchAllRunCourseStudent(user_ID, course_Name, coursecat_ID, status) {
+    async searchUnregisteredActiveInfo(user_ID, course_Name, coursecat_ID) {
       try {
-        let response = await CourseService.searchCourseRegistrationInfo(
+        console.log(course_Name)
+        let response = await CourseService.searchUnregisteredActiveInfo(
           user_ID,
           course_Name,
-          coursecat_ID,
-          status
+          coursecat_ID
         );
         this.run_courses = response.data;
         return this.run_courses;
@@ -189,13 +188,13 @@ export default {
         throw error;
       }
     },
-    async searchAllVoteCourseStudent(user_ID, course_Name, coursecat_ID, status) {
+    async searchUnvotedActiveInfo(user_ID, course_Name, coursecat_ID) {
       try {
-        let response = await CourseService.searchCourseVoteInfo(
+        console.log(coursecat_ID)
+        let response = await CourseService.searchUnvotedActiveInfo(
           user_ID,
           course_Name,
-          coursecat_ID,
-          status
+          coursecat_ID
         );
         this.vote_courses = response.data;
         return this.vote_courses;
@@ -222,8 +221,9 @@ export default {
       }); 
       console.log(this.run_courses)
       let vote_response = await CourseService.searchUnvotedActiveInfo(null, null, null)
-      console.log(vote_response)
+      console.log("vote_response", vote_response)
       this.vote_courses = vote_response.data
+      console.log(this.vote_courses)
     } catch (error) {
       console.error("Error fetching course details:", error);
     }
