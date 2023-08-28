@@ -26,12 +26,12 @@
   <style scoped>
   .modal-content {
     width: 40%;
-    height: 15%;
+    height: 20%;
   }
   
   .close-btn {
     position: absolute;
-    bottom: 25px;
+    bottom: 20px;
     right: 20px;
     width: 150px;
   }

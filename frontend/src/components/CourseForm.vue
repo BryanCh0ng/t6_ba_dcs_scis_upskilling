@@ -5,7 +5,7 @@
 
       <h2 v-else class="text-center">Edit Course</h2>
 
-      <form @submit.prevent="onSubmit">
+      <form @submit.prevent="onSubmit" @reset="onReset">
         <!--Course Name-->
         <div class="form-group mt-5 mb-4">
           <input v-model="formData.courseName" type="text" placeholder="Course Name" required autofocus
@@ -463,7 +463,8 @@ export default {
         console.error('Error fetching course categories:', error);
       }
     },
-    async resetForm() {
+    async onReset() {
+      this.v$.$reset();
       this.formData = {
         courseName: "",
         selectedCategory: "",
@@ -510,24 +511,18 @@ export default {
       if (!this.v$.$invalid) {
         // Form is valid, submit or perform further actions
         console.log('Form submitted successfully');
+
         //Create the course service
+
         this.showSuccessModal = true;
       } else {
         // Form has validation errors
-        console.log('Form has validation errors');
-        //console.log(new Date(this.formData.startDate).getDate() === new Date(this.formData.endDate).getDate())
-        console.log(new Date(this.formData.startDate).toISOString().split('T')[0] )
-        console.log(new Date(this.formData.startDate).toISOString().split('T')[0] === new Date(this.formData.endDate).toISOString().split('T')[0])
-        console.log(this.formData.startDate)
-        console.log(this.formData.endDate)
-        console.log(this.formData.startTime)
-        console.log(this.formData.endTime)
-            
+        console.log('Form has validation errors');        
       }
     },
     hideSuccessModal() {
       this.showSuccessModal = false;
-      this.resetForm();
+      this.onReset();
     }
   }
 };
