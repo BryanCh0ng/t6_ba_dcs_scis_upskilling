@@ -124,7 +124,7 @@ class DeleteCourse(Resource):
                     try:
                         db.session.delete(runCourse)              
                         db.session.commit()                 
-                        return json.loads(json.dumps({"message":"Run Course successfully deleted"})), 200
+                        return json.loads(json.dumps({"message":"Run Course has successfully deleted"})), 200
                     except Exception as e:
                         return "Foreign key dependencies exist, cannot delete. " + str(e), 408
 
@@ -1219,3 +1219,96 @@ class GetAllCourses(Resource):
             return jsonify({"code": 200, "data": result_data})
 
         return jsonify({"code": 404, "message": "No courses found"})
+    
+
+# Cancel/Deactivate Button in adminViewRunCourse
+deactivate_runcourse = api.parser()
+deactivate_runcourse.add_argument("course_id", help="Enter course id")
+@api.route("/deactivate_runcourse")
+@api.doc(description="Cancel or deactivate a run course")
+class DeactivateCourse(Resource):
+    @api.expect(deactivate_runcourse)
+    def put(self):
+        try:
+            args = deactivate_runcourse.parse_args()
+            courseID = args.get("course_id")
+            
+            runCourse = RunCourse.query.filter_by(course_ID=courseID).first()
+            
+            if runCourse:
+                if runCourse.course_Status == 'Active':
+                    if runCourse.runcourse_Status == 'Ongoing':
+                        # Update the course and registration status
+                        runCourse.course_Status = 'Inactive'
+                        runCourse.runcourse_Status = 'Closed'
+                    elif runCourse.runcourse_Status == 'Closed':
+                        # Update only the course status
+                        runCourse.course_Status = 'Inactive'
+                    db.session.commit()
+
+                    return jsonify({"code": 200, "message": "Run Course has been canceled or deactivated"})
+ 
+                else:
+                    return jsonify({"code": 400, "message": "Course is not active, cannot be canceled"})
+            else:
+                return json.loads(json.dumps({"message": "Course is not active, cannot be canceled"})), 404
+
+        except Exception as e:
+            return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
+
+
+# Retire button in the adminViewRunCourse 
+# when course_Status = Inactive and runcourse_Status = Closed, changed the course_Status to Retired
+retire_course = api.parser()
+retire_course.add_argument("course_id", help="Enter course id")
+@api.route("/retire_course")
+@api.doc(description="Retire a course")
+class RetireCourse(Resource):
+    @api.expect(retire_course)
+    def put(self):
+        try:
+            args = retire_course.parse_args()
+            courseID = args.get("course_id")
+            
+            runCourse = RunCourse.query.filter_by(course_ID=courseID).first()
+            
+            if runCourse:
+                if runCourse.course_Status == 'Inactive' and runCourse.runcourse_Status == 'Closed':
+                    runCourse.course_Status = 'Retired'
+                    db.session.commit()
+                    return jsonify({"code": 200, "message": "Course has been retired"})
+                else:
+                    return jsonify({"code": 400, "message": "Course cannot be retired"})
+            else:
+                return jsonify({"code": 404, "message": "There is no such run course"})
+
+        except Exception as e:
+            return jsonify({"message": "Failed. " + str(e)}), 500
+
+
+# Activate button in adminviewruncourse
+activate_course = api.parser()
+activate_course.add_argument("course_id", help="Enter course id")
+@api.route("/activate_course")
+@api.doc(description="Activate a course")
+class ActivateCourse(Resource):
+    @api.expect(activate_course)
+    def put(self):
+        try:
+            args = activate_course.parse_args()
+            courseID = args.get("course_id")
+            
+            runCourse = RunCourse.query.filter_by(course_ID=courseID).first()
+            
+            if runCourse:
+                if runCourse.course_Status == 'Inactive' and runCourse.runcourse_Status == 'Closed':
+                    runCourse.course_Status = 'Active'
+                    db.session.commit()
+                    return jsonify({"code": 200, "message": "Course has been activated"})
+                else:
+                    return jsonify({"code": 400, "message": "Course cannot be activated"})
+            else:
+                return jsonify({"code": 404, "message": "There is no such run course"})
+
+        except Exception as e:
+            return jsonify({"code": 500, "message": "Failed. " + str(e)})

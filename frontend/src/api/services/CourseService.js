@@ -330,6 +330,40 @@ class CourseService extends BaseApiService {
             return this.handleError(error);
         }
     }
+
+    // Cancel/Deactivate Button in adminViewRunCourse
+    async deactivateRunCourse(course_ID) {
+        try {
+            let deactivateRunCourse = await axiosClient.put("/course/deactivate_runcourse", { params: { course_id: course_ID } });
+            return deactivateRunCourse.data
+        } catch (error) {
+            console.log("Cannot deactivate the course");
+            return this.handleError(error);
+        }
+    }
+
+    // Retire button in the adminViewRunCourse 
+    async retireRunCourse(course_ID) {
+        try {
+            let retireRunCourse = await axiosClient.put("/course/retire_course", { params: { course_id: course_ID } });
+            return retireRunCourse.data
+        } catch (error) {
+            console.log("Cannot retire the course");
+            return this.handleError(error);
+        }
+    }
+
+    // Activate button in the adminViewRunCourse 
+    async activateRunCourse(course_ID) {
+        try {
+            let activateRunCourse = await axiosClient.put("/course/activate_course", { params: { course_id: course_ID } });
+            return activateRunCourse.data
+        } catch (error) {
+            console.log("Cannot retire the course");
+            return this.handleError(error);
+        }
+    }
+
 }
 
 export default new CourseService();
