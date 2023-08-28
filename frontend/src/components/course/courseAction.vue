@@ -1,6 +1,6 @@
 <template>
   <button class="btn btn-blue-green hop-on text-light font-weight-bold text-nowrap" v-if="status == 'Active'">Hop On</button>
-  <button class="btn btn-warning shoutout text-light font-weight-bold text-nowrap" v-else-if="status == 'Vote'">Shout Out</button>
+  <button class="btn btn-warning shoutout text-light font-weight-bold text-nowrap" v-else-if="status == 'Ongoing'">Shout Out</button>
   <button class="btn btn-edit edit text-light font-weight-bold text-nowrap" v-else-if="status == 'Edit'">Edit</button>
   <button class="btn btn-danger delete text-light font-weight-bold text-nowrap" v-else-if="status == 'Delete'">Delete</button>
   <button class="btn btn-deactivate deactivate text-light font-weight-bold text-nowrap" v-else-if="status == 'Deactivate'">Deactivate</button>

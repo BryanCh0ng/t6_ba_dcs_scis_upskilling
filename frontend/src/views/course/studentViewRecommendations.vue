@@ -31,19 +31,19 @@
               <tbody>
                 <tr v-for="(reg_course, key) in displayedRegCourseForYou" :key="key">
                   <td class="name">
-                    <course-name-desc :name="reg_course.name" :category="reg_course.category" :description="reg_course.description"></course-name-desc>
+                    <course-name-desc :name="reg_course.course_Name" :category="reg_course.coursecat_Name" :description="reg_course.course_Desc"></course-name-desc>
                   </td>
                   <td class="start_date">
-                    <course-date-time :date="reg_course.start_date" :time="reg_course.start_time"></course-date-time>
+                    <course-date-time :date="reg_course.run_Startdate" :time="reg_course.run_Starttime"></course-date-time>
                   </td>
                   <td class="end_date">
-                    <course-date-time :date="reg_course.end_date" :time="reg_course.end_time"></course-date-time>
+                    <course-date-time :date="reg_course.run_Enddate" :time="reg_course.run_Endtime"></course-date-time>
                   </td>
                   <td class="closing_date">
-                    <course-date-time :date="reg_course.closing_date" :time="reg_course.closing_time"></course-date-time>
+                    <course-date-time :date="reg_course.reg_Enddate" :time="reg_course.reg_Endtime"></course-date-time>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(reg_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action :status="reg_course.status" :id="reg_course.id"></course-action></td>
+                  <td><course-action :status="reg_course.course_Status" :id="reg_course.course_ID"></course-action></td>
                 </tr>
               </tbody>
             </table>
@@ -52,7 +52,7 @@
             <p>No records found</p>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentPageRegCourseForYou" v-if="reg_courses_for_you.length/itemsPerPage > 0" :totalItems="reg_courses_for_you.length" :items-per-page="1" @page-change="handlePageChangeRegCourseForYou" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-model="localCurrentPageRegCourseForYou" v-if="reg_courses_for_you.length/itemsPerPage > 0" :totalItems="reg_courses_for_you.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseForYou" class="justify-content-center pagination-container"/>
           
         <div class="pt-5 container col-12 table-responsive">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
@@ -75,19 +75,19 @@
               <tbody>
                 <tr v-for="(reg_course, key) in displayedRegCourseOthers" :key="key">
                   <td class="name">
-                      <course-name-desc :name="reg_course.name" :category="reg_course.category" :description="reg_course.description"></course-name-desc>
+                      <course-name-desc :name="reg_course.course_Name" :category="reg_course.coursecat_Name" :description="reg_course.course_Desc"></course-name-desc>
                   </td>
                   <td class="start_date">
-                    <course-date :date="reg_course.start_date" :time="reg_course.start_time"></course-date>
+                    <course-date :date="reg_course.run_Startdate" :time="reg_course.run_Starttime"></course-date>
                   </td>
                   <td class="end_date">
-                    <course-date :date="reg_course.end_date" :time="reg_course.end_time"></course-date>
+                    <course-date :date="reg_course.run_Enddate" :time="reg_course.run_Endtime"></course-date>
                   </td>
                   <td class="closing_date">
-                    <course-date :date="reg_course.closing_date" :time="reg_course.clos"></course-date>
+                    <course-date :date="reg_course.reg_Enddate" :time="reg_course.reg_Endtime"></course-date>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(reg_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action :status="reg_course.status" :id="reg_course.id"></course-action></td>
+                  <td><course-action :status="reg_course.course_Status" :id="reg_course.course_ID"></course-action></td>
                 </tr>
               </tbody>
             </table>
@@ -96,7 +96,7 @@
             <p>No records found</p>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentPageRegCourseOthers" v-if="reg_courses_others.length/itemsPerPage > 0" :totalItems="reg_courses_others.length" :items-per-page="1" @page-change="handlePageChangeRegCourseOthers" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-model="localCurrentPageRegCourseOthers" v-if="reg_courses_others.length/itemsPerPage > 0" :totalItems="reg_courses_others.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseOthers" class="justify-content-center pagination-container"/>
       </div>
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'express_interest' }">
         <div class="pt-5 container col-12 table-responsive">
@@ -114,10 +114,10 @@
               <tbody>
                 <tr v-for="(interest_course, key) in displayedInterestCourses" :key="key">
                   <td class="name">
-                      <course-name-desc :name="interest_course.name" :category="interest_course.category" :description="interest_course.description"></course-name-desc>
+                      <course-name-desc :name="interest_course.course_Name" :category="interest_course.coursecat_Name" :description="interest_course.course_Name"></course-name-desc>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(interest_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action :status="interest_course.status" :id="interest_course.id"></course-action></td>
+                  <td><course-action :status="interest_course.vote_Status" :id="interest_course.course_ID"></course-action></td>
                 </tr>
               </tbody>
             </table>
@@ -126,7 +126,7 @@
             <p>No records found</p>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentInterestCourses" v-if="interest_courses.length/itemsPerPage > 0" :totalItems="interest_courses.length" :items-per-page="1" @page-change="handlePageInterestCourses" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-model="localCurrentInterestCourses" v-if="interest_courses.length/itemsPerPage > 0" :totalItems="interest_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageInterestCourses" class="justify-content-center pagination-container"/>
           <div class="pt-5 container col-12 table-responsive">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
           <div v-if="interest_others.length > 0">
@@ -142,10 +142,10 @@
               <tbody>
                 <tr v-for="(interest_other, key) in displayedInterestOthers" :key="key">
                   <td class="name">
-                      <course-name-desc :name="interest_other.name" :category="interest_other.category" :description="interest_other.description"></course-name-desc>
+                      <course-name-desc :name="interest_other.course_Name" :category="interest_other.coursecat_Name" :description="interest_other.course_Desc"></course-name-desc>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(interest_other)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action :status="interest_other.status" :id="interest_other.id"></course-action></td>
+                  <td><course-action :status="interest_other.vote_Status" :id="interest_other.course_ID"></course-action></td>
                 </tr>
               </tbody>
             </table>
@@ -154,7 +154,7 @@
             <p>No records found</p>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentInterestOthers" v-if="interest_others.length/itemsPerPage > 0" :totalItems="interest_others.length" :items-per-page="1" @page-change="handlePageChangeInterestOthers" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-model="localCurrentInterestOthers" v-if="interest_others.length/itemsPerPage > 0" :totalItems="interest_others.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeInterestOthers" class="justify-content-center pagination-container"/>
       </div>
     </div>
     <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
@@ -164,12 +164,14 @@
 </template>
       
 <script>
-import courseAction from '../../components/course/courseAction.vue';
-import sortIcon from '../../components/common/sort-icon.vue';
-import modalCourseContent from '../../components/course/modalCourseContent.vue';
-import courseNameDesc from '../../components/course/courseNameDesc.vue';
-import courseDateTime from '../../components/course/courseDateTime.vue';
+import courseAction from '@/components/course/courseAction.vue';
+import sortIcon from '@/components/common/sort-icon.vue';
+import modalCourseContent from '@/components/course/modalCourseContent.vue';
+import courseNameDesc from '@/components/course/courseNameDesc.vue';
+import courseDateTime from '@/components/course/courseDateTime.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
+import {convertDate, convertTime} from '@/scripts/common/convertDateTime.js'
+import CourseService from "@/api/services/CourseService.js";
 
 export default {
   components: {
@@ -182,114 +184,14 @@ export default {
   },
   data() {
     return {
-      reg_courses_for_you: [
-        {
-          id: 1,
-          name: "Course Name 1",
-          category: "SCIS",
-          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
-          start_date: "Aug 20, 2023",
-          start_time: "6.30 pm",
-          end_date: "Aug 20, 2023",
-          end_time: "6.30 pm",
-          closing_date: "Aug 20, 2023",
-          closing_time: "6.30 pm",
-          fee: 50,
-          venue: 'SCIS SR-2',
-          format: 'Physical',
-          status: 'Active',
-          available_slots: 13
-        },
-        {
-          id: 2,
-          name: "Course Name 2",
-          category: "LKCSB",
-          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
-          start_date: "Aug 20, 2023",
-          start_time: "6.30 pm",
-          end_date: "Aug 20, 2023",
-          end_time: "6.30 pm",
-          closing_date: "Aug 20, 2023",
-          closing_time: "6.30 pm",
-          fee: 100,
-          venue: 'SCIS SR-5',
-          format: 'Online',
-          status: 'Vote',
-          available_slots: 15
-        }
-      ],
-      reg_courses_others: [
-        {
-          id: 1,
-          name: "Course Name 1",
-          category: "SCIS",
-          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
-          start_date: "Aug 20, 2023",
-          start_time: "6.30 pm",
-          end_date: "Aug 20, 2023",
-          end_time: "6.30 pm",
-          closing_date: "Aug 20, 2023",
-          closing_time: "6.30 pm",
-          fee: 50,
-          venue: 'SCIS SR-2',
-          format: 'Physical',
-          status: 'Active',
-          available_slots: 13
-        },
-        {
-          id: 2,
-          name: "Course Name 2",
-          category: "LKCSB",
-          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
-          start_date: "Aug 20, 2023",
-          start_time: "6.30 pm",
-          end_date: "Aug 20, 2023",
-          end_time: "6.30 pm",
-          closing_date: "Aug 20, 2023",
-          closing_time: "6.30 pm",
-          fee: 100,
-          venue: 'SCIS SR-5',
-          format: 'Online',
-          status: 'Vote',
-          available_slots: 15
-        }
-      ],
-      interest_courses: [
-      {
-        id: 1,
-        name: "Course Name 1",
-        category: "SCIS",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
-        status: 'Vote',
-      },
-      {
-        id: 2,
-        name: "Course Name 2",
-        category: "LKCSB",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
-        status: 'Vote',
-      }
-      ],
-      interest_others: [
-      {
-        id: 1,
-        name: "Course Name 1",
-        category: "SCIS",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
-        status: 'Vote',
-      },
-      {
-        id: 2,
-        name: "Course Name 2",
-        category: "LKCSB",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore",
-        status: 'Vote',
-      }
-      ],
+      reg_courses_for_you: [],
+      reg_courses_others: [],
+      interest_courses: [],
+      interest_others: [],
       sortColumn: 'name',
       sortDirection: 'asc',
       selectedCourse: null,
-      itemsPerPage: 1,
+      itemsPerPage: 10,
       localCurrentPageRegCourseForYou: 1,
       localCurrentPageRegCourseOthers: 1,
       localCurrentInterestOthers: 1,
@@ -343,6 +245,38 @@ export default {
       const startIndex = (this.localCurrentInterestCourses - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
       return this.interest_courses.slice(startIndex, endIndex);
+    }
+  },
+  async created() {
+    try {
+      let run_response = await CourseService.searchUnregisteredActiveInfo(null, null, null)
+      this.reg_courses_for_you = run_response.data
+      this.reg_courses_others = run_response.data
+      this.reg_courses_for_you.map(course => {
+        course.reg_Enddate = convertDate(course.reg_Enddate)
+        course.reg_Startdate = convertDate(course.reg_Startdate)
+        course.run_Enddate = convertDate(course.run_Enddate)
+        course.run_Startdate = convertDate(course.run_Startdate)
+        course.reg_Endtime = convertTime(course.reg_Endtime)
+        course.reg_Starttime = convertTime(course.reg_Starttime)
+        course.run_Endtime = convertTime(course.run_Endtime)
+        course.run_Starttime = convertTime(course.run_Starttime)
+      }); 
+      this.reg_courses_others.map(course => {
+        course.reg_Enddate = convertDate(course.reg_Enddate)
+        course.reg_Startdate = convertDate(course.reg_Startdate)
+        course.run_Enddate = convertDate(course.run_Enddate)
+        course.run_Startdate = convertDate(course.run_Startdate)
+        course.reg_Endtime = convertTime(course.reg_Endtime)
+        course.reg_Starttime = convertTime(course.reg_Starttime)
+        course.run_Endtime = convertTime(course.run_Endtime)
+        course.run_Starttime = convertTime(course.run_Starttime)
+      }); 
+      let interest_response = await CourseService.searchUnvotedActiveInfo(null, null, null)
+      this.interest_courses = interest_response.data
+      this.interest_others = interest_response.data
+    } catch (error) {
+      console.error("Error fetching course details:", error);
     }
   }
   }
