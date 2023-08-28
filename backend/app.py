@@ -7,6 +7,8 @@ from allClasses import *
 from os import environ
 from core_features.course import api as course
 from core_features.coursecat import api as coursecat
+from core_features.user import api as user
+from core_features.feedbacktemplate import api as feedbacktemplate
 
 app = Flask(__name__)
 api = Api(
@@ -18,6 +20,8 @@ api = Api(
 )
 api.add_namespace(course)
 api.add_namespace(coursecat)
+api.add_namespace(user)
+api.add_namespace(feedbacktemplate)
 
 
 CORS(app, supports_credentials=True)

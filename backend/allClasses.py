@@ -214,7 +214,11 @@ class FeedbackTemplate(db.Model):
         columns = self.__mapper__.column_attrs.keys()
         result = {}
         for column in columns:
-            result[column] = getattr(self, column)
+            column_value = getattr(self, column)
+            if isinstance(column_value, datetime.date):
+                result[column] = column_value.strftime("%Y-%m-%d")
+            else:
+                result[column] = column_value
         return result
     
 ##################  Template Attribute Class Creation ##################

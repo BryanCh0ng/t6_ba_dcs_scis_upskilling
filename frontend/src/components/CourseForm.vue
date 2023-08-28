@@ -37,8 +37,8 @@
         <div class="form-group mb-4">
           <dropdown-field v-model="formData.selectedInstructor" :default-placeholder="'Instructor'"
             :errors="v$?.formData.selectedInstructor?.$errors[0]?.$message">
-            <option v-for="instructor in formData.instructors" :key="instructor.id" :value="instructor.name">
-              {{ instructor.name }}
+            <option v-for="instructor in formData.instructors" :key="instructor.user_ID" :value="instructor.user_Name">
+              {{ instructor.user_Name }}
             </option>
           </dropdown-field>
         </div>
@@ -181,9 +181,9 @@
           <div class="col-md-6 form-group mt-4 mt-md-0">
             <dropdown-field v-model="formData.selectedTemplate" :default-placeholder="'Feedback Template'"
               :errors="v$?.formData.selectedTemplate?.$errors[0]?.$message">
-              <option v-for="feedbackTemplate in formData.feedbackTemplates" :key="feedbackTemplate.id"
-                :value="feedbackTemplate.name">
-                {{ feedbackTemplate.name }}
+              <option v-for="feedbackTemplate in formData.feedbackTemplates" :key="feedbackTemplate.template_ID"
+                :value="feedbackTemplate.template_Name">
+                {{ feedbackTemplate.template_Name }}
               </option>
             </dropdown-field>
           </div>
@@ -219,6 +219,8 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import SuccessModal from "../components/SuccessModal.vue";
 import "@vuepic/vue-datepicker/dist/main.css";
 import CourseCategoryService from "@/api/services/CourseCategoryService.js";
+import UserService from "@/api/services/UserService.js";
+import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js";
 import { useVuelidate } from "@vuelidate/core";
 import { required, numeric, helpers } from "@vuelidate/validators";
 //import ErrorMessage from "../components/ErrorMessage.vue";
@@ -384,10 +386,11 @@ export default {
         courseDescription: "",
         selectedInstructor: "",
         //To be removed 
-        instructors: [
+        /*instructors: [
           { id: 1, name: "Miss Tan" },
           { id: 2, name: "Miss Lee" }
-        ],
+        ],*/
+        instructors: [],
         datePickerFormat: "yyyy-MM-dd",
         startDate: null,
         endDate: null,
@@ -409,10 +412,11 @@ export default {
         courseFee: "",
         selectedTemplate: "",
         //To be removed
-        feedbackTemplates: [
+        /*feedbackTemplates: [
           { id: 1, name: "Template 1" },
           { id: 2, name: "Template 2" }
-        ]
+        ]*/
+        feedbackTemplates: []
       },
       showSuccessModal: false,
       successMessage: "The course has been successfully created and is now available for registration.",
@@ -452,8 +456,8 @@ export default {
   },
   async mounted() {
     await this.fetchCourseCategories();
-    //await this.fetchInstructors();
-    //await this.fetchFeedbackTemplates();
+    await this.fetchInstructors();
+    await this.fetchFeedbackTemplates();
   },
   methods: {
     async fetchCourseCategories() {
@@ -461,6 +465,20 @@ export default {
         this.formData.courseCategories = await CourseCategoryService.getAllCourseCategory(); // Use the CourseCategoryService
       } catch (error) {
         console.error('Error fetching course categories:', error);
+      }
+    },
+    async fetchInstructors() {
+      try {
+        this.formData.instructors = await UserService.getInstructors(); // Use the UserService
+      } catch (error) {
+        console.error('Error fetching instructors:', error);
+      }
+    },
+    async fetchFeedbackTemplates() {
+      try {
+        this.formData.feedbackTemplates = await FeedbackTemplateService.getTemplates(); // Use the UserService
+      } catch (error) {
+        console.error('Error fetching feedback templates:', error);
       }
     },
     async onReset() {
@@ -472,10 +490,11 @@ export default {
         courseDescription: "",
         selectedInstructor: "",
         //To be removed 
-        instructors: [
+        /*instructors: [
           { id: 1, name: "Miss Tan" },
           { id: 2, name: "Miss Lee" }
-        ],
+        ],*/
+        instructors: [],
         datePickerFormat: "yyyy-MM-dd",
         startDate: null,
         endDate: null,
@@ -497,13 +516,15 @@ export default {
         courseFee: "",
         selectedTemplate: "",
         //To be removed
-        feedbackTemplates: [
+        /*feedbackTemplates: [
           { id: 1, name: "Template 1" },
           { id: 2, name: "Template 2" }
-        ]
+        ]*/
+        feedbackTemplates: []
       }
 
       await this.fetchCourseCategories();
+      await this.fetchInstructors();
     },
     onSubmit() {
       this.v$.$touch();
