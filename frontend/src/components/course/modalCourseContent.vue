@@ -10,7 +10,7 @@
         </h5>
       </div>
       <div>{{ course.course_Desc }}</div>
-      <div v-if="status == 'Active'">
+      <div v-if="isRunCourse">
         <div class="pt-4 row">
           <div class="col-6">
             Course Start Date: <br> <strong>{{ course.reg_Startdate }}</strong>
@@ -47,7 +47,8 @@
           <div class="col-6">
             Fee: <br> <strong>${{ course.course_Fee }}</strong>
           </div>
-          <div class="col-6">
+          <!-- to add role check after session completed -->
+          <div class="col-6"> 
             Registration Count: <br> <strong>{{ course.registration_count }}</strong>
           </div>
         </div>
@@ -64,8 +65,14 @@ export default {
     courseCategoryBadge
   },
   props: {
-    course: Object,
-    status: String
+    course: Object
+  },
+  computed: {
+    isRunCourse() {
+      var runStatus = this.course['runcourse_Status'];
+      console.log(runStatus)
+      return runStatus !== undefined
+    },
   }
 };
 </script>

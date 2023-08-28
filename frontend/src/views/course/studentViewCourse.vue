@@ -51,11 +51,6 @@
               </tr>
             </tbody>
           </table>
-          <div class="modal fade" id="course_details_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-              <modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" />
-            </div>
-          </div>
         </div>
         <div v-else-if="run_courses=[]">
           <p>No records found</p>
@@ -90,11 +85,6 @@
               </tr>
             </tbody>
           </table>
-          <div class="modal fade" id="course_details_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-              <modal-course-content v-if="selectedCourse" :status="selectedCourse.course_Status" :course="selectedCourse" @close-modal="closeModal" />
-            </div>
-          </div>
         </div>
         <div v-else-if="vote_courses=[]">
           <p>No records found</p>
@@ -102,7 +92,11 @@
       </div>
       <vue-awesome-paginate v-if="vote_courses.length/itemsPerPage > 0" v-model="localCurrentPageVoteCourse" :totalItems="vote_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageChange" class="justify-content-center pagination-container"/>
     </div>
-    
+    <div class="modal fade" id="course_details_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" />
+      </div>
+    </div>
   </div>
 </div>
 </template>
@@ -148,7 +142,7 @@ export default {
       return this.run_courses.slice(startIndex, endIndex);
     },
     displayVoteCourses() {
-      const startIndex = (this.localCurrentPageProposed - 1) * this.itemsPerPage;
+      const startIndex = (this.localCurrentPageVoteCourse - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
       return this.vote_courses.slice(startIndex, endIndex);
     }
@@ -156,6 +150,7 @@ export default {
   methods: {
     openModal(course) {
       this.selectedCourse = course;
+      console.log(course)
       this.showModal = true;
     },
     closeModal() {

@@ -12,7 +12,7 @@
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'for_registration' }">
         <div class="pt-5 container col-12 table-responsive">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For you</h1>
-          <div v-if="reg_courses_for_you.length > 0">
+          <div v-if="reg_courses_for_you && reg_courses_for_you.length > 0"> 
             <table class="table">
               <thead>
                 <tr class="text-nowrap">
@@ -48,7 +48,7 @@
               </tbody>
             </table>
           </div>
-          <div v-else>
+          <div v-else-if="reg_courses_for_you=[]">
             <p>No records found</p>
           </div>
         </div>
@@ -56,7 +56,7 @@
           
         <div class="pt-5 container col-12 table-responsive">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
-          <div v-if="reg_courses_others.length > 0">
+          <div v-if="reg_courses_others && reg_courses_others.length > 0"> 
             <table class="table">
               <thead>
                 <tr class="text-nowrap">
@@ -92,7 +92,7 @@
               </tbody>
             </table>
           </div>
-          <div v-else>
+          <div v-else-if="reg_courses_others=[]">
             <p>No records found</p>
           </div>
         </div>
@@ -101,7 +101,7 @@
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'express_interest' }">
         <div class="pt-5 container col-12 table-responsive">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
-          <div v-if="interest_courses.length > 0">
+          <div v-if="interest_courses && interest_courses.length > 0"> 
             <table class="table">
               <thead>
                 <tr class="text-nowrap">
@@ -122,14 +122,14 @@
               </tbody>
             </table>
           </div>
-          <div v-else>
+          <div v-else-if="interest_courses=[]">
             <p>No records found</p>
           </div>
         </div>
         <vue-awesome-paginate v-model="localCurrentInterestCourses" v-if="interest_courses.length/itemsPerPage > 0" :totalItems="interest_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageInterestCourses" class="justify-content-center pagination-container"/>
           <div class="pt-5 container col-12 table-responsive">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
-          <div v-if="interest_others.length > 0">
+          <div v-if="interest_others && interest_others.length > 0"> 
             <table class="table">
               <thead>
                 <tr class="text-nowrap">
@@ -150,7 +150,7 @@
               </tbody>
             </table>
           </div>
-          <div v-else>
+          <div v-else-if="interest_others=[]">
             <p>No records found</p>
           </div>
         </div>
