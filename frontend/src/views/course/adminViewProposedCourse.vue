@@ -59,6 +59,7 @@
         </div>
         <vue-awesome-paginate v-if="pending_courses.length/itemsPerPage > 0" v-model="localCurrentPagePending" :totalItems="pending_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageChangePending" class="justify-content-center pagination-container"/>
       </div>
+      
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'approved_rejected' }">
         <common-search-filter
         :search-api="searchAllProposedCoursesAdmin"

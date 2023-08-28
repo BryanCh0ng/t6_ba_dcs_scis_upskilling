@@ -106,7 +106,7 @@ export default({
 
     #resetbtn {
         background-color: transparent;
-        border: 4px solid #616161;
+        border: 3px solid #616161;
         color:black;
     }
 

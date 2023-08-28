@@ -219,11 +219,11 @@ export default {
         course.run_Endtime = convertTime(course.run_Endtime)
         course.run_Starttime = convertTime(course.run_Starttime)
       }); 
-      console.log(this.run_courses)
+      console.log("run_response", this.run_courses)
       let vote_response = await CourseService.searchUnvotedActiveInfo(null, null, null)
-      console.log("vote_response", vote_response)
+      // console.log("vote_response", vote_response)
       this.vote_courses = vote_response.data
-      console.log(this.vote_courses)
+      console.log("vote_response", this.vote_courses)
     } catch (error) {
       console.error("Error fetching course details:", error);
     }

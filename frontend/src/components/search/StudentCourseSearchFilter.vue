@@ -68,6 +68,7 @@ export default({
             try {
                 // Assign values to variables
                 const user_ID = 1;
+                // const user_ID = this.getUserIDFromSession()
                 const course_Name = this.courseName;
                 const coursecat_ID = this.category;
 
@@ -99,7 +100,7 @@ export default({
 
     #resetbtn {
         background-color: transparent;
-        border: 4px solid #616161;
+        border: 3px solid #616161;
         color:black;
     }
 
