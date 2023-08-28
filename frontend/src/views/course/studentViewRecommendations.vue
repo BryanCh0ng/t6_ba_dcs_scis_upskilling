@@ -13,7 +13,7 @@
         <div class="pt-5 container col-12 table-responsive">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For you</h1>
           <div v-if="reg_courses_for_you && reg_courses_for_you.length > 0"> 
-            <table class="table">
+            <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
@@ -43,7 +43,7 @@
                     <course-date-time :date="reg_course.reg_Enddate" :time="reg_course.reg_Endtime"></course-date-time>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(reg_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action :status="reg_course.course_Status" :id="reg_course.course_ID"></course-action></td>
+                  <td><course-action :status="reg_course.course_Status" :course="reg_course"></course-action></td>
                 </tr>
               </tbody>
             </table>
@@ -57,7 +57,7 @@
         <div class="pt-5 container col-12 table-responsive">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
           <div v-if="reg_courses_others && reg_courses_others.length > 0"> 
-            <table class="table">
+            <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
@@ -87,7 +87,7 @@
                     <course-date :date="reg_course.reg_Enddate" :time="reg_course.reg_Endtime"></course-date>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(reg_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action :status="reg_course.course_Status" :id="reg_course.course_ID"></course-action></td>
+                  <td><course-action :status="reg_course.course_Status" :course="reg_course"></course-action></td>
                 </tr>
               </tbody>
             </table>
@@ -102,7 +102,7 @@
         <div class="pt-5 container col-12 table-responsive">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
           <div v-if="interest_courses && interest_courses.length > 0"> 
-            <table class="table">
+            <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
@@ -117,7 +117,7 @@
                       <course-name-desc :name="interest_course.course_Name" :category="interest_course.coursecat_Name" :description="interest_course.course_Name"></course-name-desc>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(interest_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action :status="interest_course.vote_Status" :id="interest_course.course_ID"></course-action></td>
+                  <td><course-action :status="interest_course.vote_Status" :course="interest_course"></course-action></td>
                 </tr>
               </tbody>
             </table>
@@ -130,7 +130,7 @@
           <div class="pt-5 container col-12 table-responsive">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
           <div v-if="interest_others && interest_others.length > 0"> 
-            <table class="table">
+            <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
@@ -145,7 +145,7 @@
                       <course-name-desc :name="interest_other.course_Name" :category="interest_other.coursecat_Name" :description="interest_other.course_Desc"></course-name-desc>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(interest_other)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action :status="interest_other.vote_Status" :id="interest_other.course_ID"></course-action></td>
+                  <td><course-action :status="interest_other.vote_Status" :course="interest_other"></course-action></td>
                 </tr>
               </tbody>
             </table>

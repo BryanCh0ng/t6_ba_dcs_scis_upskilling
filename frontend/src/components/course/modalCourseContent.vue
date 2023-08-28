@@ -70,7 +70,6 @@ export default {
   computed: {
     isRunCourse() {
       var runStatus = this.course['runcourse_Status'];
-      console.log(runStatus)
       return runStatus !== undefined
     },
   }
