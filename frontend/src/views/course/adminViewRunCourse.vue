@@ -42,7 +42,7 @@
                 <td class="col row mx-1" v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" :id="course.course_ID"></course-action></td>
                 <td class="col row mx-1" v-else><course-action :status="course.course_Status" :id="course.course_ID"></course-action></td>
                 <td class="col row mr-1"><course-action status="Edit" :id="course.course_ID"></course-action></td>
-                <td class="col row mx-1"><course-action status="Delete" :id="course.course_ID"></course-action></td>
+                <td class="col row mx-1"><course-action status="Delete" :id="course.course_ID" :courseName="course.courseName" ></course-action></td>
               </div>
             </tr>
           </tbody>
@@ -124,7 +124,17 @@ export default {
         console.error("Error fetching info:", error);
         throw error;
       }
-    }
+    },
+    async deleteCourse(ID) {
+      try {
+          let response
+          response = await CourseService.deleteCourse(ID); // Use the CourseService
+          alert(response.data)
+          } 
+      catch (error) {
+        alert(error)
+      }
+    },
   },
   computed: {
     displayedCourses() {

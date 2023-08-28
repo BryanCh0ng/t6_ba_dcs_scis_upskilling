@@ -89,23 +89,51 @@ delete_course.add_argument("course_id", help="Enter course id")
 @api.doc(description="Delete course")
 class DeleteCourse(Resource):
     @api.expect(delete_course)
-    def put(self):    
+    def delete(self):    
         try:
             courseID = delete_course.parse_args().get("course_id")
             
             course = Course.query.filter_by(course_ID=courseID).first()            
             if(course):
-                    db.session.delete(course)
-                    db.session.commit()
-                    return json.loads(json.dumps({"message":"Course successfully deleted"})), 200
+                    try:
+                        db.session.delete(course)              
+                        db.session.commit()                 
+                        return json.loads(json.dumps({"message":"Course successfully deleted"})), 200
+                    except Exception as e:
+                        return "Foreign key dependencies exist, cannot delete. " + str(e), 408
 
             return json.loads(json.dumps({"Message": "There is no such course"}, default=str)), 404
 
 
 
         except Exception as e:
-            return "Failed" + str(e), 500
+            return "Failed. " + str(e), 500
+        
+delete_runcourse = api.parser()
+delete_runcourse.add_argument("course_id", help="Enter course id")
+@api.route("/delete_runcourse")
+@api.doc(description="Delete run course")
+class DeleteCourse(Resource):
+    @api.expect(delete_runcourse)
+    def delete(self):    
+        try:
+            courseID = delete_runcourse.parse_args().get("course_id")
+            
+            runCourse = RunCourse.query.filter_by(course_ID=courseID).first()            
+            if(runCourse):
+                    try:
+                        db.session.delete(runCourse)              
+                        db.session.commit()                 
+                        return json.loads(json.dumps({"message":"Run Course successfully deleted"})), 200
+                    except Exception as e:
+                        return "Foreign key dependencies exist, cannot delete. " + str(e), 408
 
+            return json.loads(json.dumps({"Message": "There is no such run course"}, default=str)), 404
+
+
+
+        except Exception as e:
+            return "Failed. " + str(e), 500
 
 
 retrieve_course = api.parser()

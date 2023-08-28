@@ -36,9 +36,19 @@ class CourseService extends BaseApiService {
     }
     async deleteCourse(course_ID) {
         try {
-            let deleteCourse = await axiosClient.delete("/course/delete_Course", { params: { course_id: course_ID } });
+            let deleteCourse = await axiosClient.delete("/course/delete_course", { params: { course_id: course_ID } });
             return deleteCourse.data
         } catch (error) {
+            console.log("Cannot delete or update a parent row: a foreign key constraint fails");
+            return this.handleError(error);
+        }
+    }
+    async deleteRunCourse(course_ID) {
+        try {
+            let deleteRunCourse = await axiosClient.delete("/course/delete_runcourse", { params: { course_id: course_ID } });
+            return deleteRunCourse.data
+        } catch (error) {
+            console.log("Cannot delete or update a parent row: a foreign key constraint fails");
             return this.handleError(error);
         }
     }
