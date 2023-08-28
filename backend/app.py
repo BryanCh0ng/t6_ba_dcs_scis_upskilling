@@ -7,8 +7,6 @@ from allClasses import *
 from os import environ
 from core_features.course import api as course
 from core_features.coursecat import api as coursecat
-from core_features.proposedcourse import api as proposedcourse
-from core_features.runcourse import api as runcourse
 
 app = Flask(__name__)
 api = Api(
@@ -20,8 +18,6 @@ api = Api(
 )
 api.add_namespace(course)
 api.add_namespace(coursecat)
-api.add_namespace(proposedcourse)
-api.add_namespace(runcourse)
 
 CORS(app, supports_credentials=True)
 # ==================== CONNECTING TO DATABASE ====================#
@@ -36,7 +32,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # app.config['SQLALCHEMY_MAX_OVERFLOW'] = 0
 
 db = SQLAlchemy(app)
-# ==================== TEST FUNCTIONS ====================#
+# ==================== TEST FUNCTIONS ====================#test_parser = api.parser()
 test_parser = api.parser()
 test_parser.add_argument("number1", help="First number to add")
 test_parser.add_argument("number2", help="Second number to add")
