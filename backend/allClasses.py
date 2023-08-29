@@ -93,14 +93,13 @@ class CourseCategory(db.Model):
 class Course(db.Model):
     __tablename__ = 'course'
 
-    course_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    course_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     course_Name = db.Column(db.String(255), nullable=False)
     course_Desc = db.Column(db.String(800), nullable=False)
     coursecat_ID = db.Column(db.Integer, db.ForeignKey('coursecategory.coursecat_ID'), nullable=False)
 
 
-    def __init__(self, course_ID, course_Name, course_Desc, coursecat_ID):
-        self.course_ID = course_ID
+    def __init__(self, course_Name, course_Desc, coursecat_ID):
         self.course_Name = course_Name
         self.course_Desc = course_Desc
         self.coursecat_ID = coursecat_ID        
@@ -196,15 +195,14 @@ class Interest(db.Model):
 class FeedbackTemplate(db.Model):
     __tablename__ = 'feedbacktemplate'
 
-    template_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    template_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     template_Name = db.Column(db.String(255), nullable=False)
     # created_on = db.Column(db.DateTime, default=datetime.now ,  nullable=False)
     created_On = db.Column(db.Date,  nullable=False)
 
 
 
-    def __init__(self, template_ID, template_Name, created_On ):
-        self.template_ID = template_ID
+    def __init__(self, template_Name, created_On ):
         self.template_Name = template_Name
         self.created_On = created_On
 
@@ -307,7 +305,7 @@ class Feedback(db.Model):
 class RunCourse(db.Model):
     __tablename__ = 'runcourse'
 
-    rcourse_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    rcourse_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     run_Startdate = db.Column(db.Date, nullable=False)
     run_Enddate = db.Column(db.Date, nullable=False)
     run_Starttime = db.Column(db.Time, nullable=False)
@@ -329,11 +327,11 @@ class RunCourse(db.Model):
     course_Status = db.Column(db.String(255), nullable=False)
 
 
-    def __init__(self, rcourse_ID, run_Startdate, run_Enddate, run_Starttime, run_Endtime, instructor_ID,
+    def __init__(self, run_Startdate, run_Enddate, run_Starttime, run_Endtime, instructor_ID,
                  course_Format, course_Venue, runcourse_Status, course_Size, course_Minsize, course_Fee,
                  class_Duration, reg_Startdate, reg_Enddate, reg_Starttime, reg_Endtime, template_ID,
                   course_ID, course_Status ):
-        self.rcourse_ID = rcourse_ID
+        # self.rcourse_ID = rcourse_ID
         self.run_Startdate = run_Startdate
         self.run_Enddate = run_Enddate
         self.run_Starttime = run_Starttime

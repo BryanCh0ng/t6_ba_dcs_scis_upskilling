@@ -223,6 +223,7 @@ import UserService from "@/api/services/UserService.js";
 import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js";
 import { useVuelidate } from "@vuelidate/core";
 import { required, numeric, helpers } from "@vuelidate/validators";
+import { axiosClient } from "@/api/axiosClient";
 //import ErrorMessage from "../components/ErrorMessage.vue";
 
 //Validating the date fields
@@ -526,7 +527,7 @@ export default {
       await this.fetchCourseCategories();
       await this.fetchInstructors();
     },
-    onSubmit() {
+    async onSubmit() {
       this.v$.$touch();
 
       if (!this.v$.$invalid) {
@@ -534,6 +535,31 @@ export default {
         console.log('Form submitted successfully');
 
         //Create the course service
+        await axiosClient.post("/course/create_course", {
+          courseName : this.formData.courseName,
+          selectedCategory : this.formData.selectedCategory,
+          courseDescription : this.formData.courseDescription,
+          selectedInstructor : this.formData.selectedInstructor,
+          startDate : this.formData.startDate,
+          endDate : this.formData.endDate,
+          startTime : this.formData.startTime,
+          endTime : this.formData.endTime,
+          selectedFormat : this.formData.selectedFormat, // Holds the selected course format ID
+          venue : this.formData.venue,
+          courseSize : this.formData.courseSize,
+          minimumSlots : this.formData.minimumSlots,
+          openingDate : this.formData.openingDate,
+          openingTime : this.formData.openingTime,
+          closingDate : this.formData.closingDate,
+          closingTime : this.formData.closingTime,
+          courseFee : this.formData.courseFee,
+          selectedTemplate : this.formData.selectedTemplate
+        }).then(response => {
+            console.log(response.data);
+          })
+          .catch(error => {
+            console.error(error);
+          });
 
         this.showSuccessModal = true;
       } else {

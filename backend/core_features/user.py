@@ -14,7 +14,7 @@ get_instructors = api.parser()
 class GetInstructors(Resource):
     @api.expect(get_instructors)
     def get(self):
-        instructors = User.query.filter_by(role_Name='Instructors').all()
+        instructors = User.query.filter_by(role_Name='Instructor').all()
         db.session.close()
         
         if instructors:

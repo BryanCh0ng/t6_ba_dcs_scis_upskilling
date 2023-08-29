@@ -9,7 +9,7 @@ api = Namespace('course', description='Course related operations')
 # get_all_courses()
 # get_all_courses_hr()
 # get_course_by_id()
-# create_new_course()
+# create_course()
 
 retrieve_all_courses = api.parser()
 retrieve_all_courses.add_argument("course_name", help="Enter course name")
@@ -122,35 +122,104 @@ class GetCourse(Resource):
         return json.loads(json.dumps({"message": "There is no such course"})), 404
 
 
+# ==================== Create Course ====================#
 create_course_model = api.model("create_course_model", {
-    "course_ID" : fields.Integer(description="Course ID", required=True),
-    "cousre_Name" : fields.String(description="Course Name", required=True),
-    "course_Desc" : fields.String(description="Course Description", required=True),
-    "coursecat_ID" : fields.Integer(description="Course Category ID", required=True)
+    "courseName" : fields.String(description="", required=True),
+    "selectedCategory" : fields.Integer(description="", required=True),
+    "courseDescription" : fields.String(description="", required=True),
+    "selectedInstructor" : fields.Integer(description="", required=True),
+    "startDate" : fields.Date(description="", required=True),
+    "endDate" : fields.Date(description="", required=True),
+    "startTime" : fields.String(description="", required=True),
+    "endTime" : fields.String(description="", required=True),
+    "selectedFormat" : fields.Integer(description="", required=True), # Holds the selected course format ID
+    "venue" : fields.String(description="", required=True),
+    "courseSize" : fields.Integer(description="", required=True),
+    "minimumSlots" : fields.Integer(description="", required=True),
+    "openingDate" : fields.Date(description="", required=True),
+    "openingTime" : fields.String(description="", required=True),
+    "closingDate" : fields.Date(description="", required=True),
+    "closingTime" : fields.String(description="", required=True),
+    "courseFee" : fields.Integer(description="", required=True),
+    "selectedTemplate" : fields.Integer(description="", required=True)
 })
 
-# @api.route("/create_new_course", methods=["POST"])
-# @api.doc(description="Create new course. This is used for testing only. Records will come from LMS in a .csv format")
-# class CreateNewCourses(Resource):
-#     @api.expect(create_course_model)
-#     def post(self):
-#         data = request.get_json()
-#         newCourse = Course(**data)
+@api.route("/create_course", methods=["POST"])
+@api.doc(description = "Create a new course")
+class CreateCourse(Resource):
+    @api.expect(create_course_model)
+    def post(self):
+        data = request.get_json()
+        coursecat_ID = CourseCategory.query.filter_by(coursecat_Name=data['selectedCategory']).first().coursecat_ID
+        
+        # check if course already exists, else create course
+        if not Course.query.filter_by(course_Name=data['courseName']).first():
+            newCourse = Course(course_Name=data['courseName'], course_Desc=data['courseDescription'], coursecat_ID=coursecat_ID)
+            db.session.add(newCourse)
 
-#         try:
-#             courseID = data["course_ID"]
-#             if(Course.query.filter_by(course_ID=courseID).first()):
-#                 return json.loads(json.dumps({"Message": "Course ID already exist"}, default=str)), 400
+        try:
+            course_ID = Course.query.filter_by(course_Name=data['courseName']).first().course_ID
+            # this sections assume coursecat name and template names are unique
+            template_ID = FeedbackTemplate.query.filter_by(template_Name=data['selectedTemplate']).first().template_ID
+            # assumes that instructors have unique names, may need to change the process including the data input
+            instructor_ID = User.query.filter_by(user_Name=data['selectedInstructor'], role_Name="Instructor").first().user_ID
 
-#             db.session.add(newCourse)
-#             db.session.commit()
-#             return json.loads(json.dumps(newCourse.json(), default=str)), 200
-
-#         except Exception as e:
-#             return "Failed" + str(e), 500
-
-
-
+            newRunCourse = RunCourse(
+                run_Startdate=self.convertDate(data['startDate']),
+                run_Enddate=self.convertDate(data['endDate']),
+                run_Starttime=self.convertTime(data['startTime']),
+                run_Endtime=self.convertTime(data['endTime']),
+                instructor_ID=instructor_ID,
+                course_Format=data['selectedFormat'],
+                course_Venue=data['venue'],
+                runcourse_Status='Ongoing',
+                course_Size=data['courseSize'],
+                course_Minsize=data['minimumSlots'],
+                course_Fee=data['courseFee'],
+                class_Duration=self.getDuration(data['startTime'], data['endTime']),
+                reg_Startdate=self.convertDate(data['openingDate']),
+                reg_Enddate=self.convertDate(data['closingDate']),
+                reg_Starttime=self.convertTime(data['openingTime']),
+                reg_Endtime=self.convertTime(data['closingTime']),
+                template_ID=template_ID,
+                course_ID=course_ID,
+                course_Status='Active'
+            )
+            db.session.add(newRunCourse)
+            db.session.commit()
+            return json.loads(json.dumps(newRunCourse.json(), default=str)), 200
+        
+        except Exception as e:
+            return "Failed" + str(e), 500
+        
+    def convertTime(self, time):
+        # input format: {'hours': 0, 'minutes': 57, 'seconds': 0}
+        # output to database format: 00:00:00
+        res = ""
+        if int(time['hours']) < 10:
+            res += "0" + str(time['hours']) + ":"
+        else:
+            res += str(time['hours']) + ":"
+        if int(time['minutes']) < 10:
+            res += "0" + str(time['minutes']) + ":00"
+        else:
+            res += str(time['minutes']) + ":00"
+        return res
+    
+    def convertDate(self, date):
+        # input format: 2023-08-31T16:57:00.000Z
+        # output to database format: 2023-08-03
+        newdate = str(date)
+        return newdate.split("T")[0]
+    
+    def getDuration(self, start, end):
+        # inputs: {'hours': 0, 'minutes': 57, 'seconds': 0}
+        # output: integer of minutes
+        # assumes end time does not cross midnight and start time is not before midnight
+        minutes = 0
+        minutes += (end['hours'] - start['hours']) * 60
+        minutes += end['minutes'] - start['minutes']
+        return minutes
 
 
 edit_course_model = api.model("edit_course_model", {
