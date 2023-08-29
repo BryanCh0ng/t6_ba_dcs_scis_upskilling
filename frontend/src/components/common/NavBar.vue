@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <nav class="navbar navbar-expand-md">
+    <nav class="navbar navbar-expand-xl">
       <div class="container-fluid">
         <a class="navbar-brand no-underline" href="#">
           <img src="../../assets/smulogo.png" title="smu logo" class="navlogo" />
@@ -195,7 +195,7 @@ export default {
 }
 
 .navbar li + li {
-  margin-left: 30px;
+  margin-left: 20px;
 }
 
 .navbar a,
@@ -307,8 +307,7 @@ export default {
 }
 
 .dropdown-menu {
-  border: 4px solid #151c55;
-  border-radius: 5px;
+  border: 0px;
   background-color: transparent;
 }
 
@@ -318,10 +317,11 @@ export default {
   align-items: flex-end; 
   padding: 0; 
   margin: 0;
+  padding-top: 10px;
 }
 
 .dropdown-content li {
-  padding: 2px 14px;
+  padding: 8px 14px;
   cursor: pointer;
 }
 
@@ -351,5 +351,19 @@ export default {
   .admin-dropdown{
     right: 10px;
   }
+
+  .navbar-collapse{
+    border:0px;
+  }
+
 }
+
+@media (max-width: 510px) {
+  
+  .system-name {
+    display: none;
+  }
+}
+
+
 </style>

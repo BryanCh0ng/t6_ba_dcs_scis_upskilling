@@ -3,26 +3,26 @@
         <div class="container mt-5 mb-5">
             <form>
                 <div class="row">
-                    <div class="col-sm">
+                    <div class="col-md">
                         <input-field v-model="courseName" type="text" placeholder="Course Name"/>
                     </div>
-                    <div class="col-sm">
+                    <div class="col-md">
                         <dropdown-field
                         v-model="category"
                         :default-placeholder="'Course Category'">
                         <option v-for="option in categoryDropdownOptions" :key="option.coursecat_ID" :value="option.coursecat_ID">{{ option.coursecat_Name }}</option>
                         </dropdown-field>
                     </div>
-                    <div class="col-sm">
+                    <div class="col-md">
                         <dropdown-field
                         v-model="status"
                         :default-placeholder="'Status'">
                         <option v-for="option in statusDropdownOptions" :key="option" :value="option">{{ option }}</option>
                         </dropdown-field>
                     </div>
-                    <div class="col-sm">
+                    <div class="col-md">
                         <div class="d-flex justify-content-between">
-                            <button @click="resetFilter" class="btn" id="resetbtn">Clear All</button>
+                            <button @click="resetFilter" class="btn" id="resetbtn">Clear</button>
                             <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
                         </div>
                     </div>

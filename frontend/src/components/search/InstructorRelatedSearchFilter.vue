@@ -3,20 +3,20 @@
     <div class="container mb-5">
       <form>
         <div class="row">
-          <div class="col-sm">
+          <div class="col-md">
             <input-field v-model="instructorName" type="text" placeholder="Instructor Name"/>
           </div>
-          <div class="col-sm">
+          <div class="col-md">
             <dropdown-field v-model="role" :default-placeholder="'Role'">
               <option v-for="option in statusDropdownOptions" :key="option" :value="option">{{ option }}</option>
               </dropdown-field>
             </div>
-          <div class="col-sm">
+          <div class="col-md">
             <input-field v-model="organizationName" type="text" placeholder="Organization Name"/>
           </div>
-          <div class="col-sm col-lg-3">
+          <div class="col-md col-lg-3">
             <div class="d-flex justify-content-between">
-              <button @click="resetFilter" class="btn" id="resetbtn">Clear All</button>
+              <button @click="resetFilter" class="btn" id="resetbtn">Clear</button>
               <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
             </div>
           </div>
