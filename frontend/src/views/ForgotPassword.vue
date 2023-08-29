@@ -38,7 +38,7 @@ import InputField from "../components/InputField.vue";
 import SuccessModal from "../components/SuccessModal.vue";
 import { required, email } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
-// import { axiosClient } from "../api/axiosClient";
+import { axiosClient } from "../api/axiosClient";
 
 export default {
   name: "ForgotPassword",
@@ -98,14 +98,15 @@ export default {
       try {
         // Will need to update the flask api endpoint
         // Send login request
-        // const response = await axiosClient.post("/reset", {
-        //   email: this.email,
-        // });
+        const response = await axiosClient.post("/login/forgot_password", {
+          email: this.email,
+        });
 
         this.showSuccessModal = true;
+        console.log(response.data)
       } catch (error) {
         this.errorMessage = "Sent reset link failed. Please check your credentials.";
-        console.log("Reset error:", error.message);
+        console.log("Reset error:", error.request.response);
       }
     },
     hideSuccessModal() {

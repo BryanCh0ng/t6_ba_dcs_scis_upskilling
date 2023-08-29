@@ -1,6 +1,6 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
--- SET time_zone = "+00:00";
+SET time_zone = "+00:00";
 
 DROP DATABASE IF EXISTS `scis_upskilling`;
 
@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `user`(
 	user_id int NOT NULL AUTO_INCREMENT,
 	user_name varchar(255) NOT NULL,
 	user_email varchar(125) NOT NULL,
-	user_password varchar(50) NOT NULL,
+	user_password varchar(100) NOT NULL,
 	role_name varchar(20) NOT NULL,
 	PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -789,8 +789,7 @@ INSERT INTO registration VALUES
 	(40, 2, 5, 'Pending'),
 	(42, 2, 55, 'Pending'),
 	(43, 1, 25, 'Dropped'),
-	(44, 2, 1, 'Dropped'),
-    (45, 11, 1, 'Dropped');
+	(44, 2, 1, 'Dropped');
 
 DROP TABLE IF EXISTS `lesson`;
 CREATE TABLE IF NOT EXISTS `lesson`(

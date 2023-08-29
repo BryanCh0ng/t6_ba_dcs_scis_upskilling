@@ -29,23 +29,23 @@
             </li>
 
             <!-- Login Button (Visible when not logged in) -->
-            <li class="nav-item" v-if="!isLoggedIn">
+            <li class="nav-item" v-if="!user_ID">
               <button type="button" class="btn loginbtn" @click="redirectToLogin">
                 Login
               </button>
             </li>
 
             <!-- User Info and Role-Specific Dropdown (Visible when logged in) -->
-            <li class="nav-item" v-if="isLoggedIn">
+            <li class="nav-item" v-if="user_ID">
               <!-- Dropdown for displaying user information and actions -->
               <div class="nav-link dropdown">
                 <!-- Dropdown toggle button -->
                 <span class="dropdown-toggle btn dropdownbtn" id="userDropdown" role="button" @click="toggleUserDropdown" aria-expanded="false">
-                  {{ username }} <!-- Display the user's name -->
+                  {{ user_name }} <!-- Display the user's name -->
                 </span>
 
                 <!-- Dropdown content container -->
-                <div v-if="showUserDropdown" class="dropdown-content" :class="{ 'admin-dropdown': userRole === 'admin' }">
+                <div v-if="showUserDropdown" class="dropdown-content" :class="{ 'admin-dropdown': user_role === 'admin' }">
                   <ul class="dropdown-menu" aria-labelledby="userDropdown">
                     <!-- Loop through role-specific dropdown items -->
                     <li v-for="(item, index) in roleSpecificDropdownItems" :key="index">
@@ -65,13 +65,19 @@
 </template>
 
 <script>
-// import { axiosClient } from "../api/axiosClient";
+import { axiosClient } from "@/api/axiosClient";
+import { useRouter } from 'vue-router';
 
 export default {
+  setup() {
+    const router = useRouter(); // Define the router variable here
+    return {router };
+  },
   data() {
     return {
-      userRole: "", // Set the user's role here dynamically
-      isLoggedIn: false, // Set to true when the user is logged in
+      user_ID: null,
+      user_role: "", // Set the user's role here dynamically
+      user_name: "",
       showUserDropdown: false,
     };
   },
@@ -79,30 +85,30 @@ export default {
     navigationLinks() {
       const links = [];
 
-      if (this.isLoggedIn) {
-        if (this.userRole === "student") {
+      if (this.user_ID) {
+        if (this.user_role === "Student") {
           links.push(
             { path: "/recommendations", label: "Recommendations" },
             { path: "/viewCourses", label: "View Courses" },
             { path: "/proposeCourse", label: "Propose Course" }
           );
         } else if (
-          this.userRole === "instructor" ||
-          this.userRole === "trainer"
+          this.user_role === "Instructor" ||
+          this.user_role === "Trainer"
         ) {
           links.push(
             { path: "/votingCampaign", label: "Voting Campaign" },
             { path: "/proposeCourse", label: "Propose Course" }
           );
-        } else if (this.userRole === "admin") {
+        } else if (this.user_role === "Admin") {
           links.push(
-            { path: "/adminViewProposedCourse", label: "All Proposal" },
+            { path: "/allProposal", label: "All Proposal" },
             { path: "/votingCampaign", label: "Voting Campaign" },
             { path: "/createCourse", label: "Create Course" }
           );
         }
         // Add the common links for logged-in users
-        links.push({ path: "/contactUs", label: "Contact Us" });
+        links.push({ path: "/ContactUs", label: "Contact Us" });
       } else {
         // Add the default links for users who are not logged in
         links.push(
@@ -117,22 +123,19 @@ export default {
     roleSpecificDropdownItems() {
       const items = [];
 
-      if (this.userRole === "student") {
+      if (this.user_role === "Student") {
         items.push({ path: "/profile", label: "Profile" });
-      } else if (this.userRole === "instructor" || this.userRole === "trainer") 
+      } else if (this.user_role === "Instructor" || this.user_role === "Trainer") 
       {
         items.push(
           { path: "/profile", label: "Profile" },
           { path: "/blacklist", label: "Blacklist" },
           { path: "/dashboard", label: "Dashboard" }
         );
-      } else if (this.userRole === "admin") {
+      } else if (this.user_role === "Admin") {
         items.push(
           { path: "/profile", label: "Profile" },
-          { path: "/adminViewRunCourse", label: "All Run Course DB" },
-          { path: "/adminViewVoteCourse", label: "All Vote Course DB" },
-          { path: "/allAvailRegCourse", label: "All Available Registration Course" },
-          { path: "/adminViewInstructorsTrainers", label: "All Instructors DB" },
+          { path: "/academicManagement", label: "Academic Management" },
           { path: "/feedbackTemplate", label: "Feedback Template" },
           { path: "/dashboard", label: "Dashboard" }
         );
@@ -144,34 +147,63 @@ export default {
       return items;
     },
   },
+  created() {
+    this.get_user_id();
+    this.get_user_role();
+    this.get_user_name();
+  },
   methods: {
+    async get_user_id() {
+      try {
+        
+        const user_ID = await axiosClient.get("/login/get_user_id")
+        this.user_ID = user_ID.data
+        // console.log(this.user_ID)
+      } catch (error) {
+        console.error('Error fetching user ID:', error);
+        this.user_ID = null;
+      }
+    },
+    async get_user_role() {
+      try {
+        
+        const user_role = await axiosClient.get("/login/get_role")
+        this.user_role = user_role.data
+        // console.log(this.userRole)
+      } catch (error) {
+        console.error('Error fetching user ID:', error);
+        this.user_role = null;
+      }
+    },
+    async get_user_name() {
+      try {
+        
+        const user_name = await axiosClient.get("/login/get_user_name")
+        this.user_name = user_name.data
+        // console.log(this.user_name)
+      } catch (error) {
+        console.error('Error fetching user ID:', error);
+        this.user_name = null;
+      }
+    },
     isActiveLink(linkPath) {
       return this.$route.path === linkPath;
     },
     redirectToLogin() {
-      window.location.href = "/login";
+      this.router.push('/login')
     },
     // need to add in redirect link
     logout() {
-      this.userRole = "";
-      this.isLoggedIn = false;
+      this.user_role = "";
+      this.user_ID = null;
+      this.user_name = "";
+      this.router.push('/login')
     },
     toggleUserDropdown() {
       console.log("Toggling user dropdown");
       this.showUserDropdown = !this.showUserDropdown;
     },
-  },
-  // created() {
-  //   // Need to insert API endpoint
-  //   axiosClient
-  //     .get("")
-  //     .then((response) => {
-  //       this.userRole = response.data.role;
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching user role:", error);
-  //     });
-  // },
+  }
 };
 </script>
 
@@ -282,7 +314,7 @@ export default {
   border-radius: 5px;
   padding: 5px 10px;
   position: relative;
-  padding-left: 90px;
+  /* padding-left: 90px; */
 }
 .loginbtn {
   position: relative;

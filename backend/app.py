@@ -9,6 +9,11 @@ from core_features.course import api as course
 from core_features.coursecat import api as coursecat
 from core_features.proposedcourse import api as proposedcourse
 from core_features.runcourse import api as runcourse
+from core_features.login import api as login
+from core_features.contactus import api as contactus
+from flask_mail import Mail
+from flask_bcrypt import Bcrypt
+
 
 app = Flask(__name__)
 api = Api(
@@ -22,6 +27,9 @@ api.add_namespace(course)
 api.add_namespace(coursecat)
 api.add_namespace(proposedcourse)
 api.add_namespace(runcourse)
+api.add_namespace(login)
+api.add_namespace(contactus)
+
 
 CORS(app, supports_credentials=True)
 # ==================== CONNECTING TO DATABASE ====================#
@@ -32,11 +40,23 @@ app.config["CORS_HEADERS"] = "Content-Type"
 app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+mysqlconnector://{db_username}:{db_password}@{db_endpoint}"
 app.config["CORS_ALLOW_CREDENTIALS"] = True
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config['SECRET_KEY'] = 'ashSDFSDFbiuoqewiort123!@*U&!&*(@^)'
 # app.config['SQLALCHEMY_POOL_SIZE'] = 2
 # app.config['SQLALCHEMY_MAX_OVERFLOW'] = 0
 
 db = SQLAlchemy(app)
-# ==================== TEST FUNCTIONS ====================#
+
+# ==================== Mail and Bcrypt ====================#
+app.config['MAIL_SERVER'] = 'smtp-mail.outlook.com'  # Your email server
+app.config['MAIL_PORT'] = 587  # Port for sending emails
+app.config['MAIL_USE_TLS'] = True  # Use TLS for security
+app.config['MAIL_USERNAME'] = 'nic.wong@live.com'
+app.config['MAIL_PASSWORD'] = 'Nic!256980'
+#app.config['MAIL_DEFAULT_SENDER'] = 'noreply@live.com'  # Default sender email
+mail = Mail(app)
+bcrypt = Bcrypt(app)
+
+# ==================== TEST FUNCTIONS ====================
 test_parser = api.parser()
 test_parser.add_argument("number1", help="First number to add")
 test_parser.add_argument("number2", help="Second number to add")

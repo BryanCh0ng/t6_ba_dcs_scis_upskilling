@@ -2,28 +2,21 @@
   <div id="contactus">
     <!-- CONTACT US FORM -->
     <div class="container mt-5">
-      <h2 class="text-center">Contact Us</h2>
+      <h2 class="text-center mb-4">Contact Us</h2>
 
-      <p v-if="subjectError" class="text-danger">{{ subjectError }}</p>
+      <!-- Error Message -->
+      <error-message :error-message="errorMessage" />
 
       <form @submit.prevent="submitForm">
         <div class="form-group mt-5 mb-4">
-          <input
-            v-model="subject"
-            type="text"
-            placeholder="Subject"
-            required
-            autofocus=""
-            class="form-control border-0 shadow-sm px-4 field"
-          />
+          <input-field v-model="subject" type="text" :placeholder="subjectPlaceholder" />
         </div>
         <div class="form-group">
           <textarea
             v-model="message"
             class="form-control border-0 shadow-sm px-4 field"
-            placeholder="Message"
+            :placeholder="messagePlaceholder"
             style="height: 200px"
-            required
           ></textarea>
         </div>
 
@@ -51,49 +44,89 @@
 
 <script>
 // import { axiosClient } from "../api/axiosClient";
+import ErrorMessage from "../components/ErrorMessage.vue";
+import InputField from "../components/InputField.vue";
+import { required } from "@vuelidate/validators";
+import { useVuelidate } from "@vuelidate/core";
+import ContactUsService from "../api/services/contactService.js"
+import { axiosClient } from "@/api/axiosClient";
 
 export default {
+  setup() {
+    const v$ = useVuelidate(); // Initialize Vuelidate
+    return { v$ };
+  },
+
   data() {
     return {
+      user_ID: null,
       subject: "",
-      subjectError: "", // Error message for subject field
+      errorMessage: "", // Error message for subject field
       message: "",
       showSuccessModal: false,
+      subjectPlaceholder: "Subject",
+      messagePlaceholder: "Message"
     };
   },
+
+  validations() {
+    return {
+      subject: { required},
+      message: { required},
+    };
+  },
+  components: {
+    ErrorMessage,
+    InputField,
+  },
+  created() {
+    this.get_user_id();
+  },
   methods: {
-    submitForm() {
-      // Clear previous error messages
-      // this.subjectError = "";
-
-      // const formData = {
-      //   subject: this.subject,
-      //   message: this.message,
-      // };
-
-      // // Need to add in flask api endpoint
-      // axiosClient
-      //   .post("", formData)
-      //   .then((response) => {
-      //     console.log("Form submitted successfully:", response.data);
-      //     this.showSuccessModal = true;
-      //     this.resetForm();
-      //   })
-      //   .catch((error) => {
-      //     if (error.response) {
-      //       // Handle server response error
-      //       if (error.response.status === 400) {
-      //         this.subjectError = "Please provide a valid subject.";
-      //       }
-      //     }
-      //   });
-
-
-      // Test Simulate a successful submission
-        setTimeout(() => {
-          this.showSuccessModal = true;
-        }, 1000); // Show modal after 1 second (simulating response)
+    async get_user_id() {
+      try {
         
+        const user_ID = await axiosClient.get("/login/get_user_id")
+        this.user_ID = user_ID.data
+        // console.log(this.user_ID)
+      } catch (error) {
+        console.error('Error fetching user ID:', error);
+        this.user_ID = null;
+      }
+    },
+    async submitForm() {
+      // Trigger Vuelidate validation
+      this.v$.$touch();
+
+      this.errorMessage = ""; // Reset error message
+
+      // Check for empty fields
+      if (!this.subject || !this.message) {
+        this.errorMessage = "Please ensure all fields are filled.";
+        return;
+      }
+      
+      if (this.v$.$invalid) {
+        this.errorMessage = "Please fix the validation errors.";
+        return;
+      }
+
+      const formData = {
+        // will need get user_ID from session
+        user_ID: this.user_ID, 
+        msg_Subject: this.subject,
+        msg_Body: this.message,
+        msg_Datetime: new Date().toISOString(), // Current datetime
+      };
+
+      try {
+        const response = await ContactUsService.createNewMsg(formData);
+        console.log('API Response:', response);
+        this.resetForm();
+        this.showSuccessModal = true;
+      } catch (error) {
+        console.error('Error submitting form:', error);
+      }
     },
     hideSuccessModal() {
       this.showSuccessModal = false;
@@ -102,6 +135,8 @@ export default {
     resetForm() {
       this.subject = "";
       this.message = "";
+      this.subjectPlaceholder = "Subject";
+      this.messagePlaceholder = "Message";
     },
   },
 };

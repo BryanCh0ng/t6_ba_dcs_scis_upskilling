@@ -39,7 +39,7 @@ import ErrorMessage from "../components/ErrorMessage.vue";
 import SuccessModal from "../components/SuccessModal.vue";
 import { required, minLength } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
-// import { axiosClient } from "../api/axiosClient";
+import { axiosClient } from "../api/axiosClient";
 
 export default {
   name: "ResetPassword",
@@ -52,10 +52,14 @@ export default {
     return {
       password: "",
       confirmpassword: "",
+      email: "",
       errorMessage: "",
       showSuccessModal: false,
       successMessage: "You have reset your password successfully."
     };
+  },
+  created() {
+    this.email = this.$route.query.email
   },
   validations() {
     return {
@@ -120,15 +124,17 @@ export default {
       try {
         // Will need to update the flask api endpoint
         // Send login request
-        // const response = await axiosClient.post("/reset", {
-        //   email: this.email,
-        // });
+        const response = await axiosClient.post("/login/reset_password", {
+          password: this.password,
+          confirmpassword: this.confirmpassword,
+          email: this.email
+        });
 
         this.showSuccessModal = true;
-        // console.log(response.data);
+        console.log(response.data);
       } catch (error) {
         this.errorMessage = "Reset failed. Please check your credentials.";
-        console.log("Reset error:", error.message);
+        console.log("Reset error:", error.request.response);
       }
     },
     hideSuccessModal() {

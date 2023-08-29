@@ -23,14 +23,13 @@ CORS(app, supports_credentials=True)
 class User(db.Model):
     __tablename__ = 'user'
 
-    user_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    user_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     user_Name = db.Column(db.String(255), nullable=False)
     user_Email = db.Column(db.String(155), nullable=False)
-    user_Password = db.Column(db.String(50), nullable=False)
+    user_Password = db.Column(db.String(100), nullable=False)
     role_Name = db.Column(db.String(20), nullable=False)
 
-    def __init__(self, user_ID, user_Name, user_Email, user_Password, role_Name):
-        self.user_ID = user_ID
+    def __init__(self, user_Name, user_Email, user_Password, role_Name):
         self.user_Name = user_Name
         self.user_Email = user_Email
         self.user_Password = user_Password        
@@ -49,13 +48,12 @@ class User(db.Model):
 class ExternalUser(db.Model):
     __tablename__ = 'externaluser'
 
-    external_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    external_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     user_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'),  nullable=False)
     organisation_Name = db.Column(db.String(255), nullable=False)
     is_Alumni = db.Column(db.Boolean, nullable=False)
 
-    def __init__(self, external_ID, user_ID, organisation_Name, is_Alumni):
-        self.external_ID = external_ID
+    def __init__(self, user_ID, organisation_Name, is_Alumni):
         self.user_ID = user_ID
         self.organisation_Name = organisation_Name
         self.is_Alumni = is_Alumni        
