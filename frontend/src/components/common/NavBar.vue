@@ -89,7 +89,7 @@ export default {
         if (this.user_role === "Student") {
           links.push(
             { path: "/recommendations", label: "Recommendations" },
-            { path: "/viewCourses", label: "View Courses" },
+            { path: "/studentViewCourse", label: "View Courses" },
             { path: "/proposeCourse", label: "Propose Course" }
           );
         } else if (
@@ -102,7 +102,7 @@ export default {
           );
         } else if (this.user_role === "Admin") {
           links.push(
-            { path: "/allProposal", label: "All Proposal" },
+            { path: "/adminViewProposedCourse", label: "All Proposal" },
             { path: "/votingCampaign", label: "Voting Campaign" },
             { path: "/createCourse", label: "Create Course" }
           );
@@ -114,7 +114,7 @@ export default {
         links.push(
           { path: "/viewcourses", label: "View Courses" },
           { path: "/proposecourse", label: "Propose Course" },
-          { path: "/contactUs", label: "Contact Us" }
+          { path: "/ContactUs", label: "Contact Us" }
         );
       }
 
@@ -135,7 +135,10 @@ export default {
       } else if (this.user_role === "Admin") {
         items.push(
           { path: "/profile", label: "Profile" },
-          { path: "/academicManagement", label: "Academic Management" },
+          { path: "/adminViewRunCourse", label: "All Run Course DB" },
+          { path: "/adminViewVoteCourse", label: "All Vote Course DB" },
+          { path: "/allAvailRegCourse", label: "All Available Registration Course" },
+          { path: "/adminViewInstructorsTrainers", label: "All Instructors DB" },
           { path: "/feedbackTemplate", label: "Feedback Template" },
           { path: "/dashboard", label: "Dashboard" }
         );
