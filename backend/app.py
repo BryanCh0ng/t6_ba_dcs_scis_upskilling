@@ -5,8 +5,10 @@ from flask_cors import CORS
 from flask_restx import Api, Resource
 from allClasses import *
 from core_features.login import api as login
+from core_features.contactus import api as contactus
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
+
 
 app = Flask(__name__)
 api = Api(
@@ -17,6 +19,7 @@ api = Api(
     description="",
 )
 api.add_namespace(login)
+api.add_namespace(contactus)
 
 
 CORS(app, supports_credentials=True)
@@ -44,7 +47,7 @@ app.config['MAIL_PASSWORD'] = 'Nic!256980'
 mail = Mail(app)
 bcrypt = Bcrypt(app)
 
-# ==================== TEST FUNCTIONS ====================#
+# ==================== TEST FUNCTIONS ====================
 test_parser = api.parser()
 test_parser.add_argument("number1", help="First number to add")
 test_parser.add_argument("number2", help="Second number to add")
