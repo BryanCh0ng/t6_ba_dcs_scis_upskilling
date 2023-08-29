@@ -54,7 +54,7 @@ export default {
         if (this.status == 'Active') {
           // response = await regservice
           this.get_user_id();
-          const response = await RegistrationService.createNewRegistration(this.course.rcourse_ID, this.user_ID, "Enrolled");
+          const response = await RegistrationService.createNewRegistration(this.course.rcourse_ID, 1, "Pending");
           this.message = response.message;
         }
         this.$emit('action-and-message-updated', {message: this.message, course: this.course});

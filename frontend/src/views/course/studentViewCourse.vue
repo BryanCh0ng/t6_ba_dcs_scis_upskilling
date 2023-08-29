@@ -81,7 +81,7 @@
                   <course-name-desc :name="course.course_Name" :category="course.coursecat_Name" :description="course.course_Desc"></course-name-desc>
                 </td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                <td><course-action :status="course.vote_Status" :course="course"></course-action></td>
+                <td><course-action status="Vote" :course="course"></course-action></td>
               </tr>
             </tbody>
           </table>
@@ -214,7 +214,7 @@ export default {
     },
     async loadData() {
       try {
-        let run_response = await CourseService.searchUnregisteredActiveInfo(null, null, null)
+        let run_response = await CourseService.searchUnregisteredActiveInfo(1, null, null)
         this.run_courses = run_response.data
         
         let vote_response = await CourseService.searchUnvotedActiveInfo(null, null, null)
