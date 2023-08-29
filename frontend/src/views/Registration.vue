@@ -41,7 +41,6 @@ import InputField from "../components/InputField.vue";
 import { required, email } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 import { axiosClient } from "@/api/axiosClient";
-// import { axiosClient } from "../api/axiosClient";
 
 export default {
   name: "RegistrationForm",
@@ -75,17 +74,6 @@ export default {
     onSubmit() {
       // Trigger Vuelidate validation
       this.v$.$touch();
-
-      // Display the current form data for debugging
-      // console.log("Form Data:", {
-      //   role: this.role,
-      //   fullName: this.fullName,
-      //   email: this.email,
-      //   password: this.password,
-      //   confirmpassword: this.confirmpassword,
-      //   organizationName: this.organizationName,
-      //   alumni: this.alumni,
-      // });
 
       // Reset error message
       this.errorMessage = "";

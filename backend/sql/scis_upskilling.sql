@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `user`(
 	user_id int NOT NULL AUTO_INCREMENT,
 	user_name varchar(255) NOT NULL,
 	user_email varchar(125) NOT NULL,
-	user_password varchar(50) NOT NULL,
+	user_password varchar(100) NOT NULL,
 	role_name varchar(20) NOT NULL,
 	PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

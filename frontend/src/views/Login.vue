@@ -33,7 +33,7 @@
         
       </div>
     </div>
-    <success-modal :show="showSuccessModal" :message="successMessage" @close="hideSuccessModal"/>
+    <!-- <success-modal :show="showSuccessModal" :message="successMessage" @close="hideSuccessModal"/> -->
   </div>
 </template>
 
@@ -46,14 +46,15 @@ import PasswordField from "../components/PasswordField.vue";
 import { required, email } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 import { axiosClient } from "@/api/axiosClient";
-// import { axiosClient } from "../api/axiosClient";
+import { useRouter } from 'vue-router';
 
 export default {
   name: "LoginForm",
 
   setup() {
     const v$ = useVuelidate(); // Initialize Vuelidate
-    return { v$ };
+    const router = useRouter(); // Define the router variable here
+    return { v$, router };
   },
 
   data() {
@@ -108,6 +109,14 @@ export default {
         console.log(role.data)
 
         console.log(response);
+
+        // sessionStorage.setItem("role", role.data)
+
+
+        this.router.push('/ContactUs')
+
+
+
       } catch (error) {
         this.errorMessage = "Login failed. Please check your credentials.";
         console.log("Login error:", error.message);

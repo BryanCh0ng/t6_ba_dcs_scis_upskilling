@@ -3,6 +3,8 @@ from flask_restx import Namespace, Resource, fields
 from allClasses import *
 from flask_mail import Message
 import json
+import logging
+app.logger.setLevel(logging.DEBUG)
 
 api = Namespace('login', description='Login related operations')
 
@@ -42,6 +44,8 @@ class Login(Resource):
                 if bcrypt.check_password_hash(user.user_Password, password):
                     # store user details in session
                     session['user_ID'] = user.user_ID
+                    # app.logger.info("In flask:", session['user_ID'])
+                    
                     return json.loads(json.dumps({"message":"Login successful"})), 200
                 
                 else:
@@ -221,6 +225,25 @@ class ResetPassword(Resource):
         except Exception as e:
             return "Failed: " + str(e), 500
         
+# retrieve user_ID from session
+@api.route("/get_user_id")
+class GetRole(Resource):
+    def get(self):
+        user_ID = session.get('user_ID')
+        if user_ID:
+            return User.query.filter_by(user_ID=user_ID).first().user_ID
+        else:
+            return 'Session not set'
+
+@api.route("/get_user_name")
+class GetUserName(Resource):
+    def get(self):
+        user_ID = session.get('user_ID')
+        if user_ID:
+            return User.query.filter_by(user_ID=user_ID).first().user_Name
+        else:
+            return 'Session not set'
+
 @api.route("/get_role")
 class GetRole(Resource):
     def get(self):
@@ -230,4 +253,9 @@ class GetRole(Resource):
         
         else:
             return 'Session not set'
-        
+
+@api.route("/logout")
+class Logout(Resource):
+    def get(self):
+        session.pop('user_ID', None)  # Remove 'user_ID' from the session
+        return json.loads(json.dumps({"message": "Logged out successfully"})), 200

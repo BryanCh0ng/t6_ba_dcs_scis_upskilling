@@ -81,7 +81,7 @@
 import searchFilter from "../../components/searchFilter.vue"
 import courseAction from '../../components/course/courseAction.vue';
 import courseCategoryBadge from '../../components/course/courseCategoryBadge.vue';
-import sortIcon from '../../components/sort-icon.vue';
+import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 
 export default {
