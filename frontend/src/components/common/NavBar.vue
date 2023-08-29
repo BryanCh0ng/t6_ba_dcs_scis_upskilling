@@ -108,7 +108,7 @@ export default {
           );
         }
         // Add the common links for logged-in users
-        links.push({ path: "/contactUs", label: "Contact Us" });
+        links.push({ path: "/ContactUs", label: "Contact Us" });
       } else {
         // Add the default links for users who are not logged in
         links.push(
@@ -158,7 +158,7 @@ export default {
         
         const user_ID = await axiosClient.get("/login/get_user_id")
         this.user_ID = user_ID.data
-        console.log(this.user_ID)
+        // console.log(this.user_ID)
       } catch (error) {
         console.error('Error fetching user ID:', error);
         this.user_ID = null;
@@ -169,7 +169,7 @@ export default {
         
         const user_role = await axiosClient.get("/login/get_role")
         this.user_role = user_role.data
-        console.log(this.userRole)
+        // console.log(this.userRole)
       } catch (error) {
         console.error('Error fetching user ID:', error);
         this.user_role = null;
@@ -180,7 +180,7 @@ export default {
         
         const user_name = await axiosClient.get("/login/get_user_name")
         this.user_name = user_name.data
-        console.log(this.user_name)
+        // console.log(this.user_name)
       } catch (error) {
         console.error('Error fetching user ID:', error);
         this.user_name = null;

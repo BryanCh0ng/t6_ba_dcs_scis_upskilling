@@ -9,13 +9,13 @@
 
       <form @submit.prevent="submitForm">
         <div class="form-group mt-5 mb-4">
-          <input-field v-model="subject" type="text" placeholder="Subject" />
+          <input-field v-model="subject" type="text" :placeholder="subjectPlaceholder" />
         </div>
         <div class="form-group">
           <textarea
             v-model="message"
             class="form-control border-0 shadow-sm px-4 field"
-            placeholder="Message"
+            :placeholder="messagePlaceholder"
             style="height: 200px"
           ></textarea>
         </div>
@@ -49,6 +49,7 @@ import InputField from "../components/InputField.vue";
 import { required } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 import ContactUsService from "../api/services/contactService.js"
+import { axiosClient } from "@/api/axiosClient";
 
 export default {
   setup() {
@@ -58,10 +59,13 @@ export default {
 
   data() {
     return {
+      user_ID: null,
       subject: "",
       errorMessage: "", // Error message for subject field
       message: "",
       showSuccessModal: false,
+      subjectPlaceholder: "Subject",
+      messagePlaceholder: "Message"
     };
   },
 
@@ -75,7 +79,21 @@ export default {
     ErrorMessage,
     InputField,
   },
+  created() {
+    this.get_user_id();
+  },
   methods: {
+    async get_user_id() {
+      try {
+        
+        const user_ID = await axiosClient.get("/login/get_user_id")
+        this.user_ID = user_ID.data
+        // console.log(this.user_ID)
+      } catch (error) {
+        console.error('Error fetching user ID:', error);
+        this.user_ID = null;
+      }
+    },
     async submitForm() {
       // Trigger Vuelidate validation
       this.v$.$touch();
@@ -95,7 +113,7 @@ export default {
 
       const formData = {
         // will need get user_ID from session
-        user_ID: 1, 
+        user_ID: this.user_ID, 
         msg_Subject: this.subject,
         msg_Body: this.message,
         msg_Datetime: new Date().toISOString(), // Current datetime
@@ -104,8 +122,8 @@ export default {
       try {
         const response = await ContactUsService.createNewMsg(formData);
         console.log('API Response:', response);
-        this.showSuccessModal = true;
         this.resetForm();
+        this.showSuccessModal = true;
       } catch (error) {
         console.error('Error submitting form:', error);
       }
@@ -117,6 +135,8 @@ export default {
     resetForm() {
       this.subject = "";
       this.message = "";
+      this.subjectPlaceholder = "Subject";
+      this.messagePlaceholder = "Message";
     },
   },
 };
