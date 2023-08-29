@@ -370,8 +370,7 @@ class Registration(db.Model):
 
 
 
-    def __init__(self, reg_ID, rcourse_ID, user_ID, reg_Status):
-        self.reg_ID = reg_ID
+    def __init__(self, rcourse_ID, user_ID, reg_Status):
         self.rcourse_ID = rcourse_ID
         self.user_ID = user_ID
         self.reg_Status = reg_Status
