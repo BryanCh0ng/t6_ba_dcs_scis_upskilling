@@ -1312,3 +1312,25 @@ class ActivateCourse(Resource):
 
         except Exception as e:
             return jsonify({"code": 500, "message": "Failed. " + str(e)})
+
+sort_records = api.parser()
+sort_records.add_argument("sort_column", help="Enter sort column")
+sort_records.add_argument("sort_direction", help="Enter sort direction")
+sort_records.add_argument("records", help="Enter records")
+@api.route("/sort_records", methods=["POST"])
+@api.doc(description="Sort Records")
+class sortRecords(Resource):
+    @api.expect(sort_records)
+    def post(self):
+        args = sort_records.parse_args()
+        sort_column = args.get("sort_column", "")
+        sort_direction = args.get("sort_direction", "")
+        records = request.json.get("records", [])
+
+        if sort_column != "":
+            sorted_data = sorted(records, key=lambda x: x[sort_column], reverse=(sort_direction == "desc"))
+        else:
+            sorted_data = records
+
+
+        return jsonify({"code": 200, "data": sorted_data, "sort": sort_column, "direction": sort_direction})

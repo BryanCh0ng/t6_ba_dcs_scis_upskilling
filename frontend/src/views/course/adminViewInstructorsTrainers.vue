@@ -12,13 +12,12 @@
           <thead>
             <tr class="text-nowrap">
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Name <sort-icon :sortColumn="sortColumn === 'user_name'" :sortDirection="sortDirection"/></a></th>
+                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('user_Name')">Name <sort-icon :sortColumn="sortColumn === 'user_Name'" :sortDirection="getSortDirection('user_Name')"/></a></th>
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Role <sort-icon :sortColumn="sortColumn === 'user_role'" :sortDirection="sortDirection"/></a></th>
+                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('role_Name')">Role <sort-icon :sortColumn="sortColumn === 'role_Name'" :sortDirection="getSortDirection('role_Name')"/></a></th>
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Organization <sort-icon :sortColumn="sortColumn === 'organization'" :sortDirection="sortDirection"/></a></th>
-              <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Ratings <sort-icon :sortColumn="sortColumn === 'ratings'" :sortDirection="sortDirection"/></a></th>
+                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('organisation_Name')">Organization <sort-icon :sortColumn="sortColumn === 'organisation_Name'" :sortDirection="getSortDirection('organisation_Name')"/></a></th>
+              <th>Ratings</th>
               <th scope="col">Feedback Analysis</th>
             </tr>
           </thead>
@@ -64,7 +63,7 @@ export default {
   data() {
     return {
       instructors_trainers: [],
-      sortColumn: 'name',
+      sortColumn: '',
       sortDirection: 'asc',
       itemsPerPage: 10,
       localCurrentPageInstructorsTrainers: 1,
@@ -93,6 +92,26 @@ export default {
         console.error("Error fetching info:", error);
         throw error;
       }
+    },
+    sort(column) {
+      if (this.sortColumn === column) {
+        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.sortColumn = column;
+        this.sortDirection = 'asc';
+      }
+      this.sortCourse()
+    },
+    getSortDirection(column) {
+      if (this.sortColumn === column) {
+        return this.sortDirection;
+      }
+    },
+    async sortCourse() {
+      let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.instructors_trainers)
+        if (sort_response.code == 200) {
+          this.instructors_trainers = sort_response.data
+        }
     }
   },
   computed: {

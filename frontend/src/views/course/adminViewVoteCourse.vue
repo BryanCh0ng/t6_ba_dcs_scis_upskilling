@@ -12,11 +12,11 @@
           <thead>
             <tr class="text-nowrap">
             <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'name'" :sortDirection="sortDirection"/></a></th>
+                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
             <th scope="col">
-                <a href="" class="text-decoration-none text-dark"># of Current Interest <sort-icon :sortColumn="sortColumn === 'reg_count'" :sortDirection="sortDirection"/></a></th>
+                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('vote_count')"># of Current Interest <sort-icon :sortColumn="sortColumn === 'vote_count'" :sortDirection="getSortDirection('vote_count')"/></a></th>
             <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'status'" :sortDirection="sortDirection"/></a></th>
+                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('vote_Status')">Status <sort-icon :sortColumn="sortColumn === 'vote_Status'" :sortDirection="getSortDirection('vote_Status')"/></a></th>
             <th scope="col">Course Details</th>
             <th scope="col">Action(s)</th>
             </tr>
@@ -33,7 +33,7 @@
             <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(vote_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
             <td v-if="vote_course.vote_Status === 'Ongoing'"><course-action status="Close" :course="vote_course"></course-action></td>
             <td v-else-if="vote_course.vote_Status === 'Closed'"><course-action status="Open for Registration" :course="vote_course"></course-action></td>
-            <td v-else><course-action status="Open for Voting" :course="vote_course"></course-action></td>
+            <td v-else></td>
           </tr>
           </tbody>
         </table>
@@ -70,7 +70,7 @@ export default {
   data() {
     return {
       vote_courses: [],
-      sortColumn: 'name',
+      sortColumn: '',
       sortDirection: 'asc',
       selectedCourse: null,
       itemsPerPage: 10,
@@ -110,6 +110,26 @@ export default {
         console.error("Error fetching info:", error);
         throw error;
       }
+    },
+    sort(column) {
+      if (this.sortColumn === column) {
+        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.sortColumn = column;
+        this.sortDirection = 'asc';
+      }
+      this.sortCourse()
+    },
+    getSortDirection(column) {
+      if (this.sortColumn === column) {
+        return this.sortDirection;
+      }
+    },
+    async sortCourse() {
+      let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.vote_courses)
+        if (sort_response.code == 200) {
+          this.vote_courses = sort_response.data
+        }
     }
   },
   computed: {

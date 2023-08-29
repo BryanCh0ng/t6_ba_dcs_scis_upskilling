@@ -11,15 +11,15 @@
           <thead>
             <tr class="text-nowrap">
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'name'" :sortDirection="sortDirection"/></a></th>
+                <a href="" @click.prevent="sort('course_Name')" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Registration Count <sort-icon :sortColumn="sortColumn === 'reg_count'" :sortDirection="sortDirection"/></a></th>
+                <a href="" @click.prevent="sort('registration_count')" class="text-decoration-none text-dark">Registration Count <sort-icon :sortColumn="sortColumn === 'registration_count'" :sortDirection="getSortDirection('registration_count')"/></a></th>
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Closing Date <sort-icon :sortColumn="sortColumn === 'closing_date'" :sortDirection="sortDirection"/></a></th>
+                <a href="" @click.prevent="sort('reg_Enddate')" class="text-decoration-none text-dark">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Run Status <sort-icon :sortColumn="sortColumn === 'run_status'" :sortDirection="sortDirection"/></a></th>
+                <a href="" @click.prevent="sort('runcourse_Status')" class="text-decoration-none text-dark">Run Status <sort-icon :sortColumn="sortColumn === 'runcourse_Status'" :sortDirection="getSortDirection('runcourse_Status')"/></a></th>
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'status'" :sortDirection="sortDirection"/></a></th>
+                <a href="" @click.prevent="sort('course_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'course_Status'" :sortDirection="getSortDirection('course_Status')"/></a></th>
               <th scope="col">Feedback Analysis</th>
               <th scope="col">Course Details</th>
               <th scope="col">Action(s)</th>
@@ -52,17 +52,21 @@
           <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" /></div>
         </div>
 
-        <div class="modal fade" id="after_action_modal" tabindex="-1" aria-hidden="true" ref="afterActionModal">
-          <div class="modal-dialog modal-lg"> <modal-after-action :course="actionCourse" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" /></div>
-        </div>
-
       </div>
       <div v-else-if="courses=[]">
         <p>No records found</p>
       </div>
     </div>
     <vue-awesome-paginate v-if="courses.length/itemsPerPage > 0" v-model="localCurrentPageCourses" :totalItems="courses.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeCourses" class="justify-content-center pagination-container"/>
+    
+    <div class="modal fade" id="after_action_modal" tabindex="-1" aria-hidden="true" ref="afterActionModal">
+      <div class="modal-dialog modal-lg"> 
+        <modal-after-action :course="actionCourse" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
+      </div>
+    </div>
+
   </div>
+
 </template>
   
 <script>
@@ -74,7 +78,6 @@ import courseDateTime from '@/components/course/courseDateTime.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
-import {convertDate, convertTime} from '@/scripts/common/convertDateTime.js'
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
 
 export default {
@@ -91,7 +94,7 @@ export default {
   data() {
     return {
       courses: [],
-      sortColumn: 'name',
+      sortColumn: '',
       sortDirection: 'asc',
       selectedCourse: null,
       itemsPerPage: 10,
@@ -100,6 +103,13 @@ export default {
       receivedMessage: '',
       actionCourse: {}
     }
+  },
+  computed: {
+    displayedCourses() {
+      const startIndex = (this.localCurrentPageCourses - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      return this.courses.slice(startIndex, endIndex);
+    },
   },
   methods: {
     openModal(course) {
@@ -119,14 +129,9 @@ export default {
       this.courses = searchResults;
       
     },
-    async searchAllCoursesAdmin(user_ID, course_Name, coursecat_ID, status) {
+    async searchAllCoursesAdmin(courseName, coursecat_ID, status) {
       try {
-        let response = await CourseService.searchAllCoursesAdmin(
-          user_ID,
-          course_Name,
-          coursecat_ID,
-          status
-        );
+        let response = await CourseService.searchAllCoursesAdmin(courseName, coursecat_ID, status);
         this.courses = response.data;
         
         return this.courses;
@@ -145,41 +150,49 @@ export default {
       try {
         let response = await CourseService.searchAllCoursesAdmin(null, null, null)
         this.courses = response.data
-        this.courses.map(course => {
-          course.reg_Enddate = convertDate(course.reg_Enddate)
-          course.reg_Startdate = convertDate(course.reg_Startdate)
-          course.run_Enddate = convertDate(course.run_Enddate)
-          course.run_Startdate = convertDate(course.run_Startdate)
-          course.reg_Endtime = convertTime(course.reg_Endtime)
-          course.reg_Starttime = convertTime(course.reg_Starttime)
-          course.run_Endtime = convertTime(course.run_Endtime)
-          course.run_Starttime = convertTime(course.run_Starttime)
-        }); 
       } catch (error) {
         console.error("Error fetching course details:", error);
       }
     },
     modalAfterActionClose() {
       this.loadData();
-    }
-  },
-  computed: {
-    displayedCourses() {
-      const startIndex = (this.localCurrentPageCourses - 1) * this.itemsPerPage;
-      const endIndex = startIndex + this.itemsPerPage;
-      return this.courses.slice(startIndex, endIndex);
+    },
+    sort(column) {
+      if (this.sortColumn === column) {
+        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.sortColumn = column;
+        this.sortDirection = 'asc';
+      }
+      this.sortCourse()
+    },
+    getSortDirection(column) {
+      if (this.sortColumn === column) {
+        return this.sortDirection;
+      }
+    },
+    async sortCourse() {
+      let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.courses)
+        if (sort_response.code == 200) {
+          this.courses = sort_response.data
+        }
     },
   },
   created() {
    this.loadData();
   },
   mounted() {
-    // Create a button element
     const buttonElement = document.createElement('button');
     buttonElement.className = 'btn btn-primary d-none invisible-btn';
     buttonElement.setAttribute('data-bs-toggle', 'modal');
     buttonElement.setAttribute('data-bs-target', '#after_action_modal');
     this.$el.appendChild(buttonElement);
+    const modalElement = this.$refs.afterActionModal;
+    modalElement.addEventListener('hidden.bs.modal', this.modalAfterActionClose);
+  },
+  beforeUnmount() {
+    const modalElement = this.$refs.afterActionModal;
+    modalElement.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
   },
   }
 </script>
