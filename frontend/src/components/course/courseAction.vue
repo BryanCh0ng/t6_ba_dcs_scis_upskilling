@@ -17,7 +17,8 @@
 </template>
 
 <script>
-// import CourseService from "@/api/services/CourseService.js"
+import RegistrationService from "@/api/services/RegistrationService.js"
+import { axiosClient } from "@/api/axiosClient";
 
 export default {
   props: {
@@ -27,20 +28,34 @@ export default {
   data() {
     return {
       message: '',
-      showModal: false
+      showModal: false,
+      user_ID: ''
     };
   },
   methods: {
     closeModal() {
       this.showModal = false;
     },
+
+    async get_user_id() {
+      try {
+        const user_ID = await axiosClient.get("/login/get_user_id")
+        this.user_ID = user_ID.data
+
+      } catch (error) {
+        this.message = error.message
+        this.user_ID = null;
+      }
+    },
+
     async runCourseAction() {
       try {
         // let response;
         if (this.status == 'Active') {
           // response = await regservice
-          // this.message = response.message
-          this.message = 'Successfully Registered Course'
+          this.get_user_id();
+          const response = await RegistrationService.createNewRegistration(this.course.rcourse_ID, this.user_ID, "Enrolled");
+          this.message = response.message;
         }
         this.$emit('action-and-message-updated', {message: this.message, course: this.course});
       } catch (error) {
