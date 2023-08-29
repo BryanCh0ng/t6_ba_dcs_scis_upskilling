@@ -11,8 +11,10 @@ from core_features.proposedcourse import api as proposedcourse
 from core_features.runcourse import api as runcourse
 from core_features.login import api as login
 from core_features.contactus import api as contactus
+from core_features.registration import api as registration
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
+
 
 
 app = Flask(__name__)
@@ -29,7 +31,7 @@ api.add_namespace(proposedcourse)
 api.add_namespace(runcourse)
 api.add_namespace(login)
 api.add_namespace(contactus)
-
+api.add_namespace(registration)
 
 CORS(app, supports_credentials=True)
 # ==================== CONNECTING TO DATABASE ====================#

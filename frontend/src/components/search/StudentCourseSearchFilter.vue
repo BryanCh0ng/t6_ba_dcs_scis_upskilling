@@ -3,28 +3,19 @@
         <div class="container mt-5 mb-5">
             <form>
                 <div class="row">
-                    <div class="col-md">
+                    <div class="col-sm">
                         <input-field v-model="courseName" type="text" placeholder="Course Name"/>
                     </div>
-                    <div class="col-md">
+                    <div class="col-sm">
                         <dropdown-field
                         v-model="category"
                         :default-placeholder="'Course Category'">
                         <option v-for="option in categoryDropdownOptions" :key="option.coursecat_ID" :value="option.coursecat_ID">{{ option.coursecat_Name }}</option>
                         </dropdown-field>
                     </div>
-                    <div class="col-md">
-                        <dropdown-field
-                        v-model="coursetype"
-                        :default-placeholder="'Course Type'">
-                        <option value="allcourse">All Course</option>
-                        <option value="interest">Hop on</option>
-                        <option value="register">Shout out</option>
-                        </dropdown-field>
-                    </div>
-                    <div class="col-md">
+                    <div class="col-sm">
                         <div class="d-flex justify-content-between">
-                            <button @click="resetFilter" class="btn" id="resetbtn">Clear</button>
+                            <button @click="resetFilter" class="btn" id="resetbtn">Clear All</button>
                             <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
                         </div>
                     </div>
@@ -46,7 +37,6 @@ export default({
         return {
             courseName: "",
             category: "",
-            coursetype: "",
             categoryDropdownOptions: [],
         };
     },
@@ -56,6 +46,9 @@ export default({
     },
     async mounted() {
         await this.fetchCategoryDropdownOptions(); // Fetch category options using the new service
+    },
+    props: {
+        searchApi: Function,
     },
     methods: {
         async fetchCategoryDropdownOptions() {
@@ -67,18 +60,27 @@ export default({
             }
         },
         
-        resetFilter() {
+        async resetFilter() {
             this.courseName = "";
             this.category = "";
-            this.coursetype = "";
         },
-        searchFilter() {
-            const filters = {
-                courseName: this.courseName,
-                category: this.category,
-                coursetype: this.coursetype,
-            };
-            this.$emit('apply-filters', filters);
+        async searchFilter() {
+            try {
+                // Assign values to variables
+                const user_ID = 1;
+                // const user_ID = this.getUserIDFromSession()
+                const course_Name = this.courseName;
+                const coursecat_ID = this.category;
+
+                let searchResults;
+
+                searchResults = await this.searchApi(user_ID, course_Name, coursecat_ID);
+
+                this.$emit("search-complete", searchResults);
+
+            } catch (error) {
+                console.error("Error fetching instructors info:", error);
+            }
         }
     },
 })
@@ -98,7 +100,7 @@ export default({
 
     #resetbtn {
         background-color: transparent;
-        border: 4px solid #616161;
+        border: 3px solid #616161;
         color:black;
     }
 
