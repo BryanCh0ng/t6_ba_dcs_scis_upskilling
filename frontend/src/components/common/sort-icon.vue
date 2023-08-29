@@ -8,11 +8,11 @@
 </template>
   
 <script>
-  export default {
-    props: {
-      sortColumn: Boolean,
-      sortDirection: String
-    },
-  };
+export default {
+  props: {
+    sortColumn: Boolean,
+    sortDirection: String
+  },
+};
 </script>
   

@@ -21,13 +21,13 @@
             <thead>
               <tr class="text-nowrap">
                 <th scope="col">
-                  <a href="" class="text-decoration-none text-dark">Course Name / Description <sort-icon ::sortColumn="sortColumn === 'name'" :sortDirection="sortDirection"/></a></th>
+                  <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'run')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                 <th scope="col">
-                  <a href="" class="text-decoration-none text-dark">Course Start Date <sort-icon :sortColumn="sortColumn === 'start_date'" :sortDirection="sortDirection"/></a></th>
+                  <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'run')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
                 <th scope="col">
-                  <a href="" class="text-decoration-none text-dark">Course End Date <sort-icon :sortColumn="sortColumn === 'end_date'" :sortDirection="sortDirection"/></a></th>
+                  <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'run')">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
                 <th scope="col">
-                  <a href="" class="text-decoration-none text-dark">Closing Date <sort-icon :sortColumn="sortColumn === 'closing_date'" :sortDirection="sortDirection"/></a></th>
+                  <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'run')">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
                 <th scope="col">Course Details</th>
                 <th scope="col">Action(s)</th>
               </tr>
@@ -70,7 +70,7 @@
             <thead>
               <tr class="text-nowrap">
                 <th scope="col">
-                  <a href="" class="text-decoration-none text-dark">Course Name / Description <sort-icon ::sortColumn="sortColumn === 'name'" :sortDirection="sortDirection"/></a></th>
+                  <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'vote')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                 <th scope="col">Course Details</th>
                 <th scope="col">Action(s)</th>
               </tr>
@@ -115,7 +115,6 @@ import courseNameDesc from '@/components/course/courseNameDesc.vue';
 import courseDateTime from '@/components/course/courseDateTime.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/StudentCourseSearchFilter.vue";
-import {convertDate, convertTime} from '@/scripts/common/convertDateTime.js'
 import CourseService from "@/api/services/CourseService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
 
@@ -134,7 +133,7 @@ export default {
     return {
       run_courses: [],
       vote_courses: [],
-      sortColumn: 'name',
+      sortColumn: '',
       sortDirection: 'asc',
       selectedCourse: null,
       itemsPerPage: 10,
@@ -217,16 +216,7 @@ export default {
       try {
         let run_response = await CourseService.searchUnregisteredActiveInfo(null, null, null)
         this.run_courses = run_response.data
-        this.run_courses.map(course => {
-          course.reg_Enddate = convertDate(course.reg_Enddate)
-          course.reg_Startdate = convertDate(course.reg_Startdate)
-          course.run_Enddate = convertDate(course.run_Enddate)
-          course.run_Startdate = convertDate(course.run_Startdate)
-          course.reg_Endtime = convertTime(course.reg_Endtime)
-          course.reg_Starttime = convertTime(course.reg_Starttime)
-          course.run_Endtime = convertTime(course.run_Endtime)
-          course.run_Starttime = convertTime(course.run_Starttime)
-        }); 
+        
         let vote_response = await CourseService.searchUnvotedActiveInfo(null, null, null)
         this.vote_courses = vote_response.data
       } catch (error) {
@@ -235,6 +225,34 @@ export default {
     },
     modalAfterActionClose() {
       this.loadData();
+    },
+    sort(column, action) {
+      if (this.sortColumn === column) {
+        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.sortColumn = column;
+        this.sortDirection = 'asc';
+      }
+      this.sortCourse(action)
+    },
+    getSortDirection(column) {
+      if (this.sortColumn === column) {
+        return this.sortDirection;
+      }
+    },
+  async sortCourse(action) {
+      if (action == 'run') {
+        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.run_courses)
+         if (sort_response.code == 200) {
+          this.run_courses = sort_response.data
+         }
+      }
+      if (action == 'vote') {
+        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.vote_courses)
+         if (sort_response.code == 200) {
+          this.vote_courses = sort_response.data
+         }
+      }
     }
   },
   created() {
@@ -246,6 +264,12 @@ export default {
     buttonElement.setAttribute('data-bs-toggle', 'modal');
     buttonElement.setAttribute('data-bs-target', '#after_action_modal');
     this.$el.appendChild(buttonElement);
+    const modalElement = this.$refs.afterActionModal;
+    modalElement.addEventListener('hidden.bs.modal', this.modalAfterActionClose);
+  },
+  beforeUnmount() {
+    const modalElement = this.$refs.afterActionModal;
+    modalElement.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
   }
 };
 </script>
