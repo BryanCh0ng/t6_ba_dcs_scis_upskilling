@@ -160,8 +160,13 @@ export default {
       try {
         
         const user_ID = await axiosClient.get("/login/get_user_id")
-        this.user_ID = user_ID.data
-        // console.log(this.user_ID)
+
+        if (user_ID.data === "Session not set") {
+          this.user_ID = null
+        } else {
+          this.user_ID = user_ID.data
+        }
+
       } catch (error) {
         console.error('Error fetching user ID:', error);
         this.user_ID = null;
@@ -172,10 +177,8 @@ export default {
         
         const user_role = await axiosClient.get("/login/get_role")
         this.user_role = user_role.data
-        // console.log(this.userRole)
       } catch (error) {
         console.error('Error fetching user ID:', error);
-        this.user_role = null;
       }
     },
     async get_user_name() {
@@ -186,7 +189,6 @@ export default {
         // console.log(this.user_name)
       } catch (error) {
         console.error('Error fetching user ID:', error);
-        this.user_name = null;
       }
     },
     isActiveLink(linkPath) {
