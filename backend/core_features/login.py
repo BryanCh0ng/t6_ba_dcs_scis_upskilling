@@ -257,5 +257,15 @@ class GetRole(Resource):
 @api.route("/logout")
 class Logout(Resource):
     def get(self):
-        session.pop('user_ID', None)  # Remove 'user_ID' from the session
-        return json.loads(json.dumps({"message": "Logged out successfully"})), 200
+        user_ID = session.get('user_ID')
+        if user_ID:
+        
+            session.pop('user_ID', None)  # Remove 'user_ID' from the session
+            #return redirect(url_for('logout_page'))
+            session.clear()
+
+            return json.loads(json.dumps({"message": "Logged out successfully"})), 200
+        else:  
+            
+            return json.loads(json.dumps({"message": "Logged out not successful"})), 400
+        

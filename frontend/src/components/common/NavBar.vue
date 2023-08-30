@@ -198,11 +198,19 @@ export default {
       this.router.push('/login')
     },
     // need to add in redirect link
-    logout() {
+    async logout() {
+      try {
+      const response = await axiosClient.get('/login/logout');
+      console.log(response)
       this.user_role = "";
       this.user_ID = null;
       this.user_name = "";
-      this.router.push('/login')
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+
+    // After successfully logging out, navigate to the login page
+    this.router.push('/login');
     },
     toggleUserDropdown() {
       console.log("Toggling user dropdown");
