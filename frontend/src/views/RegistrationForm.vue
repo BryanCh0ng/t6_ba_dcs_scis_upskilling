@@ -62,7 +62,7 @@ import InputField from "../components/InputField.vue";
 import PasswordField from "../components/PasswordField.vue";
 import { required, email, minLength } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
-import { axiosClient } from "../api/axiosClient";
+import UserService from "@/api/services/UserService.js";
 
 export default {
   name: "RegistrationForm",
@@ -164,15 +164,25 @@ export default {
     },
     async performRegister() {
       try {
-        const response = await axiosClient.post("/login/register", {
-          role: this.role,
-          fullName: this.fullName,
-          email: this.email,
-          password: this.password,
-          confirmpassword: this.confirmpassword,
-          organizationName: this.organizationName,
-          alumni: this.alumni,
-        });
+        const userData = {
+            role: this.role,
+            fullName: this.fullName,
+            email: this.email,
+            password: this.password,
+            confirmpassword: this.confirmpassword,
+            organizationName: this.organizationName,
+            alumni: this.alumni,
+        }
+        const response = await UserService.register(userData)
+        // const response = await axiosClient.post("/user/register", {
+        //   role: this.role,
+        //   fullName: this.fullName,
+        //   email: this.email,
+        //   password: this.password,
+        //   confirmpassword: this.confirmpassword,
+        //   organizationName: this.organizationName,
+        //   alumni: this.alumni,
+        // });
 
         this.showSuccessModal = true;
         console.log(response.data);

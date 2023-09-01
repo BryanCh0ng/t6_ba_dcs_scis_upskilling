@@ -9,12 +9,11 @@ from core_features.course import api as course
 from core_features.coursecat import api as coursecat
 from core_features.proposedcourse import api as proposedcourse
 from core_features.runcourse import api as runcourse
-from core_features.login import api as login
+from core_features.user import api as user
 from core_features.contactus import api as contactus
 from core_features.registration import api as registration
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
-
 
 
 app = Flask(__name__)
@@ -29,7 +28,7 @@ api.add_namespace(course)
 api.add_namespace(coursecat)
 api.add_namespace(proposedcourse)
 api.add_namespace(runcourse)
-api.add_namespace(login)
+api.add_namespace(user)
 api.add_namespace(contactus)
 api.add_namespace(registration)
 
@@ -81,6 +80,7 @@ class Test(Resource):
                     "code": 404,
                     "message": "Error bro"
                 }), 404
+
 # ====================  FUNCTIONS ====================#        
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

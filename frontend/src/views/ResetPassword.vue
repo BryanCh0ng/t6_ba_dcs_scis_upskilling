@@ -39,7 +39,8 @@ import ErrorMessage from "../components/ErrorMessage.vue";
 import SuccessModal from "../components/SuccessModal.vue";
 import { required, minLength } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
-import { axiosClient } from "../api/axiosClient";
+import UserService from "@/api/services/UserService.js";
+
 
 export default {
   name: "ResetPassword",
@@ -124,11 +125,9 @@ export default {
       try {
         // Will need to update the flask api endpoint
         // Send login request
-        const response = await axiosClient.post("/login/reset_password", {
-          password: this.password,
-          confirmpassword: this.confirmpassword,
-          email: this.email
-        });
+        console.log(this.email)
+        const response = await UserService.resetPassword(this.password, this.confirmpassword, this.email)
+       
 
         this.showSuccessModal = true;
         console.log(response.data);

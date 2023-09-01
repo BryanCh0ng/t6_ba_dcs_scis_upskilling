@@ -45,8 +45,8 @@ import InputField from "../components/InputField.vue";
 import PasswordField from "../components/PasswordField.vue";
 import { required, email } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
-import { axiosClient } from "@/api/axiosClient";
 import { useRouter } from 'vue-router';
+import UserService from "@/api/services/UserService.js";
 
 export default {
   name: "LoginForm",
@@ -100,22 +100,18 @@ export default {
 
     async performLogin() {
       try {
-        const response = await axiosClient.post("/login/login", {
-          email: this.email,
-          password: this.password
-        })
+        const response = await UserService.login(this.email,this.password)
         
-        const role = await axiosClient.get("/login/get_role")
-        console.log(role.data)
+        // const user_id = await UserService.getUserID()
+        // console.log(user_id)
+        // const role = await UserService.getUserRole()
+        // console.log(role)
 
         console.log(response);
 
         // sessionStorage.setItem("role", role.data)
 
-
         this.router.push('/ContactUs')
-
-
 
       } catch (error) {
         this.errorMessage = "Login failed. Please check your credentials.";

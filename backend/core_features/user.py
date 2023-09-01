@@ -6,7 +6,7 @@ import json
 import logging
 app.logger.setLevel(logging.DEBUG)
 
-api = Namespace('login', description='Login related operations')
+api = Namespace('user', description='Login related operations')
 
 import os
 import sys
