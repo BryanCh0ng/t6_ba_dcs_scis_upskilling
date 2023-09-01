@@ -40,7 +40,7 @@ import ErrorMessage from "../components/ErrorMessage.vue";
 import InputField from "../components/InputField.vue";
 import { required, email } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
-import { axiosClient } from "@/api/axiosClient";
+import UserService from "@/api/services/UserService.js";
 
 export default {
   name: "RegistrationForm",
@@ -88,9 +88,7 @@ export default {
     },
     async sendRegLink() {
       try {
-        const response = await axiosClient.post("/login/verify_email", {
-          email: this.email
-        })
+        const response = await UserService.verifyEmail(this.email)
 
         this.showSuccessModal = true;
         console.log(response.data);

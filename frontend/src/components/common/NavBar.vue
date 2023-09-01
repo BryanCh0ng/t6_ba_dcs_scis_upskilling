@@ -65,8 +65,8 @@
 </template>
 
 <script>
-import { axiosClient } from "@/api/axiosClient";
 import { useRouter } from 'vue-router';
+import UserService from "@/api/services/UserService.js";
 
 export default {
   setup() {
@@ -158,13 +158,14 @@ export default {
   methods: {
     async get_user_id() {
       try {
-        
-        const user_ID = await axiosClient.get("/login/get_user_id")
+        const user_ID = await UserService.getUserID()
+        this.user_ID = user_ID
+        console.log(this.user_ID)
 
         if (user_ID.data === "Session not set") {
           this.user_ID = null
         } else {
-          this.user_ID = user_ID.data
+          this.user_ID = user_ID
         }
 
       } catch (error) {
@@ -174,21 +175,21 @@ export default {
     },
     async get_user_role() {
       try {
-        
-        const user_role = await axiosClient.get("/login/get_role")
-        this.user_role = user_role.data
+        const user_role = await UserService.getUserRole()
+        this.user_role = user_role
       } catch (error) {
         console.error('Error fetching user ID:', error);
+        this.user_role = null;
       }
     },
     async get_user_name() {
       try {
-        
-        const user_name = await axiosClient.get("/login/get_user_name")
-        this.user_name = user_name.data
-        // console.log(this.user_name)
+        const user_name = await UserService.getUserName()
+        this.user_name = user_name
+        console.log(this.user_name)
       } catch (error) {
         console.error('Error fetching user ID:', error);
+        this.user_name = null;
       }
     },
     isActiveLink(linkPath) {
@@ -200,12 +201,14 @@ export default {
     // need to add in redirect link
     async logout() {
       try {
-      const response = await axiosClient.get('/login/logout');
-      console.log(response)
-      this.user_role = "";
-      this.user_ID = null;
-      this.user_name = "";
-    } catch (error) {
+      
+        const response = await UserService.logout()
+        console.log(response)
+        this.user_role = "";
+        this.user_ID = null;
+        this.user_name = "";
+        this.router.push('/login')
+      }catch (error) {
       console.error('Error logging out:', error);
     }
 

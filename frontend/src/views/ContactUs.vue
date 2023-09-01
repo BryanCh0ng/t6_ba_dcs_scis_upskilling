@@ -49,7 +49,7 @@ import InputField from "../components/InputField.vue";
 import { required } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 import ContactUsService from "../api/services/contactService.js"
-import { axiosClient } from "@/api/axiosClient";
+import UserService from "@/api/services/UserService.js";
 
 export default {
   setup() {
@@ -85,9 +85,8 @@ export default {
   methods: {
     async get_user_id() {
       try {
-        
-        const user_ID = await axiosClient.get("/login/get_user_id")
-        this.user_ID = user_ID.data
+        const user_ID = await UserService.getUserID()
+        this.user_ID = user_ID
         // console.log(this.user_ID)
       } catch (error) {
         console.error('Error fetching user ID:', error);
