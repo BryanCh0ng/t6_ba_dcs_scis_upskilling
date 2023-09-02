@@ -259,7 +259,6 @@ class Logout(Resource):
     def get(self):
         user_ID = session.get('user_ID')
         if user_ID:
-        
             session.pop('user_ID', None)  # Remove 'user_ID' from the session
             #return redirect(url_for('logout_page'))
             session.clear()

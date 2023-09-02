@@ -162,7 +162,7 @@ export default {
         this.user_ID = user_ID
         console.log(this.user_ID)
 
-        if (user_ID.data === "Session not set") {
+        if (user_ID === "Session not set") {
           this.user_ID = null
         } else {
           this.user_ID = user_ID
@@ -201,15 +201,14 @@ export default {
     // need to add in redirect link
     async logout() {
       try {
-      
         const response = await UserService.logout()
         console.log(response)
         this.user_role = "";
         this.user_ID = null;
         this.user_name = "";
         this.router.push('/login')
-      }catch (error) {
-      console.error('Error logging out:', error);
+      } catch (error) {
+        console.error('Error logging out:', error);
     }
 
     // After successfully logging out, navigate to the login page
