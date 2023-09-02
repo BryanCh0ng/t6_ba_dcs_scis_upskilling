@@ -548,22 +548,27 @@ class GetCompletedCourses(Resource):
         course_name = args.get("course_name", "")
         course_category_id = args.get("coursecat_id", "")
         
+        current_datetime = datetime.now()
+
         UserInstructor = aliased(User)
         UserStudent = aliased(User)
 
         query = db.session.query(
             Course,
             RunCourse,
+            CourseCategory.coursecat_Name,
             UserInstructor.user_Name.label("instructor_name"),
             UserInstructor.user_Email.label("instructor_email"),
         ).select_from(RunCourse).join(Course, RunCourse.course_ID == Course.course_ID) \
             .join(Registration, RunCourse.rcourse_ID == Registration.rcourse_ID) \
             .join(UserInstructor, RunCourse.instructor_ID == UserInstructor.user_ID) \
             .join(UserStudent, Registration.user_ID == UserStudent.user_ID) \
+            .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
             .filter(UserStudent.user_ID == user_id) \
-            .filter(Registration.reg_Status == 'Enrolled') \
-            .filter(RunCourse.runcourse_Status == 'Closed') \
-            .filter(RunCourse.course_Status == 'Inactive')
+            .filter(RunCourse.run_Enddate <= current_datetime)
+            # .filter(Registration.reg_Status == 'Enrolled') \
+            # .filter(RunCourse.runcourse_Status == 'Closed') \
+            # .filter(RunCourse.course_Status == 'Inactive')
 
         if course_name:
             query = query.filter(Course.course_Name.contains(course_name))
@@ -592,8 +597,9 @@ class GetCompletedCourses(Resource):
                 course_info = {
                     **result[0].json(),
                     **modified_run_course,
-                    "instructor_Name": result[2],
-                    "instructor_Email": result[3]
+                    "coursecat_Name": result[2],
+                    "instructor_Name": result[3],
+                    "instructor_Email": result[4]
                 }
                 result_data.append(course_info)
 

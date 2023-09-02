@@ -9,22 +9,6 @@ const routes = [
             title: 'Home',
         },
     },
-    {
-      path: '/blacklistfilter',
-      name: 'blacklist',
-      component: () => import('../components/search/BlacklistAttendanceSearchFilter.vue'),
-      meta: {
-          title: 'Blacklist Attendencec Search Filter',
-      },
-  },
-  {
-    path: '/commonsearchfilter',
-    name: 'commonsearchfilter',
-    component: () => import('../components/search/CommonSearchFilter.vue'),
-    meta: {
-        title: 'common search filter',
-    },
-  },
   {
       path: '/contactUs',
       name: 'ContactUs',
@@ -128,6 +112,14 @@ const routes = [
     component: () => import('../views/course/studentViewRecommendations.vue'),
     meta: {
         title: 'Student View Recommendations',
+    },
+  },
+  {
+    path: '/studentViewProfile',
+    name: 'studentViewProfile',
+    component: () => import('../views/course/studentViewProfile.vue'),
+    meta: {
+        title: 'Student View Profile',
     },
   }
   // },
