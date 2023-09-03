@@ -237,7 +237,7 @@ class GetUnregisteredActiveCourses(Resource):
         args = retrieve_unregistered_active_courses_filter.parse_args()
         user_ID = args.get("user_id")
 
-        app.logger.debug(user_ID)
+        # app.logger.debug(user_ID)
 
         # Get the courses that the user has already registered for
         registered_course_ids = db.session.query(Registration.rcourse_ID).filter_by(user_ID=user_ID).subquery()
@@ -308,8 +308,7 @@ class GetUnvotedOngoingCourses(Resource):
         course_Name = args.get("course_name", "")
         coursecat_ID = args.get("coursecat_id", "")
 
-
-        app.logger.debug(user_ID)
+        # app.logger.debug(user_ID)
 
         # Get the courses that the user has already voted for
         voted_course_ids = db.session.query(Interest.vote_ID).filter_by(user_ID=user_ID).subquery()
@@ -548,22 +547,27 @@ class GetCompletedCourses(Resource):
         course_name = args.get("course_name", "")
         course_category_id = args.get("coursecat_id", "")
         
+        current_datetime = datetime.now()
+
         UserInstructor = aliased(User)
         UserStudent = aliased(User)
 
         query = db.session.query(
             Course,
             RunCourse,
+            CourseCategory.coursecat_Name,
             UserInstructor.user_Name.label("instructor_name"),
             UserInstructor.user_Email.label("instructor_email"),
         ).select_from(RunCourse).join(Course, RunCourse.course_ID == Course.course_ID) \
             .join(Registration, RunCourse.rcourse_ID == Registration.rcourse_ID) \
             .join(UserInstructor, RunCourse.instructor_ID == UserInstructor.user_ID) \
             .join(UserStudent, Registration.user_ID == UserStudent.user_ID) \
+            .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
             .filter(UserStudent.user_ID == user_id) \
-            .filter(Registration.reg_Status == 'Enrolled') \
-            .filter(RunCourse.runcourse_Status == 'Closed') \
-            .filter(RunCourse.course_Status == 'Inactive')
+            .filter(RunCourse.run_Enddate <= current_datetime)
+            # .filter(Registration.reg_Status == 'Enrolled') \
+            # .filter(RunCourse.runcourse_Status == 'Closed') \
+            # .filter(RunCourse.course_Status == 'Inactive')
 
         if course_name:
             query = query.filter(Course.course_Name.contains(course_name))
@@ -592,8 +596,9 @@ class GetCompletedCourses(Resource):
                 course_info = {
                     **result[0].json(),
                     **modified_run_course,
-                    "instructor_Name": result[2],
-                    "instructor_Email": result[3]
+                    "coursecat_Name": result[2],
+                    "instructor_Name": result[3],
+                    "instructor_Email": result[4]
                 }
                 result_data.append(course_info)
 
@@ -675,6 +680,8 @@ class GetInstructorCourses(Resource):
         course_category_id = args.get("coursecat_id", "")
         runcourse_status = args.get("runcourse_status", "")
 
+        current_datetime = datetime.now()
+
         UserInstructor = aliased(User)
         # RunCourseAlias = aliased(RunCourse)
         # CourseAlias = aliased(Course)
@@ -690,7 +697,8 @@ class GetInstructorCourses(Resource):
         .join(UserInstructor, UserInstructor.user_ID == User.user_ID) \
         .join(RunCourse, RunCourse.instructor_ID == UserInstructor.user_ID) \
         .join(Course, Course.course_ID == RunCourse.course_ID) \
-        .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)
+        .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
+        .filter(RunCourse.run_Enddate >= current_datetime)
 
         if instructor_id:
             query = query.filter(UserInstructor.user_ID == instructor_id)
@@ -813,7 +821,8 @@ class GetInstructorTaughtCourses(Resource):
         course_category_id = args.get("coursecat_id", "")
 
         UserInstructor = aliased(User)
-        current_time = datetime.now()  # Current time
+
+        current_datetime = datetime.now()
 
         query = db.session.query(
             User.user_Name,
@@ -825,7 +834,8 @@ class GetInstructorTaughtCourses(Resource):
         .join(UserInstructor, UserInstructor.user_ID == User.user_ID) \
         .join(RunCourse, RunCourse.instructor_ID == UserInstructor.user_ID) \
         .join(Course, Course.course_ID == RunCourse.course_ID) \
-        .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)
+        .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
+        .filter(RunCourse.run_Enddate < current_datetime)
 
         if instructor_id:
             query = query.filter(UserInstructor.user_ID == instructor_id)
@@ -834,8 +844,6 @@ class GetInstructorTaughtCourses(Resource):
         if course_category_id:
             query = query.filter(Course.coursecat_ID == course_category_id)
 
-        # Filter out courses that have ended
-        query = query.filter(RunCourse.run_Endtime <= current_time)
 
         results = query.all()
         db.session.close()
@@ -861,7 +869,7 @@ class GetInstructorTaughtCourses(Resource):
                     "user_Email": result[1],
                     **modified_run_course,
                     **result[3].json(),
-                    "coursecat_Name": result[1]
+                    "coursecat_Name": result[4]
                 }
                 result_data.append(course_info)
 

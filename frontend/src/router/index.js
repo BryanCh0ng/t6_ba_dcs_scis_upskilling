@@ -129,6 +129,14 @@ const routes = [
     meta: {
         title: 'Student View Recommendations',
     },
+  },
+  {
+    path: '/instructorTrainerViewProfile',
+    name: 'instructorTrainerViewProfile',
+    component: () => import('../views/course/instructorTrainerViewProfile.vue'),
+    meta: {
+        title: 'Instructor Trainer View Profile',
+    },
   }
   // },
   // {
