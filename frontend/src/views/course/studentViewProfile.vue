@@ -140,6 +140,7 @@
                     <th scope="col">Status</th>
                     <th scope="col">Course Details</th>
                     <th scope="col">Action(s)</th>
+                    <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -152,7 +153,11 @@
                     </td>
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                     <td v-if="proposed_course.pcourse_Status == 'Pending'">
-                        <course-action status="proposed_course" :id="proposed_course.course_ID"></course-action>
+                      <course-action status="Edit" :id="proposed_course.course_ID"></course-action>
+                    </td>
+                    <td v-else></td>
+                    <td v-if="proposed_course.pcourse_Status == 'Pending'">
+                      <course-action status="proposed_course" :id="proposed_course.course_ID"></course-action>
                     </td>
                     <td v-else></td>
                     </tr>
@@ -248,6 +253,7 @@ export default {
     StudentSearchFilter,
     courseDateTime
   },
+
   data() {
     return {
         registered_courses: [],
@@ -269,48 +275,58 @@ export default {
         currentDate: new Date(),
     }
   },
+
   methods: {
-    
     openModal(course) {
       this.selectedCourse = course;
       this.showModal = true;
     },
+
     closeModal() {
       this.selectedCourse = null;
       this.showModal = false;
     },
+
     handlePageChangeRegistered(newPage) {
       this.localCurrentPageRegistered = newPage;
       this.$emit('page-change', newPage);
     },
+
     handlePageChangeInterested(newPage) {
       this.localCurrentPageInterested = newPage;
       this.$emit('page-change', newPage);
     },
+
     handlePageChangeProposed(newPage) {
       this.localCurrentPageProposed = newPage;
       this.$emit('page-change', newPage);
     },
+    
     handlePageChangeCompleted(newPage) {
       this.localCurrentPageCompleted = newPage;
       this.$emit('page-change', newPage);
     },
+
     async handleSearchCompleteRegistered(searchResults) {
       // console.log(searchResults)
       this.registered_courses = searchResults;
     },
+
     async handleSearchCompleteInterested(searchResults) {
       // console.log(searchResults)
       this.interested_courses = searchResults;
     },
+
     async handleSearchCompleteProposed(searchResults) {
       // console.log(searchResults)
       this.proposed_courses = searchResults;
     },
+
     async handleSearchCompleteCompleted(searchResults) {
       // console.log(searchResults)
       this.completed_courses = searchResults;
     },
+
     async searchCourseRegistrationInfo(user_ID, course_Name, coursecat_ID, status) {
       try {
         // const user_id = await UserService.getUserID()
@@ -330,6 +346,7 @@ export default {
         throw error;
       }
     },
+
     async searchCourseVoteInfo(user_ID, course_Name, coursecat_ID, status) {
       try {
         // const user_id = await UserService.getUserID()
@@ -348,6 +365,7 @@ export default {
         throw error;
       }
     },
+
     async searchProposedInfo(user_ID, course_Name, coursecat_ID, status) {
       try {
         // const user_id = await UserService.getUserID()
@@ -366,6 +384,7 @@ export default {
         throw error;
       }
     },
+
     async searchCompletedInfo(user_ID, course_Name, coursecat_ID) {
       try {
         // const user_id = await UserService.getUserID()
@@ -383,6 +402,7 @@ export default {
         throw error;
       }
     },
+
     sort(column, action) {
       if (this.sortColumn === column) {
         this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -392,11 +412,13 @@ export default {
       }
       this.sortCourse(action)
     },
+
     getSortDirection(column) {
       if (this.sortColumn === column) {
         return this.sortDirection;
       }
     },
+
     async sortCourse(action) {
         if (action == 'registered') {
             let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.registered_courses)

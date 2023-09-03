@@ -22,7 +22,7 @@
                     </div>
                     <div class="col-md">
                         <div class="d-flex justify-content-between">
-                            <button @click="resetFilter" class="btn" id="resetbtn">Clear</button>
+                            <button @click="resetFilter" class="btn" id="resetbtn" type="button">Clear</button>
                             <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
                         </div>
                     </div>
@@ -79,10 +79,12 @@ export default({
             }
         },
         resetFilter() {
-            console.log(this.status);
+            // console.log(this.status);
             this.courseName = "";
             this.category = "";
             this.status = "";
+
+            this.searchFilter();
         },
         async searchFilter() {
             try {
@@ -93,7 +95,7 @@ export default({
                 const status = this.status;
 
                 let searchResults;
-                console.log(status)
+                // console.log(status)
                 
                 // Use the searchApi function from the parent component
                 searchResults = await this.searchApi(user_ID, course_Name, coursecat_ID, status);
