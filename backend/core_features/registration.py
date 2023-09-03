@@ -20,7 +20,7 @@ class GetAllRegistrations(Resource):
     def get(self):
         arg = get_all_registrations.parse_args().get("reg_ID")
         reg_ID = arg if arg else ""
-        regList = Registration.query.filter(Registration.reg_ID.contains(reg_ID)).all()
+        regList = Registration.query.filter(Registration.reg_ID == reg_ID).all()
         db.session.close()
 
         if len(regList):
@@ -111,3 +111,33 @@ class UpdateRegistration(Resource):
         
         except Exception as e:
             return "Failed" + str(e), 500
+
+#get_registration_by_userid()
+get_registration_by_userid = api.parser()
+get_registration_by_userid.add_argument("user_ID", help="Enter user ID")
+@api.route("/get_registration_by_userid")
+@api.doc(description="Gets registration by user ID")
+class GetRegistrationByUserID(Resource):
+    @api.expect(get_registration_by_userid)
+    def get(self):
+        arg = get_registration_by_userid.parse_args().get("user_ID")
+        user_ID = arg if arg else ""
+        regList = Registration.query.filter(Registration.user_ID == user_ID).all()
+        db.session.close()
+
+        if len(regList):
+            return jsonify(
+                {
+                    "code": 200,
+                    "data": {
+                        "reg_list": [reg.json() for reg in regList]
+                    }
+                }
+            )
+        
+        return jsonify(
+            {
+                "code": 404,
+                "message": "No such registration record exists"
+            }
+        )
