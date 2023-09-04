@@ -26,6 +26,25 @@ class ProposedCourseService extends BaseApiService {
       return this.handleError(error);
     }
   }
+
+  async updateProposedCourse(courseId, courseData) {
+    console.log(courseId)
+    console.log(courseData)
+    try {
+      const apiUrl = `/proposedcourse/update_proposed_course/${courseId}`;
+      console.log(apiUrl)
+      const response = await axiosClient.put(apiUrl, courseData);
+      console.log(response)
+      if (response.status === 200) {
+        return { success: true, message: response.data.message };
+      } else {
+        return { success: false, message: 'Failed to update the proposed course' };
+      }
+    } catch (error) {
+      console.error('Error updating proposed course:', error);
+      return { success: false, message: 'An error occurred while updating the proposed course' };
+    }
+  }
 }
 
 export default new ProposedCourseService();
