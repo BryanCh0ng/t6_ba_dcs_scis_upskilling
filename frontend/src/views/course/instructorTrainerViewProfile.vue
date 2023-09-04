@@ -85,9 +85,12 @@
                 <thead>
                     <tr class="text-nowrap">
                     <th scope="col">
-                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'proposed')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'proposed')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                    <th scope="col">
+                      <a href="" @click.prevent="sort('proposed_Date')" class="text-decoration-none text-dark">Propose Date <sort-icon :sortColumn="sortColumn === 'proposed_Date'" :sortDirection="getSortDirection('proposed_Date')"/></a></th>
                     <th scope="col">No. of Interest</th>
                     <th scope="col">Status</th>
+                    <th scope="col">Reason</th>
                     <th scope="col">Course Details</th>
                     <th scope="col">Action(s)</th>
                     <th scope="col"></th>
@@ -98,11 +101,17 @@
                         <td class="name">
                             <course-name-desc :name="proposed_course.course_Name" :category="proposed_course.coursecat_Name" :description="proposed_course.course_Desc"></course-name-desc>
                         </td>
+                        <td class="proposed_date">
+                          <course-date :date="proposed_course.proposed_Date"></course-date>
+                        </td>
                         <td class="status">{{ proposed_course.vote_count }}</td>
                         <td class="status">{{ proposed_course.pcourse_Status }}</td>
+                        <td class="reason">
+                          {{ proposed_course.reason }}
+                      </td>
                         <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                         <td v-if="proposed_course.pcourse_Status == 'Pending'">
-                            <course-action status="Edit" :id="proposed_course.course_ID"></course-action>
+                            <course-action status="Edit" :id="proposed_course.course_ID" @click="editCourse(proposed_course.course_ID)"></course-action>
                         </td>
                         <td v-else></td>
                         <td v-if="proposed_course.pcourse_Status == 'Pending'">
@@ -373,6 +382,10 @@ export default {
     isClosingDateValid(closingDate) {
         const regClosingDate = new Date(closingDate);
         return this.currentDate < regClosingDate;
+    },
+
+    editCourse(courseId) {
+      this.$router.push({ name: 'editProposedCourse', params: { courseId } });
     },
 
   },

@@ -166,7 +166,7 @@
                     </td>
                     <td v-else></td>
                     <td v-if="proposed_course.pcourse_Status == 'Pending'">
-                      <course-action status="proposed_course" :id="proposed_course.course_ID"></course-action>
+                      <course-action status="proposed_delete" :id="proposed_course.course_ID"></course-action>
                     </td>
                     <td v-else></td>
                     </tr>

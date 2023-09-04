@@ -82,6 +82,7 @@ export default {
 
   created() {
     this.getUserID();
+    this.get_user_role();
     this.fetchCategoryDropdownOptions();
     this.fetchProposedCourseDetails();
   },
@@ -105,7 +106,15 @@ export default {
         this.user_ID = null;
       }
     },
-
+    async get_user_role() {
+      try {
+        const user_role = await UserService.getUserRole()
+        this.user_role = user_role
+      } catch (error) {
+        console.error('Error fetching user ID:', error);
+        this.user_role = null;
+      }
+    },
     async fetchProposedCourseDetails() {
       try {
         const courseId = this.$route.params.courseId;
@@ -171,7 +180,12 @@ export default {
 
     hideSuccessModal() {
       this.showSuccessModal = false;
-      this.$router.push({ name: 'studentViewProfile' });
+      if (this.user_role === "Student") {
+        this.$router.push({ name: 'studentViewProfile' });
+      } else if (this.user_role === "Instructor" || this.user_role === "Trainer") {
+        this.$router.push({ name: 'instructorTrainerViewProfile' });
+      }
+      
     },
   },
 };

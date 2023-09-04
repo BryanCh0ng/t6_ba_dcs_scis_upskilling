@@ -120,6 +120,10 @@ const routes = [
     component: () => import('../views/course/instructorTrainerViewProfile.vue'),
     meta: {
         title: 'Instructor Trainer View Profile',
+   
+    }
+  },     
+  {
     path: '/studentViewProfile',
     name: 'studentViewProfile',
     component: () => import('../views/course/studentViewProfile.vue'),

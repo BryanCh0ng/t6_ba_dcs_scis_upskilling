@@ -14,7 +14,7 @@
     <button class="btn btn-primary open_for_registration text-light font-weight-bold text-nowrap" v-else-if="status == 'Open for Voting'">Open for Voting</button>
     <button class="btn btn-success attendance-list text-light font-weight-bold text-nowrap" v-else-if="status == 'attendance'">Attendance List</button>
     <button class="btn btn-success feedback-analysis text-light font-weight-bold text-nowrap" v-else-if="status == 'feedback-analysis'">Feedback Analysis</button>
-    <button class="btn btn-danger proposed_delete text-light font-weight-bold text-nowrap" v-else-if="status == 'proposed_course'">Delete</button> 
+    <button class="btn btn-danger proposed_delete text-light font-weight-bold text-nowrap" v-else-if="status == 'proposed_delete'">Delete</button> 
     <button class="btn btn-danger registered_drop text-light font-weight-bold text-nowrap" v-else-if="status == 'registered_drop'">Drop</button>
     <button class="btn btn-warning say_pass text-light font-weight-bold text-nowrap" v-else-if="status == 'say_pass'">Say pass</button> 
     <button class="btn btn-success provide_feedback text-light font-weight-bold text-nowrap" v-else-if="status == 'provide_feedback'">Provide Feedback</button>
