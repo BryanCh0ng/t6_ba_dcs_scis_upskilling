@@ -111,11 +111,10 @@ export default {
       }
 
       const formData = {
-        // will need get user_ID from session
         user_ID: this.user_ID, 
         msg_Subject: this.subject,
         msg_Body: this.message,
-        msg_Datetime: new Date().toISOString(), // Current datetime
+        msg_Datetime: new Date().toISOString(), 
       };
 
       try {
