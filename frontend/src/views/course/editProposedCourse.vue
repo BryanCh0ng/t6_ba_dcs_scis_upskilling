@@ -17,7 +17,8 @@
           </dropdown-field>
         </div>
         <div class="form-group">
-          <textarea v-model="course_desc" class="form-control border-0 shadow-sm px-4 field" :placeholder="descPlaceholder" style="height: 200px"></textarea>
+          <textarea v-model="course_desc" class="form-control border-0 shadow-sm px-4 field" :placeholder="descPlaceholder" style="height: 200px" @input="limitCourseDescription"></textarea>
+          <div class="text-muted mt-2">Character Count: {{ courseDescLength }}/800</div>
         </div>
 
         <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
@@ -42,7 +43,7 @@
 <script>
 import ErrorMessage from "../../components/ErrorMessage.vue";
 import DropdownField from "../../components/DropdownField.vue";
-import { required } from "@vuelidate/validators";
+import { required, maxLength } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 import UserService from "@/api/services/UserService.js";
 import CourseCategoryService from "@/api/services/CourseCategoryService.js";
@@ -70,7 +71,7 @@ export default {
   validations() {
     return {
       course_name: { required },
-      course_desc: { required },
+      course_desc: { required, maxLength: maxLength(800) },
       category: { required },
     };
   },
@@ -151,6 +152,16 @@ export default {
         this.v$.$touch();
 
         // Check for validation errors
+         if (!this.course_name || !this.course_desc || !this.category) {
+          this.errorMessage = "Please ensure all fields are filled.";
+          return;
+        }
+
+        if (this.course_desc.length > 800) {
+          this.errorMessage = "Course description must be 800 characters or less.";
+          return;
+        }
+
         if (this.v$.$invalid) {
             this.errorMessage = "Please fix the validation errors.";
             return;
@@ -186,6 +197,17 @@ export default {
         this.$router.push({ name: 'instructorTrainerViewProfile' });
       }
       
+    },
+
+    limitCourseDescription() {
+      if (this.course_desc.length > 800) {
+        this.course_desc = this.course_desc.substring(0, 800); // Limit the description to 800 characters
+      }
+    },
+  },
+  computed: {
+    courseDescLength() {
+      return this.course_desc.length;
     },
   },
 };
