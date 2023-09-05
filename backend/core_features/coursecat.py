@@ -49,4 +49,3 @@ class GetCoursecat(Resource):
             return json.loads(json.dumps(coursecat.json())), 200
 
         return json.loads(json.dumps({"message": "There is no such course category", "code": 404}, default=str))
-

@@ -165,13 +165,14 @@ CREATE TABLE IF NOT EXISTS `proposedcourse`(
 	pcourse_status varchar(20) NOT NULL,
     action_done_by int, 
     reason varchar(255),
+    votecount int default 0,
 	PRIMARY KEY (`pcourse_id`),
 	FOREIGN KEY (submitted_by) REFERENCES user(user_id),
     FOREIGN KEY (action_done_by) REFERENCES user(user_id),
 	FOREIGN KEY (course_id) REFERENCES course(course_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO proposedcourse VALUES 
+INSERT INTO proposedcourse (pcourse_id,submitted_by,course_id,pcourse_status,action_done_by,reason) VALUES 
 	(1, 3, 1, 'Approved', 2, NULL),
 	(2, 3, 2, 'Approved', 2, NULL),
 	(3, 4, 3, 'Approved', 2, NULL),

@@ -1342,3 +1342,62 @@ class sortRecords(Resource):
 
 
         return jsonify({"code": 200, "data": sorted_data, "sort": sort_column, "direction": sort_direction})
+
+
+
+add_interest = api.parser()
+add_interest.add_argument("vote_ID", help="Vote ID")
+add_interest.add_argument("user_ID", help="User ID")
+@api.route('/add_interest', methods=["POST"])
+@api.doc(description="Add Interest For Course")
+class AddInterest(Resource):
+    @api.expect(add_interest)
+    def post(self):
+        try:
+            args = add_interest.parse_args()
+            voteID = args.get("vote_ID")
+            userID = args.get("user_ID")
+            interestList = Interest.query.filter(Interest.interest_ID.contains("")).all()
+            finalInterest = interestList[-1]
+            interestID = finalInterest.interest_ID
+
+            newInterest = Interest(interestID+1, voteID, userID)
+
+
+            
+            course = VoteCourse.query.filter_by(vote_ID = voteID).first()
+            courseID = course.course_ID
+            Proposedcourse = ProposedCourse.query.filter_by(course_ID=courseID).first()
+            votecount = Interest.query.filter_by(vote_ID = voteID).count()
+            Proposedcourse.voteCount = votecount + 1
+            db.session.add(newInterest)
+            db.session.commit()
+            return json.loads(json.dumps(newInterest.json(), default=str)), 200
+        except Exception as e:
+            return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
+
+
+
+delete_interest = api.parser()
+delete_interest.add_argument("vote_ID", help="Vote ID")
+delete_interest.add_argument("user_ID", help="User ID")
+@api.route('/delete_interest')
+@api.doc(description="Delete Interest for Course")
+class DemoveInterest(Resource):
+    @api.expect(delete_interest)
+    def post(self):
+        try:
+            args = delete_interest.parse_args()
+            voteID = args.get("vote_ID")
+            userID = args.get("user_ID")
+            course = VoteCourse.query.filter_by(vote_ID = voteID).first()
+            courseID = course.course_ID
+            Proposedcourse = ProposedCourse.query.filter_by(course_ID=courseID).first()
+            votecount = Interest.query.filter_by(vote_ID = voteID).count()
+            Proposedcourse.voteCount = votecount - 1
+            db.session.delete(Interest.query.filter_by(vote_ID=voteID, user_ID=userID).first())                                 
+            db.session.commit()
+            return json.loads(json.dumps({"message":"Interest successfully deleted"})), 200
+        except Exception as e:
+            return "Failed" + str(e), 500
+
