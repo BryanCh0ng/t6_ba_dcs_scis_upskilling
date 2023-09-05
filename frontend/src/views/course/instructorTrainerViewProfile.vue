@@ -88,7 +88,8 @@
                       <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'proposed')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                     <th scope="col">
                       <a href="" @click.prevent="sort('proposed_Date')" class="text-decoration-none text-dark">Propose Date <sort-icon :sortColumn="sortColumn === 'proposed_Date'" :sortDirection="getSortDirection('proposed_Date')"/></a></th>
-                    <th scope="col">No. of Interest</th>
+                    <th scope="col">
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('voteCount')"># of Interest <sort-icon :sortColumn="sortColumn === 'voteCount'" :sortDirection="getSortDirection('voteCount')"/></a></th>
                     <th scope="col">Status</th>
                     <th scope="col">Reason</th>
                     <th scope="col">Course Details</th>
@@ -104,7 +105,7 @@
                         <td class="proposed_date">
                           <course-date :date="proposed_course.proposed_Date"></course-date>
                         </td>
-                        <td class="status">{{ proposed_course.vote_count }}</td>
+                        <td class="status">{{ proposed_course.voteCount }}</td>
                         <td class="status">{{ proposed_course.pcourse_Status }}</td>
                         <td class="reason">
                           {{ proposed_course.reason }}
@@ -176,9 +177,7 @@
                     </tr>
                 </tbody>
                 </table>
-                <div class="modal fade" id="rejected_modal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg"><reject-proposal-modal @close-modal="closeReject"/></div>
-                </div>
+               
             </div>
             <div v-else-if="conducted_courses=[]">
                 <p>No records found</p>

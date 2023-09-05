@@ -310,14 +310,13 @@ class GetUnvotedOngoingCourses(Resource):
 
         # app.logger.debug(user_ID)
 
-        # Get the courses that the user has already voted for
         voted_course_ids = db.session.query(Interest.vote_ID).filter_by(user_ID=user_ID).subquery()
 
         # Construct the query for unvoted courses with ongoing vote status
         query = db.session.query(
             Course,
             CourseCategory.coursecat_Name,
-            VoteCourse.vote_Status
+            VoteCourse
         ).select_from(Course).join(VoteCourse, Course.course_ID == VoteCourse.course_ID).join(
             CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
         ).filter(
@@ -339,7 +338,7 @@ class GetUnvotedOngoingCourses(Resource):
                 course_info = {
                     **result[0].json(),
                     "coursecat_Name": result[1],
-                    "vote_Status": result[2]
+                    **result[2].json(),
                 }
                 result_data.append(course_info)
             return jsonify({"code": 200, "data": result_data})
@@ -443,7 +442,7 @@ class GetCourseInterestInfo(Resource):
         query = db.session.query(
             Course,
             CourseCategory.coursecat_Name,
-            VoteCourse.vote_Status
+            VoteCourse
         ).select_from(Course).join(VoteCourse, Course.course_ID == VoteCourse.course_ID).join(
             Interest, VoteCourse.vote_ID == Interest.vote_ID
         ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)
@@ -466,7 +465,7 @@ class GetCourseInterestInfo(Resource):
                 course_info = {
                     **result[0].json(),
                     "coursecat_Name": result[1],
-                    "vote_Status": result[2]
+                    **result[2].json()
                 }
                 result_data.append(course_info)
 
@@ -760,20 +759,12 @@ class GetProposedCoursesByUser(Resource):
         course_category_id = args.get("coursecat_id", "")
         pcourse_status = args.get("pcourse_status", "")
 
-        vote_counts_subquery = db.session.query(
-            VoteCourse.course_ID,
-            func.count(Interest.interest_ID).label("vote_count")
-        ).join(Interest, VoteCourse.vote_ID == Interest.vote_ID) \
-        .group_by(VoteCourse.course_ID).subquery()
-        
         query = db.session.query(
             Course,
             CourseCategory.coursecat_Name,
-            ProposedCourse,
-            vote_counts_subquery.c.vote_count
+            ProposedCourse
         ).select_from(ProposedCourse).join(Course, ProposedCourse.course_ID == Course.course_ID) \
-            .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
-            .outerjoin(vote_counts_subquery, Course.course_ID == vote_counts_subquery.c.course_ID)
+            .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)
         
         if user_id:
             query = query.filter(ProposedCourse.submitted_By == user_id)
@@ -794,8 +785,7 @@ class GetProposedCoursesByUser(Resource):
                 course_info = {
                     **result[0].json(),
                     "coursecat_Name": result[1],
-                    **result[2].json(),
-                    "vote_count": result[3]
+                    **result[2].json()
                 }
                 result_data.append(course_info)
             
@@ -1007,21 +997,15 @@ class GetAllVotingCoursesAdmin(Resource):
         course_category_id = args.get("coursecat_id", "")
         vote_status = args.get("vote_status", "")
 
-        vote_counts_subquery = db.session.query(
-            VoteCourse.course_ID,
-            func.count(Interest.interest_ID).label("vote_count")
-        ).join(Interest, VoteCourse.vote_ID == Interest.vote_ID) \
-        .group_by(VoteCourse.course_ID).subquery()
-
         query = db.session.query(
             Course,
             CourseCategory.coursecat_Name,
             VoteCourse.vote_Status,
-            vote_counts_subquery.c.vote_count
+            ProposedCourse
         ).select_from(VoteCourse) \
         .join(Course, VoteCourse.course_ID == Course.course_ID) \
         .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
-        .outerjoin(vote_counts_subquery, Course.course_ID == vote_counts_subquery.c.course_ID)
+        .join(ProposedCourse, Course.course_ID == ProposedCourse.course_ID)
 
         if course_name:
             query = query.filter(Course.course_Name.contains(course_name))
@@ -1040,7 +1024,7 @@ class GetAllVotingCoursesAdmin(Resource):
                     **result[0].json(),
                     "coursecat_Name": result[1],
                     "vote_Status": result[2],
-                    "vote_count": result[3]
+                    **result[3].json()
                 }
                 result_data.append(course_info)
 
@@ -1372,7 +1356,7 @@ class AddInterest(Resource):
             Proposedcourse.voteCount = votecount + 1
             db.session.add(newInterest)
             db.session.commit()
-            return json.loads(json.dumps(newInterest.json(), default=str)), 200
+            return json.loads(json.dumps({"message":"Express Interest Successfully"}, default=str)), 200
         except Exception as e:
             return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
 

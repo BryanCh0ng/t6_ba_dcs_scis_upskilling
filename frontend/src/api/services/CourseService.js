@@ -375,6 +375,35 @@ class CourseService extends BaseApiService {
         }
     }
 
+    async voteCourse(vote_ID, user_ID) {
+        try {
+            const response = await axiosClient.post("/course/add_interest", {
+                vote_ID: vote_ID,
+                user_ID: user_ID,
+            });
+            console.log(response.data);
+            return response.data;
+            
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+    async unvoteCourse(vote_ID, user_ID) {
+        try {
+            const response = await axiosClient.post("/course/delete_interest", {
+                vote_ID: vote_ID,
+                user_ID: user_ID,
+            });
+            console.log(response);
+            return response;
+            
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+
     
 }
 

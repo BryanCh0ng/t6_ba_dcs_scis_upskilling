@@ -14,7 +14,9 @@
             <th scope="col">
                 <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
             <th scope="col">
-                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('vote_count')"># of Current Interest <sort-icon :sortColumn="sortColumn === 'vote_count'" :sortDirection="getSortDirection('vote_count')"/></a></th>
+                <a href="" @click.prevent="sort('proposed_Date')" class="text-decoration-none text-dark">Propose Date <sort-icon :sortColumn="sortColumn === 'proposed_Date'" :sortDirection="getSortDirection('proposed_Date')"/></a></th>
+            <th scope="col">
+                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('voteCount')"># of Interest <sort-icon :sortColumn="sortColumn === 'voteCount'" :sortDirection="getSortDirection('voteCount')"/></a></th>
             <th scope="col">
                 <a href="" class="text-decoration-none text-dark" @click.prevent="sort('vote_Status')">Status <sort-icon :sortColumn="sortColumn === 'vote_Status'" :sortDirection="getSortDirection('vote_Status')"/></a></th>
             <th scope="col">Course Details</th>
@@ -26,8 +28,11 @@
             <td class="name">
               <course-name-desc :name="vote_course.course_Name" :category="vote_course.coursecat_Name" :description="vote_course.course_Desc"></course-name-desc>
             </td>
+            <td class="proposed_date">
+              <course-date :date="vote_course.proposed_Date"></course-date>
+            </td>
             <td class="current_interest">
-                {{ vote_course.vote_count }}
+                {{ vote_course.voteCount }}
             </td>
             <td>{{ vote_course.vote_Status }}</td>
             <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(vote_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
@@ -55,6 +60,7 @@ import sortIcon from '@/components/common/sort-icon.vue';
 import modalCourseContent from '@/components/course/modalCourseContent.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import courseNameDesc from '@/components/course/courseNameDesc.vue';
+import courseDate from '@/components/course/courseDate.vue';
 import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 
@@ -65,7 +71,8 @@ export default {
     modalCourseContent,
     VueAwesomePaginate,
     courseNameDesc,
-    SearchFilter
+    SearchFilter,
+    courseDate
   },
   data() {
     return {

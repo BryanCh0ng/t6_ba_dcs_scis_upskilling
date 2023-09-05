@@ -1,6 +1,6 @@
 <template>
   <div>
-    <button class="btn btn-warning shoutout text-light font-weight-bold text-nowrap" v-if="status == 'Vote'">Shout Out</button>
+    <button @click=runCourseAction(course.course_ID) class="btn btn-warning shoutout text-light font-weight-bold text-nowrap" v-if="status == 'Vote'">Shout Out</button>
     <button class="btn btn-edit edit text-light font-weight-bold text-nowrap" v-else-if="status == 'Edit'">Edit</button>
     <button @click="runCourseAction(course.course_ID)" class="btn btn-danger retire text-light font-weight-bold text-nowrap" v-else-if="status == 'Retire'">Retire</button>
     <button @click="runCourseAction(course.course_ID)" class="btn btn-deactivate deactivate text-light font-weight-bold text-nowrap" v-else-if="status == 'Deactivate'">Deactivate</button>
@@ -44,7 +44,9 @@ export default {
     },
     async runCourseAction() {
       try {
+        console.log("say pass button clicked")
         let response;
+        // let user_ID = this.get_user_id();
         if (this.status == 'Retire') {
           response = await CourseService.retireRunCourse(this.course.course_ID);
         } else if (this.status == 'Activate') {
@@ -52,9 +54,11 @@ export default {
         } else if (this.status == 'Deactivate') {
           response = await CourseService.deactivateRunCourse(this.course.course_ID);
         } else  if (this.status == 'Active') {
-          this.get_user_id();
+          
           response = await RegistrationService.createNewRegistration(this.course.rcourse_ID, 1, "Pending");
-        }
+        } else if (this.status == 'Vote') {
+          response = await CourseService.voteCourse(this.course.vote_ID, 1);
+        } 
         this.message = response.message;
         this.$emit('action-and-message-updated', {message: this.message, course: this.course});
       } catch (error) {

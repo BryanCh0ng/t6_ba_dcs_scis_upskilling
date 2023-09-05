@@ -65,9 +65,6 @@
                     </tr>
                 </tbody>
                 </table>
-                <div class="modal fade" id="rejected_modal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg"><reject-proposal-modal @close-modal="closeReject"/></div>
-                </div>
             </div>
             <div v-else-if="registered_courses=[]">
                 <p>No records found</p>
@@ -104,15 +101,13 @@
                         <td class="status">{{ interested_course.vote_Status }}</td>
                         <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(interested_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                         <td v-if="interested_course.vote_Status == 'Ongoing'">
-                            <course-action status="say_pass" :id="interested_course.course_ID"></course-action>
+                            <course-action @click="unvoteCourse(interested_course.vote_ID)" status="say_pass"></course-action>
                         </td>
                         <td v-else></td>
                     </tr>
                 </tbody>
                 </table>
-                <div class="modal fade" id="rejected_modal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg"><reject-proposal-modal @close-modal="closeReject"/></div>
-                </div>
+                
             </div>
             <div v-else-if="interested_courses=[]">
                 <p>No records found</p>
@@ -172,9 +167,7 @@
                     </tr>
                 </tbody>
                 </table>
-                <div class="modal fade" id="rejected_modal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg"><reject-proposal-modal @close-modal="closeReject"/></div>
-                </div>
+                
             </div>
             <div v-else-if="proposed_courses=[]">
                 <p>No records found</p>
@@ -220,9 +213,7 @@
                     </tr>
                 </tbody>
                 </table>
-                <div class="modal fade" id="rejected_modal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg"><reject-proposal-modal @close-modal="closeReject"/></div>
-                </div>
+               
             </div>
             <div v-else-if="completed_courses=[]">
                 <p>No records found</p>
@@ -241,7 +232,6 @@
 import courseAction from '../../components/course/courseAction.vue';
 import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
-import rejectProposalModal from '../../components/course/rejectProposalModal.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
 import courseDateTime from '@/components/course/courseDateTime.vue';
 import courseDate from '@/components/course/courseDate.vue';
@@ -257,12 +247,11 @@ export default {
     sortIcon,
     modalCourseContent,
     VueAwesomePaginate,
-    rejectProposalModal,
     courseNameDesc,
     SearchFilter,
     StudentSearchFilter,
     courseDateTime, 
-    courseDate
+    courseDate,
   },
 
   data() {
@@ -466,6 +455,35 @@ export default {
     editCourse(courseId) {
       this.$router.push({ name: 'editProposedCourse', params: { courseId } });
     },
+    async unvoteCourse(vote_Id) {
+      try {
+        let response = await CourseService.unvoteCourse(vote_Id, 1); // Assuming user ID is 1
+        console.log(response); 
+        this.loadData();
+      } catch (error) {
+        console.error('Error unvoting course:', error);
+      }
+    },
+    async loadData() {
+      try {
+        // const user_ID = await UserService.getUserID()
+        const user_ID = 1
+
+        let registered_courses = await CourseService.searchCourseRegistrationInfo(user_ID, null, null, null)
+        this.registered_courses = registered_courses.data
+
+        let interested_courses = await CourseService.searchCourseVoteInfo(user_ID, null, null, null)
+        this.interested_courses = interested_courses.data
+
+        let proposed_courses = await CourseService.searchProposedInfo(user_ID, null, null, null)
+        this.proposed_courses = proposed_courses.data
+
+        let completed_courses = await CourseService.searchCompletedInfo(user_ID, null, null)
+        this.completed_courses = completed_courses.data
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+      }
+    }
 
   },
   computed: {
@@ -493,25 +511,8 @@ export default {
       return this.completed_courses.slice(startIndex, endIndex);
     },
   },
-  async created() {
-    try {
-      // const user_ID = await UserService.getUserID()
-      const user_ID = 1
-
-      let registered_courses = await CourseService.searchCourseRegistrationInfo(user_ID, null, null, null)
-      this.registered_courses = registered_courses.data
-
-      let interested_courses = await CourseService.searchCourseVoteInfo(user_ID, null, null, null)
-      this.interested_courses = interested_courses.data
-
-      let proposed_courses = await CourseService.searchProposedInfo(user_ID, null, null, null)
-      this.proposed_courses = proposed_courses.data
-
-      let completed_courses = await CourseService.searchCompletedInfo(user_ID, null, null)
-      this.completed_courses = completed_courses.data
-    } catch (error) {
-      console.error("Error fetching course details:", error);
-    }
+  created() {
+    this.loadData();
   },
   }
 </script>

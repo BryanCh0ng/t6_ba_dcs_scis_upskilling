@@ -183,8 +183,8 @@ INSERT INTO proposedcourse VALUES
 	(7, 4, 8, 'Approved', 2, NULL, "2023-08-25", 21),
 	(8, 5, 9, 'Approved', 2, NULL, "2023-08-25", 7),
 	(9, 1, 13, 'Approved', 2, NULL, "2023-08-25", 7),
-	(10, 1, 19, 'Pending', 2, NULL, "2023-08-25"), 
-	(11, 1, 20, 'Rejected', 2, 'Alignment with curriculum', "2023-08-25"),
+	(10, 1, 19, 'Pending', 2, NULL, "2023-08-25", 0), 
+	(11, 1, 20, 'Rejected', 2, 'Alignment with curriculum', "2023-08-25", 0),
 	(12, 3, 21, 'Approved', 2, NULL, "2023-08-25", 20),
 	(13, 4, 22, 'Approved', 2, NULL, "2023-08-25", 7), 
 	(14, 5, 23, 'Approved', 2, NULL, "2023-08-25", 20),
@@ -193,9 +193,9 @@ INSERT INTO proposedcourse VALUES
 	(17, 5, 26, 'Approved', 2, NULL, "2023-08-25", 9),
 	(18, 3, 27, 'Approved', 2, NULL, "2023-08-25", 20),
 	(19, 6, 28, 'Approved', 2, NULL, "2023-08-25", 20), 
-	(20, 6, 29, 'Approved', 2, NULL, "2023-08-25", 12), 
-	(21, 4, 11, 'Rejected', 2, 'Alignment with curriculum', "2023-08-25"),
-    (22, 4, 10, 'Pending', 2, NULL, "2023-09-01");
+	(20, 6, 29, 'Approved', 2, NULL, "2023-08-26", 12), 
+	(21, 4, 11, 'Rejected', 2, 'Alignment with curriculum', "2023-08-25", 0),
+    (22, 4, 10, 'Pending', 2, NULL, "2023-09-01", 0);
 	
 
 DROP TABLE IF EXISTS `votecourse`;
