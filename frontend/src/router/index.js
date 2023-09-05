@@ -129,6 +129,22 @@ const routes = [
     meta: {
         title: 'Student View Recommendations',
     },
+  },
+  {
+    path: '/studentProposeCourse',
+    name: 'studentProposeCourse',
+    component: () => import('../views/course/studentProposeCourse.vue'),
+    meta: {
+        title: 'Student Propose Course',
+    },
+  },
+  {
+    path: '/instructorTrainerProposeCourse',
+    name: 'instructorTrainerProposeCourse',
+    component: () => import('../views/course/instructorTrainerProposeCourse.vue'),
+    meta: {
+        title: 'Instructor / Trainer Propose Course',
+    },
   }
   // },
   // {
