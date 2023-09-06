@@ -21,17 +21,16 @@
             <div class="container col-12 table-responsive">
             <h5 class="pb-3">Course(s) Assigned to Me</h5>
             <div v-if="assigned_courses && assigned_courses.length > 0">
-                <table class="table">
+                <table class="table bg-white">
                 <thead>
                     <tr class="text-nowrap">
                     <th scope="col">
                         <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'assigned')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                     <th scope="col">Venue</th>
                      <th scope="col">
-                        <a href="" @click.prevent="sort('run_Startdate')" class="text-decoration-none text-dark">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
+                        <a href="" @click.prevent="sort('run_Startdate', 'assigned')" class="text-decoration-none text-dark">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
                      <th scope="col">
-                        <a href="" @click.prevent="sort('run_Enddate')" class="text-decoration-none text-dark">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
-                    
+                        <a href="" @click.prevent="sort('run_Enddate', 'assigned')" class="text-decoration-none text-dark">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
                     <th scope="col">Start & End Time</th>
                     <th scope="col">Course Details</th>
                     <th scope="col">Action(s)</th>
@@ -50,19 +49,15 @@
                             <course-date :date="assigned_course.run_Enddate"></course-date>
                         </td>
                         <td class="time">
-                            <course-duration :start_time="assigned_course.run_Starttime" :end_time="assigned_course.run_Endtime"></course-duration> 
+                          <course-duration :start_time="assigned_course.run_Starttime" :end_time="assigned_course.run_Endtime"></course-duration> 
                         </td>
-                       
                         <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(assigned_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                         <td>
-                            <course-action status="attendance" :id="assigned_course.course_ID"></course-action>
+                          <course-action status="attendance" :id="assigned_course.course_ID"></course-action>
                         </td>
                     </tr>
                 </tbody>
                 </table>
-                <div class="modal fade" id="rejected_modal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg"><reject-proposal-modal @close-modal="closeReject"/></div>
-                </div>
             </div>
             <div v-else-if="assigned_courses=[]">
                 <p>No records found</p>
@@ -81,16 +76,17 @@
             <div class="container col-12 table-responsive">
             <h5 class="pb-3">Course(s) Proposed by Me</h5>
             <div v-if="proposed_courses && proposed_courses.length > 0">
-                <table class="table">
+                <table class="table bg-white">
                 <thead>
                     <tr class="text-nowrap">
                     <th scope="col">
                       <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'proposed')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                     <th scope="col">
-                      <a href="" @click.prevent="sort('proposed_Date')" class="text-decoration-none text-dark">Propose Date <sort-icon :sortColumn="sortColumn === 'proposed_Date'" :sortDirection="getSortDirection('proposed_Date')"/></a></th>
+                      <a href="" @click.prevent="sort('proposed_Date', 'proposed')" class="text-decoration-none text-dark">Propose Date <sort-icon :sortColumn="sortColumn === 'proposed_Date'" :sortDirection="getSortDirection('proposed_Date')"/></a></th>
                     <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('voteCount')"># of Interest <sort-icon :sortColumn="sortColumn === 'voteCount'" :sortDirection="getSortDirection('voteCount')"/></a></th>
-                    <th scope="col">Status</th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('voteCount', 'proposed')"># of Interest <sort-icon :sortColumn="sortColumn === 'voteCount'" :sortDirection="getSortDirection('voteCount')"/></a></th>
+                    <th scope="col">
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('pcourse_Status', 'proposed')">Status <sort-icon :sortColumn="sortColumn === 'pcourse_Status'" :sortDirection="getSortDirection('pcourse_Status')"/></a></th>
                     <th scope="col">Reason</th>
                     <th scope="col">Course Details</th>
                     <th scope="col">Action(s)</th>
@@ -105,26 +101,23 @@
                         <td class="proposed_date">
                           <course-date :date="proposed_course.proposed_Date"></course-date>
                         </td>
-                        <td class="status">{{ proposed_course.voteCount }}</td>
+                        <td class="vote_count">{{ proposed_course.voteCount }}</td>
                         <td class="status">{{ proposed_course.pcourse_Status }}</td>
                         <td class="reason">
                           {{ proposed_course.reason }}
                       </td>
                         <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                         <td v-if="proposed_course.pcourse_Status == 'Pending'">
-                            <course-action status="Edit" :id="proposed_course.course_ID" @click="editCourse(proposed_course.course_ID)"></course-action>
+                          <course-action status="Edit" :id="proposed_course.course_ID" @click="editCourse(proposed_course.course_ID)"></course-action>
                         </td>
                         <td v-else></td>
                         <td v-if="proposed_course.pcourse_Status == 'Pending'">
-                            <course-action status="proposed_delete" :id="proposed_course.course_ID"></course-action>
+                          <course-action status="proposed_delete" :id="proposed_course.course_ID"></course-action>
                         </td>
                         <td v-else></td>
                     </tr>
                 </tbody>
                 </table>
-                <div class="modal fade" id="rejected_modal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg"><reject-proposal-modal @close-modal="closeReject"/></div>
-                </div>
             </div>
             <div v-else-if="proposed_courses=[]">
                 <p>No records found</p>
@@ -143,17 +136,17 @@
             <div class="container col-12 table-responsive">
             <h5 class="pb-3">Course(s) Taught by Me</h5>
             <div v-if="conducted_courses && conducted_courses.length > 0">
-                <table class="table">
+                <table class="table bg-white">
                 <thead>
                     <tr class="text-nowrap">
                     <th scope="col">
                         <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'conducted')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
-                    <th scope="col">Venue</th>
                     <th scope="col">
-                        <a href="" @click.prevent="sort('run_Startdate')" class="text-decoration-none text-dark">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
+                      <a href="" @click.prevent="sort('course_Venue', 'conducted')" class="text-decoration-none text-dark">Venue <sort-icon :sortColumn="sortColumn === 'course_Venue'" :sortDirection="getSortDirection('course_Venue')"/></a></th>
                     <th scope="col">
-                        <a href="" @click.prevent="sort('run_Enddate')" class="text-decoration-none text-dark">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
-                    
+                      <a href="" @click.prevent="sort('run_Startdate', 'conducted')" class="text-decoration-none text-dark">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
+                    <th scope="col">
+                      <a href="" @click.prevent="sort('run_Enddate', 'conducted')" class="text-decoration-none text-dark">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
                     <th scope="col">Course Details</th>
                     <th scope="col">Action(s)</th>
                     </tr>
@@ -196,7 +189,6 @@
 import courseAction from '../../components/course/courseAction.vue';
 import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
-import rejectProposalModal from '../../components/course/rejectProposalModal.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
 // import courseDateTime from '@/components/course/courseDateTime.vue';
 import courseDate from '@/components/course/courseDate.vue';
@@ -213,7 +205,6 @@ export default {
     sortIcon,
     modalCourseContent,
     VueAwesomePaginate,
-    rejectProposalModal,
     courseNameDesc,
     SearchFilter,
     StudentSearchFilter,
@@ -354,27 +345,35 @@ export default {
         return this.sortDirection;
       }
     },
-
     async sortCourse(action) {
         if (action == 'assigned') {
-            let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.assigned_courses)
-            if (sort_response.code == 200) {
-                this.assigned_courses = sort_response.data
-            }
+          let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.assigned_courses)
+          console.log(this.sortColumn)
+          console.log(this.sortDirection)
+          console.log(sort_response)
+          if (sort_response.code == 200) {
+            this.assigned_courses = sort_response.data
+          }
         }
 
         if (action == 'proposed') {
-            let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
-            if (sort_response.code == 200) {
-                this.proposed_courses = sort_response.data
-            }
+          let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
+          console.log(this.sortColumn)
+          console.log(this.sortDirection)
+          console.log(sort_response)
+          if (sort_response.code == 200) {
+            this.proposed_courses = sort_response.data
+          }
         }
 
         if (action == 'conducted') {
-                let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.conducted_courses)
-                if (sort_response.code == 200) {
-                    this.conducted_courses = sort_response.data
-                }
+          let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.conducted_courses)
+          console.log(this.sortColumn)
+          console.log(this.sortDirection)
+          console.log(sort_response)
+          if (sort_response.code == 200) {
+            this.conducted_courses = sort_response.data
+          }
         }
 
     },

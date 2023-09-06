@@ -21,6 +21,7 @@
     <button class="btn btn-danger remove-proposal text-light font-weight-bold text-nowrap" v-else-if="status == 'remove-proposal'">Remove</button>   
     <button class="btn btn-info provide-feedback text-light font-weight-bold text-nowrap" v-else-if="status == 'provide-feedback'">Provide Feedback</button>  
     <button class="btn btn-success view-feedback text-light font-weight-bold text-nowrap" v-else-if="status == 'view-feedback'">View Feedback</button>  
+    <button class="btn btn-secondary rejected-reason text-light font-weight-bold text-nowrap" v-else-if="status == 'rejected-reason'">View Rejected Reason</button>  
   </div>
 </template>
   

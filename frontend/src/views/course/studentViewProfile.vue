@@ -110,7 +110,7 @@
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(interested_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                   <td v-if="interested_course.vote_Status == 'Ongoing'">
-                      <course-action status="say-pass" :id="interested_course.course_ID"></course-action>
+                      <course-action @click="unvoteCourse(interested_course.vote_ID)" status="say-pass"></course-action>
                   </td>
                 </tr>
               </tbody>
@@ -158,7 +158,10 @@
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                   <div v-if="proposed_course.pcourse_Status == 'Pending'">
                     <td><course-action status="Edit" :id="proposed_course.course_ID" @click="editCourse(proposed_course.course_ID)"></course-action></td>
-                    <td><course-action status="proposed_course" :id="proposed_course.course_ID"></course-action></td>
+                    <td><course-action status="remove-proposal" :id="proposed_course.course_ID"></course-action></td>
+                  </div>
+                  <div v-else-if="proposed_course.pcourse_Status == 'Rejected'">
+                    <td><course-action status="rejected-reason" :id="proposed_course.course_ID"></course-action></td>
                   </div>
                 </tr>
               </tbody>
@@ -394,6 +397,37 @@ export default {
       } catch (error) {
         console.error("Error fetching info:", error);
         throw error;
+      }
+    },
+
+    async unvoteCourse(vote_Id) {
+      try {
+        let response = await CourseService.unvoteCourse(vote_Id, 1); // Assuming user ID is 1
+        console.log(response); 
+        this.loadData();
+      } catch (error) {
+        console.error('Error unvoting course:', error);
+      }
+    },
+
+    async loadData() {
+      try {
+        // const user_ID = await UserService.getUserID()
+        const user_ID = 1
+
+        let registered_courses = await CourseService.searchCourseRegistrationInfo(user_ID, null, null, null)
+        this.registered_courses = registered_courses.data
+
+        let interested_courses = await CourseService.searchCourseVoteInfo(user_ID, null, null, null)
+        this.interested_courses = interested_courses.data
+
+        let proposed_courses = await CourseService.searchProposedInfo(user_ID, null, null, null)
+        this.proposed_courses = proposed_courses.data
+
+        let completed_courses = await CourseService.searchCompletedInfo(user_ID, null, null)
+        this.completed_courses = completed_courses.data
+      } catch (error) {
+        console.error("Error fetching course details:", error);
       }
     },
 
