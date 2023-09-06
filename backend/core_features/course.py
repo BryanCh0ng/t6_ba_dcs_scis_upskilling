@@ -251,7 +251,8 @@ class GetUnregisteredActiveCourses(Resource):
             CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
         ).filter(
             ~RunCourse.rcourse_ID.in_(registered_course_ids),
-            RunCourse.course_Status == "active"
+            RunCourse.course_Status == "active",
+            RunCourse.runcourse_Status == "ongoing"
         )
 
         # Apply additional filters based on user inputs
@@ -368,6 +369,8 @@ class GetCourseRegistrationInfo(Resource):
 
         app.logger.debug(reg_Status)
 
+        current_datetime = datetime.now()
+
         query = db.session.query(
             Course,
             CourseCategory.coursecat_Name,
@@ -375,7 +378,8 @@ class GetCourseRegistrationInfo(Resource):
             Registration
         ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).join(
             Registration, RunCourse.rcourse_ID == Registration.rcourse_ID
-        ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)
+        ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)  \
+            .filter(RunCourse.run_Enddate > current_datetime)
 
         if user_ID:
             query = query.filter(Registration.user_ID == user_ID)
@@ -542,7 +546,6 @@ class GetCompletedCourses(Resource):
     def get(self):
         args = retrieve_completed_courses_filter_search.parse_args()
         user_id = args.get("user_id")
-        # user_id = session.get("user_id")
         course_name = args.get("course_name", "")
         course_category_id = args.get("coursecat_id", "")
         
@@ -557,16 +560,18 @@ class GetCompletedCourses(Resource):
             CourseCategory.coursecat_Name,
             UserInstructor.user_Name.label("instructor_name"),
             UserInstructor.user_Email.label("instructor_email"),
+            Feedback.feedback_ID.label("feedback_id")  
         ).select_from(RunCourse).join(Course, RunCourse.course_ID == Course.course_ID) \
             .join(Registration, RunCourse.rcourse_ID == Registration.rcourse_ID) \
             .join(UserInstructor, RunCourse.instructor_ID == UserInstructor.user_ID) \
             .join(UserStudent, Registration.user_ID == UserStudent.user_ID) \
             .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
+            .outerjoin(Feedback, and_(
+                Feedback.submitted_By == user_id,
+                Feedback.course_ID == Course.course_ID
+            )) \
             .filter(UserStudent.user_ID == user_id) \
             .filter(RunCourse.run_Enddate <= current_datetime)
-            # .filter(Registration.reg_Status == 'Enrolled') \
-            # .filter(RunCourse.runcourse_Status == 'Closed') \
-            # .filter(RunCourse.course_Status == 'Inactive')
 
         if course_name:
             query = query.filter(Course.course_Name.contains(course_name))
@@ -597,7 +602,8 @@ class GetCompletedCourses(Resource):
                     **modified_run_course,
                     "coursecat_Name": result[2],
                     "instructor_Name": result[3],
-                    "instructor_Email": result[4]
+                    "instructor_Email": result[4],
+                    "feedback_submitted": bool(result[5])  # Check if feedback exists
                 }
                 result_data.append(course_info)
 
