@@ -159,10 +159,10 @@
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                   <div v-if="proposed_course.pcourse_Status == 'Pending'">
                     <td><course-action status="Edit" :id="proposed_course.course_ID" @click="editCourse(proposed_course.course_ID)"></course-action></td>
-                    <td><course-action status="remove-proposal" :id="proposed_course.course_ID"></course-action></td>
+                    <td><course-action @action-and-message-updated="handleActionData" status="remove-proposal" :course="proposed_course"></course-action></td>
                   </div>
                   <div v-else-if="proposed_course.pcourse_Status == 'Rejected'">
-                    <td><course-action status="rejected-reason" :id="proposed_course.course_ID"></course-action></td>
+                    <td><course-action status="rejected-reason" :id="proposed_course.pcourse_ID"></course-action></td>
                   </div>
                 </tr>
               </tbody>
