@@ -1352,8 +1352,6 @@ class AddInterest(Resource):
             interestID = finalInterest.interest_ID
 
             newInterest = Interest(interestID+1, voteID, userID)
-
-
             
             course = VoteCourse.query.filter_by(vote_ID = voteID).first()
             courseID = course.course_ID
@@ -1362,7 +1360,8 @@ class AddInterest(Resource):
             Proposedcourse.voteCount = votecount + 1
             db.session.add(newInterest)
             db.session.commit()
-            return json.loads(json.dumps({"message":"Express Interest Successfully"}, default=str)), 200
+
+            return json.loads(json.dumps({"message":"Express Interest Successfully! Please refer to your profile to find out the status of the course."}, default=str)), 200
         except Exception as e:
             return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
 
@@ -1387,7 +1386,9 @@ class DemoveInterest(Resource):
             Proposedcourse.voteCount = votecount - 1
             db.session.delete(Interest.query.filter_by(vote_ID=voteID, user_ID=userID).first())                                 
             db.session.commit()
-            return json.loads(json.dumps({"message":"Interest successfully deleted"})), 200
+
+            return json.loads(json.dumps({"message":"Unvote Interest Successfully! Please refer to View Course page to find out more courses."}, default=str)), 200
+            
         except Exception as e:
-            return "Failed" + str(e), 500
+            return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
 

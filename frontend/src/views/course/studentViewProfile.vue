@@ -110,7 +110,7 @@
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(interested_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                   <td v-if="interested_course.vote_Status == 'Ongoing'">
-                      <course-action @click="unvoteCourse(interested_course.vote_ID)" status="say-pass"></course-action>
+                      <course-action @action-and-message-updated="handleActionData" status="say-pass" :course="interested_course"></course-action>
                   </td>
                 </tr>
               </tbody>
@@ -146,6 +146,7 @@
                     <a href="" @click.prevent="sort('course_Name', 'proposed')" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                   <th scope="col">
                     <a href="" @click.prevent="sort('pcourse_Status', 'proposed')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'pcourse_Status'" :sortDirection="getSortDirection('pcourse_Status')"/></a></th>
+                  <th scope="col">Course Details</th>
                   <th scope="col">Action(s)</th>
                 </tr>
               </thead>
@@ -228,9 +229,18 @@
         <vue-awesome-paginate v-if="completed_courses.length/itemsPerPage > 0" v-model="localCurrentPageCompleted" :totalItems="completed_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeCompleted" class="justify-content-center pagination-container"/>
       </div>
 
-    </div>
-    <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" /></div>
+      <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" />
+        </div>
+      </div>
+
+      <div class="modal fade" id="after_action_modal" tabindex="-1" aria-hidden="true" ref="afterActionModal">
+        <div class="modal-dialog modal-lg"> 
+          <modal-after-action :course="actionCourse" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -246,6 +256,7 @@ import SearchFilter from "@/components/search/CommonSearchFilter.vue";
 import StudentSearchFilter from "@/components/search/StudentCourseSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 // import UserService from "@/api/services/UserService.js";
+import modalAfterAction from '@/components/course/modalAfterAction.vue';
 
 export default {
   components: {
@@ -256,7 +267,8 @@ export default {
     courseNameDesc,
     SearchFilter,
     StudentSearchFilter,
-    courseDateTime
+    courseDateTime,
+    modalAfterAction
   },
   data() {
     return {
@@ -281,7 +293,9 @@ export default {
       onInitialEmptyRegistered: false,
       onInitialEmptyInterested: false,
       onInitialEmptyProposed: false,
-      onInitialEmptyCompleted: false
+      onInitialEmptyCompleted: false,
+      receivedMessage: '',
+      actionCourse: {}
     }
   },
   methods: {
@@ -292,6 +306,15 @@ export default {
     closeModal() {
       this.selectedCourse = null;
       this.showModal = false;
+    },
+    handleActionData(actionData) {
+      this.receivedMessage = actionData.message;
+      this.actionCourse = actionData.course
+      const modalButtonElement = this.$el.querySelector('.invisible-btn')
+      modalButtonElement.click();
+    },
+    modalAfterActionClose() {
+      this.loadData();
     },
     handlePageChangeRegistered(newPage) {
       this.localCurrentPageRegistered = newPage;
@@ -530,8 +553,21 @@ export default {
     } catch (error) {
       console.error("Error fetching course details:", error);
     }
+  },
+  mounted() {
+    const buttonElement = document.createElement('button');
+    buttonElement.className = 'btn btn-primary d-none invisible-btn';
+    buttonElement.setAttribute('data-bs-toggle', 'modal');
+    buttonElement.setAttribute('data-bs-target', '#after_action_modal');
+    this.$el.appendChild(buttonElement);
+    const modalElement = this.$refs.afterActionModal;
+    modalElement.addEventListener('hidden.bs.modal', this.modalAfterActionClose);
+  },
+  beforeUnmount() {
+    const modalElement = this.$refs.afterActionModal;
+    modalElement.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
   }
-  }
+}
 </script>
 
 

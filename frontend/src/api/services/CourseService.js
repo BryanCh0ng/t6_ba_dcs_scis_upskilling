@@ -396,7 +396,7 @@ class CourseService extends BaseApiService {
                 user_ID: user_ID,
             });
             console.log(response);
-            return response;
+            return response.data;
             
         } catch (error) {
             return this.handleError(error);

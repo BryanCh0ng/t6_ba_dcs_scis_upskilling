@@ -16,7 +16,7 @@
     <button class="btn btn-success feedback-analysis text-light font-weight-bold text-nowrap" v-else-if="status == 'feedback-analysis'">Feedback Analysis</button>
     <button class="btn btn-danger proposed_delete text-light font-weight-bold text-nowrap" v-else-if="status == 'proposed_delete'">Delete</button> 
     <button class="btn btn-danger registered_drop text-light font-weight-bold text-nowrap" v-else-if="status == 'registered_drop'">Drop</button>
-    <button class="btn btn-warning say-pass text-light font-weight-bold text-nowrap" v-else-if="status == 'say-pass'">Say Pass</button>   
+    <button @click=runCourseAction(course.vote_ID) class="btn btn-warning say-pass text-light font-weight-bold text-nowrap" v-else-if="status == 'say-pass'">Say Pass</button>   
     <button class="btn btn-primary edit-proposal text-light font-weight-bold text-nowrap" v-else-if="status == 'edit-proposal'">Edit</button>   
     <button class="btn btn-danger remove-proposal text-light font-weight-bold text-nowrap" v-else-if="status == 'remove-proposal'">Remove</button>   
     <button class="btn btn-info provide-feedback text-light font-weight-bold text-nowrap" v-else-if="status == 'provide-feedback'">Provide Feedback</button>  
@@ -60,7 +60,11 @@ export default {
         } else  if (this.status == 'Active') {
           this.get_user_id();
           response = await RegistrationService.createNewRegistration(this.course.rcourse_ID, this.user_ID, "Pending");
-        }
+        }  else if (this.status == 'Vote') {
+          response = await CourseService.voteCourse(this.course.vote_ID, 1);
+        } else if (this.status == 'say-pass') {
+          response = await CourseService.unvoteCourse(this.course.vote_ID, 1);
+        } 
         this.message = response.message;
         this.$emit('action-and-message-updated', {message: this.message, course: this.course});
       } catch (error) {

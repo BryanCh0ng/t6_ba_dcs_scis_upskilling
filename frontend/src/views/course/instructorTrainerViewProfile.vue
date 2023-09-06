@@ -87,10 +87,8 @@
                       <a href="" class="text-decoration-none text-dark" @click.prevent="sort('voteCount', 'proposed')"># of Interest <sort-icon :sortColumn="sortColumn === 'voteCount'" :sortDirection="getSortDirection('voteCount')"/></a></th>
                     <th scope="col">
                       <a href="" class="text-decoration-none text-dark" @click.prevent="sort('pcourse_Status', 'proposed')">Status <sort-icon :sortColumn="sortColumn === 'pcourse_Status'" :sortDirection="getSortDirection('pcourse_Status')"/></a></th>
-                    <th scope="col">Reason</th>
                     <th scope="col">Course Details</th>
                     <th scope="col">Action(s)</th>
-                    <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -103,18 +101,15 @@
                         </td>
                         <td class="vote_count">{{ proposed_course.voteCount }}</td>
                         <td class="status">{{ proposed_course.pcourse_Status }}</td>
-                        <td class="reason">
-                          {{ proposed_course.reason }}
-                      </td>
                         <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                        <td v-if="proposed_course.pcourse_Status == 'Pending'">
-                          <course-action status="Edit" :id="proposed_course.course_ID" @click="editCourse(proposed_course.course_ID)"></course-action>
-                        </td>
-                        <td v-else></td>
-                        <td v-if="proposed_course.pcourse_Status == 'Pending'">
-                          <course-action status="proposed_delete" :id="proposed_course.course_ID"></course-action>
-                        </td>
-                        <td v-else></td>
+                        <div v-if="proposed_course.pcourse_Status == 'Pending'">
+                          <td><course-action status="Edit" :id="proposed_course.course_ID" @click="editCourse(proposed_course.course_ID)"></course-action></td>
+                          <td><course-action status="remove-proposal" :id="proposed_course.course_ID"></course-action></td>
+                        </div>
+                        <div v-else-if="proposed_course.pcourse_Status == 'Rejected'">
+                          <td><course-action status="rejected-reason" :id="proposed_course.course_ID"></course-action></td>
+                        </div>
+                        
                     </tr>
                 </tbody>
                 </table>

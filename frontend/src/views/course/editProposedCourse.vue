@@ -20,10 +20,19 @@
           <textarea v-model="course_desc" class="form-control border-0 shadow-sm px-4 field" :placeholder="descPlaceholder" style="height: 200px" @input="limitCourseDescription"></textarea>
           <div class="text-muted mt-2">Character Count: {{ courseDescLength }}/800</div>
         </div>
+        <div class="row mt-5">
+          <div class="col-md-6 mb-2">
+            <button type="button" class="btn btn-secondary shadow-sm w-100 mt-2 field cancelbtn" @click="cancelForm">
+              Cancel
+            </button>
+          </div>
+          <div class="col-md-6 mb-2">
+            <button type="submit" class="btn btn-block shadow-sm w-100 mt-2 field submitbtn">
+              Save
+            </button>
+          </div>
+        </div>
 
-        <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
-          Save
-        </button>
       </form>
     </div>
     <!-- Success modal -->
@@ -191,12 +200,11 @@ export default {
 
     hideSuccessModal() {
       this.showSuccessModal = false;
-      if (this.user_role === "Student") {
-        this.$router.push({ name: 'studentViewProfile' });
-      } else if (this.user_role === "Instructor" || this.user_role === "Trainer") {
-        this.$router.push({ name: 'instructorTrainerViewProfile' });
-      }
-      
+      this.$router.go(-1);
+    },
+
+    cancelForm() {
+      this.$router.go(-1);
     },
 
     limitCourseDescription() {
