@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -122,7 +122,7 @@ class ProposedCourse(db.Model):
     course_ID = db.Column(db.Integer,db.ForeignKey('course.course_ID'), nullable=False)
     pcourse_Status = db.Column(db.String(20), nullable=False)
     reason = db.Column(db.String(255), nullable=False)
-
+    proposed_date = db.Column(db.Date, default=datetime.today().strftime('%Y-%m-%d'), nullable=False)
 
 
     def __init__(self, pcourse_ID, submitted_By, action_Done_By, course_ID, pcourse_Status, reason ):

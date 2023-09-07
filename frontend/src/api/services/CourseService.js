@@ -375,6 +375,16 @@ class CourseService extends BaseApiService {
         }
     }
 
+    async createCourse(newCourseData) {
+        try {
+          let response = await axiosClient.post('/course/create_course', newCourseData);
+          return response.data;
+        } catch (error) {
+          return this.handleError(error);
+        }
+    }
+      
+
     
 }
 

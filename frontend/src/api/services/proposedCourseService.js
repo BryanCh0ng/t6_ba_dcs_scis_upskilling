@@ -26,6 +26,14 @@ class ProposedCourseService extends BaseApiService {
       return this.handleError(error);
     }
   }
+  async createProposedCourse(newProposedCourseData) {
+    try {
+      let response = await axiosClient.post('/proposedcourse/create_proposed_course', newProposedCourseData);
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
+  } 
 }
 
 export default new ProposedCourseService();

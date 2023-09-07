@@ -158,37 +158,36 @@ class GetCourse(Resource):
 
         return json.loads(json.dumps({"message": "There is no such course"})), 404
 
+@api.route("/create_course", methods=["POST"])
+@api.doc(description="Create course")
+class CreateNewCourse(Resource):
+    def post(self):
+        try: 
+            # Get the data for creating a new course from the request body
+            new_course_data = request.json
+            new_course_name = new_course_data.get("course_Name")
 
-create_course_model = api.model("create_course_model", {
-    "course_ID" : fields.Integer(description="Course ID", required=True),
-    "course_Name" : fields.String(description="Course Name", required=True),
-    "course_Desc" : fields.String(description="Course Description", required=True),
-    "coursecat_ID" : fields.Integer(description="Course Category ID", required=True)
-})
+            # Check if the course name already exists in the database
+            existing_course = Course.query.filter_by(course_Name=new_course_name).first()
 
-# @api.route("/create_new_course", methods=["POST"])
-# @api.doc(description="Create new course. This is used for testing only. Records will come from LMS in a .csv format")
-# class CreateNewCourses(Resource):
-#     @api.expect(create_course_model)
-#     def post(self):
-#         data = request.get_json()
-#         newCourse = Course(**data)
+            if existing_course:
+                return {"message": "Course name already exists"}, 409  # Conflict
 
-#         try:
-#             courseID = data["course_ID"]
-#             if(Course.query.filter_by(course_ID=courseID).first()):
-#                 return json.loads(json.dumps({"Message": "Course ID already exist"}, default=str)), 400
+            # Create a new course object with the data
+            new_course = Course(None, course_Name=new_course_name, course_Desc=new_course_data.get("course_Desc"), coursecat_ID=new_course_data.get("coursecat_ID"))
 
-#             db.session.add(newCourse)
-#             db.session.commit()
-#             return json.loads(json.dumps(newCourse.json(), default=str)), 200
+            # Add the new course to the database
+            db.session.add(new_course)
 
-#         except Exception as e:
-#             return "Failed" + str(e), 500
+            # Commit the changes to the database
+            db.session.commit()
 
+            # Return the newly created course as JSON response
+            return json.loads(json.dumps(new_course.json(), default=str)), 201
 
-
-
+        except Exception as e:
+            print("Error:", str(e))
+            return "Failed to create a new course: " + str(e), 500
 
 edit_course_model = api.model("edit_course_model", {
     "course_ID": fields.Integer(description="Course ID", required=True),

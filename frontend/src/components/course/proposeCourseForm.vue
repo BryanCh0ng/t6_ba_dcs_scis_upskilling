@@ -53,7 +53,6 @@
             </form>
         </div>
         <!-- Success modal -->
-        <!--<success-modal :show="showSuccessModal" :message="successMessage" @close="hideSuccessModal" />-->
         <AlertDefaultVue :visible="showAlert" variant="success"></AlertDefaultVue>
     </div>
 </template>
@@ -62,6 +61,9 @@ import DropdownField from "../DropdownField.vue";
 import CourseCategoryService from "@/api/services/CourseCategoryService.js";
 import { useVuelidate } from "@vuelidate/core";
 import { required, helpers } from "@vuelidate/validators";
+import CourseService from "@/api/services/CourseService";
+import UserService from "@/api/services/UserService";
+import proposedCourseService from "@/api/services/proposedCourseService";
 
 export default {
     name: "ProposeCourseForm",
@@ -71,12 +73,14 @@ export default {
     },
     data() {
         return {
+            userID: 0,
             formData: {
                 courseName: "",
                 selectedCategory: "",
                 courseCategories: [],
                 courseDescription: ""
             },
+            createCourseResponse: {},
             submitFormData: {}
         }
     },
@@ -93,9 +97,17 @@ export default {
         }
     },
     async mounted() {
+        await this.fetchUserID();
         await this.fetchCourseCategories();
     },
     methods: {
+        async fetchUserID() {
+            try {
+                this.userID = await UserService.getUserID();
+            } catch (error) {
+                console.error("Error fetching user id: ", error);
+            }
+        },
         async fetchCourseCategories() {
             try {
                 this.formData.courseCategories = await CourseCategoryService.getAllCourseCategory();
@@ -103,10 +115,47 @@ export default {
                 console.error('Error fetching course categories:', error);
             }
         },
-        onSubmit() {
+        async createCourse() {
+            try {
+                this.createCourseResponse = await CourseService.createCourse(this.submitFormData);
+            } catch (error) {
+                console.error('Error creating a new course', error);
+            }
+        },
+        async createProposedCourse() {
+            try {
+                this.createProposedCourseResponse = await proposedCourseService.createProposedCourse(this.submitFormData);
+                console.log(this.createProposedCourseResponse)
+            } catch (error) {
+                console.error('Error creating a new proposed course', error);
+            }
+        },
+        async onSubmit() {
             this.v$.$touch();
 
             if (!this.v$.$invalid) {
+
+                this.submitFormData["course_Name"] = this.formData.courseName;
+
+                this.submitFormData["course_Desc"] = this.formData.courseDescription;
+
+                this.submitFormData["coursecat_ID"] = this.formData.courseCategories.find(i => i.coursecat_Name === this.formData.selectedCategory).coursecat_ID;
+
+                await this.createCourse();
+
+                this.submitFormData = {};
+
+                //Need to delete this ltr
+                this.user = 1;
+
+                this.submitFormData["submitted_By"] = this.user;
+
+                this.submitFormData["course_ID"] = this.createCourseResponse["course_ID"];
+
+                //this.submitFormData["course_ID"] = 1;
+
+                await this.createProposedCourse();
+
                 console.log('Form submitted successfully');
             } else {
                 console.log('Form has validation errors');
