@@ -58,9 +58,6 @@
                   </tr>
                   </tbody>
                 </table>
-                <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
-                  <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" /></div>
-                </div>
               </div>
               <div v-else-if="vote_courses=[]">
                 <p>No records found</p>
@@ -106,9 +103,6 @@
                   </tr>
                   </tbody>
                 </table>
-                <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
-                  <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" /></div>
-                </div>
               </div>
               <div v-else-if="notoffered_courses=[]">
                 <p>No records found</p>
@@ -123,10 +117,10 @@
     </div>
 
     <div class="modal fade" id="after_action_modal" tabindex="-1" aria-hidden="true" ref="afterActionModal">
-        <div class="modal-dialog modal-lg"> 
-          <modal-after-action :course="actionCourse" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
-        </div>
+      <div class="modal-dialog modal-lg"> 
+        <modal-after-action :course="actionCourse" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
       </div>
+    </div>
       
   </div>
 </template>

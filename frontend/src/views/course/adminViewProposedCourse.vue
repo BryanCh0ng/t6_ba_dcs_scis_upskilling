@@ -74,7 +74,6 @@
                     <a href="" @click.prevent="sort('pcourse_Status', 'proposed')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'pcourse_Status'" :sortDirection="getSortDirection('pcourse_Status')"/></a></th>
                   <th scope="col">Rejection Reason</th>
                   <th scope="col">Course Details</th>
-                  <th scope="col">Action(s)</th>
                 </tr>
               </thead>
               <tbody>
@@ -88,7 +87,6 @@
                   <td>{{ proposed_course.pcourse_Status }}</td>
                   <td>{{ proposed_course.reason }}</td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <!-- <td><course-action :status="proposed_course.pcourse_Status" :id="proposed_course.course_ID"></course-action></td> -->
                 </tr>
               </tbody>
             </table>

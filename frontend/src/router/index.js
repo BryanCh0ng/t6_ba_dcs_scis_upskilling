@@ -116,13 +116,11 @@ const routes = [
   },
   {
     path: '/editProposedCourse/:courseId/:action?',
-    path: '/instructorTrainerViewProfile',
-    name: 'instructorTrainerViewProfile',
-    component: () => import('../views/course/instructorTrainerViewProfile.vue'),
+    name: 'editProposedCourse',
+    component: () => import('../views/course/editProposedCourse.vue'),
     meta: {
-        title: 'Instructor Trainer View Profile',
-   
-    }
+        title: 'Edit Proposed Course',
+    },
   },     
   {
     path: '/studentViewProfile',
@@ -132,6 +130,15 @@ const routes = [
         title: 'Student View Profile',
     },
   },
+  {
+    path: '/instructorTrainerViewProfile',
+    name: 'instructorTrainerViewProfile',
+    component: () => import('../views/course/instructorTrainerViewProfile.vue'),
+    meta: {
+        title: 'Instructor Trainer View Profile',
+   
+    }
+  }
   // },
   // {
   //     path: '/deleteCourse',
