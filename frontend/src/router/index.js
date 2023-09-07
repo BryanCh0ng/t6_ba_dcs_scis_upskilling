@@ -129,6 +129,14 @@ const routes = [
     meta: {
         title: 'Student View Recommendations',
     },
+  },
+  {
+    path: '/editProposedCourse/:courseId?',
+    name: 'editProposedCourse',
+    component: () => import('../views/course/editProposedCourse.vue'),
+    meta: {
+        title: 'Edit Proposed Course',
+    },
   }
   // },
   // {

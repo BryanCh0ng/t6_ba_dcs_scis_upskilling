@@ -29,10 +29,10 @@
             <td class="current_interest">
                 {{ vote_course.vote_count }}
             </td>
-            <td>{{ vote_course.vote_Status }}</td>
+            <td>{{ vote_status[vote_course.vote_Status] }}</td>
             <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(vote_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
             <td v-if="vote_course.vote_Status === 'Ongoing'"><course-action status="Close" :course="vote_course"></course-action></td>
-            <td v-else-if="vote_course.vote_Status === 'Closed'"><course-action status="Open for Registration" :course="vote_course"></course-action></td>
+            <td v-else-if="vote_course.vote_Status === 'Closed'"><course-action status="promote_to_course" :course="vote_course" @click="editCourse(vote_course.course_ID)"></course-action></td>
             <td v-else></td>
           </tr>
           </tbody>
@@ -76,6 +76,11 @@ export default {
       itemsPerPage: 10,
       localCurrentPage: 1,
       statusOptions: ["Ongoing", "Offered", "Closed"],
+      vote_status: {
+        "Ongoing": "Open for registration",
+        "Offered": "Offered for students to register",
+        "Closed": "Closed for student"
+      }
     }
   },
   methods: {
@@ -130,6 +135,9 @@ export default {
         if (sort_response.code == 200) {
           this.vote_courses = sort_response.data
         }
+    },
+    editCourse(courseId) {
+      this.$router.push({ name: 'editProposedCourse', params: { courseId } });
     }
   },
   computed: {
