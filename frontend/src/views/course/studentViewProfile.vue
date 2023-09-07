@@ -36,8 +36,10 @@
                     <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'registered')">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
                   <th scope="col">
                     <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'registered')">Closing Date<sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
+                    
                   <th scope="col">
                     <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Status', 'registered')">Status <sort-icon :sortColumn="sortColumn === 'reg_Status'" :sortDirection="getSortDirection('reg_Status')"/></a></th>
+                  <th scope="col">Course Details</th>
                   <th scope="col">Action(s)</th>
                 </tr>
               </thead>
@@ -60,7 +62,7 @@
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(registered_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                   <td v-if="registered_course.reg_Status === 'Enrolled' && isClosingDateValid(registered_course.reg_Enddate)">
-                      <course-action status="registered_drop" :id="registered_course.course_ID"></course-action>
+                      <course-action status="registered_drop" @action-and-message-updated="handleActionData" :course="registered_course"></course-action>
                   </td>
                 </tr>
               </tbody>
@@ -162,7 +164,7 @@
                     <td><course-action @action-and-message-updated="handleActionData" status="remove-proposal" :course="proposed_course"></course-action></td>
                   </div>
                   <div v-else-if="proposed_course.pcourse_Status == 'Rejected'">
-                    <td><course-action status="rejected-reason" :id="proposed_course.pcourse_ID"></course-action></td>
+                    <td><course-action status="rejected-reason" @click="openRejectedCourseModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#rejected_course_modal"></course-action></td>
                   </div>
                 </tr>
               </tbody>
@@ -210,8 +212,12 @@
                     {{ completed_course.instructor_Name }}
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(completed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action status="provide-feedback" :id="completed_course.course_ID"></course-action></td>
-                  <!-- <td><course-action status="view-feedback" :id="completed_course.course_ID"></course-action></td> -->
+                  <div v-if="completed_course.feedback_submitted == true">
+                    <td><course-action status="view-feedback" :id="completed_course.course_ID"></course-action></td>
+                  </div>
+                  <div v-else>
+                    <td><course-action status="provide-feedback" :id="completed_course.course_ID"></course-action></td>
+                  </div>
                 </tr>
               </tbody>
             </table>
@@ -240,7 +246,17 @@
           <modal-after-action :course="actionCourse" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
         </div>
       </div>
-
+      
+      <div class="modal fade" id="rejected_course_modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <modal-rejected-reason
+            v-if="showRejectedCourseModal"
+            :course="selectedRejectedCourse"
+            :message="receivedRejectedCourseMessage"
+            @close-modal="closeRejectedCourseModal"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -257,6 +273,7 @@ import StudentSearchFilter from "@/components/search/StudentCourseSearchFilter.v
 import CourseService from "@/api/services/CourseService.js";
 // import UserService from "@/api/services/UserService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
+import modalRejectedReason from '@/components/course/modalRejectedReason.vue';
 
 export default {
   components: {
@@ -268,7 +285,8 @@ export default {
     SearchFilter,
     StudentSearchFilter,
     courseDateTime,
-    modalAfterAction
+    modalAfterAction,
+    modalRejectedReason
   },
   data() {
     return {
@@ -289,13 +307,16 @@ export default {
       statusOptionsInterested: ["Offered", "Ongoing", "Closed"],
       statusOptionsProposed: ["Approved", "Rejected", "Pending"],
       currentDate: new Date(),
-      user_ID: 1,
+      user_ID: null,
       onInitialEmptyRegistered: false,
       onInitialEmptyInterested: false,
       onInitialEmptyProposed: false,
       onInitialEmptyCompleted: false,
       receivedMessage: '',
-      actionCourse: {}
+      actionCourse: {},
+      showRejectedCourseModal: false,
+      selectedRejectedCourse: null,
+      receivedRejectedCourseMessage: '',
     }
   },
   methods: {
@@ -315,6 +336,17 @@ export default {
     },
     modalAfterActionClose() {
       this.loadData();
+    },
+    openRejectedCourseModal(proposedCourse) {
+      this.selectedRejectedCourse = proposedCourse;
+      this.showRejectedCourseModal = true;
+      this.receivedRejectedCourseMessage = proposedCourse.reason;
+    },
+
+    closeRejectedCourseModal() {
+      this.selectedRejectedCourse = null;
+      this.showRejectedCourseModal = false;
+      this.receivedRejectedCourseMessage = '';
     },
     handlePageChangeRegistered(newPage) {
       this.localCurrentPageRegistered = newPage;
@@ -359,7 +391,7 @@ export default {
           status
         );
         this.registered_courses = response.data;
-        console.log(this.registered_courses)
+        // console.log(this.registered_courses)
         return this.registered_courses;
       } catch (error) {
         console.error("Error fetching info:", error);
@@ -449,6 +481,7 @@ export default {
 
         let completed_courses = await CourseService.searchCompletedInfo(user_ID, null, null)
         this.completed_courses = completed_courses.data
+        
       } catch (error) {
         console.error("Error fetching course details:", error);
       }
@@ -526,30 +559,36 @@ export default {
   },
   async created() {
     try {
-      let registered_response= await CourseService.searchCourseRegistrationInfo(this.user_ID, null, null, null)
+      // const user_ID = await UserService.getUserID()
+      const user_ID = 1
+
+      let registered_response= await CourseService.searchCourseRegistrationInfo(user_ID, null, null, null)
       this.registered_courses = registered_response.data
       if (this.registered_courses == undefined || this.registered_courses.length == 0) {
         this.onInitialEmptyRegistered = true
       }
       // console.log(this.registered_courses)
-      let interested_response= await CourseService.searchCourseVoteInfo(this.user_ID, null, null, null)
+
+      let interested_response= await CourseService.searchCourseVoteInfo(user_ID, null, null, null)
       this.interested_courses = interested_response.data
       if (this.interested_courses == undefined || this.interested_courses.length == 0) {
         this.onInitialEmptyInterested = true
       }
       // console.log(this.interested_courses)
-      let proposed_response = await CourseService.searchProposedInfo(this.user_ID, null, null, null)
+
+      let proposed_response = await CourseService.searchProposedInfo(user_ID, null, null, null)
       this.proposed_courses = proposed_response.data
       if (this.proposed_courses == undefined || this.proposed_courses.length == 0) {
         this.onInitialEmptyProposed = true
       }
       // console.log(this.proposed_courses)
-      let completed_response = await CourseService.searchCompletedInfo(this.user_ID, null, null, null)
+
+      let completed_response = await CourseService.searchCompletedInfo(user_ID, null, null, null)
       this.completed_courses = completed_response.data
       if (this.completed_courses == undefined || this.completed_courses.length == 0) {
         this.onInitialEmptyCompleted = true
       }
-      console.log(this.completed_courses)
+      // console.log(this.completed_courses)
     } catch (error) {
       console.error("Error fetching course details:", error);
     }

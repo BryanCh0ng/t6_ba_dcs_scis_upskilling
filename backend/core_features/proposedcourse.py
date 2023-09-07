@@ -94,9 +94,7 @@ class GetProposedCourseByStatus(Resource):
       )
     return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
 
-
-
-# Update Proposed Course 
+# Edit/Update Proposed Course 
 update_proposed_course_model = {
     "course_Name": fields.String(description="Course Name", required=True),
     "course_Desc": fields.String(description="Course Description", required=True),
@@ -132,3 +130,43 @@ class UpdateProposedCourse(Resource):
 
         except Exception as e:
             return jsonify({"message": f"Failed to update proposed course: {str(e)}", "code": 500})
+        
+
+# Delete Propose Course
+delete_proposed_course = api.parser()
+delete_proposed_course.add_argument("pcourse_ID", help="Proposed Course ID")
+
+@api.route('/delete_proposed_course')
+@api.doc(description="Delete Proposed Course")
+class RemoveProposedCourse(Resource):
+    @api.expect(delete_proposed_course)
+    def delete(self):
+        try:
+            args = delete_proposed_course.parse_args()
+            pcourse_id = args.get("pcourse_ID")
+
+            app.logger.debug(pcourse_id)
+
+            # Find the proposed course by its ID.
+            proposed_course = ProposedCourse.query.get(pcourse_id)
+
+            if proposed_course is None:
+                return {"message": "Proposed course not found"}, 404
+
+            # Get the associated course ID.
+            course_id = proposed_course.course_ID
+
+            # Delete the proposed course.
+            db.session.delete(proposed_course)
+            db.session.commit()
+
+            # Now, delete the corresponding course if it exists.
+            course = Course.query.get(course_id)
+            if course is not None:
+                db.session.delete(course)
+                db.session.commit()
+
+            return {"message": "Proposed course deleted successfully"}
+
+        except Exception as e:
+            return {"message": "Failed to delete proposed course: " + str(e)}, 500

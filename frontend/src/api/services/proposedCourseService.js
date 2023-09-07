@@ -28,13 +28,10 @@ class ProposedCourseService extends BaseApiService {
   }
 
   async updateProposedCourse(courseId, courseData) {
-    console.log(courseId)
-    console.log(courseData)
     try {
       const apiUrl = `/proposedcourse/update_proposed_course/${courseId}`;
-      console.log(apiUrl)
       const response = await axiosClient.put(apiUrl, courseData);
-      console.log(response)
+
       if (response.status === 200) {
         return { success: true, message: response.data.message };
       } else {
@@ -45,6 +42,17 @@ class ProposedCourseService extends BaseApiService {
       return { success: false, message: 'An error occurred while updating the proposed course' };
     }
   }
+
+  async removeProposedCourse(pcourse_ID) {
+    try {
+      console.log("im here")
+      let response = await axiosClient.delete("/proposedcourse/delete_proposed_course", { params: { pcourse_ID: pcourse_ID } });
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+  
 }
 
 export default new ProposedCourseService();

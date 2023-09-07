@@ -104,10 +104,10 @@
                         <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                         <div v-if="proposed_course.pcourse_Status == 'Pending'">
                           <td><course-action status="Edit" :id="proposed_course.course_ID" @click="editCourse(proposed_course.course_ID)"></course-action></td>
-                          <td><course-action status="remove-proposal" :id="proposed_course.course_ID"></course-action></td>
+                          <td><course-action @action-and-message-updated="handleActionData" status="remove-proposal" :course="proposed_course"></course-action></td>
                         </div>
                         <div v-else-if="proposed_course.pcourse_Status == 'Rejected'">
-                          <td><course-action status="rejected-reason" :id="proposed_course.course_ID"></course-action></td>
+                          <td><course-action status="rejected-reason" @click="openRejectedCourseModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#rejected_course_modal"></course-action></td>
                         </div>
                         
                     </tr>
@@ -177,6 +177,24 @@
     <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" /></div>
     </div>
+
+    <div class="modal fade" id="after_action_modal" tabindex="-1" aria-hidden="true" ref="afterActionModal">
+        <div class="modal-dialog modal-lg"> 
+          <modal-after-action :course="actionCourse" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
+        </div>
+      </div>
+      
+      <div class="modal fade" id="rejected_course_modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+          <modal-after-action
+            v-if="showRejectedCourseModal"
+            :course="selectedRejectedCourse"
+            :message="receivedRejectedCourseMessage"
+            @close-modal="closeRejectedCourseModal"
+          />
+        </div>
+      </div>
+
   </div>
 </template>
     
@@ -193,6 +211,7 @@ import SearchFilter from "@/components/search/CommonSearchFilter.vue";
 import StudentSearchFilter from "@/components/search/StudentCourseSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 // import UserService from "@/api/services/UserService.js";
+import modalAfterAction from '@/components/course/modalAfterAction.vue';
 
 export default {
   components: {
@@ -204,11 +223,13 @@ export default {
     SearchFilter,
     StudentSearchFilter,
     courseDate,
-    courseDuration
+    courseDuration,
+    modalAfterAction
   },
 
   data() {
     return {
+        user_ID:null,
         assigned_courses: [],
         proposed_courses: [],
         conducted_courses: [],
@@ -223,6 +244,10 @@ export default {
         statusOptionsAssigned: ["Enrolled", "Pending", "Not Enrolled", "Dropped"],
         statusOptionsProposed: ["Approved", "Rejected", "Pending"],
         currentDate: new Date(),
+        actionCourse: {},
+        showRejectedCourseModal: false,
+        selectedRejectedCourse: null,
+        receivedRejectedCourseMessage: '',
     }
   },
 
@@ -235,6 +260,18 @@ export default {
     closeModal() {
       this.selectedCourse = null;
       this.showModal = false;
+    },
+
+    openRejectedCourseModal(proposedCourse) {
+      this.selectedRejectedCourse = proposedCourse;
+      this.showRejectedCourseModal = true;
+      this.receivedRejectedCourseMessage = proposedCourse.reason;
+    },
+
+    closeRejectedCourseModal() {
+      this.selectedRejectedCourse = null;
+      this.showRejectedCourseModal = false;
+      this.receivedRejectedCourseMessage = '';
     },
 
     handlePageChangeAssigned(newPage) {

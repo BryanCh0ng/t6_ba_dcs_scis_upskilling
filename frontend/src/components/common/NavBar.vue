@@ -125,10 +125,9 @@ export default {
 
       if (this.user_role === "Student") {
         items.push({ path: "/studentViewProfile", label: "Profile" });
-      } else if (this.user_role === "Instructor" || this.user_role === "Trainer") 
-      {
+      } else if (this.user_role === "Instructor" || this.user_role === "Trainer") {
         items.push(
-          { path: "/profile", label: "Profile" },
+          { path: "/instructorTrainerViewProfile", label: "Profile" },
           { path: "/blacklist", label: "Blacklist" },
           { path: "/dashboard", label: "Dashboard" }
         );
@@ -139,6 +138,7 @@ export default {
           { path: "/adminViewVoteCourse", label: "All Vote Course DB" },
           { path: "/allAvailRegCourse", label: "All Available Registration Course" },
           { path: "/adminViewInstructorsTrainers", label: "All Instructors DB" },
+          { path: "/blacklist", label: "Blacklist" },
           { path: "/feedbackTemplate", label: "Feedback Template" },
           { path: "/dashboard", label: "Dashboard" }
         );
@@ -160,7 +160,7 @@ export default {
       try {
         const user_ID = await UserService.getUserID()
         this.user_ID = user_ID
-        console.log(this.user_ID)
+        // console.log(this.user_ID)
 
         if (user_ID === "Session not set") {
           this.user_ID = null
@@ -186,7 +186,7 @@ export default {
       try {
         const user_name = await UserService.getUserName()
         this.user_name = user_name
-        console.log(this.user_name)
+        // console.log(this.user_name)
       } catch (error) {
         console.error('Error fetching user ID:', error);
         this.user_name = null;
@@ -215,7 +215,7 @@ export default {
     this.router.push('/login');
     },
     toggleUserDropdown() {
-      console.log("Toggling user dropdown");
+      // console.log("Toggling user dropdown");
       this.showUserDropdown = !this.showUserDropdown;
     },
   }

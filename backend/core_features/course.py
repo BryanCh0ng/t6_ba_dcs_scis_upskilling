@@ -3,7 +3,7 @@ from flask_restx import Namespace, Resource, fields
 from allClasses import *
 import json
 from sqlalchemy.orm import aliased
-from sqlalchemy import func, and_  
+from sqlalchemy import func, and_, exists
 from datetime import datetime
 import logging
 app.logger.setLevel(logging.DEBUG)
@@ -560,16 +560,16 @@ class GetCompletedCourses(Resource):
             CourseCategory.coursecat_Name,
             UserInstructor.user_Name.label("instructor_name"),
             UserInstructor.user_Email.label("instructor_email"),
-            Feedback.feedback_ID.label("feedback_id")  
+            exists().where(and_(
+                Feedback.submitted_By == user_id,
+                Feedback.course_ID == Course.course_ID,  # Specify course filter
+                Feedback.feedback_Template_ID == RunCourse.template_ID  # Add this filter
+            )).label("feedback_submitted")
         ).select_from(RunCourse).join(Course, RunCourse.course_ID == Course.course_ID) \
             .join(Registration, RunCourse.rcourse_ID == Registration.rcourse_ID) \
             .join(UserInstructor, RunCourse.instructor_ID == UserInstructor.user_ID) \
             .join(UserStudent, Registration.user_ID == UserStudent.user_ID) \
             .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
-            .outerjoin(Feedback, and_(
-                Feedback.submitted_By == user_id,
-                Feedback.course_ID == Course.course_ID
-            )) \
             .filter(UserStudent.user_ID == user_id) \
             .filter(RunCourse.run_Enddate <= current_datetime)
 
@@ -603,13 +603,15 @@ class GetCompletedCourses(Resource):
                     "coursecat_Name": result[2],
                     "instructor_Name": result[3],
                     "instructor_Email": result[4],
-                    "feedback_submitted": bool(result[5])  # Check if feedback exists
+                    "feedback_submitted": result[5]  # Use the boolean value
                 }
                 result_data.append(course_info)
 
             return jsonify({"code": 200, "data": result_data})
 
         return jsonify({"code": 404, "message": "No completed courses found"})
+
+
 
     
 
@@ -1003,6 +1005,9 @@ class GetAllVotingCoursesAdmin(Resource):
         course_category_id = args.get("coursecat_id", "")
         vote_status = args.get("vote_status", "")
 
+        # Define a list of valid vote status values
+        valid_vote_statuses = ["Offered", "Closed", "Ongoing"]
+
         query = db.session.query(
             Course,
             CourseCategory.coursecat_Name,
@@ -1011,7 +1016,10 @@ class GetAllVotingCoursesAdmin(Resource):
         ).select_from(VoteCourse) \
         .join(Course, VoteCourse.course_ID == Course.course_ID) \
         .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
-        .join(ProposedCourse, Course.course_ID == ProposedCourse.course_ID)
+        .join(ProposedCourse, Course.course_ID == ProposedCourse.course_ID) \
+        .filter(
+            VoteCourse.vote_Status.in_(valid_vote_statuses)
+        )
 
         if course_name:
             query = query.filter(Course.course_Name.contains(course_name))
@@ -1019,6 +1027,54 @@ class GetAllVotingCoursesAdmin(Resource):
             query = query.filter(Course.coursecat_ID == course_category_id)
         if vote_status:
             query = query.filter(VoteCourse.vote_Status == vote_status)
+
+        results = query.all()
+        db.session.close()
+
+        if results:
+            result_data = []
+            for result in results:
+                course_info = {
+                    **result[0].json(),
+                    "coursecat_Name": result[1],
+                    "vote_Status": result[2],
+                    **result[3].json()
+                }
+                result_data.append(course_info)
+
+            return jsonify({"code": 200, "data": result_data})
+
+        return jsonify({"code": 404, "message": "No voting courses found"})
+    
+#  Admin - All Voting Campaign - Deleted
+retrieve_all_voting_courses_admin = api.parser()
+retrieve_all_voting_courses_admin.add_argument("course_name", help="Enter course name")
+retrieve_all_voting_courses_admin.add_argument("coursecat_id", help="Enter course category id")
+
+@api.route("/get_all_not_offered_courses_admin")
+@api.doc(description="Get all voting courses (Admin)")
+class GetAllDeletedVotingCoursesAdmin(Resource):
+    @api.expect(retrieve_all_voting_courses_admin)
+    def get(self):
+        args = retrieve_all_voting_courses_admin.parse_args()
+        course_name = args.get("course_name", "")
+        course_category_id = args.get("coursecat_id", "")
+
+        query = db.session.query(
+            Course,
+            CourseCategory.coursecat_Name,
+            VoteCourse.vote_Status,
+            ProposedCourse
+        ).select_from(VoteCourse) \
+        .join(Course, VoteCourse.course_ID == Course.course_ID) \
+        .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
+        .join(ProposedCourse, Course.course_ID == ProposedCourse.course_ID) \
+        .filter(VoteCourse.vote_Status == "Not Offered")
+
+        if course_name:
+            query = query.filter(Course.course_Name.contains(course_name))
+        if course_category_id:
+            query = query.filter(Course.coursecat_ID == course_category_id)
 
         results = query.all()
         db.session.close()
@@ -1392,3 +1448,30 @@ class DemoveInterest(Resource):
         except Exception as e:
             return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
 
+# Soft delete vote - Update status to Not Offered
+update_vote_status_parser = api.parser()
+update_vote_status_parser.add_argument("course_ID", type=int, help="Course ID")
+
+@api.route('/update_vote_unoffered_course')
+@api.doc(description="Update Vote Status in VoteCourse Table to 'Not Offered'")
+class UpdateVoteStatus(Resource):
+    @api.expect(update_vote_status_parser)
+    def put(self):
+        try:
+            args = update_vote_status_parser.parse_args()
+            course_ID = args.get("course_ID")
+
+            # Find the corresponding VoteCourse record by course ID.
+            vote_course = VoteCourse.query.filter_by(course_ID=course_ID).first()
+
+            if vote_course is None:
+                return {"message": "VoteCourse record not found for the specified course"}, 404
+
+            # Update the vote_Status to 'Not Offered'.
+            vote_course.vote_Status = 'Not Offered'
+            db.session.commit()
+
+            return json.loads(json.dumps({"message":"You have delete the course successfully. Please refer to 'Deleted Course' Tab."}, default=str)), 200
+
+        except Exception as e:
+            return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
