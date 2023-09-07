@@ -947,7 +947,7 @@ class GetAllProposedCoursesAdmin(Resource):
         course_category_id = args.get("coursecat_id", "")
         pcourse_status = args.get("pcourse_status", "")
 
-        app.logger.debug(pcourse_status)
+        # app.logger.debug(pcourse_status)
 
         query = db.session.query(
             ProposedCourse,
@@ -990,23 +990,20 @@ class GetAllProposedCoursesAdmin(Resource):
         return jsonify({"code": 404, "message": "No proposed courses found"})
     
 #  Admin - All Voting Campaign
-retrieve_all_voting_courses_admin = api.parser()
-retrieve_all_voting_courses_admin.add_argument("course_name", help="Enter course name")
-retrieve_all_voting_courses_admin.add_argument("coursecat_id", help="Enter course category id")
-retrieve_all_voting_courses_admin.add_argument("vote_status", help="Enter vote status")
+retrieve_all_voting_campaign_courses_admin = api.parser()
+retrieve_all_voting_campaign_courses_admin.add_argument("course_name", help="Enter course name")
+retrieve_all_voting_campaign_courses_admin.add_argument("coursecat_id", help="Enter course category id")
+retrieve_all_voting_campaign_courses_admin.add_argument("vote_status", help="Enter course category id")
 
 @api.route("/get_all_voting_courses_admin")
 @api.doc(description="Get all voting courses (Admin)")
 class GetAllVotingCoursesAdmin(Resource):
-    @api.expect(retrieve_all_voting_courses_admin)
+    @api.expect(retrieve_all_voting_campaign_courses_admin)
     def get(self):
-        args = retrieve_all_voting_courses_admin.parse_args()
+        args = retrieve_all_voting_campaign_courses_admin.parse_args()
         course_name = args.get("course_name", "")
         course_category_id = args.get("coursecat_id", "")
         vote_status = args.get("vote_status", "")
-
-        # Define a list of valid vote status values
-        valid_vote_statuses = ["Offered", "Closed", "Ongoing"]
 
         query = db.session.query(
             Course,
@@ -1018,9 +1015,10 @@ class GetAllVotingCoursesAdmin(Resource):
         .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
         .join(ProposedCourse, Course.course_ID == ProposedCourse.course_ID) \
         .filter(
-            VoteCourse.vote_Status.in_(valid_vote_statuses)
+            (VoteCourse.vote_Status == "Offered") |
+            (VoteCourse.vote_Status == "Closed") |
+            (VoteCourse.vote_Status == "Ongoing")
         )
-
         if course_name:
             query = query.filter(Course.course_Name.contains(course_name))
         if course_category_id:

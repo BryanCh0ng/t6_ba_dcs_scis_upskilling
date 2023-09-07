@@ -209,7 +209,7 @@ export default {
       this.notoffered_courses = searchResults; // Always update the courses array
     },
     async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, vote_status) {
-      console.log("vote status",status)
+      console.log("vote status",vote_status)
       try {
         let response = await CourseService.searchAllVotingCoursesAdmin(
           course_Name,
