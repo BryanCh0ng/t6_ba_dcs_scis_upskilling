@@ -29,10 +29,10 @@
             </button>
           </div>
           <div class="col-md-6 mb-2">
-            <button v-if="action == 'approve'" type="button" class="btn btn-block shadow-sm w-100 mt-2 field submitbtn">
+            <button v-if="action == 'approve'" type="submit" class="btn btn-block shadow-sm w-100 mt-2 field submitbtn">
               Approve Proposed Course
             </button>
-            <button v-else-if="action == 'promote_to_course'" type="button" class="btn btn-block shadow-sm w-100 mt-2 field submitbtn">
+            <button v-else-if="action == 'promote_to_course'" type="submit" class="btn btn-block shadow-sm w-100 mt-2 field submitbtn">
               Promote to course
             </button>
             <button  v-else type="submit" class="btn btn-block shadow-sm w-100 mt-2 field submitbtn">
@@ -82,6 +82,7 @@ export default {
       showSuccessModal: false,
       descPlaceholder: "Course Description",
       categoryDropdownOptions: [],
+      pcourse_ID: ""
     };
   },
 
@@ -154,6 +155,8 @@ export default {
           const coursecat_ID = courseData.coursecat_ID;
           this.category = coursecat_ID;
 
+          this.pcourse_ID = courseData.pcourse_ID
+
           // Optional: You can set the default dropdown option if it exists
           const defaultOption = this.categoryDropdownOptions.find(option => option.coursecat_ID === coursecat_ID);
           if (defaultOption) {
@@ -199,10 +202,18 @@ export default {
             const result = await ProposedCourseService.updateProposedCourse(courseId, formData);
 
             if (result.success) {
-                this.showSuccessModal = true;
-
+              if (this.action == 'approve'){
+                console.log(this.pcourse_ID)
+                const approve_result = await ProposedCourseService.acceptProposedCourse({"pcourseID": this.pcourse_ID});
+                if (approve_result.code == 200) {
+                  this.showSuccessModal = true;
+                }
+                else {
+                  this.errorMessage = approve_result.message
+                }
+              }
             } else {
-            this.errorMessage = result.message;
+              this.errorMessage = result.message;
             }
         } catch (error) {
             console.error('Error submitting form:', error);

@@ -57,7 +57,8 @@ class GetProposedCourse(Resource):
                 "course_Name": course.course_Name,
                 "course_Desc": course.course_Desc,
                 "coursecat_ID": course.coursecat_ID,
-                "coursecat_Name": course_category.coursecat_Name
+                "coursecat_Name": course_category.coursecat_Name,
+                "pcourse_ID": proposed_course.pcourse_ID
             }
             
             return jsonify(
@@ -182,7 +183,7 @@ class RejectProposedCourse(Resource):
   def post(self):
     try:
       data = request.get_json()
-      proposed_course = ProposedCourse.query.filter_by(pcourse_ID = data['pcourseID'], pcourse_Status='Pending').first()
+      proposed_course = ProposedCourse.query.filter_by(pcourse_ID = data['pcourseID']).first()
       if proposed_course:
         proposed_course.pcourse_Status = 'Rejected'
         proposed_course.reason = data['reason']
@@ -190,8 +191,33 @@ class RejectProposedCourse(Resource):
         return jsonify({"message": "Proposed Course is successfully rejected", "code": 200})
   
       else:
-        return jsonify({"message": "Course does not exist or is not of Pending status", "code": 404})
+        return jsonify({"message": "Course does not exist", "code": 404})
 
     except Exception as e:
       return jsonify({"message": "Failed " + str(e), "code": 500})
+    
 
+accept_proposed_course_model = api.model("accept_proposed_course_model", {
+    "pcourseID" : fields.Integer(description="", required=True),
+})
+@api.route('/accept_proposed_course', methods=["POST"])
+@api.doc(description="Accept Proposed Course")
+class AcceptProposedCourse(Resource):
+  @api.expect(accept_proposed_course_model)
+  def post(self):
+    try:
+      data = request.get_json()
+      print(data)
+
+      proposed_course = ProposedCourse.query.filter_by(pcourse_ID = data['pcourseID']).first()
+
+      if proposed_course:
+        proposed_course.pcourse_Status = 'Accepted'
+        db.session.commit()
+        return jsonify({"message": "Proposed Course is successfully accepted", "code": 200})
+  
+      else:
+        return jsonify({"message": "Course does not exist", "code": 404})
+
+    except Exception as e:
+        return jsonify({"message": "Failed " + str(e), "code": 500})
