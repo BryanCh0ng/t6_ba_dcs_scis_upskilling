@@ -123,9 +123,9 @@ class ProposedCourse(db.Model):
     pcourse_Status = db.Column(db.String(20), nullable=False)
     reason = db.Column(db.String(255), nullable=False)
     proposed_Date = db.Column(db.Date, nullable=False)
+    voteCount = db.Column(db.Integer, nullable=False)
 
-
-    def __init__(self, pcourse_ID, submitted_By, action_Done_By, course_ID, pcourse_Status, reason, proposed_Date ):
+    def __init__(self, pcourse_ID, submitted_By, action_Done_By, course_ID, pcourse_Status, reason,proposed_Date, voteCount ):
         self.pcourse_ID = pcourse_ID
         self.submitted_By = submitted_By
         self.course_ID = course_ID
@@ -133,6 +133,9 @@ class ProposedCourse(db.Model):
         self.action_Done_By = action_Done_By
         self.reason = reason        
         self.proposed_Date = proposed_Date
+        self.reason = reason 
+        self.voteCount = voteCount       
+
 
     def json(self):
         columns = self.__mapper__.column_attrs.keys()

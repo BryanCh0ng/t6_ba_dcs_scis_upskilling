@@ -81,8 +81,8 @@
                   <course-name-desc :name="course.course_Name" :category="course.coursecat_Name" :description="course.course_Desc"></course-name-desc>
                 </td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                <td><course-action status="Vote" :course="course"></course-action></td>
-              </tr>
+                <td><course-action @action-and-message-updated="handleActionData" status="Vote" :course="course"></course-action></td>
+              </tr> 
             </tbody>
           </table>
         </div>
@@ -217,7 +217,7 @@ export default {
         let run_response = await CourseService.searchUnregisteredActiveInfo(1, null, null)
         this.run_courses = run_response.data
         
-        let vote_response = await CourseService.searchUnvotedActiveInfo(null, null, null)
+        let vote_response = await CourseService.searchUnvotedActiveInfo(1, null, null)
         this.vote_courses = vote_response.data
       } catch (error) {
         console.error("Error fetching course details:", error);

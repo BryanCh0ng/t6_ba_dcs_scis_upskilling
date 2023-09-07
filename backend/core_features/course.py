@@ -3,7 +3,7 @@ from flask_restx import Namespace, Resource, fields
 from allClasses import *
 import json
 from sqlalchemy.orm import aliased
-from sqlalchemy import func, and_  
+from sqlalchemy import func, and_, exists
 from datetime import datetime
 import logging
 app.logger.setLevel(logging.DEBUG)
@@ -237,7 +237,7 @@ class GetUnregisteredActiveCourses(Resource):
         args = retrieve_unregistered_active_courses_filter.parse_args()
         user_ID = args.get("user_id")
 
-        app.logger.debug(user_ID)
+        # app.logger.debug(user_ID)
 
         # Get the courses that the user has already registered for
         registered_course_ids = db.session.query(Registration.rcourse_ID).filter_by(user_ID=user_ID).subquery()
@@ -251,7 +251,8 @@ class GetUnregisteredActiveCourses(Resource):
             CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
         ).filter(
             ~RunCourse.rcourse_ID.in_(registered_course_ids),
-            RunCourse.course_Status == "active"
+            RunCourse.course_Status == "active",
+            RunCourse.runcourse_Status == "ongoing"
         )
 
         # Apply additional filters based on user inputs
@@ -308,17 +309,15 @@ class GetUnvotedOngoingCourses(Resource):
         course_Name = args.get("course_name", "")
         coursecat_ID = args.get("coursecat_id", "")
 
+        # app.logger.debug(user_ID)
 
-        app.logger.debug(user_ID)
-
-        # Get the courses that the user has already voted for
         voted_course_ids = db.session.query(Interest.vote_ID).filter_by(user_ID=user_ID).subquery()
 
         # Construct the query for unvoted courses with ongoing vote status
         query = db.session.query(
             Course,
             CourseCategory.coursecat_Name,
-            VoteCourse.vote_Status
+            VoteCourse
         ).select_from(Course).join(VoteCourse, Course.course_ID == VoteCourse.course_ID).join(
             CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
         ).filter(
@@ -340,7 +339,7 @@ class GetUnvotedOngoingCourses(Resource):
                 course_info = {
                     **result[0].json(),
                     "coursecat_Name": result[1],
-                    "vote_Status": result[2]
+                    **result[2].json(),
                 }
                 result_data.append(course_info)
             return jsonify({"code": 200, "data": result_data})
@@ -370,6 +369,8 @@ class GetCourseRegistrationInfo(Resource):
 
         app.logger.debug(reg_Status)
 
+        current_datetime = datetime.now()
+
         query = db.session.query(
             Course,
             CourseCategory.coursecat_Name,
@@ -377,7 +378,8 @@ class GetCourseRegistrationInfo(Resource):
             Registration
         ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).join(
             Registration, RunCourse.rcourse_ID == Registration.rcourse_ID
-        ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)
+        ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)  \
+            .filter(RunCourse.run_Enddate > current_datetime)
 
         if user_ID:
             query = query.filter(Registration.user_ID == user_ID)
@@ -444,7 +446,7 @@ class GetCourseInterestInfo(Resource):
         query = db.session.query(
             Course,
             CourseCategory.coursecat_Name,
-            VoteCourse.vote_Status
+            VoteCourse
         ).select_from(Course).join(VoteCourse, Course.course_ID == VoteCourse.course_ID).join(
             Interest, VoteCourse.vote_ID == Interest.vote_ID
         ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)
@@ -467,7 +469,7 @@ class GetCourseInterestInfo(Resource):
                 course_info = {
                     **result[0].json(),
                     "coursecat_Name": result[1],
-                    "vote_Status": result[2]
+                    **result[2].json()
                 }
                 result_data.append(course_info)
 
@@ -544,26 +546,32 @@ class GetCompletedCourses(Resource):
     def get(self):
         args = retrieve_completed_courses_filter_search.parse_args()
         user_id = args.get("user_id")
-        # user_id = session.get("user_id")
         course_name = args.get("course_name", "")
         course_category_id = args.get("coursecat_id", "")
         
+        current_datetime = datetime.now()
+
         UserInstructor = aliased(User)
         UserStudent = aliased(User)
 
         query = db.session.query(
             Course,
             RunCourse,
+            CourseCategory.coursecat_Name,
             UserInstructor.user_Name.label("instructor_name"),
             UserInstructor.user_Email.label("instructor_email"),
+            exists().where(and_(
+                Feedback.submitted_By == user_id,
+                Feedback.course_ID == Course.course_ID,  # Specify course filter
+                Feedback.feedback_Template_ID == RunCourse.template_ID  # Add this filter
+            )).label("feedback_submitted")
         ).select_from(RunCourse).join(Course, RunCourse.course_ID == Course.course_ID) \
             .join(Registration, RunCourse.rcourse_ID == Registration.rcourse_ID) \
             .join(UserInstructor, RunCourse.instructor_ID == UserInstructor.user_ID) \
             .join(UserStudent, Registration.user_ID == UserStudent.user_ID) \
+            .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
             .filter(UserStudent.user_ID == user_id) \
-            .filter(Registration.reg_Status == 'Enrolled') \
-            .filter(RunCourse.runcourse_Status == 'Closed') \
-            .filter(RunCourse.course_Status == 'Inactive')
+            .filter(RunCourse.run_Enddate <= current_datetime)
 
         if course_name:
             query = query.filter(Course.course_Name.contains(course_name))
@@ -592,14 +600,18 @@ class GetCompletedCourses(Resource):
                 course_info = {
                     **result[0].json(),
                     **modified_run_course,
-                    "instructor_Name": result[2],
-                    "instructor_Email": result[3]
+                    "coursecat_Name": result[2],
+                    "instructor_Name": result[3],
+                    "instructor_Email": result[4],
+                    "feedback_submitted": result[5]  # Use the boolean value
                 }
                 result_data.append(course_info)
 
             return jsonify({"code": 200, "data": result_data})
 
         return jsonify({"code": 404, "message": "No completed courses found"})
+
+
 
     
 
@@ -675,6 +687,8 @@ class GetInstructorCourses(Resource):
         course_category_id = args.get("coursecat_id", "")
         runcourse_status = args.get("runcourse_status", "")
 
+        current_datetime = datetime.now()
+
         UserInstructor = aliased(User)
         # RunCourseAlias = aliased(RunCourse)
         # CourseAlias = aliased(Course)
@@ -690,7 +704,8 @@ class GetInstructorCourses(Resource):
         .join(UserInstructor, UserInstructor.user_ID == User.user_ID) \
         .join(RunCourse, RunCourse.instructor_ID == UserInstructor.user_ID) \
         .join(Course, Course.course_ID == RunCourse.course_ID) \
-        .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)
+        .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
+        .filter(RunCourse.run_Enddate >= current_datetime)
 
         if instructor_id:
             query = query.filter(UserInstructor.user_ID == instructor_id)
@@ -752,20 +767,12 @@ class GetProposedCoursesByUser(Resource):
         course_category_id = args.get("coursecat_id", "")
         pcourse_status = args.get("pcourse_status", "")
 
-        vote_counts_subquery = db.session.query(
-            VoteCourse.course_ID,
-            func.count(Interest.interest_ID).label("vote_count")
-        ).join(Interest, VoteCourse.vote_ID == Interest.vote_ID) \
-        .group_by(VoteCourse.course_ID).subquery()
-        
         query = db.session.query(
             Course,
             CourseCategory.coursecat_Name,
-            ProposedCourse,
-            vote_counts_subquery.c.vote_count
+            ProposedCourse
         ).select_from(ProposedCourse).join(Course, ProposedCourse.course_ID == Course.course_ID) \
-            .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
-            .outerjoin(vote_counts_subquery, Course.course_ID == vote_counts_subquery.c.course_ID)
+            .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)
         
         if user_id:
             query = query.filter(ProposedCourse.submitted_By == user_id)
@@ -786,8 +793,7 @@ class GetProposedCoursesByUser(Resource):
                 course_info = {
                     **result[0].json(),
                     "coursecat_Name": result[1],
-                    **result[2].json(),
-                    "vote_count": result[3]
+                    **result[2].json()
                 }
                 result_data.append(course_info)
             
@@ -813,7 +819,8 @@ class GetInstructorTaughtCourses(Resource):
         course_category_id = args.get("coursecat_id", "")
 
         UserInstructor = aliased(User)
-        current_time = datetime.now()  # Current time
+
+        current_datetime = datetime.now()
 
         query = db.session.query(
             User.user_Name,
@@ -825,7 +832,8 @@ class GetInstructorTaughtCourses(Resource):
         .join(UserInstructor, UserInstructor.user_ID == User.user_ID) \
         .join(RunCourse, RunCourse.instructor_ID == UserInstructor.user_ID) \
         .join(Course, Course.course_ID == RunCourse.course_ID) \
-        .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)
+        .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
+        .filter(RunCourse.run_Enddate < current_datetime)
 
         if instructor_id:
             query = query.filter(UserInstructor.user_ID == instructor_id)
@@ -834,8 +842,6 @@ class GetInstructorTaughtCourses(Resource):
         if course_category_id:
             query = query.filter(Course.coursecat_ID == course_category_id)
 
-        # Filter out courses that have ended
-        query = query.filter(RunCourse.run_Endtime <= current_time)
 
         results = query.all()
         db.session.close()
@@ -861,7 +867,7 @@ class GetInstructorTaughtCourses(Resource):
                     "user_Email": result[1],
                     **modified_run_course,
                     **result[3].json(),
-                    "coursecat_Name": result[1]
+                    "coursecat_Name": result[4]
                 }
                 result_data.append(course_info)
 
@@ -941,7 +947,7 @@ class GetAllProposedCoursesAdmin(Resource):
         course_category_id = args.get("coursecat_id", "")
         pcourse_status = args.get("pcourse_status", "")
 
-        app.logger.debug(pcourse_status)
+        # app.logger.debug(pcourse_status)
 
         query = db.session.query(
             ProposedCourse,
@@ -984,37 +990,35 @@ class GetAllProposedCoursesAdmin(Resource):
         return jsonify({"code": 404, "message": "No proposed courses found"})
     
 #  Admin - All Voting Campaign
-retrieve_all_voting_courses_admin = api.parser()
-retrieve_all_voting_courses_admin.add_argument("course_name", help="Enter course name")
-retrieve_all_voting_courses_admin.add_argument("coursecat_id", help="Enter course category id")
-retrieve_all_voting_courses_admin.add_argument("vote_status", help="Enter vote status")
+retrieve_all_voting_campaign_courses_admin = api.parser()
+retrieve_all_voting_campaign_courses_admin.add_argument("course_name", help="Enter course name")
+retrieve_all_voting_campaign_courses_admin.add_argument("coursecat_id", help="Enter course category id")
+retrieve_all_voting_campaign_courses_admin.add_argument("vote_status", help="Enter course category id")
 
 @api.route("/get_all_voting_courses_admin")
 @api.doc(description="Get all voting courses (Admin)")
 class GetAllVotingCoursesAdmin(Resource):
-    @api.expect(retrieve_all_voting_courses_admin)
+    @api.expect(retrieve_all_voting_campaign_courses_admin)
     def get(self):
-        args = retrieve_all_voting_courses_admin.parse_args()
+        args = retrieve_all_voting_campaign_courses_admin.parse_args()
         course_name = args.get("course_name", "")
         course_category_id = args.get("coursecat_id", "")
         vote_status = args.get("vote_status", "")
-
-        vote_counts_subquery = db.session.query(
-            VoteCourse.course_ID,
-            func.count(Interest.interest_ID).label("vote_count")
-        ).join(Interest, VoteCourse.vote_ID == Interest.vote_ID) \
-        .group_by(VoteCourse.course_ID).subquery()
 
         query = db.session.query(
             Course,
             CourseCategory.coursecat_Name,
             VoteCourse.vote_Status,
-            vote_counts_subquery.c.vote_count
+            ProposedCourse
         ).select_from(VoteCourse) \
         .join(Course, VoteCourse.course_ID == Course.course_ID) \
         .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
-        .outerjoin(vote_counts_subquery, Course.course_ID == vote_counts_subquery.c.course_ID)
-
+        .join(ProposedCourse, Course.course_ID == ProposedCourse.course_ID) \
+        .filter(
+            (VoteCourse.vote_Status == "Offered") |
+            (VoteCourse.vote_Status == "Closed") |
+            (VoteCourse.vote_Status == "Ongoing")
+        )
         if course_name:
             query = query.filter(Course.course_Name.contains(course_name))
         if course_category_id:
@@ -1032,7 +1036,55 @@ class GetAllVotingCoursesAdmin(Resource):
                     **result[0].json(),
                     "coursecat_Name": result[1],
                     "vote_Status": result[2],
-                    "vote_count": result[3]
+                    **result[3].json()
+                }
+                result_data.append(course_info)
+
+            return jsonify({"code": 200, "data": result_data})
+
+        return jsonify({"code": 404, "message": "No voting courses found"})
+    
+#  Admin - All Voting Campaign - Deleted
+retrieve_all_voting_courses_admin = api.parser()
+retrieve_all_voting_courses_admin.add_argument("course_name", help="Enter course name")
+retrieve_all_voting_courses_admin.add_argument("coursecat_id", help="Enter course category id")
+
+@api.route("/get_all_not_offered_courses_admin")
+@api.doc(description="Get all voting courses (Admin)")
+class GetAllDeletedVotingCoursesAdmin(Resource):
+    @api.expect(retrieve_all_voting_courses_admin)
+    def get(self):
+        args = retrieve_all_voting_courses_admin.parse_args()
+        course_name = args.get("course_name", "")
+        course_category_id = args.get("coursecat_id", "")
+
+        query = db.session.query(
+            Course,
+            CourseCategory.coursecat_Name,
+            VoteCourse.vote_Status,
+            ProposedCourse
+        ).select_from(VoteCourse) \
+        .join(Course, VoteCourse.course_ID == Course.course_ID) \
+        .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
+        .join(ProposedCourse, Course.course_ID == ProposedCourse.course_ID) \
+        .filter(VoteCourse.vote_Status == "Not Offered")
+
+        if course_name:
+            query = query.filter(Course.course_Name.contains(course_name))
+        if course_category_id:
+            query = query.filter(Course.coursecat_ID == course_category_id)
+
+        results = query.all()
+        db.session.close()
+
+        if results:
+            result_data = []
+            for result in results:
+                course_info = {
+                    **result[0].json(),
+                    "coursecat_Name": result[1],
+                    "vote_Status": result[2],
+                    **result[3].json()
                 }
                 result_data.append(course_info)
 
@@ -1334,3 +1386,90 @@ class sortRecords(Resource):
 
 
         return jsonify({"code": 200, "data": sorted_data, "sort": sort_column, "direction": sort_direction})
+
+
+
+add_interest = api.parser()
+add_interest.add_argument("vote_ID", help="Vote ID")
+add_interest.add_argument("user_ID", help="User ID")
+@api.route('/add_interest', methods=["POST"])
+@api.doc(description="Add Interest For Course")
+class AddInterest(Resource):
+    @api.expect(add_interest)
+    def post(self):
+        try:
+            args = add_interest.parse_args()
+            voteID = args.get("vote_ID")
+            userID = args.get("user_ID")
+            interestList = Interest.query.filter(Interest.interest_ID.contains("")).all()
+            finalInterest = interestList[-1]
+            interestID = finalInterest.interest_ID
+
+            newInterest = Interest(interestID+1, voteID, userID)
+            
+            course = VoteCourse.query.filter_by(vote_ID = voteID).first()
+            courseID = course.course_ID
+            Proposedcourse = ProposedCourse.query.filter_by(course_ID=courseID).first()
+            votecount = Interest.query.filter_by(vote_ID = voteID).count()
+            Proposedcourse.voteCount = votecount + 1
+            db.session.add(newInterest)
+            db.session.commit()
+
+            return json.loads(json.dumps({"message":"Express Interest Successfully! Please refer to your profile to find out the status of the course."}, default=str)), 200
+        except Exception as e:
+            return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
+
+
+
+delete_interest = api.parser()
+delete_interest.add_argument("vote_ID", help="Vote ID")
+delete_interest.add_argument("user_ID", help="User ID")
+@api.route('/delete_interest')
+@api.doc(description="Delete Interest for Course")
+class DemoveInterest(Resource):
+    @api.expect(delete_interest)
+    def post(self):
+        try:
+            args = delete_interest.parse_args()
+            voteID = args.get("vote_ID")
+            userID = args.get("user_ID")
+            course = VoteCourse.query.filter_by(vote_ID = voteID).first()
+            courseID = course.course_ID
+            Proposedcourse = ProposedCourse.query.filter_by(course_ID=courseID).first()
+            votecount = Interest.query.filter_by(vote_ID = voteID).count()
+            Proposedcourse.voteCount = votecount - 1
+            db.session.delete(Interest.query.filter_by(vote_ID=voteID, user_ID=userID).first())                                 
+            db.session.commit()
+
+            return json.loads(json.dumps({"message":"Unvote Interest Successfully! Please refer to View Course page to find out more courses."}, default=str)), 200
+            
+        except Exception as e:
+            return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
+
+# Soft delete vote - Update status to Not Offered
+update_vote_status_parser = api.parser()
+update_vote_status_parser.add_argument("course_ID", type=int, help="Course ID")
+
+@api.route('/update_vote_unoffered_course')
+@api.doc(description="Update Vote Status in VoteCourse Table to 'Not Offered'")
+class UpdateVoteStatus(Resource):
+    @api.expect(update_vote_status_parser)
+    def put(self):
+        try:
+            args = update_vote_status_parser.parse_args()
+            course_ID = args.get("course_ID")
+
+            # Find the corresponding VoteCourse record by course ID.
+            vote_course = VoteCourse.query.filter_by(course_ID=course_ID).first()
+
+            if vote_course is None:
+                return {"message": "VoteCourse record not found for the specified course"}, 404
+
+            # Update the vote_Status to 'Not Offered'.
+            vote_course.vote_Status = 'Not Offered'
+            db.session.commit()
+
+            return json.loads(json.dumps({"message":"You have delete the course successfully. Please refer to 'Deleted Course' Tab."}, default=str)), 200
+
+        except Exception as e:
+            return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
