@@ -1,7 +1,9 @@
 <template>
     <div id="editProposedCourse">
       <div class="container mt-5">
-        <h2 class="text-center mb-4">Edit Proposed Course</h2>
+        <h2 v-if="action == 'approve'" class="text-center mb-4">Edit Course (Proposed Course Approved)</h2>
+        <h2 v-else-if="action == 'promote_to_course'" class="text-center mb-4">Edit Course (Promote to course)</h2>
+        <h2 v-else class="text-center mb-4">Edit Proposed Course</h2>
   
         <!-- Error Message -->
         <error-message :error-message="errorMessage" />
@@ -27,12 +29,17 @@
               </button>
             </div>
             <div class="col-md-6 mb-2">
-              <button type="submit" class="btn btn-block shadow-sm w-100 mt-2 field submitbtn">
+              <button v-if="action == 'approve'" type="button" class="btn btn-block shadow-sm w-100 mt-2 field submitbtn">
+                Approve Proposed Course
+              </button>
+              <button v-else-if="action == 'promote_to_course'" type="button" class="btn btn-block shadow-sm w-100 mt-2 field submitbtn">
+                Promote to course
+              </button>
+              <button v-else type="submit" class="btn btn-block shadow-sm w-100 mt-2 field submitbtn">
                 Save
               </button>
             </div>
           </div>
-  
         </form>
       </div>
       <!-- Success modal -->
@@ -74,6 +81,7 @@
         showSuccessModal: false,
         descPlaceholder: "Course Description",
         categoryDropdownOptions: [],
+        action: ""
       };
     },
   
@@ -95,6 +103,9 @@
       this.get_user_role();
       this.fetchCategoryDropdownOptions();
       this.fetchProposedCourseDetails();
+      const action = this.$route.params.action;
+      this.action = action
+      console.log(action)
     },
   
     methods: {

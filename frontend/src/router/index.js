@@ -131,7 +131,7 @@ const routes = [
     },
   },
   {
-    path: '/editProposedCourse/:courseId?',
+    path: '/editProposedCourse/:courseId/:action?',
     name: 'editProposedCourse',
     component: () => import('../views/course/editProposedCourse.vue'),
     meta: {
