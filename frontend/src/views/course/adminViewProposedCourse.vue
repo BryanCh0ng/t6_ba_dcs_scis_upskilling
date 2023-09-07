@@ -42,9 +42,6 @@
                 </tr>
               </tbody>
             </table>
-            <div class="modal fade" id="rejected_modal" tabindex="-1" aria-hidden="true">
-              <div class="modal-dialog modal-lg"><reject-proposal-modal @close-modal="closeReject"/></div>
-            </div>
           </div>
           <div v-else-if="pending_courses=[]">
             <p>No records found</p>
@@ -101,6 +98,10 @@
     <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" /></div>
     </div>
+
+    <div class="modal fade" id="rejected_modal" tabindex="-1" aria-hidden="true" ref="rejectedModal">
+      <div class="modal-dialog modal-lg"><reject-proposal-modal ref="rejectComponent"  id="after_action_modal" :course="rejectedCourse" @close-modal="closeReject"/></div>
+    </div>      
   </div>
 </template>
     
@@ -133,6 +134,7 @@ export default {
       sortColumn: '',
       sortDirection: 'asc',
       selectedCourse: null,
+      rejectedCourse: null,
       itemsPerPage: 10,
       localCurrentPagePending: 1,
       localCurrentPageProposed: 1,
@@ -157,10 +159,13 @@ export default {
       this.localCurrentPageProposed = newPage;
       this.$emit('page-change', newPage);
     },
-    openReject() {
+    openReject(course) {
+      this.rejectedCourse = course;
       this.showModal = true;
+      this.$refs.rejectComponent.resetData();
     },
     closeReject() {
+      this.rejectedCourse = null;
       this.showModal = false;
     },
     async handleSearchComplete(searchResults) {
@@ -231,6 +236,19 @@ export default {
     },
     editCourse(courseId, action) {
       this.$router.push({ name: 'editProposedCourse', params: { courseId, action } });
+    },
+    modalRejectedClose() {
+      this.loadData();
+    },
+    async loadData() {
+      try {
+        let pending_response = await CourseService.searchAllSubmittedProposedCoursesAdmin(null, null)
+        this.pending_courses = pending_response.data
+        let proposed_response = await CourseService.searchAllApprovedRejectedProposedCoursesAdmin(null, null, null)
+        this.proposed_courses = proposed_response.data
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+      }
     }
   },
   computed: {
@@ -246,14 +264,20 @@ export default {
     }
   },
   async created() {
-    try {
-      let pending_response = await CourseService.searchAllSubmittedProposedCoursesAdmin(null, null)
-      this.pending_courses = pending_response.data
-      let proposed_response = await CourseService.searchAllApprovedRejectedProposedCoursesAdmin(null, null, null)
-      this.proposed_courses = proposed_response.data
-    } catch (error) {
-      console.error("Error fetching course details:", error);
-    }
+    this.loadData();
+  },
+  mounted() {
+    const buttonElement = document.createElement('button');
+    buttonElement.className = 'btn btn-primary d-none invisible-btn';
+    buttonElement.setAttribute('data-bs-toggle', 'modal');
+    buttonElement.setAttribute('data-bs-target', '#rejected_modal');
+    this.$el.appendChild(buttonElement);
+    const modalElement = this.$refs.rejectedModal;
+    modalElement.addEventListener('hidden.bs.modal', this.modalRejectedClose);
+  },
+  beforeUnmount() {
+    const modalElement = this.$refs.rejectedModal;
+    modalElement.removeEventListener('hidden.bs.modal', this.modalRejectedClose)
   }
   }
 </script>

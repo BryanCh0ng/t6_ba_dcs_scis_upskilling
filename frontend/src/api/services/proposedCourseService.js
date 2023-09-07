@@ -52,6 +52,15 @@ class ProposedCourseService extends BaseApiService {
       return this.handleError(error);
     }
   }
+
+  async rejectProposedCourse(updatedData) {
+    try {
+      let response = await axiosClient.post("/proposedcourse/reject_proposed_course", updatedData);
+        return response.data;
+    } catch (error) {
+        return this.handleError(error)
+    }
+  }
   
 }
 

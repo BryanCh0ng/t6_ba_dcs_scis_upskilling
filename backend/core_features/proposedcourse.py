@@ -169,3 +169,29 @@ class RemoveProposedCourse(Resource):
 
         except Exception as e:
             return {"message": "Failed to delete proposed course: " + str(e)}, 500
+
+
+reject_proposed_course_model = api.model("reject_proposed_course_model", {
+    "pcourseID" : fields.Integer(description="", required=True),
+    "reason" : fields.String(description="", required=True)
+})
+@api.route('/reject_proposed_course', methods=["POST"])
+@api.doc(description="Reject Proposed Course")
+class RejectProposedCourse(Resource):
+  @api.expect(reject_proposed_course_model)
+  def post(self):
+    try:
+      data = request.get_json()
+      proposed_course = ProposedCourse.query.filter_by(pcourse_ID = data['pcourseID'], pcourse_Status='Pending').first()
+      if proposed_course:
+        proposed_course.pcourse_Status = 'Rejected'
+        proposed_course.reason = data['reason']
+        db.session.commit()
+        return jsonify({"message": "Proposed Course is successfully rejected", "code": 200})
+  
+      else:
+        return jsonify({"message": "Course does not exist or is not of Pending status", "code": 404})
+
+    except Exception as e:
+      return jsonify({"message": "Failed " + str(e), "code": 500})
+
