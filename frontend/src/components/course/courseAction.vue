@@ -9,7 +9,7 @@
     <button class="btn btn-activate approve text-light font-weight-bold text-nowrap" v-else-if="status == 'pending_approve'">Approve</button>
     <button class="btn btn-danger reject text-light font-weight-bold text-nowrap" v-else-if="status == 'pending_reject'">Reject</button>
     <button class="btn btn-info open_for_voting text-light font-weight-bold text-nowrap" v-else-if="status == 'Approved'">Open for Voting</button>
-    <button class="btn btn-danger close text-light font-weight-bold text-nowrap" v-else-if="status == 'Close'">Close</button>
+    <button @click=voteAction(course.course_ID) class="btn btn-danger close text-light font-weight-bold text-nowrap" v-else-if="status == 'Close'">Close</button>
     <button class="btn btn-success promote_to_course text-light font-weight-bold text-nowrap" v-else-if="status == 'promote_to_course'">Promote to course</button>
     <button class="btn btn-primary open_for_voting text-light font-weight-bold text-nowrap" v-else-if="status == 'open_for_voting'">Open for Voting</button>
     <button class="btn btn-danger close text-light font-weight-bold text-nowrap" v-else-if="status == 'proposed_delete'">Delete</button>
@@ -82,6 +82,8 @@ export default {
           response = await CourseService.unvoteCourse(this.course.vote_ID, 1);
         } else if (this.status == 'unoffered-vote') {
           response = await CourseService.unofferedVoteCourse(this.course.course_ID);
+        } else if (this.status == 'Close') {
+          response = await CourseService.closeVote(this.course.course_ID);
         } 
         this.message = response.message;
         this.$emit('action-and-message-updated', {message: this.message, course: this.course});

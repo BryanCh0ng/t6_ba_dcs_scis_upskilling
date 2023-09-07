@@ -1473,3 +1473,29 @@ class UpdateVoteStatus(Resource):
 
         except Exception as e:
             return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
+        
+# Close Voting
+close_vote_course_parser = api.parser()
+close_vote_course_parser.add_argument("course_ID", type=int, help="Course ID")
+
+@api.route('/close_vote_course')
+@api.doc(description="Close Voting")
+class CloseVoteCourse(Resource):
+    @api.expect(close_vote_course_parser)
+    def put(self):
+        try:
+            args = close_vote_course_parser.parse_args()
+            course_ID = args.get("course_ID")
+
+            vote_course = VoteCourse.query.filter_by(course_ID=course_ID).first()
+
+            if vote_course is None:
+                return {"message": "VoteCourse record not found for the specified course"}, 404
+
+            vote_course.vote_Status = 'Closed'
+            db.session.commit()
+
+            return json.loads(json.dumps({"message":"You have closed the course. The course is not available for voting now."}, default=str)), 200
+
+        except Exception as e:
+            return json.loads(json.dumps({"message": "Failed" + str(e)})), 500

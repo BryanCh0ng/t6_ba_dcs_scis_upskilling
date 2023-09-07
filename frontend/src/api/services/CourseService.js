@@ -412,8 +412,20 @@ class CourseService extends BaseApiService {
 
     async unofferedVoteCourse(course_ID) {
         try {
-            console.log("im here")
             const response = await axiosClient.put("/course/update_vote_unoffered_course", {
+                course_ID: course_ID,
+            });
+            // console.log(response);
+            return response.data;
+            
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+    async closeVote(course_ID) {
+        try {
+            const response = await axiosClient.put("/course/close_vote_course", {
                 course_ID: course_ID,
             });
             // console.log(response);
