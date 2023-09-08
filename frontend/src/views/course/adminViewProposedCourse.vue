@@ -22,6 +22,8 @@
                 <tr class="text-nowrap">
                   <th scope="col">
                     <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'pending')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                   <th scope="col">
+                      <a href="" @click.prevent="sort('proposed_Date', 'pending')" class="text-decoration-none text-dark">Proposed Date <sort-icon :sortColumn="sortColumn === 'proposed_Date'" :sortDirection="getSortDirection('proposed_Date')"/></a></th>
                   <th scope="col">
                     <a href="" class="text-decoration-none text-dark" @click.prevent="sort('submitted_by', 'pending')">Owner <sort-icon :sortColumn="sortColumn === 'submitted_by'" :sortDirection="getSortDirection('submitted_by')"/></a></th>
                   <th scope="col">Course Details</th>
@@ -33,6 +35,9 @@
                   <td class="name">
                     <course-name-desc :name="pending_course.course_Name" :category="pending_course.coursecat_Name" :description="pending_course.course_Desc"></course-name-desc>
                   </td>
+                  <td class="proposed_date">
+                          <course-date :date="pending_course.proposed_Date"></course-date>
+                        </td>
                   <td class="submitted_by">
                     {{ pending_course.submitted_by }}
                   </td>
@@ -115,6 +120,7 @@ import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/ProposalCourseRelatedSearchFilter.vue";
 import CommonSearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
+import courseDate from '@/components/course/courseDate.vue';
 
 export default {
   components: {
@@ -125,7 +131,8 @@ export default {
     rejectProposalModal,
     courseNameDesc,
     SearchFilter,
-    CommonSearchFilter
+    CommonSearchFilter,
+    courseDate,
   },
   data() {
     return {

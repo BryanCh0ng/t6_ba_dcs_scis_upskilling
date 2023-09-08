@@ -148,6 +148,8 @@
                   <th scope="col">
                     <a href="" @click.prevent="sort('course_Name', 'proposed')" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                   <th scope="col">
+                      <a href="" @click.prevent="sort('proposed_Date', 'proposed')" class="text-decoration-none text-dark">Proposed Date <sort-icon :sortColumn="sortColumn === 'proposed_Date'" :sortDirection="getSortDirection('proposed_Date')"/></a></th>
+                  <th scope="col">
                     <a href="" @click.prevent="sort('pcourse_Status', 'proposed')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'pcourse_Status'" :sortDirection="getSortDirection('pcourse_Status')"/></a></th>
                   <th scope="col">Course Details</th>
                   <th scope="col">Action(s)</th>
@@ -157,6 +159,9 @@
                 <tr v-for="(proposed_course, key) in displayedProposedCourses" :key="key">
                   <td>
                     <course-name-desc :name="proposed_course.course_Name" :category="proposed_course.coursecat_Name" :description="proposed_course.course_Desc"></course-name-desc>
+                  </td>
+                  <td class="proposed_date">
+                    <course-date :date="proposed_course.proposed_Date"></course-date>
                   </td>
                   <td>{{ proposed_course.pcourse_Status }}</td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
@@ -174,7 +179,7 @@
           <div v-else-if="proposed_courses=[] && onInitialEmptyProposed">
             <div class="pt-5 text-center">
               <p>You have not yet proposed any courses.</p>
-               <router-link :to="{ name: 'studentProposeCourse' }" class="btn btn-edit">Propose a Course</router-link>
+               <router-link :to="{ name: 'proposeCourse' }" class="btn btn-edit">Propose a Course</router-link>
             </div>
           </div>
           <div v-else-if="proposed_courses=[]">
@@ -268,6 +273,7 @@ import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
 import courseDateTime from '@/components/course/courseDateTime.vue';
+import courseDate from '@/components/course/courseDate.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/CommonSearchFilter.vue";
 import StudentSearchFilter from "@/components/search/StudentCourseSearchFilter.vue";
@@ -287,7 +293,8 @@ export default {
     StudentSearchFilter,
     courseDateTime,
     modalAfterAction,
-    modalRejectedReason
+    modalRejectedReason,
+    courseDate,
   },
   data() {
     return {

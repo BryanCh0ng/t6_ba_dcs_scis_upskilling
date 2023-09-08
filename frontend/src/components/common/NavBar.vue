@@ -90,7 +90,7 @@ export default {
           links.push(
             { path: "/recommendations", label: "Recommendations" },
             { path: "/studentViewCourse", label: "View Courses" },
-            { path: "/studentProposeCourse", label: "Propose Course" }
+            { path: "/proposeCourse", label: "Propose Course" }
           );
         } else if (
           this.user_role === "Instructor" ||
@@ -98,7 +98,7 @@ export default {
         ) {
           links.push(
             { path: "/votingCampaign", label: "Voting Campaign" },
-            { path: "/instructorTrainerProposeCourse", label: "Propose Course" }
+            { path: "/proposeCourse", label: "Propose Course" }
           );
         } else if (this.user_role === "Admin") {
           links.push(
@@ -113,7 +113,7 @@ export default {
         // Add the default links for users who are not logged in
         links.push(
           { path: "/viewcourses", label: "View Courses" },
-          { path: "/proposecourse", label: "Propose Course" },
+          { path: "/proposeCourse", label: "Propose Course" },
           { path: "/ContactUs", label: "Contact Us" }
         );
       }
