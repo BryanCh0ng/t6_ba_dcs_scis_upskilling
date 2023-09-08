@@ -96,16 +96,18 @@ class EditRunCourse(Resource):
             print("Error:", str(e))
             return "Failed" + str(e), 500
 
-@api.route("/create_runcourse", methods=["POST"])
+@api.route("/create_runcourse/<int:course_id>", methods=["POST"])
 @api.doc(description="Create run course")
 class CreateRunCourse(Resource):
-    def post(self):
+    def post(self, course_id):
         try: 
+            print("Course ID:", course_id)
+            
             # Get the data for creating a new run course from the request body
             new_run_course_data = request.json
 
             # Create a new run course object with the data
-            new_run_course = RunCourse(None, run_Startdate=new_run_course_data.get("run_Startdate"), run_Enddate=new_run_course_data.get("run_Enddate"), run_Starttime=new_run_course_data.get("run_Starttime"), run_Endtime=new_run_course_data.get("run_Endtime"), instructor_ID=new_run_course_data.get("instructor_ID"), course_Format=new_run_course_data.get("course_Format"), course_Venue=new_run_course_data.get("course_Venue"), runcourse_Status=new_run_course_data.get("runcourse_Status"), course_Size=new_run_course_data.get("course_Size"), course_Minsize=new_run_course_data.get("course_Minsize"), course_Fee=new_run_course_data.get("course_Fee"), class_Duration=new_run_course_data.get("class_Duration"), reg_Startdate=new_run_course_data.get("reg_Startdate"), reg_Enddate=new_run_course_data.get("reg_Enddate"), reg_Starttime=new_run_course_data.get("reg_Starttime"), reg_Endtime=new_run_course_data.get("reg_Endtime"), template_ID=new_run_course_data.get("template_ID"), course_ID=new_run_course_data.get("course_ID"), course_Status=new_run_course_data.get("course_Status"))
+            new_run_course = RunCourse(None, **new_run_course_data)
 
             # Add the new course to the database
             db.session.add(new_run_course)

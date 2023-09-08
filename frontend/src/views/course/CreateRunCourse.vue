@@ -1,5 +1,5 @@
 <template>
-    <RunCourseForm :create="create" />
+    <RunCourseForm :create="create" :courseId="courseId"/>
 </template>
   
 <script>
@@ -9,7 +9,8 @@ export default {
     name: "CreateRunCourse",
     data() {
         return {
-            create: true
+            create: true,
+            courseId: null
         };
     },
     components: {
@@ -17,6 +18,7 @@ export default {
     },
     created() {
         document.title = "Create a Run Course";
+        this.courseId = this.$route.params.id;
     },
 };
 </script>

@@ -4,6 +4,7 @@ from allClasses import *
 from flask_mail import Message
 import json
 import logging
+from sqlalchemy import or_
 app.logger.setLevel(logging.DEBUG)
 
 api = Namespace('user', description='Login related operations')
@@ -268,32 +269,32 @@ class Logout(Resource):
             
             return json.loads(json.dumps({"message": "Logged out not successful"})), 400
         
-get_all_instructors = api.parser()
-@api.route("/get_all_instructors")
-@api.doc(description="Get all instructors")
+get_all_coaches = api.parser()
+@api.route("/get_all_coaches")
+@api.doc(description="Get all instructors and trainers")
 class GetAllInstructors(Resource):
-    @api.expect(get_all_instructors)
+    @api.expect(get_all_coaches)
     def get(self):
-        instructors = User.query.filter_by(role_Name='Instructor').all()
+        coaches = User.query.filter(or_(User.role_Name == 'Instructor', User.role_Name == "Trainer")).all()
         db.session.close()
         
-        if instructors:
-            instructors_json = [instructor.json() for instructor in instructors]
-            return {"code": 200, "data": {"instructors": instructors_json}}, 200
+        if coaches:
+            coaches_json = [coach.json() for coach in coaches]
+            return {"code": 200, "data": {"coaches": coaches_json}}, 200
 
-        return {"code": 404, "message": "No instructors found"}, 404
+        return {"code": 404, "message": "No instructors or trainers found"}, 404
 
-get_instructor_by_id = api.parser()
-get_instructor_by_id.add_argument("instructor_id", help="Enter instructor id")
-@api.route("/get_instructor_by_id")
-@api.doc(description="Get instructor by instructor id")
+get_coach_by_id = api.parser()
+get_coach_by_id.add_argument("instructor_id", help="Enter instructor id")
+@api.route("/get_coach_by_id")
+@api.doc(description="Get instructor or trainer by instructor id")
 class GetInstructor(Resource):
-    @api.expect(get_instructor_by_id)
+    @api.expect(get_coach_by_id)
     def get(self):
-        instructorID = get_instructor_by_id.parse_args().get("instructor_id")
-        instructor = User.query.filter_by(user_ID=instructorID).first()
+        instructorID = get_coach_by_id.parse_args().get("instructor_id")
+        coach = User.query.filter_by(user_ID=instructorID).first()
         db.session.close()
-        if instructor:
-            return json.loads(json.dumps(instructor.json())), 200
+        if coach:
+            return json.loads(json.dumps(coach.json())), 200
 
-        return json.loads(json.dumps({"message": "There is no such instructor"})), 404
+        return json.loads(json.dumps({"message": "There is no such instructor or trainer"})), 404

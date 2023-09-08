@@ -427,6 +427,9 @@ export default {
         },
         runcourseId: {
             type: Number
+        },
+        courseId: {
+            type: Number
         }
     },
     setup() {
@@ -470,9 +473,8 @@ export default {
             //Edit Run Course
             instructorID: 0,
             templateID: 0,
+            courseID: 0,
             createRunCourseResponse: {},
-            //Should be pass from the other page 
-            courseID: 1,
             editRunCourseResponse: {},
             submitFormData: {}
         };
@@ -522,9 +524,9 @@ export default {
         handleModalClosed(value) {
             this.showAlert = value;
         },
-        async fetchInstructors() {
+        async fetchCoaches() {
             try {
-                this.formData.instructors = await UserService.getAllInstructors();
+                this.formData.instructors = await UserService.getAllCoaches();
             } catch (error) {
                 console.error('Error fetching instructors:', error);
 
@@ -541,7 +543,7 @@ export default {
             }
         },
         async fetchFormFieldsData() {
-            await this.fetchInstructors();
+            await this.fetchCoaches();
             await this.fetchFeedbackTemplates();
 
             if (this.errorMsg.length > 0) {
@@ -564,8 +566,6 @@ export default {
 
                 const endTimeParts = runcourseData.run_Endtime.split(":");
                 this.formData.endTime = { hours: parseInt(endTimeParts[0]), minutes: parseInt(endTimeParts[1]), seconds: 0 }
-
-                console.log(runcourseData.course_Format);
 
                 if (runcourseData.course_Format === "face-to-face") {
                     this.formData.selectedFormat = this.formData.courseFormats[1].name;
@@ -593,21 +593,23 @@ export default {
 
                 this.templateID = runcourseData.template_ID;
 
+                this.courseID = runcourseData.course_ID;
+
             } catch (error) {
                 console.error('Error fetching run course by ID:', error);
 
                 throw new Error("An error occurred in fetching run course by ID");
             }
         },
-        async fetchInstructorByID() {
+        async fetchCoachByID() {
             try {
-                const instructorData = await UserService.getInstructorById(this.instructorID);
+                const coachData = await UserService.getCoachById(this.instructorID);
 
-                this.formData.selectedInstructor = instructorData.user_Name;
+                this.formData.selectedInstructor = coachData.user_Name;
 
             } catch (error) {
-                console.error('Error fetching instructor by ID:', error);
-                this.errorMsg.push('Error fetching instructor by ID:', error);
+                console.error('Error fetching coach by ID:', error);
+                this.errorMsg.push('Error fetching coach by ID:', error);
             }
         },
         async fetchTemplateByID() {
@@ -626,7 +628,7 @@ export default {
                 await this.fetchRunCourseByID();
 
                 //need instructor id from runcourse
-                await this.fetchInstructorByID();
+                await this.fetchCoachByID();
 
                 //need template id from runcourse 
                 await this.fetchTemplateByID();
@@ -648,7 +650,7 @@ export default {
         },
         async createRunCourse() {
             try {
-                this.createRunCourseResponse = await RunCourseService.createRunCourse(this.submitFormData);
+                this.createRunCourseResponse = await RunCourseService.createRunCourse(this.courseId, this.submitFormData);
 
             } catch (error) {
                 console.error('Error creating a new run course:', error);
@@ -719,9 +721,9 @@ export default {
         },
         //Converting Object to String (For Date variable)
         formatDateToYYYYMMDD(dateObj) {
-            const parsedYear = dateObj.getUTCFullYear();
-            const parsedMonth = String(dateObj.getUTCMonth() + 1).padStart(2, "0");
-            const parsedDay = String(dateObj.getUTCDate()).padStart(2, "0");
+            const parsedYear = dateObj.getFullYear();
+            const parsedMonth = dateObj.getMonth()+1;
+            const parsedDay = dateObj.getDate();
             return `${parsedYear}-${parsedMonth}-${parsedDay}`;
         },
         //Converting Object to String (For Time variable)
@@ -742,7 +744,11 @@ export default {
 
                     this.submitFormData["run_Startdate"] = this.formatDateToYYYYMMDD(this.formData.startDate);
 
+                    console.log(this.submitFormData["run_Startdate"]);
+
                     this.submitFormData["run_Enddate"] = this.formatDateToYYYYMMDD(this.formData.endDate);
+
+                    console.log(this.submitFormData["run_Enddate"]);
 
                     this.submitFormData["run_Starttime"] = this.formatTimeObjectToString(this.formData.startTime);
 
@@ -795,7 +801,11 @@ export default {
 
                     this.submitFormData["reg_Startdate"] = this.formatDateToYYYYMMDD(this.formData.openingDate);
 
+                    console.log(this.submitFormData["reg_Startdate"]);
+
                     this.submitFormData["reg_Enddate"] = this.formatDateToYYYYMMDD(this.formData.closingDate);
+
+                    console.log(this.submitFormData["reg_Enddate"]);
 
                     this.submitFormData["reg_Starttime"] = this.formatTimeObjectToString(this.formData.openingTime);
 
@@ -803,13 +813,13 @@ export default {
 
                     this.submitFormData["template_ID"] = this.formData.feedbackTemplates.find(i => i.template_Name === this.formData.selectedTemplate).template_ID;
 
-                    this.submitFormData["course_ID"] = this.courseID;
-
                     this.submitFormData["course_Status"] = "Active";
 
 
                     //For Edit Course (Updating the run course and course)
                     if (!this.create) {
+
+                        this.submitFormData["course_ID"] = this.courseID;
 
                         //Update the run course 
                         await this.updateRunCourse();
@@ -822,6 +832,8 @@ export default {
                         //console.log('Form has submitted successfully')
 
                     } else {
+
+                        this.submitFormData["course_ID"] = this.courseId;
 
                         await this.createRunCourse();
 

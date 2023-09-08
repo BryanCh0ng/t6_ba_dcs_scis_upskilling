@@ -28,9 +28,10 @@ class runCourseService extends BaseApiService {
         return this.handleError(error)
     }
   }
-  async createRunCourse(newRunCourseData) {
+  async createRunCourse(courseId, newRunCourseData) {
     try {
-      let response = await axiosClient.post('/runcourse/create_runcourse', newRunCourseData);
+      console.log(courseId);
+      let response = await axiosClient.post(`/runcourse/create_runcourse/${courseId}`, newRunCourseData);
       return response.data;
     } catch (error) {
       return this.handleError(error);

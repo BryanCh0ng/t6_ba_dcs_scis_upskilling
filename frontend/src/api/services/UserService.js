@@ -106,19 +106,19 @@ class UserService extends BaseApiService {
         }
     }
 
-    async getAllInstructors() {
+    async getAllCoaches() {
         try {
-            let response = await axiosClient.get("/user/get_all_instructors");
-            return response.data.data.instructors;
+            let response = await axiosClient.get("/user/get_all_coaches");
+            return response.data.data.coaches;
 
         } catch (error) {
             return this.handleError(error);
         }
     }
 
-    async getInstructorById(instructorId) {
+    async getCoachById(coachId) {
         try {
-            let response = await axiosClient.get("/user/get_instructor_by_id", { params: { instructor_id: instructorId } });
+            let response = await axiosClient.get("/user/get_coach_by_id", { params: { instructor_id: coachId } });
             return response.data;
 
         } catch (error) {

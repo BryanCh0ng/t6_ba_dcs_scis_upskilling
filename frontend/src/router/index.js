@@ -139,7 +139,7 @@ const routes = [
     },
   },
   {
-    path: '/createRunCourse',
+    path: '/createRunCourse/:id',
     name: 'createRunCourse',
     component: () => import('../views/course/CreateRunCourse.vue'),
     meta: {

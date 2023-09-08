@@ -47,7 +47,7 @@
               <td v-if="course.course_Status =='Inactive' && course.runcourse_Status=='Closed'">
                 <course-action @action-and-message-updated="handleActionData"  status="Retire" :course="course" :courseName="course.courseName" ></course-action>
               </td>
-              <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course" @click="goToCreateRunCourse"></course-action></td>
+              <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course" @click="goToCreateRunCourse(course.course_ID)"></course-action></td>
               <td v-if="course.course_Status =='Inactive' && course.runcourse_Status=='Closed'">
                 <course-action status="open_for_registration" :course="course" :courseName="course.courseName" ></course-action>
               </td>
@@ -189,8 +189,8 @@ export default {
     goToEditRunCourseWithId(runcourseID) {
       this.$router.push({ name: 'editRunCourse', params: {id: runcourseID}})
     },
-    goToCreateRunCourse(){
-      this.$router.push("/createRunCourse");
+    goToCreateRunCourse(courseID){
+      this.$router.push({ name: 'createRunCourse', params: {id: courseID}});
     }
   },
   created() {
