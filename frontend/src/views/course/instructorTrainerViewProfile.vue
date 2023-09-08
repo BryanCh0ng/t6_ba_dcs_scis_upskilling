@@ -59,6 +59,12 @@
                 </tbody>
                 </table>
             </div>
+            <div v-else-if="assigned_courses=[] && onInitialEmptyAssigned">
+              <div class="pt-5 text-center">
+                <p>You are not assigned to any courses.</p>
+                <router-link :to="{ name: 'instructorTrainerViewProfile' }" class="btn btn-edit">Propose a Course</router-link>
+              </div>
+            </div>
             <div v-else-if="assigned_courses=[]">
                 <p>No records found</p>
             </div>
@@ -114,6 +120,12 @@
                 </tbody>
                 </table>
             </div>
+            <div v-else-if="proposed_course=[] && onInitialEmptyProposed">
+              <div class="pt-5 text-center">
+                <p>You have not yet proposed any courses.</p>
+                <router-link :to="{ name: 'instructorTrainerViewProfile' }" class="btn btn-edit">Propose a Course</router-link>
+              </div>
+            </div>
             <div v-else-if="proposed_courses=[]">
                 <p>No records found</p>
             </div>
@@ -166,6 +178,12 @@
                 </tbody>
                 </table>
                
+            </div>
+            <div v-else-if="conducted_course=[] && onInitialEmptyConducted">
+              <div class="pt-5 text-center">
+                <p>You have not yet conducted any courses.</p>
+                <router-link :to="{ name: 'instructorTrainerViewProfile' }" class="btn btn-edit">Propose a Course</router-link>
+              </div>
             </div>
             <div v-else-if="conducted_courses=[]">
                 <p>No records found</p>
@@ -248,6 +266,9 @@ export default {
         showRejectedCourseModal: false,
         selectedRejectedCourse: null,
         receivedRejectedCourseMessage: '',
+        onInitialEmptyAssigned: false,
+        onInitialEmptyProposed: false,
+        onInitialEmptyConducted: false,
     }
   },
 
@@ -418,6 +439,26 @@ export default {
       this.$router.push({ name: 'editProposedCourse', params: { courseId } });
     },
 
+    async loadData() {
+      try {
+         // let user_ID = await UserService.getUserID()
+          let user_ID = 4
+
+          let assigned_courses = await CourseService.searchInstructorAssignedCourseInfo(user_ID, null, null, null)
+          this.assigned_courses = assigned_courses.data
+          console.log(this.assigned_coures)
+
+          let proposed_courses = await CourseService.searchInstructorProposedCourseInfo(user_ID, null, null, null)
+          this.proposed_courses = proposed_courses.data
+
+          let conducted_courses = await CourseService.searchInstructorCompletedCourseInfo(user_ID, null, null)
+          this.conducted_courses = conducted_courses.data
+        
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+      }
+    },
+
   },
   computed: {
     displayedAssignedCourses() {
@@ -441,18 +482,26 @@ export default {
   },
   async created() {
     try {
-      // const user_ID = await UserService.getUserID()
-      const user_ID = 4
+      // let user_ID = await UserService.getUserID()
+      let user_ID = 4
 
       let assigned_courses = await CourseService.searchInstructorAssignedCourseInfo(user_ID, null, null, null)
       this.assigned_courses = assigned_courses.data
-      console.log(this.assigned_coures)
+      if (this.assigned_courses == undefined || this.assigned_courses.length == 0) {
+        this.onInitialEmptyAssigned = true
+      }
 
       let proposed_courses = await CourseService.searchInstructorProposedCourseInfo(user_ID, null, null, null)
       this.proposed_courses = proposed_courses.data
+      if (this.proposed_courses == undefined || this.proposed_courses.length == 0) {
+        this.onInitialEmptyProposed = true
+      }
 
       let conducted_courses = await CourseService.searchInstructorCompletedCourseInfo(user_ID, null, null)
       this.conducted_courses = conducted_courses.data
+      if (this.conducted_courses == undefined || this.conducted_courses.length == 0) {
+        this.onInitialEmptyConducted = true
+      }
 
     } catch (error) {
       console.error("Error fetching course details:", error);
