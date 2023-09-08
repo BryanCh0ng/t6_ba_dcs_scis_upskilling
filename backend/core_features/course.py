@@ -229,7 +229,6 @@ retrieve_unregistered_active_courses_filter.add_argument("user_id", type=int, he
 retrieve_unregistered_active_courses_filter.add_argument("course_name", help="Enter course name")
 retrieve_unregistered_active_courses_filter.add_argument("coursecat_id", help="Enter course category id")
 
-
 @api.route("/get_unregistered_active_courses")
 @api.doc(description="Get unregistered active course information")
 class GetUnregisteredActiveCourses(Resource):
@@ -238,15 +237,10 @@ class GetUnregisteredActiveCourses(Resource):
         args = retrieve_unregistered_active_courses_filter.parse_args()
         user_ID = args.get("user_id")
 
-        current_datetime = datetime.now()
-        current_time = current_datetime.strftime('%H:%M:%S')
+        # app.logger.debug(user_ID)
 
-        valid_reg_statuses = ["pending", "enrolled", "not enrolled"]
-
-        registered_course_ids = db.session.query(Registration.rcourse_ID).filter(
-            Registration.user_ID == user_ID,
-            Registration.reg_Status.in_(valid_reg_statuses)
-        ).subquery()
+        # Get the courses that the user has already registered for
+        registered_course_ids = db.session.query(Registration.rcourse_ID).filter_by(user_ID=user_ID).subquery()
 
         # Construct the query for unregistered courses with active course status
         query = db.session.query(
@@ -258,11 +252,8 @@ class GetUnregisteredActiveCourses(Resource):
         ).filter(
             ~RunCourse.rcourse_ID.in_(registered_course_ids),
             RunCourse.course_Status == "active",
-            RunCourse.runcourse_Status == "ongoing",
-            RunCourse.reg_Enddate >= current_datetime.date(),
-            (RunCourse.reg_Enddate > current_datetime.date()) | (RunCourse.reg_Endtime > current_time)
+            RunCourse.runcourse_Status == "ongoing"
         )
-
 
         # Apply additional filters based on user inputs
         course_Name = args.get("course_name", "")
@@ -272,7 +263,6 @@ class GetUnregisteredActiveCourses(Resource):
             query = query.filter(Course.course_Name.contains(course_Name))
         if coursecat_ID:
             query = query.filter(Course.coursecat_ID == coursecat_ID)
-
 
         results = query.all()
         db.session.close()
