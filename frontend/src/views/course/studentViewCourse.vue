@@ -58,6 +58,7 @@
       </div>
       <vue-awesome-paginate v-if="run_courses.length/itemsPerPage > 0" v-model="localCurrentPageRunCourse" :totalItems="run_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageChange" class="justify-content-center pagination-container"/>
     </div>
+    
     <div class="tab-pane fade" :class="{ 'show active': activeTab === 'course_vote' }">
       <search-filter
       :search-api="searchUnvotedActiveInfo"
