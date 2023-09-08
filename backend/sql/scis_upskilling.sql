@@ -703,7 +703,7 @@ CREATE TABLE IF NOT EXISTS `runcourse`(
 	instructor_id int,
 	course_format varchar(20),
 	course_venue varchar(255), -- can be null for those online courses
-	runcourse_status varchar(15) NOT NULL,
+	runcourse_status varchar(15),
 	course_size int, 
 	course_minsize int,
 	course_fee int,

@@ -3,10 +3,10 @@ import BaseApiService from "../BaseApiService";
 
 class VoteCourseService extends BaseApiService {
 
-  async adminUpdateVoteCourseStatusToOffered(updatedData) {
+  async promoteToCourse(updatedData) {
     try {
       console.log(updatedData)
-      let response = await axiosClient.post("/votecourse/update_vote_course_status_to_offered", updatedData);
+      let response = await axiosClient.post("/votecourse/promote_to_course", updatedData);
       return response.data;
     } catch (error) {
       return { success: false, message: 'An error occurred while updating the vote course' };

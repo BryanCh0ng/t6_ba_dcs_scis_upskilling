@@ -148,19 +148,15 @@ class ProposedCourse(db.Model):
 class VoteCourse(db.Model):
     __tablename__ = 'votecourse'
 
-    vote_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    vote_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     course_ID = db.Column(db.Integer,db.ForeignKey('course.course_ID'), nullable=False)
     vote_Status = db.Column(db.String(15), nullable=False)
 
 
 
-
-    def __init__(self, vote_ID, course_ID, vote_Status ):
-        self.vote_ID = vote_ID
+    def __init__(self, course_ID, vote_Status ):
         self.course_ID = course_ID
         self.vote_Status = vote_Status
-
-
 
     def json(self):
         columns = self.__mapper__.column_attrs.keys()
@@ -176,8 +172,6 @@ class Interest(db.Model):
     interest_ID = db.Column(db.Integer, nullable=False, primary_key=True)
     vote_ID = db.Column(db.Integer,db.ForeignKey('votecourse.vote_ID'), nullable=False)
     user_ID = db.Column(db.Integer,db.ForeignKey('user.user_ID'),  nullable=False)
-
-
 
 
     def __init__(self, interest_ID, vote_ID, user_ID ):
@@ -305,33 +299,32 @@ class Feedback(db.Model):
 class RunCourse(db.Model):
     __tablename__ = 'runcourse'
 
-    rcourse_ID = db.Column(db.Integer, nullable=False, primary_key=True)
-    run_Startdate = db.Column(db.Date, nullable=False)
-    run_Enddate = db.Column(db.Date, nullable=False)
-    run_Starttime = db.Column(Time, nullable=False)
-    run_Endtime = db.Column(Time, nullable=False)
-    instructor_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'), nullable=False)
-    course_Format = db.Column(db.String(20), nullable=False)
-    course_Venue = db.Column(db.String(255), nullable=False)
-    runcourse_Status = db.Column(db.String(15), nullable=False)
-    course_Size = db.Column(db.Integer, nullable=False)
-    course_Minsize = db.Column(db.Integer, nullable=False)
-    course_Fee = db.Column(db.Integer, nullable=False)
-    class_Duration = db.Column(db.Integer, nullable=False)
-    reg_Startdate = db.Column(db.Date, nullable=False)
-    reg_Enddate = db.Column(db.Date, nullable=False)
-    reg_Starttime = db.Column(Time, nullable=False)
-    reg_Endtime = db.Column(Time, nullable=False)
-    template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'), nullable=False)
-    course_ID = db.Column(db.Integer, db.ForeignKey('course.course_ID'), nullable=False)
+    rcourse_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
+    run_Startdate = db.Column(db.Date, nullable=True)
+    run_Enddate = db.Column(db.Date, nullable=True)
+    run_Starttime = db.Column(Time, nullable=True)
+    run_Endtime = db.Column(Time, nullable=True)
+    instructor_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'), nullable=True)
+    course_Format = db.Column(db.String(20), nullable=True)
+    course_Venue = db.Column(db.String(255), nullable=True)
+    runcourse_Status = db.Column(db.String(15), nullable=True)
+    course_Size = db.Column(db.Integer, nullable=True)
+    course_Minsize = db.Column(db.Integer, nullable=True)
+    course_Fee = db.Column(db.Integer, nullable=True)
+    class_Duration = db.Column(db.Integer, nullable=True)
+    reg_Startdate = db.Column(db.Date, nullable=True)
+    reg_Enddate = db.Column(db.Date, nullable=True)
+    reg_Starttime = db.Column(Time, nullable=True)
+    reg_Endtime = db.Column(Time, nullable=True)
+    template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'), nullable=True)
+    course_ID = db.Column(db.Integer, db.ForeignKey('course.course_ID'), nullable=True)
     course_Status = db.Column(db.String(255), nullable=False)
 
 
-    def __init__(self, rcourse_ID, run_Startdate, run_Enddate, run_Starttime, run_Endtime, instructor_ID,
+    def __init__(self, run_Startdate, run_Enddate, run_Starttime, run_Endtime, instructor_ID,
                  course_Format, course_Venue, runcourse_Status, course_Size, course_Minsize, course_Fee,
                  class_Duration, reg_Startdate, reg_Enddate, reg_Starttime, reg_Endtime, template_ID,
                   course_ID, course_Status ):
-        self.rcourse_ID = rcourse_ID
         self.run_Startdate = run_Startdate
         self.run_Enddate = run_Enddate
         self.run_Starttime = run_Starttime

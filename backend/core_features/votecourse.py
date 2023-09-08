@@ -10,13 +10,13 @@ app.logger.setLevel(logging.DEBUG)
 
 api = Namespace('votecourse', description='Vote Course related operations')
 
-update_vote_course_status_model = api.model("update_vote_course_status_model", {
+promote_to_course_model = api.model("promote_to_course_model", {
     "vote_id" : fields.Integer(description="", required=True),
 })
-@api.route('/update_vote_course_status_to_offered', methods=["POST"])
-@api.doc(description="Update Vote Course to Offered")
-class adminUpdateVoteCourseStatusToOffered(Resource):
-  @api.expect(update_vote_course_status_model)
+@api.route('/promote_to_course', methods=["POST"])
+@api.doc(description="Promote To Course")
+class PromoteToCourse(Resource):
+  @api.expect(promote_to_course_model)
   def post(self):
     try:
       data = request.get_json()
@@ -25,9 +25,30 @@ class adminUpdateVoteCourseStatusToOffered(Resource):
 
       if vote_course:
         vote_course.vote_Status = 'Offered'
+        newRunCourse = RunCourse(
+          run_Startdate=None,
+          run_Enddate=None,
+          run_Starttime=None,
+          run_Endtime=None,
+          instructor_ID=None,
+          course_Format=None,
+          course_Venue=None,
+          runcourse_Status=None,
+          course_Size=None,
+          course_Minsize=None,
+          course_Fee=None,
+          class_Duration=None,
+          reg_Startdate=None,
+          reg_Enddate=None,
+          reg_Starttime=None,
+          reg_Endtime=None,
+          template_ID=None,
+          course_ID= vote_course.course_ID,
+          course_Status='Active'
+        )
+        db.session.add(newRunCourse)
         db.session.commit()
         return jsonify({"message": "Vote Course is successfully offered", "code": 200})
-  
       else:
         return jsonify({"message": "Course does not exist", "code": 404})
     except Exception as e:

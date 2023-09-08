@@ -207,13 +207,17 @@ class ApproveProposedCourse(Resource):
   def post(self):
     try:
       data = request.get_json()
-      print(data)
-
       proposed_course = ProposedCourse.query.filter_by(pcourse_ID = data['pcourseID']).first()
 
       if proposed_course:
         proposed_course.pcourse_Status = 'Approved'
+        newVoteCourse = VoteCourse(
+          course_ID= proposed_course.course_ID,
+          vote_Status='Ongoing'
+        )
+        db.session.add(newVoteCourse)
         db.session.commit()
+      
         return jsonify({"message": "Proposed Course is successfully accepted", "code": 200})
   
       else:

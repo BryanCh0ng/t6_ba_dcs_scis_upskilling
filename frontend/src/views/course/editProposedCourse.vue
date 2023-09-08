@@ -213,7 +213,7 @@ export default {
               } else if (this.action == 'promote_to_course') {
                 const course = await VoteCourseService.getVoteCourseByCourseId(courseId);
                 console.log(course);
-                const updatePromise = VoteCourseService.adminUpdateVoteCourseStatusToOffered({ "vote_id": course['data'].vote_ID });
+                const updatePromise = VoteCourseService.promoteToCourse({ "vote_id": course['data'].vote_ID });
                 approve_result = await updatePromise;
               } else {
                 approve_result = { code: 200 };
