@@ -34,7 +34,7 @@
             <td class="current_interest">
                 {{ vote_course.voteCount }}
             </td>
-            <td>{{ vote_course.vote_Status }}</td>
+            <td class="text-nowrap">{{ vote_course.vote_Status }}</td>
             <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(vote_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
             <td v-if="vote_course.vote_Status === 'Ongoing'"><course-action status="Close" :course="vote_course"></course-action></td>
             <td v-else-if="vote_course.vote_Status === 'Closed'"><course-action status="Open for Registration" :course="vote_course"></course-action></td>
