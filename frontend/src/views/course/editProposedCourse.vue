@@ -65,6 +65,8 @@ import { useVuelidate } from "@vuelidate/core";
 import UserService from "@/api/services/UserService.js";
 import CourseCategoryService from "@/api/services/CourseCategoryService.js";
 import ProposedCourseService from "@/api/services/proposedCourseService.js";
+import CourseService from "@/api/services/CourseService.js";
+import VoteCourseService from "@/api/services/voteCourseService.js";
 
 export default {
   setup() {
@@ -81,8 +83,7 @@ export default {
       errorMessage: "", // Error message for validation
       showSuccessModal: false,
       descPlaceholder: "Course Description",
-      categoryDropdownOptions: [],
-      pcourse_ID: ""
+      categoryDropdownOptions: []
     };
   },
 
@@ -199,30 +200,47 @@ export default {
         };
 
         try {
-            const result = await ProposedCourseService.updateProposedCourse(courseId, formData);
-
-            if (result.success) {
-              if (this.action == 'approve'){
-                console.log(this.pcourse_ID)
-                const approve_result = await ProposedCourseService.acceptProposedCourse({"pcourseID": this.pcourse_ID});
-                if (approve_result.code == 200) {
-                  this.showSuccessModal = true;
-                }
-                else {
-                  this.errorMessage = approve_result.message
-                }
+          const result = await CourseService.adminUpdateCourse(courseId, formData);
+          if (result.success) {
+              let approve_result;
+              if (this.action == 'approve') {
+                const course = await ProposedCourseService.getProposedCourseByCourseId(courseId);
+                console.log(course);
+                const acceptPromise = ProposedCourseService.approveProposedCourse({ "pcourseID": course['data'].pcourse_ID });
+                approve_result = await acceptPromise;
+                console.log(approve_result);
+        
+              } else if (this.action == 'promote_to_course') {
+                const course = await VoteCourseService.getVoteCourseByCourseId(courseId);
+                console.log(course);
+                const updatePromise = VoteCourseService.adminUpdateVoteCourseStatusToOffered({ "vote_id": course['data'].vote_ID });
+                approve_result = await updatePromise;
+              } else {
+                approve_result = { code: 200 };
               }
-            } else {
-              this.errorMessage = result.message;
-            }
+              console.log(approve_result);
+              
+              if (approve_result.code == 200) {
+                this.showSuccessModal = true;
+              } else {
+                this.errorMessage = approve_result.message;
+              }
+          }
         } catch (error) {
             console.error('Error submitting form:', error);
         }
-    },
+        },
 
     hideSuccessModal() {
       this.showSuccessModal = false;
-      this.$router.go(-1);
+      if (this.action == 'approve')
+        this.$router.push({ name: 'adminViewProposedCourse'});
+      else if (this.action == 'promote_to_course') {
+        this.$router.push({ name: 'adminViewVoteCourse'});
+      }
+      else {
+        this.$router.push({ name: 'adminViewRunCourse'});
+      }
     },
 
     cancelForm() {

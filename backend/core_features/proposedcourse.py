@@ -197,13 +197,13 @@ class RejectProposedCourse(Resource):
       return jsonify({"message": "Failed " + str(e), "code": 500})
     
 
-accept_proposed_course_model = api.model("accept_proposed_course_model", {
+approve_proposed_course_model = api.model("accept_proposed_course_model", {
     "pcourseID" : fields.Integer(description="", required=True),
 })
-@api.route('/accept_proposed_course', methods=["POST"])
-@api.doc(description="Accept Proposed Course")
-class AcceptProposedCourse(Resource):
-  @api.expect(accept_proposed_course_model)
+@api.route('/approve_proposed_course', methods=["POST"])
+@api.doc(description="Approve Proposed Course")
+class ApproveProposedCourse(Resource):
+  @api.expect(approve_proposed_course_model)
   def post(self):
     try:
       data = request.get_json()
@@ -212,7 +212,7 @@ class AcceptProposedCourse(Resource):
       proposed_course = ProposedCourse.query.filter_by(pcourse_ID = data['pcourseID']).first()
 
       if proposed_course:
-        proposed_course.pcourse_Status = 'Accepted'
+        proposed_course.pcourse_Status = 'Approved'
         db.session.commit()
         return jsonify({"message": "Proposed Course is successfully accepted", "code": 200})
   

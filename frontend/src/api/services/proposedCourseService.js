@@ -62,9 +62,9 @@ class ProposedCourseService extends BaseApiService {
     }
   }
 
-  async acceptProposedCourse(updatedData) {
+  async approveProposedCourse(updatedData) {
     try {
-      let response = await axiosClient.post("/proposedcourse/accept_proposed_course", updatedData);
+      let response = await axiosClient.post("/proposedcourse/approve_proposed_course", updatedData);
         return response.data;
     } catch (error) {
         return this.handleError(error)

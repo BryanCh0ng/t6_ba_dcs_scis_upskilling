@@ -1499,3 +1499,41 @@ class CloseVoteCourse(Resource):
 
         except Exception as e:
             return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
+
+
+# update run course by admin
+admin_update_course = {
+    "course_Name": fields.String(description="Course Name", required=True),
+    "course_Desc": fields.String(description="Course Description", required=True),
+    "coursecat_ID": fields.Integer(description="Course Category ID", required=True),
+}
+
+@api.route('/admin_update_course/<int:course_id>', methods=['PUT'])
+@api.doc(description="Admin Update Course")
+class AdminUpdateRunCourse(Resource):
+    @api.expect(admin_update_course)
+    def put(self, course_id):
+        try:
+            # app.logger.debug(course_id)
+
+            data = request.get_json()
+            # app.logger.debug(data)
+            course_name = data.get('course_Name')
+            course_desc = data.get('course_Desc')
+            coursecat_ID = data.get('coursecat_ID')
+
+            course = Course.query.get(course_id)
+
+            if course is None:
+                return jsonify({"message": "course not found", "code": 404}), 404
+
+            course.course_Name = course_name
+            course.course_Desc = course_desc
+            course.coursecat_ID = coursecat_ID
+
+            db.session.commit()
+
+            return jsonify({"message": "course updated successfully", "code": 200})
+
+        except Exception as e:
+            return jsonify({"message": f"Failed to update course: {str(e)}", "code": 500})
