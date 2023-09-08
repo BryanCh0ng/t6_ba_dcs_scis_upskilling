@@ -19,28 +19,72 @@
         <div class="mt-2">
           <textarea placeholder="Rejection Reason" class="form-control" id="reject-reason" rows="4" v-model="rejectionReason"></textarea>
         </div>
+        <div :class="{ 'd-none': !showResponse, 'd-block': showResponse }">
+           <p :class="{ 'text-danger mt-2': isError, 'text-success mt-2': !isError }">{{ responseText }}</p> 
+        </div>
       </div>
     </div>
     <div class="modal-footer"> 
-      <button class="btn btn-danger" @click="reject">Reject</button>
+      <button class="btn btn-danger" id="reject-proposed-course-btn" @click="reject">Reject</button>
     </div>
   </div>
 </template>
 
 <script>
+import ProposedCourseService from "@/api/services/proposedCourseService"
+
 export default {
+  props: {
+    course: Object
+  },
   data() {
     return {
       selectedRadio: 'no-reason', 
       rejectionReason: '',
+      showResponse: false,
+      responseText: "",
+      isError: false
     };
   },
   methods: {
     reject() {
-      console.log( this.selectedRadio);
-      console.log(this.rejectionReason);
+      if (this.selectedRadio == 'with-reason' && /^[^a-zA-Z]*$/.test(this.rejectionReason)){
+        this.showResponse = true
+        this.responseText = "Please Specify reason for rejecting"
+        this.isError = true
+      }
+      if (!this.showResponse) {
+       this.reject_proposed_course()
+      }
+    },
+    resetData(){
+      this.rejectionReason = ''
+      this.showResponse = false;
+      this.selectedRadio = 'no-reason'
+      this.responseText = "";
+      this.isError = false
+    },
+    async reject_proposed_course() {
+      try {
+        let response = await ProposedCourseService.rejectProposedCourse({"pcourseID": this.course.pcourse_ID, "reason": this.rejectionReason})
+        if (response.code == 200) {
+          this.responseText = response.message
+          this.isError = false
+          const button = document.getElementById("reject-proposed-course-btn");
+          button.disabled = true;
+        }
+        else {
+          this.responseText = response.message
+          this.isError = true
+        }
+        this.showResponse = true
+      } catch (error) {
+        this.isError = true
+        this.responseText = error
+        this.showResponse = true
+      }
     }
-  }
+  },
 }
 </script>
 
