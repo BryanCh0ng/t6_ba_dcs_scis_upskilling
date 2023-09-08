@@ -23,8 +23,6 @@
                   <th scope="col">
                     <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'pending')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                   <th scope="col">
-                      <a href="" @click.prevent="sort('proposed_Date', 'pending')" class="text-decoration-none text-dark">Proposed Date <sort-icon :sortColumn="sortColumn === 'pending'" :sortDirection="getSortDirection('pending')"/></a></th>
-                  <th scope="col">
                     <a href="" class="text-decoration-none text-dark" @click.prevent="sort('submitted_by', 'pending')">Owner <sort-icon :sortColumn="sortColumn === 'submitted_by'" :sortDirection="getSortDirection('submitted_by')"/></a></th>
                   <th scope="col">Course Details</th>
                   <th scope="col">Action(s)</th>
@@ -34,9 +32,6 @@
                 <tr v-for="(pending_course, key) in displayedPendingCourses" :key="key">
                   <td class="name">
                     <course-name-desc :name="pending_course.course_Name" :category="pending_course.coursecat_Name" :description="pending_course.course_Desc"></course-name-desc>
-                  </td>
-                  <td class="proposed_date">
-                    <course-date :date="pending_course.proposed_Date"></course-date>
                   </td>
                   <td class="submitted_by">
                     {{ pending_course.submitted_by }}
@@ -116,7 +111,6 @@ import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import rejectProposalModal from '../../components/course/rejectProposalModal.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
-import courseDate from '@/components/course/courseDate.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/ProposalCourseRelatedSearchFilter.vue";
 import CommonSearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
@@ -131,8 +125,7 @@ export default {
     rejectProposalModal,
     courseNameDesc,
     SearchFilter,
-    CommonSearchFilter,
-    courseDate,
+    CommonSearchFilter
   },
   data() {
     return {
