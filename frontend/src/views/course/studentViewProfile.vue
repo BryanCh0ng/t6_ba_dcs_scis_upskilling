@@ -70,8 +70,8 @@
           </div>
           <div v-else-if="registered_courses=[] && onInitialEmptyRegistered">
             <div class="pt-5 text-center">
-              <p>You have not yet enrolled in any courses</p>
-              <button class="btn btn-edit">Register for a Course</button>
+              <p>You have not yet enrolled in any courses.</p>
+              <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Register for a Course</router-link>
             </div>
           </div>
           <div v-else-if="registered_courses=[]">
@@ -120,8 +120,9 @@
           </div>
           <div v-else-if="interested_courses=[] && onInitialEmptyInterested">
             <div class="pt-5 text-center">
-              <p>You have not yet expressed interest in any courses</p>
-              <button class="btn btn-edit">Indicate Interest</button>
+              <p>You have not yet expressed interest in any courses.</p>
+              <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Indicate Interest</router-link>
+              
             </div>
           </div>
           <div v-else-if="interested_courses=[]">
@@ -172,8 +173,8 @@
           </div>
           <div v-else-if="proposed_courses=[] && onInitialEmptyProposed">
             <div class="pt-5 text-center">
-              <p>You have not yet proposed any courses</p>
-              <button class="btn btn-edit">Proposed a Course</button>
+              <p>You have not yet proposed any courses.</p>
+               <router-link :to="{ name: 'studentProposeCourse' }" class="btn btn-edit">Propose a Course</router-link>
             </div>
           </div>
           <div v-else-if="proposed_courses=[]">
@@ -224,8 +225,8 @@
           </div>
           <div v-else-if="completed_courses=[] && onInitialEmptyCompleted">
             <div class="pt-5 text-center">
-              <p>You have not yet completed any courses</p>
-              <button class="btn btn-edit">Register for a Course</button>
+              <p>You have not yet completed any courses.</p>
+              <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Register for a Course</router-link>
             </div>
           </div>
           <div v-else-if="completed_courses=[]">
@@ -381,9 +382,10 @@ export default {
     },
     async searchCourseRegistrationInfo(user_ID, course_Name, coursecat_ID, status) {
       try {
-        // const user_id = await UserService.getUserID()
-        const user_id = 1
+        // let user_id = await UserService.getUserID()
+        let user_id = 1
         user_ID = user_id
+
         let response = await CourseService.searchCourseRegistrationInfo(
           user_ID,
           course_Name,
@@ -401,9 +403,10 @@ export default {
 
     async searchCourseVoteInfo(user_ID, course_Name, coursecat_ID, status) {
       try {
-        // const user_id = await UserService.getUserID()
-        const user_id = 1
+        // let user_id = await UserService.getUserID()
+        let user_id = 1
         user_ID = user_id
+
         let response = await CourseService.searchCourseVoteInfo(
           user_ID,
           course_Name,
@@ -423,6 +426,7 @@ export default {
         // const user_id = await UserService.getUserID()
         const user_id = 1
         user_ID = user_id
+
         let response = await CourseService.searchProposedInfo(
           user_ID,
           course_Name,
@@ -442,6 +446,7 @@ export default {
         // const user_id = await UserService.getUserID()
         const user_id = 1
         user_ID = user_id
+
         let response = await CourseService.searchCompletedInfo(
           user_ID,
           course_Name,
@@ -457,7 +462,10 @@ export default {
 
     async unvoteCourse(vote_Id) {
       try {
-        let response = await CourseService.unvoteCourse(vote_Id, 1); // Assuming user ID is 1
+        // let user_id = await UserService.getUserID()
+        let user_ID = 1
+
+        let response = await CourseService.unvoteCourse(vote_Id, user_ID);
         console.log(response); 
         this.loadData();
       } catch (error) {
@@ -467,8 +475,8 @@ export default {
 
     async loadData() {
       try {
-        // const user_ID = await UserService.getUserID()
-        const user_ID = 1
+        // let  user_ID = await UserService.getUserID()
+        let user_ID = 1
 
         let registered_courses = await CourseService.searchCourseRegistrationInfo(user_ID, null, null, null)
         this.registered_courses = registered_courses.data
@@ -559,8 +567,8 @@ export default {
   },
   async created() {
     try {
-      // const user_ID = await UserService.getUserID()
-      const user_ID = 1
+      // let user_ID = await UserService.getUserID()
+      let user_ID = 1
 
       let registered_response= await CourseService.searchCourseRegistrationInfo(user_ID, null, null, null)
       this.registered_courses = registered_response.data

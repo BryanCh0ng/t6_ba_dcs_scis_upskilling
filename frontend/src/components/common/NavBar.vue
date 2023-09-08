@@ -90,7 +90,7 @@ export default {
           links.push(
             { path: "/recommendations", label: "Recommendations" },
             { path: "/studentViewCourse", label: "View Courses" },
-            { path: "/proposeCourse", label: "Propose Course" }
+            { path: "/studentProposeCourse", label: "Propose Course" }
           );
         } else if (
           this.user_role === "Instructor" ||
@@ -98,7 +98,7 @@ export default {
         ) {
           links.push(
             { path: "/votingCampaign", label: "Voting Campaign" },
-            { path: "/proposeCourse", label: "Propose Course" }
+            { path: "/instructorTrainerProposeCourse", label: "Propose Course" }
           );
         } else if (this.user_role === "Admin") {
           links.push(
