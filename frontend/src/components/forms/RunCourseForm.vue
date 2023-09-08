@@ -565,10 +565,12 @@ export default {
                 const endTimeParts = runcourseData.run_Endtime.split(":");
                 this.formData.endTime = { hours: parseInt(endTimeParts[0]), minutes: parseInt(endTimeParts[1]), seconds: 0 }
 
+                console.log(runcourseData.course_Format);
+
                 if (runcourseData.course_Format === "face-to-face") {
-                    this.formData.selectedFormat = this.formData.courseFormats[0].name;
-                } else {
                     this.formData.selectedFormat = this.formData.courseFormats[1].name;
+                } else {
+                    this.formData.selectedFormat = this.formData.courseFormats[0].name;
                 }
 
                 this.formData.venue = runcourseData.course_Venue;
