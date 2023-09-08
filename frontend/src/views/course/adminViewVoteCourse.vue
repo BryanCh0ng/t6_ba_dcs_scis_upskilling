@@ -48,10 +48,10 @@
                     <td>{{ vote_status[vote_course.vote_Status] }}</td>
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(vote_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                     <div v-if="vote_course.vote_Status === 'Ongoing'">
-                      <td><course-action status="Close" :course="vote_course"></course-action></td>
+                      <td><course-action status="Close" @action-and-message-updated="handleActionData" :course="vote_course"></course-action></td>
                     </div>
                     <div v-else-if="vote_course.vote_Status === 'Closed'">
-                      <td ><course-action status="Open for Registration" :course="vote_course" @click="editCourse(vote_course.course_ID, 'promote_to_course')"></course-action></td>
+                      <td ><course-action status="promote_to_course" :course="vote_course" @click="editCourse(vote_course.course_ID, 'promote_to_course')"></course-action></td>
                       <td><course-action @action-and-message-updated="handleActionData" status="unoffered-vote" :course="vote_course"></course-action></td>
                     </div>
                     <div v-else></div>

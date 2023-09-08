@@ -155,16 +155,16 @@ class RemoveProposedCourse(Resource):
 
             # Get the associated course ID.
             course_id = proposed_course.course_ID
-
+            app.logger.debug("delete")
             # Delete the proposed course.
             db.session.delete(proposed_course)
             db.session.commit()
-
+            app.logger.debug("delete111")
             # Now, delete the corresponding course if it exists.
             course = Course.query.get(course_id)
             if course is not None:
-                db.session.delete(course)
-                db.session.commit()
+              db.session.delete(course)
+              db.session.commit()
 
             return {"message": "Proposed course deleted successfully"}
 

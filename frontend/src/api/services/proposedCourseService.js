@@ -45,10 +45,12 @@ class ProposedCourseService extends BaseApiService {
 
   async removeProposedCourse(pcourse_ID) {
     try {
-      console.log("im here")
+      console.log(pcourse_ID)
       let response = await axiosClient.delete("/proposedcourse/delete_proposed_course", { params: { pcourse_ID: pcourse_ID } });
+      console.log("delete")
       return response.data;
     } catch (error) {
+      console.log("delete111")
       return this.handleError(error);
     }
   }

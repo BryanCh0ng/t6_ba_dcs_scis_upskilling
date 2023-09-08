@@ -191,28 +191,28 @@
             </div>
             <vue-awesome-paginate v-if="conducted_courses.length/itemsPerPage > 0" v-model="localCurrentPageConducted" :totalItems="conducted_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeConducted" class="justify-content-center pagination-container"/>
         </div>
-    </div>
-    <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" /></div>
-    </div>
 
-    <div class="modal fade" id="after_action_modal" tabindex="-1" aria-hidden="true" ref="afterActionModal">
-        <div class="modal-dialog modal-lg"> 
-          <modal-after-action :course="actionCourse" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
+        <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" /></div>
         </div>
-      </div>
-      
-      <div class="modal fade" id="rejected_course_modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <modal-after-action
-            v-if="showRejectedCourseModal"
-            :course="selectedRejectedCourse"
-            :message="receivedRejectedCourseMessage"
-            @close-modal="closeRejectedCourseModal"
-          />
-        </div>
-      </div>
 
+        <div class="modal fade" id="after_action_modal" tabindex="-1" aria-hidden="true" ref="afterActionModal">
+            <div class="modal-dialog modal-lg"> 
+              <modal-after-action :course="actionCourse" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
+            </div>
+          </div>
+          
+        <div class="modal fade" id="rejected_course_modal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <modal-after-action
+                v-if="showRejectedCourseModal"
+                :course="selectedRejectedCourse"
+                :message="receivedRejectedCourseMessage"
+                @close-modal="closeRejectedCourseModal"
+            />
+          </div>
+        </div>
+    </div>
   </div>
 </template>
     
@@ -262,6 +262,7 @@ export default {
         statusOptionsAssigned: ["Enrolled", "Pending", "Not Enrolled", "Dropped"],
         statusOptionsProposed: ["Approved", "Rejected", "Pending"],
         currentDate: new Date(),
+        receivedMessage: '',
         actionCourse: {},
         showRejectedCourseModal: false,
         selectedRejectedCourse: null,
@@ -282,7 +283,16 @@ export default {
       this.selectedCourse = null;
       this.showModal = false;
     },
-
+    handleActionData(actionData) {
+      console.log(actionData.message)
+      this.receivedMessage = actionData.message;
+      this.actionCourse = actionData.course
+      const modalButtonElement = this.$el.querySelector('.invisible-btn')
+      modalButtonElement.click();
+    },
+    modalAfterActionClose() {
+      this.loadData();
+    },
     openRejectedCourseModal(proposedCourse) {
       this.selectedRejectedCourse = proposedCourse;
       this.showRejectedCourseModal = true;
@@ -446,7 +456,6 @@ export default {
 
           let assigned_courses = await CourseService.searchInstructorAssignedCourseInfo(user_ID, null, null, null)
           this.assigned_courses = assigned_courses.data
-          console.log(this.assigned_coures)
 
           let proposed_courses = await CourseService.searchInstructorProposedCourseInfo(user_ID, null, null, null)
           this.proposed_courses = proposed_courses.data
@@ -507,6 +516,19 @@ export default {
       console.error("Error fetching course details:", error);
     }
   },
+  mounted() {
+    const buttonElement = document.createElement('button');
+    buttonElement.className = 'btn btn-primary d-none invisible-btn';
+    buttonElement.setAttribute('data-bs-toggle', 'modal');
+    buttonElement.setAttribute('data-bs-target', '#after_action_modal');
+    this.$el.appendChild(buttonElement);
+    const modalElement = this.$refs.afterActionModal;
+    modalElement.addEventListener('hidden.bs.modal', this.modalAfterActionClose);
+  },
+  beforeUnmount() {
+    const modalElement = this.$refs.afterActionModal;
+    modalElement.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
+  }
   }
 </script>
 
