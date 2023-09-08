@@ -17,6 +17,20 @@ class RegistrationService extends BaseApiService {
         }
     }
 
+    async dropRegisteredCourse(rcourse_ID, user_ID) {
+        try {
+            const response = await axiosClient.put("/registration/drop_registered_course", {
+                rcourse_ID: rcourse_ID,
+                user_ID: user_ID,
+            });
+            // console.log(response);
+            return response.data;
+            
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
 }
 
 export default new RegistrationService();
