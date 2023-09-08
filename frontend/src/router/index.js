@@ -153,13 +153,15 @@ const routes = [
     meta: {
         title: 'Edit Run Course',
     },
+  },
+  {
     path: '/editProposedCourse/:courseId/:action?',
     name: 'editProposedCourse',
     component: () => import('../views/course/editProposedCourse.vue'),
     meta: {
         title: 'Edit Proposed Course',
     },
-  },     
+  },    
   {
     path: '/studentViewProfile',
     name: 'studentViewProfile',

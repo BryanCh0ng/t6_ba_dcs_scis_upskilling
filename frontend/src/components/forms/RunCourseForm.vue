@@ -734,8 +734,6 @@ export default {
 
                 try {
 
-                    console.log(typeof (this.formData.closingDate));
-
                     this.submitFormData["run_Startdate"] = this.formatDateToYYYYMMDD(this.formData.startDate);
 
                     this.submitFormData["run_Enddate"] = this.formatDateToYYYYMMDD(this.formData.endDate);

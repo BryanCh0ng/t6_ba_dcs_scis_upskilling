@@ -267,6 +267,12 @@ export default {
                 this.showAlert = !this.showAlert;
             }
         },
+        formatDateToYYYYMMDD(dateObj) {
+            const parsedYear = dateObj.getUTCFullYear();
+            const parsedMonth = String(dateObj.getUTCMonth() + 1).padStart(2, "0");
+            const parsedDay = String(dateObj.getUTCDate()).padStart(2, "0");
+            return `${parsedYear}-${parsedMonth}-${parsedDay}`;
+        },
         setSuccessAlert(action) {
             this.title = `${action} Success`;
             this.message = `${action} was successful`;
@@ -307,6 +313,10 @@ export default {
                         this.submitFormData["submitted_By"] = this.userID;
 
                         this.submitFormData["course_ID"] = this.createCourseResponse["course_ID"];
+
+                        const today = new Date();
+
+                        this.submitFormData["proposed_Date"] = this.formatDateToYYYYMMDD(today);
 
                         await this.createProposedCourse();
 

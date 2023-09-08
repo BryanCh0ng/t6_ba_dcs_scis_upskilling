@@ -122,21 +122,20 @@ class ProposedCourse(db.Model):
     course_ID = db.Column(db.Integer,db.ForeignKey('course.course_ID'), nullable=False)
     pcourse_Status = db.Column(db.String(20), nullable=False)
     reason = db.Column(db.String(255), nullable=False)
-    proposed_date = db.Column(db.Date, default=datetime.today().strftime('%Y-%m-%d'), nullable=False)
+    proposed_Date = db.Column(db.Date, nullable=False)
+    #proposed_date = db.Column(db.Date, default=datetime.today().strftime('%Y-%m-%d'), nullable=False)
     voteCount = db.Column(db.Integer, nullable=False)
 
 
-    def __init__(self, pcourse_ID, submitted_By, action_Done_By, course_ID, pcourse_Status, reason ):
+    def __init__(self, pcourse_ID, submitted_By, action_Done_By, course_ID, pcourse_Status, reason, proposed_Date, voteCount):
         self.pcourse_ID = pcourse_ID
         self.submitted_By = submitted_By
         self.course_ID = course_ID
         self.pcourse_Status = pcourse_Status
         self.action_Done_By = action_Done_By
-        self.reason = reason        
+        self.reason = reason  
         self.proposed_Date = proposed_Date
-        self.reason = reason 
-        self.voteCount = voteCount       
-
+        self.voteCount = voteCount         
 
     def json(self):
         columns = self.__mapper__.column_attrs.keys()

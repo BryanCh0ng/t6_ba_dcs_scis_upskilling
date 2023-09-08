@@ -103,7 +103,7 @@ class CreateProposedCourse(Resource):
             new_proposed_course_data = request.json
 
             # Create a new proposed course object with the data
-            new_proposed_course = ProposedCourse(None, submitted_By=new_proposed_course_data.get("submitted_By"), action_Done_By=None, course_ID=new_proposed_course_data.get("course_ID"), pcourse_Status="Pending", reason=None)
+            new_proposed_course = ProposedCourse(None, submitted_By=new_proposed_course_data.get("submitted_By"), course_ID=new_proposed_course_data.get("course_ID"), pcourse_Status="Pending", action_Done_By=None, proposed_Date=new_proposed_course_data.get("proposed_Date"), reason=None, voteCount=0)
 
             # Add the new proposed course to the database
             db.session.add(new_proposed_course)
