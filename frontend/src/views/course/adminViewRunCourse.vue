@@ -43,7 +43,7 @@
               <td v-if="course.course_Status === 'Active'"><course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
               <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
               <td v-else><course-action :status="course.course_Status" :course="course"></course-action></td>
-              <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course"></course-action></td>
+              <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course" @click="goToPageWithId(course.rcourse_ID)"></course-action></td>
               <td v-if="course.course_Status =='Inactive' && course.runcourse_Status=='Closed'">
                 <course-action @action-and-message-updated="handleActionData"  status="Retire" :course="course" :courseName="course.courseName" ></course-action>
               </td>
@@ -185,6 +185,9 @@ export default {
         if (sort_response.code == 200) {
           this.courses = sort_response.data
         }
+    },
+    goToPageWithId(runcourseID) {
+      this.$router.push({ name: 'editRunCourse', params: {id: runcourseID}})
     }
   },
   created() {

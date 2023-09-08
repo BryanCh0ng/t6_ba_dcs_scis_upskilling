@@ -147,7 +147,7 @@ const routes = [
     },
   },
   {
-    path: '/editRunCourse',
+    path: '/editRunCourse/:id',
     name: 'editRunCourse',
     component: () => import('../views/course/EditRunCourse.vue'),
     meta: {

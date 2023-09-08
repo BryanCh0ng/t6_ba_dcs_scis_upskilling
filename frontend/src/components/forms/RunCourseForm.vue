@@ -202,7 +202,7 @@
 
                 <div v-else class="row">
                     <div class="col-md-6 form-group">
-                        <button type="button" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                        <button type="button" @click="goToAdminViewRunCourse" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
                             Cancel
                         </button>
                     </div>
@@ -425,6 +425,9 @@ export default {
             type: Boolean,
             required: true
         },
+        runcourseId: {
+            type: Number
+        }
     },
     setup() {
         // Initialize Vuelidate
@@ -465,8 +468,6 @@ export default {
             buttonType: "",
             showAlert: false,
             //Edit Run Course
-            //Need to change later 
-            runcourseId: 16,
             instructorID: 0,
             templateID: 0,
             createRunCourseResponse: {},
@@ -669,6 +670,9 @@ export default {
 
             }
         },
+        goToAdminViewRunCourse() {
+            this.$router.push("/adminViewRunCourse");
+        },
         async onReset() {
             this.v$.$reset();
 
@@ -824,7 +828,7 @@ export default {
                         this.buttonType = "success"
                         this.showAlert = !this.showAlert;
 
-                        //create the run course 
+                        //create the run course
 
                     }
 
