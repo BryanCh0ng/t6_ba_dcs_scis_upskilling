@@ -155,7 +155,8 @@ INSERT INTO course VALUES
 	(26, 'Introduction to Sociology', "Explore the fundamental concepts of society, culture, and human behavior. Study social institutions, socialization, inequality, and the impact of social change on individuals and communities", 4),
 	(27, 'Constitutional Law', "Study the constitution and its impact on government and individual rights. Explore topics such as separation of powers, federalism, and constitutional interpretation.", 5),
 	(28, 'Cost Accounting', "Focus on understanding and analyzing costs in business operations. Learn techniques for cost allocation, cost-volume-profit analysis, and cost estimation.", 6),
-	(29, 'Ethics in Accounting', "Examine ethical considerations in the field of accounting. Learn about professional ethics, conflicts of interest, confidentiality, and the role of accountants in maintaining integrity.", 6);
+	(29, 'Ethics in Accounting', "Examine ethical considerations in the field of accounting. Learn about professional ethics, conflicts of interest, confidentiality, and the role of accountants in maintaining integrity.", 6),
+    (30, 'Vue.js Mastery: Building Interactive Web Applications', "Unlock the full potential of Vue.js and become a front-end development master with our comprehensive Vue.js Mastery course. Whether you're a beginner looking to get started or an experienced developer seeking to enhance your skills, this course has something for everyone.", 1);
 
 DROP TABLE IF EXISTS `proposedcourse`;
 CREATE TABLE IF NOT EXISTS `proposedcourse`(
@@ -195,7 +196,7 @@ INSERT INTO proposedcourse VALUES
 	(19, 6, 28, 'Approved', 2, NULL, "2023-08-25", 20), 
 	(20, 6, 29, 'Approved', 2, NULL, "2023-08-26", 12), 
 	(21, 4, 11, 'Rejected', 2, 'Alignment with curriculum', "2023-08-25", 0),
-    (22, 4, 10, 'Pending', 2, NULL, "2023-09-01", 0);
+    (22, 4, 30, 'Pending', 2, NULL, "2023-09-01", 0);
 	
 
 DROP TABLE IF EXISTS `votecourse`;

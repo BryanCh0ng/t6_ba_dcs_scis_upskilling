@@ -59,6 +59,12 @@
                 </tbody>
                 </table>
             </div>
+            <div v-else-if="assigned_courses=[] && onInitialEmptyAssigned">
+              <div class="pt-5 text-center">
+                <p>You are not assigned to any courses.</p>
+                <router-link :to="{ name: 'instructorTrainerViewProfile' }" class="btn btn-edit">Propose a Course</router-link>
+              </div>
+            </div>
             <div v-else-if="assigned_courses=[]">
                 <p>No records found</p>
             </div>
@@ -114,6 +120,12 @@
                 </tbody>
                 </table>
             </div>
+            <div v-else-if="proposed_course=[] && onInitialEmptyProposed">
+              <div class="pt-5 text-center">
+                <p>You have not yet proposed any courses.</p>
+                <router-link :to="{ name: 'instructorTrainerViewProfile' }" class="btn btn-edit">Propose a Course</router-link>
+              </div>
+            </div>
             <div v-else-if="proposed_courses=[]">
                 <p>No records found</p>
             </div>
@@ -167,34 +179,40 @@
                 </table>
                
             </div>
+            <div v-else-if="conducted_course=[] && onInitialEmptyConducted">
+              <div class="pt-5 text-center">
+                <p>You have not yet conducted any courses.</p>
+                <router-link :to="{ name: 'instructorTrainerViewProfile' }" class="btn btn-edit">Propose a Course</router-link>
+              </div>
+            </div>
             <div v-else-if="conducted_courses=[]">
                 <p>No records found</p>
             </div>
             </div>
             <vue-awesome-paginate v-if="conducted_courses.length/itemsPerPage > 0" v-model="localCurrentPageConducted" :totalItems="conducted_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeConducted" class="justify-content-center pagination-container"/>
         </div>
-    </div>
-    <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" /></div>
-    </div>
 
-    <div class="modal fade" id="after_action_modal" tabindex="-1" aria-hidden="true" ref="afterActionModal">
-        <div class="modal-dialog modal-lg"> 
-          <modal-after-action :course="actionCourse" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
+        <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" /></div>
         </div>
-      </div>
-      
-      <div class="modal fade" id="rejected_course_modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <modal-after-action
-            v-if="showRejectedCourseModal"
-            :course="selectedRejectedCourse"
-            :message="receivedRejectedCourseMessage"
-            @close-modal="closeRejectedCourseModal"
-          />
-        </div>
-      </div>
 
+        <div class="modal fade" id="after_action_modal" tabindex="-1" aria-hidden="true" ref="afterActionModal">
+            <div class="modal-dialog modal-lg"> 
+              <modal-after-action :course="actionCourse" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
+            </div>
+          </div>
+          
+        <div class="modal fade" id="rejected_course_modal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <modal-after-action
+                v-if="showRejectedCourseModal"
+                :course="selectedRejectedCourse"
+                :message="receivedRejectedCourseMessage"
+                @close-modal="closeRejectedCourseModal"
+            />
+          </div>
+        </div>
+    </div>
   </div>
 </template>
     
@@ -244,10 +262,14 @@ export default {
         statusOptionsAssigned: ["Enrolled", "Pending", "Not Enrolled", "Dropped"],
         statusOptionsProposed: ["Approved", "Rejected", "Pending"],
         currentDate: new Date(),
+        receivedMessage: '',
         actionCourse: {},
         showRejectedCourseModal: false,
         selectedRejectedCourse: null,
         receivedRejectedCourseMessage: '',
+        onInitialEmptyAssigned: false,
+        onInitialEmptyProposed: false,
+        onInitialEmptyConducted: false,
     }
   },
 
@@ -261,7 +283,16 @@ export default {
       this.selectedCourse = null;
       this.showModal = false;
     },
-
+    handleActionData(actionData) {
+      console.log(actionData.message)
+      this.receivedMessage = actionData.message;
+      this.actionCourse = actionData.course
+      const modalButtonElement = this.$el.querySelector('.invisible-btn')
+      modalButtonElement.click();
+    },
+    modalAfterActionClose() {
+      this.loadData();
+    },
     openRejectedCourseModal(proposedCourse) {
       this.selectedRejectedCourse = proposedCourse;
       this.showRejectedCourseModal = true;
@@ -418,6 +449,25 @@ export default {
       this.$router.push({ name: 'editProposedCourse', params: { courseId } });
     },
 
+    async loadData() {
+      try {
+         // let user_ID = await UserService.getUserID()
+          let user_ID = 4
+
+          let assigned_courses = await CourseService.searchInstructorAssignedCourseInfo(user_ID, null, null, null)
+          this.assigned_courses = assigned_courses.data
+
+          let proposed_courses = await CourseService.searchInstructorProposedCourseInfo(user_ID, null, null, null)
+          this.proposed_courses = proposed_courses.data
+
+          let conducted_courses = await CourseService.searchInstructorCompletedCourseInfo(user_ID, null, null)
+          this.conducted_courses = conducted_courses.data
+        
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+      }
+    },
+
   },
   computed: {
     displayedAssignedCourses() {
@@ -441,23 +491,44 @@ export default {
   },
   async created() {
     try {
-      // const user_ID = await UserService.getUserID()
-      const user_ID = 4
+      // let user_ID = await UserService.getUserID()
+      let user_ID = 4
 
       let assigned_courses = await CourseService.searchInstructorAssignedCourseInfo(user_ID, null, null, null)
       this.assigned_courses = assigned_courses.data
-      console.log(this.assigned_coures)
+      if (this.assigned_courses == undefined || this.assigned_courses.length == 0) {
+        this.onInitialEmptyAssigned = true
+      }
 
       let proposed_courses = await CourseService.searchInstructorProposedCourseInfo(user_ID, null, null, null)
       this.proposed_courses = proposed_courses.data
+      if (this.proposed_courses == undefined || this.proposed_courses.length == 0) {
+        this.onInitialEmptyProposed = true
+      }
 
       let conducted_courses = await CourseService.searchInstructorCompletedCourseInfo(user_ID, null, null)
       this.conducted_courses = conducted_courses.data
+      if (this.conducted_courses == undefined || this.conducted_courses.length == 0) {
+        this.onInitialEmptyConducted = true
+      }
 
     } catch (error) {
       console.error("Error fetching course details:", error);
     }
   },
+  mounted() {
+    const buttonElement = document.createElement('button');
+    buttonElement.className = 'btn btn-primary d-none invisible-btn';
+    buttonElement.setAttribute('data-bs-toggle', 'modal');
+    buttonElement.setAttribute('data-bs-target', '#after_action_modal');
+    this.$el.appendChild(buttonElement);
+    const modalElement = this.$refs.afterActionModal;
+    modalElement.addEventListener('hidden.bs.modal', this.modalAfterActionClose);
+  },
+  beforeUnmount() {
+    const modalElement = this.$refs.afterActionModal;
+    modalElement.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
+  }
   }
 </script>
 
