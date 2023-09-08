@@ -63,7 +63,7 @@ class CourseService extends BaseApiService {
                     coursecat_id: coursecat_ID
                 }
             });
-            console.log(response.data);
+            // console.log(response.data);
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -80,7 +80,7 @@ class CourseService extends BaseApiService {
                     coursecat_id: coursecat_ID
                 }
             });
-            console.log(response.data);
+            // console.log(response.data);
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -98,7 +98,7 @@ class CourseService extends BaseApiService {
                     reg_status: reg_Status
                 }
             });
-            console.log(response.data);
+            // console.log(response.data);
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -107,9 +107,6 @@ class CourseService extends BaseApiService {
     // Student - Vote - course name, course cat, status
     async searchCourseVoteInfo(user_ID, course_Name, coursecat_ID, vote_Status) {
         try {
-            console.log(user_ID)
-            console.log(vote_Status)
-            console.log("Making API request...");
             let response = await axiosClient.get("/course/get_course_vote_info_filter_search", {
                 params: {
                     user_id: user_ID,
@@ -118,8 +115,6 @@ class CourseService extends BaseApiService {
                     vote_status: vote_Status
                 }
             });
-            console.log(response); // Log the full response object
-            console.log(response.data); // Log response data specifically
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -243,9 +238,6 @@ class CourseService extends BaseApiService {
     // Admin - All Proposal - Approved/Rejected
     async searchAllApprovedRejectedProposedCoursesAdmin(course_Name, coursecat_ID, status) {
         try {
-            console.log("course_Name:", course_Name);
-            console.log("coursecat_ID:", coursecat_ID);
-            console.log("status:", status);
             let response = await axiosClient.get("/course/get_all_app_reg_proposed_courses_admin", {
                 params: {
                     course_name: course_Name,
@@ -253,25 +245,40 @@ class CourseService extends BaseApiService {
                     pcourse_status: status
                 }
             });
-            console.log(response.data)
+            // console.log(response.data)
             return response.data;
         } catch (error) {
             return this.handleError(error);
         }
     }
 
-
     // Admin - All Voting Campaign
-    async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, status) {
+    async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, vote_Status) {
         try {
             let response = await axiosClient.get("/course/get_all_voting_courses_admin", {
                 params: {
                     course_name: course_Name,
                     coursecat_id: coursecat_ID,
-                    vote_status: status
+                    vote_status: vote_Status
                 }
             });
-            console.log("Response data:", response.data);
+            // console.log("Response data:", response.data);
+            return response.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+    // Admin - All Voting Campaign - Deleted
+    async searchAllNotOfferedVotingCoursesAdmin(course_Name, coursecat_ID) {
+        try {
+            let response = await axiosClient.get("/course/get_all_not_offered_courses_admin", {
+                params: {
+                    course_name: course_Name,
+                    coursecat_id: coursecat_ID,
+                }
+            });
+            // console.log("Response data:", response.data);
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -289,7 +296,7 @@ class CourseService extends BaseApiService {
                     course_status: course_Status
                 }
             });
-            console.log(response.data)
+            // console.log(response.data)
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -324,7 +331,7 @@ class CourseService extends BaseApiService {
                     course_status: course_Status
                 }
             });
-            console.log(response.data)
+            // console.log(response.data)
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -393,6 +400,48 @@ class CourseService extends BaseApiService {
             return this.handleError(error)
         }
     }    
+    async voteCourse(vote_ID, user_ID) {
+        try {
+            const response = await axiosClient.post("/course/add_interest", {
+                vote_ID: vote_ID,
+                user_ID: user_ID,
+            });
+            // console.log(response.data);
+            return response.data;
+            
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+    async unvoteCourse(vote_ID, user_ID) {
+        try {
+            const response = await axiosClient.post("/course/delete_interest", {
+                vote_ID: vote_ID,
+                user_ID: user_ID,
+            });
+            // console.log(response);
+            return response.data;
+            
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+    async unofferedVoteCourse(course_ID) {
+        try {
+            console.log("im here")
+            const response = await axiosClient.put("/course/update_vote_unoffered_course", {
+                course_ID: course_ID,
+            });
+            // console.log(response);
+            return response.data;
+            
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+    
 }
 
 export default new CourseService();

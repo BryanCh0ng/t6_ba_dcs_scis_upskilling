@@ -12,19 +12,19 @@
       <div>{{ course.course_Desc }}</div>
       <div v-if="isRunCourse">
         <div class="pt-4 row">
-          <div class="col-6">
-            Course Start Date: <br> <strong>{{ course.reg_Startdate }}</strong>
+          <div class="col-6"> 
+            Course Start Date: <br> <strong>{{ convertDate(course.reg_Startdate) }}</strong>
           </div>
           <div class="col-6">
-            Course Start Time: <br> <strong>{{ course.reg_Starttime }}</strong>
+            Course Start Time: <br> <strong>{{ convertTime(course.reg_Starttime) }}</strong>
           </div>
         </div>
         <div class="pt-3 row">
           <div class="col-6">
-            Course End Date: <br> <strong>{{ course.run_Enddate }}</strong>
+            Course End Date: <br> <strong>{{ convertDate(course.run_Enddate) }}</strong>
           </div>
           <div class="col-6">
-            Course End Time: <br> <strong>{{ course.run_Endtime }}</strong>
+            Course End Time: <br> <strong>{{ convertTime(course.run_Endtime) }}</strong>
           </div>
         </div>
         <div class="pt-3 row">
@@ -47,8 +47,7 @@
           <div class="col-6">
             Fee: <br> <strong>${{ course.course_Fee }}</strong>
           </div>
-          <!-- to add role check after session completed -->
-          <div class="col-6"> 
+          <div v-if="userRole == 'Admin'" class="col-6"> 
             Registration Count: <br> <strong>{{ course.registration_count }}</strong>
           </div>
         </div>
@@ -59,6 +58,8 @@
 
 <script>
 import courseCategoryBadge from './courseCategoryBadge.vue';
+import {convertDate, convertTime} from '@/scripts/common/convertDateTime.js'
+import UserService from "@/api/services/UserService.js";
 
 export default {
   components: {
@@ -72,6 +73,21 @@ export default {
       var runStatus = this.course['runcourse_Status'];
       return runStatus !== undefined
     },
+    userRole() {
+      return this.getUserRole()
+    }
+  },
+  methods: {
+    convertDate, 
+    convertTime,
+    async getUserRole() {
+      try {
+        const user_Role = await UserService.getUserRole()
+        return user_Role
+      } catch (error) {
+        return null
+      }
+    }
   }
 };
 </script>

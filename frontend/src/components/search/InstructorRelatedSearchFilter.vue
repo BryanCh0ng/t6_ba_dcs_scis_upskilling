@@ -16,7 +16,7 @@
           </div>
           <div class="col-md col-lg-3">
             <div class="d-flex justify-content-between">
-              <button @click="resetFilter" class="btn" id="resetbtn">Clear</button>
+              <button @click="resetFilter" class="btn" id="resetbtn" button="type">Clear</button>
               <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
             </div>
           </div>
@@ -53,11 +53,13 @@ export default {
     this.statusDropdownOptions = this.statusOptions;
   },
   methods: {
-    async resetFilter() {
+    resetFilter() {
       this.instructorName = "";
       this.organizationName = "";
       this.role = "";
       this.searchedInstructors = []; // Clear search results
+
+      this.searchFilter();
     },
     async searchFilter() {
       try {

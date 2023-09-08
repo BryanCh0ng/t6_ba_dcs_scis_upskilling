@@ -92,7 +92,7 @@ class CourseCategory(db.Model):
 class Course(db.Model):
     __tablename__ = 'course'
 
-    course_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    course_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     course_Name = db.Column(db.String(255), nullable=False)
     course_Desc = db.Column(db.String(800), nullable=False)
     coursecat_ID = db.Column(db.Integer, db.ForeignKey('coursecategory.coursecat_ID'), nullable=False)
@@ -116,13 +116,14 @@ class Course(db.Model):
 class ProposedCourse(db.Model):
     __tablename__ = 'proposedcourse'
 
-    pcourse_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    pcourse_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     submitted_By = db.Column(db.Integer,db.ForeignKey('user.user_ID'), nullable=False)
     action_Done_By = db.Column(db.Integer,db.ForeignKey('user.user_ID'), nullable=False)
     course_ID = db.Column(db.Integer,db.ForeignKey('course.course_ID'), nullable=False)
     pcourse_Status = db.Column(db.String(20), nullable=False)
     reason = db.Column(db.String(255), nullable=False)
     proposed_date = db.Column(db.Date, default=datetime.today().strftime('%Y-%m-%d'), nullable=False)
+    voteCount = db.Column(db.Integer, nullable=False)
 
 
     def __init__(self, pcourse_ID, submitted_By, action_Done_By, course_ID, pcourse_Status, reason ):
@@ -132,6 +133,9 @@ class ProposedCourse(db.Model):
         self.pcourse_Status = pcourse_Status
         self.action_Done_By = action_Done_By
         self.reason = reason        
+        self.proposed_Date = proposed_Date
+        self.reason = reason 
+        self.voteCount = voteCount       
 
 
     def json(self):

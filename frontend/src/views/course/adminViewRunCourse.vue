@@ -44,7 +44,16 @@
               <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
               <td v-else><course-action :status="course.course_Status" :course="course"></course-action></td>
               <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course"></course-action></td>
-              <td v-if="course.course_Status=='Inactive' && course.runcourse_Status=='Closed'"><course-action @action-and-message-updated="handleActionData"  status="Retire" :course="course" :courseName="course.courseName" ></course-action></td>
+              <td v-if="course.course_Status =='Inactive' && course.runcourse_Status=='Closed'">
+                <course-action @action-and-message-updated="handleActionData"  status="Retire" :course="course" :courseName="course.courseName" ></course-action>
+              </td>
+              <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course"></course-action></td>
+              <td v-if="course.course_Status =='Inactive' && course.runcourse_Status=='Closed'">
+                <course-action status="open_for_registration" :course="course" :courseName="course.courseName" ></course-action>
+              </td>
+              <td v-else-if="course.course_Status =='Active' && course.runcourse_Status=='Ongoing'">
+                <course-action status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
+              </td>
             </tr>               
           </tbody>
         </table>
@@ -176,7 +185,7 @@ export default {
         if (sort_response.code == 200) {
           this.courses = sort_response.data
         }
-    },
+    }
   },
   created() {
    this.loadData();

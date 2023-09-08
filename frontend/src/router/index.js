@@ -9,22 +9,6 @@ const routes = [
             title: 'Home',
         },
     },
-    {
-      path: '/blacklistfilter',
-      name: 'blacklist',
-      component: () => import('../components/search/BlacklistAttendanceSearchFilter.vue'),
-      meta: {
-          title: 'Blacklist Attendencec Search Filter',
-      },
-  },
-  {
-    path: '/commonsearchfilter',
-    name: 'commonsearchfilter',
-    component: () => import('../components/search/CommonSearchFilter.vue'),
-    meta: {
-        title: 'common search filter',
-    },
-  },
   {
       path: '/contactUs',
       name: 'ContactUs',
@@ -169,6 +153,29 @@ const routes = [
     meta: {
         title: 'Edit Run Course',
     },
+    path: '/editProposedCourse/:courseId/:action?',
+    name: 'editProposedCourse',
+    component: () => import('../views/course/editProposedCourse.vue'),
+    meta: {
+        title: 'Edit Proposed Course',
+    },
+  },     
+  {
+    path: '/studentViewProfile',
+    name: 'studentViewProfile',
+    component: () => import('../views/course/studentViewProfile.vue'),
+    meta: {
+        title: 'Student View Profile',
+    },
+  },
+  {
+    path: '/instructorTrainerViewProfile',
+    name: 'instructorTrainerViewProfile',
+    component: () => import('../views/course/instructorTrainerViewProfile.vue'),
+    meta: {
+        title: 'Instructor Trainer View Profile',
+   
+    }
   }
   
 

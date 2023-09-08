@@ -17,7 +17,7 @@
         <div class="container col-12 table-responsive">
           <h5 class="pb-3">Proposed Course</h5>
           <div v-if="pending_courses && pending_courses.length > 0">
-            <table class="table">
+            <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
@@ -37,14 +37,11 @@
                     {{ pending_course.submitted_by }}
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(pending_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action status="pending_approve" :id="pending_course.course_ID"></course-action></td>
+                  <td><course-action status="pending_approve" :id="pending_course.course_ID" @click="editCourse(pending_course.course_ID, 'approve')"></course-action></td>
                   <td><course-action status="pending_reject" :id="pending_course.course_ID" @click="openReject(pending_course)" data-bs-toggle="modal" data-bs-target="#rejected_modal"></course-action></td>
                 </tr>
               </tbody>
             </table>
-            <div class="modal fade" id="rejected_modal" tabindex="-1" aria-hidden="true">
-              <div class="modal-dialog modal-lg"><reject-proposal-modal @close-modal="closeReject"/></div>
-            </div>
           </div>
           <div v-else-if="pending_courses=[]">
             <p>No records found</p>
@@ -63,7 +60,7 @@
         <div class="container col-12 table-responsive">
           <h5 class="pb-3">All Proposals</h5>
           <div  v-if="proposed_courses && proposed_courses.length > 0">
-            <table class="table">
+            <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
@@ -72,8 +69,8 @@
                     <a href="" @click.prevent="sort('submitted_by_name', 'proposed')" class="text-decoration-none text-dark">Owner <sort-icon :sortColumn="sortColumn === 'submitted_by_name'" :sortDirection="getSortDirection('submitted_by_name')"/></a></th>
                   <th scope="col">
                     <a href="" @click.prevent="sort('pcourse_Status', 'proposed')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'pcourse_Status'" :sortDirection="getSortDirection('pcourse_Status')"/></a></th>
+                  <th scope="col">Rejection Reason</th>
                   <th scope="col">Course Details</th>
-                  <th scope="col">Action(s)</th>
                 </tr>
               </thead>
               <tbody>
@@ -85,8 +82,8 @@
                     {{ proposed_course.submitted_by_name }}
                   </td>
                   <td>{{ proposed_course.pcourse_Status }}</td>
+                  <td>{{ proposed_course.reason }}</td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action :status="proposed_course.pcourse_Status" :id="proposed_course.course_ID"></course-action></td>
                 </tr>
               </tbody>
             </table>
@@ -101,6 +98,10 @@
     <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" /></div>
     </div>
+
+    <div class="modal fade" id="rejected_modal" tabindex="-1" aria-hidden="true" ref="rejectedModal">
+      <div class="modal-dialog modal-lg"><reject-proposal-modal ref="rejectComponent"  id="after_action_modal" :course="rejectedCourse" @close-modal="closeReject"/></div>
+    </div>      
   </div>
 </template>
     
@@ -133,6 +134,7 @@ export default {
       sortColumn: '',
       sortDirection: 'asc',
       selectedCourse: null,
+      rejectedCourse: null,
       itemsPerPage: 10,
       localCurrentPagePending: 1,
       localCurrentPageProposed: 1,
@@ -157,10 +159,13 @@ export default {
       this.localCurrentPageProposed = newPage;
       this.$emit('page-change', newPage);
     },
-    openReject() {
+    openReject(course) {
+      this.rejectedCourse = course;
       this.showModal = true;
+      this.$refs.rejectComponent.resetData();
     },
     closeReject() {
+      this.rejectedCourse = null;
       this.showModal = false;
     },
     async handleSearchComplete(searchResults) {
@@ -228,6 +233,22 @@ export default {
           this.proposed_courses = sort_response.data
          }
       }
+    },
+    editCourse(courseId, action) {
+      this.$router.push({ name: 'editProposedCourse', params: { courseId, action } });
+    },
+    modalRejectedClose() {
+      this.loadData();
+    },
+    async loadData() {
+      try {
+        let pending_response = await CourseService.searchAllSubmittedProposedCoursesAdmin(null, null)
+        this.pending_courses = pending_response.data
+        let proposed_response = await CourseService.searchAllApprovedRejectedProposedCoursesAdmin(null, null, null)
+        this.proposed_courses = proposed_response.data
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+      }
     }
   },
   computed: {
@@ -243,14 +264,20 @@ export default {
     }
   },
   async created() {
-    try {
-      let pending_response = await CourseService.searchAllSubmittedProposedCoursesAdmin(null, null)
-      this.pending_courses = pending_response.data
-      let proposed_response = await CourseService.searchAllApprovedRejectedProposedCoursesAdmin(null, null, null)
-      this.proposed_courses = proposed_response.data
-    } catch (error) {
-      console.error("Error fetching course details:", error);
-    }
+    this.loadData();
+  },
+  mounted() {
+    const buttonElement = document.createElement('button');
+    buttonElement.className = 'btn btn-primary d-none invisible-btn';
+    buttonElement.setAttribute('data-bs-toggle', 'modal');
+    buttonElement.setAttribute('data-bs-target', '#rejected_modal');
+    this.$el.appendChild(buttonElement);
+    const modalElement = this.$refs.rejectedModal;
+    modalElement.addEventListener('hidden.bs.modal', this.modalRejectedClose);
+  },
+  beforeUnmount() {
+    const modalElement = this.$refs.rejectedModal;
+    modalElement.removeEventListener('hidden.bs.modal', this.modalRejectedClose)
   }
   }
 </script>

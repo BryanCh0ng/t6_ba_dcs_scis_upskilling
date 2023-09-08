@@ -117,6 +117,11 @@ body {
   color: #FFFFFF !important;
 }
 
+.btn-warning {
+  background-color: #DAA520 !important;
+  border: #DAA520;
+}
+
 .nav-link:hover {
   cursor: pointer;
 }
