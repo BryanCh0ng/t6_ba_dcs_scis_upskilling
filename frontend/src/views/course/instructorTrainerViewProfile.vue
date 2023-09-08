@@ -82,7 +82,7 @@
                     <th scope="col">
                       <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'proposed')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                     <th scope="col">
-                      <a href="" @click.prevent="sort('proposed_Date', 'proposed')" class="text-decoration-none text-dark">Propose Date <sort-icon :sortColumn="sortColumn === 'proposed_Date'" :sortDirection="getSortDirection('proposed_Date')"/></a></th>
+                      <a href="" @click.prevent="sort('proposed_Date', 'proposed')" class="text-decoration-none text-dark">Proposed Date <sort-icon :sortColumn="sortColumn === 'proposed_Date'" :sortDirection="getSortDirection('proposed_Date')"/></a></th>
                     <th scope="col">
                       <a href="" class="text-decoration-none text-dark" @click.prevent="sort('voteCount', 'proposed')"># of Interest <sort-icon :sortColumn="sortColumn === 'voteCount'" :sortDirection="getSortDirection('voteCount')"/></a></th>
                     <th scope="col">
