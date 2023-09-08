@@ -66,3 +66,76 @@ class GetRunCourse(Resource):
       }
     )
     return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
+
+edit_runcourse = api.parser()
+@api.route("/edit_runcourse/<int:runcourse_id>", methods=["PUT"])
+class EditRunCourse(Resource):
+    @api.expect(edit_runcourse)
+    def put(self, runcourse_id):
+
+        try: 
+            #Get the updated data from the request body 
+            updated_data = request.json
+        
+            runcourse = RunCourse.query.filter_by(rcourse_ID=runcourse_id).first()
+
+            if runcourse:
+                # Update the fields based on updated_data
+                for field, value in updated_data.items():
+                    #print(f"Updating {field} to {value}")
+                    setattr(runcourse, field, value)
+
+                #Commit the changes to the database 
+                db.session.commit()
+
+                return json.loads(json.dumps(runcourse.json(), default=str)), 200
+
+            return json.loads(json.dumps({"message": "There is no such runcourse"})), 404
+
+        except Exception as e:
+            print("Error:", str(e))
+            return "Failed" + str(e), 500
+
+@api.route("/create_runcourse", methods=["POST"])
+@api.doc(description="Create run course")
+class CreateRunCourse(Resource):
+    def post(self):
+        try: 
+            # Get the data for creating a new run course from the request body
+            new_run_course_data = request.json
+
+            # Create a new run course object with the data
+            new_run_course = RunCourse(None, run_Startdate=new_run_course_data.get("run_Startdate"), run_Enddate=new_run_course_data.get("run_Enddate"), run_Starttime=new_run_course_data.get("run_Starttime"), run_Endtime=new_run_course_data.get("run_Endtime"), instructor_ID=new_run_course_data.get("instructor_ID"), course_Format=new_run_course_data.get("course_Format"), course_Venue=new_run_course_data.get("course_Venue"), runcourse_Status=new_run_course_data.get("runcourse_Status"), course_Size=new_run_course_data.get("course_Size"), course_Minsize=new_run_course_data.get("course_Minsize"), course_Fee=new_run_course_data.get("course_Fee"), class_Duration=new_run_course_data.get("class_Duration"), reg_Startdate=new_run_course_data.get("reg_Startdate"), reg_Enddate=new_run_course_data.get("reg_Enddate"), reg_Starttime=new_run_course_data.get("reg_Starttime"), reg_Endtime=new_run_course_data.get("reg_Endtime"), template_ID=new_run_course_data.get("template_ID"), course_ID=new_run_course_data.get("course_ID"), course_Status=new_run_course_data.get("course_Status"))
+
+            # Add the new course to the database
+            db.session.add(new_run_course)
+
+            # Commit the changes to the database
+            db.session.commit()
+
+            # Inside the create_proposed_course route
+            #print("Data before returning:", new_proposed_course.json())
+
+            # Return the newly created course as JSON response
+            return json.loads(json.dumps(new_run_course.json(), default=str)), 201
+
+        except Exception as e:
+            print("Error:", str(e))
+            return "Failed to create a new course: " + str(e), 500
+
+get_runcourse_by_id = api.parser()
+get_runcourse_by_id.add_argument("runcourse_id", help="Enter runcourse id")
+@api.route("/get_runcourse_by_id")
+@api.doc(description="Get run course by runcourse id")
+class GetRunCourse(Resource):
+    @api.expect(get_runcourse_by_id)
+    def get(self):
+        rcourse_id = get_runcourse_by_id.parse_args().get("runcourse_id")  # Use "runcourse_id" instead of "rcourse_ID"
+        runcourse = RunCourse.query.filter_by(rcourse_ID=rcourse_id).first()  # Use "rcourse_ID" instead of "rcourse_id"
+        db.session.close()
+
+        if runcourse:
+            return json.loads(json.dumps(runcourse.json(), default=str)), 200
+
+        return json.loads(json.dumps({"message": "There is no such runcourse"})), 404
+

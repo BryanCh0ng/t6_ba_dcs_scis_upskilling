@@ -11,6 +11,10 @@
   padding: 30px;
 }
 
+body {
+  overflow-x: hidden;
+}
+
 /* ------------------------------ FORMS ---------------------------------- */
 .submitbtn {
   background-color: #151c55;

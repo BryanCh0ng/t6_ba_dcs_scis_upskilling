@@ -19,6 +19,34 @@ class runCourseService extends BaseApiService {
       return this.handleError(error);
     }
   }
+  async editRunCourse(runcourseId, updatedData) {
+    try {
+        let response = await axiosClient.put(`/runcourse/edit_runcourse/${runcourseId}`, updatedData);
+        return response.data;
+
+    } catch (error) {
+        return this.handleError(error)
+    }
+  }
+  async createRunCourse(newRunCourseData) {
+    try {
+      let response = await axiosClient.post('/runcourse/create_runcourse', newRunCourseData);
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+  async getRunCourseById(runcourseId) {
+    try {
+        let runcourse = await axiosClient.get("/runcourse/get_runcourse_by_id", { params: { runcourse_id: runcourseId } });
+        return runcourse.data
+
+    } catch (error) {
+        return this.handleError(error);
+     }
+  }
+  
+
 }
 
 export default new runCourseService();

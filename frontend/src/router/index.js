@@ -115,13 +115,53 @@ const routes = [
     },
   },
   {
+    path: '/proposeCourse',
+    name: 'proposeCourse',
+    component: () => import('../views/course/ProposeCourse.vue'),
+    meta: {
+        title: 'Propose Course',
+    },
+  },
+  {
+    path: '/createCourse',
+    name: 'createCourse',
+    component: () => import('../views/course/CreateCourse.vue'),
+    meta: {
+        title: 'Create Course',
+    },
+  }, 
+  {
+    path: '/editCourse',
+    name: 'editCourse',
+    component: () => import('../views/course/EditCourse.vue'),
+    meta: {
+        title: 'Edit Course',
+    },
+  },
+  {
+    path: '/createRunCourse',
+    name: 'createRunCourse',
+    component: () => import('../views/course/CreateRunCourse.vue'),
+    meta: {
+        title: 'Create Run Course',
+    },
+  },
+  {
+    path: '/editRunCourse',
+    name: 'editRunCourse',
+    component: () => import('../views/course/EditRunCourse.vue'),
+    meta: {
+        title: 'Edit Run Course',
+    },
+  },
+  {
     path: '/editProposedCourse/:courseId/:action?',
     name: 'editProposedCourse',
     component: () => import('../views/course/editProposedCourse.vue'),
     meta: {
         title: 'Edit Proposed Course',
     },
-  },     
+  },    
   {
     path: '/studentViewProfile',
     name: 'studentViewProfile',
@@ -139,6 +179,8 @@ const routes = [
    
     }
   }
+  
+
   // },
   // {
   //     path: '/deleteCourse',

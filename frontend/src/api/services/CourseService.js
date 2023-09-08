@@ -382,6 +382,24 @@ class CourseService extends BaseApiService {
         }
     }
 
+    async createCourse(newCourseData) {
+        try {
+          let response = await axiosClient.post('/course/create_course', newCourseData);
+          return response.data;
+        } catch (error) {
+          return this.handleError(error);
+        }
+    }
+
+    async editCourse(courseId, updatedData) {
+        try {
+            let response = await axiosClient.put(`/course/edit_course/${courseId}`, updatedData);
+            return response.data;
+
+        } catch (error) {
+            return this.handleError(error)
+        }
+    }    
     async voteCourse(vote_ID, user_ID) {
         try {
             const response = await axiosClient.post("/course/add_interest", {

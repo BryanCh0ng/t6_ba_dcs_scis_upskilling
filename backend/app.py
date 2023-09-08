@@ -13,6 +13,7 @@ from core_features.user import api as user
 from core_features.contactus import api as contactus
 from core_features.registration import api as registration
 from core_features.votecourse import api as votecourse
+from core_features.feedbacktemplate import api as feedbacktemplate
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
 
@@ -33,6 +34,7 @@ api.add_namespace(user)
 api.add_namespace(contactus)
 api.add_namespace(registration)
 api.add_namespace(votecourse)
+api.add_namespace(feedbacktemplate)
 
 CORS(app, supports_credentials=True)
 # ==================== CONNECTING TO DATABASE ====================#

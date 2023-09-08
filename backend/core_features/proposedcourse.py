@@ -94,6 +94,32 @@ class GetProposedCourseByStatus(Resource):
       )
     return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
 
+@api.route("/create_proposed_course", methods=["POST"])
+@api.doc(description="Create proposed course")
+class CreateProposedCourse(Resource):
+    def post(self):
+        try: 
+            # Get the data for creating a new proposed course from the request body
+            new_proposed_course_data = request.json
+
+            # Create a new proposed course object with the data
+            new_proposed_course = ProposedCourse(None, submitted_By=new_proposed_course_data.get("submitted_By"), course_ID=new_proposed_course_data.get("course_ID"), pcourse_Status="Pending", action_Done_By=None, proposed_Date=new_proposed_course_data.get("proposed_Date"), reason=None, voteCount=0)
+
+            # Add the new proposed course to the database
+            db.session.add(new_proposed_course)
+
+            # Commit the changes to the database
+            db.session.commit()
+
+            # Inside the create_proposed_course route
+            #print("Data before returning:", new_proposed_course.json())
+
+            # Return the newly created course as JSON response
+            return json.loads(json.dumps(new_proposed_course.json(), default=str)), 201
+
+        except Exception as e:
+            print("Error:", str(e))
+            return "Failed to create a new course: " + str(e), 500
 # Edit/Update Proposed Course 
 update_proposed_course_model = {
     "course_Name": fields.String(description="Course Name", required=True),

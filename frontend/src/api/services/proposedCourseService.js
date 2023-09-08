@@ -26,7 +26,14 @@ class ProposedCourseService extends BaseApiService {
       return this.handleError(error);
     }
   }
-
+  async createProposedCourse(newProposedCourseData) {
+    try {
+      let response = await axiosClient.post('/proposedcourse/create_proposed_course', newProposedCourseData);
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
   async updateProposedCourse(courseId, courseData) {
     try {
       const apiUrl = `/proposedcourse/update_proposed_course/${courseId}`;
@@ -47,13 +54,11 @@ class ProposedCourseService extends BaseApiService {
     try {
       console.log(pcourse_ID)
       let response = await axiosClient.delete("/proposedcourse/delete_proposed_course", { params: { pcourse_ID: pcourse_ID } });
-      console.log("delete")
       return response.data;
     } catch (error) {
-      console.log("delete111")
-      return this.handleError(error);
+      return this.handleError(error)
     }
-  }
+  } 
 
   async rejectProposedCourse(updatedData) {
     try {
