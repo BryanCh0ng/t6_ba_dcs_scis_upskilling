@@ -156,7 +156,7 @@ INSERT INTO course VALUES
 	(27, 'Constitutional Law', "Study the constitution and its impact on government and individual rights. Explore topics such as separation of powers, federalism, and constitutional interpretation.", 5),
 	(28, 'Cost Accounting', "Focus on understanding and analyzing costs in business operations. Learn techniques for cost allocation, cost-volume-profit analysis, and cost estimation.", 6),
 	(29, 'Ethics in Accounting', "Examine ethical considerations in the field of accounting. Learn about professional ethics, conflicts of interest, confidentiality, and the role of accountants in maintaining integrity.", 6),
-    (30, 'Vue.js Mastery: Building Interactive Web Applications', "Unlock the full potential of Vue.js and become a front-end development master with our comprehensive Vue.js Mastery course. Whether you're a beginner looking to get started or an experienced developer seeking to enhance your skills, this course has something for everyone.", 6);
+    (30, 'Vue.js Mastery: Building Interactive Web Applications', "Unlock the full potential of Vue.js and become a front-end development master with our comprehensive Vue.js Mastery course. Whether you're a beginner looking to get started or an experienced developer seeking to enhance your skills, this course has something for everyone.", 1);
 
 DROP TABLE IF EXISTS `proposedcourse`;
 CREATE TABLE IF NOT EXISTS `proposedcourse`(
