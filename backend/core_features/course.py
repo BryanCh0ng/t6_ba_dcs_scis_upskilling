@@ -229,6 +229,7 @@ retrieve_unregistered_active_courses_filter.add_argument("user_id", type=int, he
 retrieve_unregistered_active_courses_filter.add_argument("course_name", help="Enter course name")
 retrieve_unregistered_active_courses_filter.add_argument("coursecat_id", help="Enter course category id")
 
+
 @api.route("/get_unregistered_active_courses")
 @api.doc(description="Get unregistered active course information")
 class GetUnregisteredActiveCourses(Resource):
@@ -237,10 +238,15 @@ class GetUnregisteredActiveCourses(Resource):
         args = retrieve_unregistered_active_courses_filter.parse_args()
         user_ID = args.get("user_id")
 
-        # app.logger.debug(user_ID)
+        current_datetime = datetime.now()
+        current_time = current_datetime.strftime('%H:%M:%S')
 
-        # Get the courses that the user has already registered for
-        registered_course_ids = db.session.query(Registration.rcourse_ID).filter_by(user_ID=user_ID).subquery()
+        valid_reg_statuses = ["pending", "enrolled", "not enrolled"]
+
+        registered_course_ids = db.session.query(Registration.rcourse_ID).filter(
+            Registration.user_ID == user_ID,
+            Registration.reg_Status.in_(valid_reg_statuses)
+        ).subquery()
 
         # Construct the query for unregistered courses with active course status
         query = db.session.query(
@@ -252,8 +258,11 @@ class GetUnregisteredActiveCourses(Resource):
         ).filter(
             ~RunCourse.rcourse_ID.in_(registered_course_ids),
             RunCourse.course_Status == "active",
-            RunCourse.runcourse_Status == "ongoing"
+            RunCourse.runcourse_Status == "ongoing",
+            RunCourse.reg_Enddate >= current_datetime.date(),
+            (RunCourse.reg_Enddate > current_datetime.date()) | (RunCourse.reg_Endtime > current_time)
         )
+
 
         # Apply additional filters based on user inputs
         course_Name = args.get("course_name", "")
@@ -264,6 +273,7 @@ class GetUnregisteredActiveCourses(Resource):
         if coursecat_ID:
             query = query.filter(Course.coursecat_ID == coursecat_ID)
 
+
         results = query.all()
         db.session.close()
 
@@ -271,14 +281,14 @@ class GetUnregisteredActiveCourses(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[2].run_Startdate),
-                    'run_Enddate': format_date_time(result[2].run_Enddate),
-                    'run_Starttime': format_date_time(result[2].run_Starttime),
-                    'run_Endtime': format_date_time(result[2].run_Endtime),
-                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                    "run_Startdate": result[2].run_Startdate.strftime('%Y-%m-%d'),
+                    "run_Enddate": result[2].run_Enddate.strftime('%Y-%m-%d'),
+                    "run_Starttime": result[2].run_Starttime.strftime('%H:%M:%S'),
+                    "run_Endtime": result[2].run_Endtime.strftime('%H:%M:%S'),
+                    "reg_Startdate": result[2].reg_Startdate.strftime('%Y-%m-%d'),
+                    "reg_Enddate": result[2].reg_Enddate.strftime('%Y-%m-%d'),
+                    "reg_Starttime": result[2].reg_Starttime.strftime('%H:%M:%S'),
+                    "reg_Endtime": result[2].reg_Endtime.strftime('%H:%M:%S'),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -585,14 +595,14 @@ class GetCompletedCourses(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[2].run_Startdate),
-                    'run_Enddate': format_date_time(result[2].run_Enddate),
-                    'run_Starttime': format_date_time(result[2].run_Starttime),
-                    'run_Endtime': format_date_time(result[2].run_Endtime),
-                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                    'run_Startdate': format_date_time(result[1].run_Startdate),
+                    'run_Enddate': format_date_time(result[1].run_Enddate),
+                    'run_Starttime': format_date_time(result[1].run_Starttime),
+                    'run_Endtime': format_date_time(result[1].run_Endtime),
+                    'reg_Startdate': format_date_time(result[1].reg_Startdate),
+                    'reg_Enddate': format_date_time(result[1].reg_Enddate),
+                    'reg_Starttime': format_date_time(result[1].reg_Starttime),
+                    'reg_Endtime': format_date_time(result[1].reg_Endtime),
                 }
 
                 modified_run_course = {**result[1].json(), **run_course_attrs}

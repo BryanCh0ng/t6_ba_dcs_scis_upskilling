@@ -61,7 +61,7 @@
                     {{ registered_course.reg_Status }}
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(registered_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td v-if="registered_course.reg_Status === 'Enrolled' && isClosingDateValid(registered_course.reg_Enddate)">
+                  <td v-if="(registered_course.reg_Status === 'Enrolled' || registered_course.reg_Status === 'Pending') && isClosingDateValid(registered_course.reg_Enddate)">
                       <course-action status="registered_drop" @action-and-message-updated="handleActionData" :course="registered_course"></course-action>
                   </td>
                 </tr>
@@ -592,6 +592,7 @@ export default {
       // console.log(this.proposed_courses)
 
       let completed_response = await CourseService.searchCompletedInfo(user_ID, null, null, null)
+      // console.log(completed_response.data)
       this.completed_courses = completed_response.data
       if (this.completed_courses == undefined || this.completed_courses.length == 0) {
         this.onInitialEmptyCompleted = true
