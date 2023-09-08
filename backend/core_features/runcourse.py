@@ -74,26 +74,31 @@ change_registration_status_model = api.model("change_registration_status_model",
     "rcourse_ID": fields.Integer(description="Runcourse ID", required=True),
 })
 
-@api.route("/change_registration_status", methods=["PUT"])
+@api.route("/change_registration_status", methods=["POST"])
 @api.doc(description="Change registration status between ongoing and closed")
 class ChangeRegistrationStatus(Resource):
     @api.expect(change_registration_status_model)
-    def put(self):
+    def post(self):
         data = request.get_json()
 
         try:
             rcourseID = data["rcourse_ID"]
-            rcourse = RunCourse.query.filter_by(rcourse_ID=rcourseID).first()            
+            rcourse = RunCourse.query.filter_by(rcourse_ID=rcourseID).first()
+            message = ''            
             if(rcourse):
                 if rcourse.runcourse_Status == "Closed":
                     setattr(rcourse, "runcourse_Status", "Ongoing")
+                    setattr(rcourse, "course_Status", "Active")
+                    message = 'Run Course registration closed'
                 else:
                     setattr(rcourse, "runcourse_Status", "Closed")
+                    setattr(rcourse, "course_Status", "Inactive")
+                    message = 'Run Course registration Open'
 
                 db.session.commit()
-                return json.loads(json.dumps(rcourse.json(), default=str)), 200
+                return json.loads(json.dumps({"message": message, "code": 200}, default=str))
 
-            return json.loads(json.dumps({"Message": "There is no such runcourse"}, default=str)), 404
+            return json.loads(json.dumps({"message": "There is no such runcourse", "code": 404}, default=str))
 
         except Exception as e:
             return "Failed" + str(e), 500
