@@ -105,6 +105,28 @@ class UserService extends BaseApiService {
             throw error;
         }
     }
+
+    async getAllInstructors() {
+        try {
+            let response = await axiosClient.get("/user/get_all_instructors");
+            return response.data.data.instructors;
+
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+    async getInstructorById(instructorId) {
+        try {
+            let response = await axiosClient.get("/user/get_instructor_by_id", { params: { instructor_id: instructorId } });
+            return response.data;
+
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+    
     
 }
 

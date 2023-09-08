@@ -10,11 +10,15 @@ import { fas, faEye, faEyeSlash} from '@fortawesome/free-solid-svg-icons'
 import { fab } from '@fortawesome/free-brands-svg-icons'
 import "./assets/css/style.css" // css
 // import { VuePaginate } from 'vue-paginate';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
+import { faClock } from '@fortawesome/free-regular-svg-icons';
 
-library.add(fas, fab, faEye, faEyeSlash)
+library.add(fas, fab, faEye, faEyeSlash, faClock)
 
 createApp(App)
     .use(router)
     // .use(VuePaginate)
     .component('font-awesome-icon', FontAwesomeIcon)
+    .component('VueDatePicker', VueDatePicker)
     .mount('#app')

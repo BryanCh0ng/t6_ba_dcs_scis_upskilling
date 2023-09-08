@@ -131,21 +131,47 @@ const routes = [
     },
   },
   {
-    path: '/studentProposeCourse',
-    name: 'studentProposeCourse',
-    component: () => import('../views/course/studentProposeCourse.vue'),
+    path: '/proposeCourse',
+    name: 'proposeCourse',
+    component: () => import('../views/course/ProposeCourse.vue'),
     meta: {
-        title: 'Student Propose Course',
+        title: 'Propose Course',
     },
   },
   {
-    path: '/instructorTrainerProposeCourse',
-    name: 'instructorTrainerProposeCourse',
-    component: () => import('../views/course/instructorTrainerProposeCourse.vue'),
+    path: '/createCourse',
+    name: 'createCourse',
+    component: () => import('../views/course/CreateCourse.vue'),
     meta: {
-        title: 'Instructor / Trainer Propose Course',
+        title: 'Create Course',
+    },
+  }, 
+  {
+    path: '/editCourse',
+    name: 'editCourse',
+    component: () => import('../views/course/EditCourse.vue'),
+    meta: {
+        title: 'Edit Course',
+    },
+  },
+  {
+    path: '/createRunCourse',
+    name: 'createRunCourse',
+    component: () => import('../views/course/CreateRunCourse.vue'),
+    meta: {
+        title: 'Create Run Course',
+    },
+  },
+  {
+    path: '/editRunCourse',
+    name: 'editRunCourse',
+    component: () => import('../views/course/EditRunCourse.vue'),
+    meta: {
+        title: 'Edit Run Course',
     },
   }
+  
+
   // },
   // {
   //     path: '/deleteCourse',

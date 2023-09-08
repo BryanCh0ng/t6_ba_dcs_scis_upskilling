@@ -84,16 +84,16 @@ class GetProposedCourseByStatus(Resource):
 
 @api.route("/create_proposed_course", methods=["POST"])
 @api.doc(description="Create proposed course")
-class CreateNewProposedCourse(Resource):
+class CreateProposedCourse(Resource):
     def post(self):
         try: 
-            # Get the data for creating a new course from the request body
+            # Get the data for creating a new proposed course from the request body
             new_proposed_course_data = request.json
 
-            # Create a new course object with the data
+            # Create a new proposed course object with the data
             new_proposed_course = ProposedCourse(None, submitted_By=new_proposed_course_data.get("submitted_By"), action_Done_By=None, course_ID=new_proposed_course_data.get("course_ID"), pcourse_Status="Pending", reason=None)
 
-            # Add the new course to the database
+            # Add the new proposed course to the database
             db.session.add(new_proposed_course)
 
             # Commit the changes to the database

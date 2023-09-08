@@ -383,9 +383,16 @@ class CourseService extends BaseApiService {
           return this.handleError(error);
         }
     }
-      
 
-    
+    async editCourse(courseId, updatedData) {
+        try {
+            let response = await axiosClient.put(`/course/edit_course/${courseId}`, updatedData);
+            return response.data;
+
+        } catch (error) {
+            return this.handleError(error)
+        }
+    }    
 }
 
 export default new CourseService();

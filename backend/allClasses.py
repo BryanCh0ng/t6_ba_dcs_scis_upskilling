@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -213,7 +213,11 @@ class FeedbackTemplate(db.Model):
         columns = self.__mapper__.column_attrs.keys()
         result = {}
         for column in columns:
-            result[column] = getattr(self, column)
+            column_value = getattr(self, column)
+            if isinstance(column_value, date):
+                result[column] = column_value.strftime("%Y-%m-%d")
+            else:
+                result[column] = column_value
         return result
     
 ##################  Template Attribute Class Creation ##################

@@ -160,7 +160,7 @@ class GetCourse(Resource):
 
 @api.route("/create_course", methods=["POST"])
 @api.doc(description="Create course")
-class CreateNewCourse(Resource):
+class CreateCourse(Resource):
     def post(self):
         try: 
             # Get the data for creating a new course from the request body
@@ -189,38 +189,34 @@ class CreateNewCourse(Resource):
             print("Error:", str(e))
             return "Failed to create a new course: " + str(e), 500
 
-edit_course_model = api.model("edit_course_model", {
-    "course_ID": fields.Integer(description="Course ID", required=True),
-    "course_Name": fields.String(description="Course Name", required=True),
-    "course_Desc": fields.String(description="Course Description", required=True),
-    "coursecat_ID": fields.Integer(description="Course Category ID", required=True),
-
-})
-
-@api.route("/edit_course", methods=["PUT"])
-@api.doc(description="Edit course")
+edit_course = api.parser()
+@api.route("/edit_course/<int:course_id>", methods=["PUT"])
 class EditCourse(Resource):
-    @api.expect(edit_course_model)
-    def put(self):
-        data = request.get_json()
+    @api.expect(edit_course)
+    def put(self, course_id):
+
+        try: 
+            #Get the updated data from the request body 
+            updated_data = request.json
         
+            course = Course.query.filter_by(course_ID=course_id).first()
 
-        try:
-            courseID = data["course_ID"]
-            course = Course.query.filter_by(course_ID=courseID).first()            
-            if(course):
-                for key, value in data.items():
-                    setattr(course, key, value)
+            if course:
+                # Update the fields based on updated_data
+                for field, value in updated_data.items():
+                    #print(f"Updating {field} to {value}")
+                    setattr(course, field, value)
 
+                #Commit the changes to the database 
                 db.session.commit()
+
                 return json.loads(json.dumps(course.json(), default=str)), 200
 
-            return json.loads(json.dumps({"Message": "There is no such course"}, default=str)), 404
+            return json.loads(json.dumps({"message": "There is no such course"})), 404
 
         except Exception as e:
+            print("Error:", str(e))
             return "Failed" + str(e), 500
-
-
 
 # Student - Courses Available for Registration (Ongoing) with Filters
 retrieve_unregistered_active_courses_filter = api.parser()
