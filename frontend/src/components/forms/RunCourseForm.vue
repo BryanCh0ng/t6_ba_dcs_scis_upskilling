@@ -18,7 +18,7 @@
                 </div>
                 <div class="row mb-4">
                     <!--Start Date-->
-                    <div class="col-md-6 form-group">
+                <div class="col-md-6 form-group">
                         <VueDatePicker v-model="formData.startDate" placeholder="Start Date" :enable-time-picker="false"
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.startDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.startDate?.$error }"
                             input-class-name="dp-custom-input" :format="this.formData.datePickerFormat" required>
@@ -565,11 +565,19 @@ export default {
 
                 this.formData.endDate = new Date(runcourseData.run_Enddate);
 
-                const startTimeParts = runcourseData.run_Starttime.split(":");
-                this.formData.startTime = { hours: parseInt(startTimeParts[0]), minutes: parseInt(startTimeParts[1]), seconds: 0 }
+                if (runcourseData.run_Starttime !== null) {
+                    const startTimeParts = runcourseData.run_Starttime;
+                    this.formData.startTime = { hours: parseInt(startTimeParts[0]), minutes: parseInt(startTimeParts[1]), seconds: 0 }
+                } else {
+                    this.formData.startTime = null
+                }
 
-                const endTimeParts = runcourseData.run_Endtime.split(":");
-                this.formData.endTime = { hours: parseInt(endTimeParts[0]), minutes: parseInt(endTimeParts[1]), seconds: 0 }
+                if (runcourseData.run_Endtime !== null) {
+                    const endTimeParts = runcourseData.run_Endtime;
+                    this.formData.run_Endtime = { hours: parseInt(endTimeParts[0]), minutes: parseInt(endTimeParts[1]), seconds: 0 }
+                } else {
+                    this.formData.run_Endtime = null
+                }
 
                 if (runcourseData.course_Format === "face-to-face") {
                     this.formData.selectedFormat = this.formData.courseFormats[1].name;
@@ -578,22 +586,30 @@ export default {
                 }
 
                 this.formData.venue = runcourseData.course_Venue;
+                
+                this.formData.courseSize = runcourseData.course_Size !== null ? runcourseData.course_Size.toString() : null;
 
-                this.formData.courseSize = (runcourseData.course_Size).toString();
-
-                this.formData.minimumSlots = (runcourseData.course_Minsize).toString();
+                this.formData.minimumSlots = runcourseData.course_Minsize !== null ? runcourseData.course_Minsize.toString() : null;
 
                 this.formData.openingDate = new Date(runcourseData.reg_Startdate);
 
-                const openingTimeParts = runcourseData.reg_Starttime.split(":");
-                this.formData.openingTime = { hours: parseInt(openingTimeParts[0]), minutes: parseInt(openingTimeParts[1]), seconds: 0 }
+                if (runcourseData.reg_Starttime !== null) {
+                    const openingTimeParts = runcourseData.reg_Starttime.split(":");
+                    this.formData.openingTime = { hours: parseInt(openingTimeParts[0]), minutes: parseInt(openingTimeParts[1]), seconds: 0 }
+                } else {
+                    this.formData.openingTime = null
+                }
 
                 this.formData.closingDate = new Date(runcourseData.reg_Enddate);
 
-                const closingTimeParts = runcourseData.reg_Endtime.split(":");
-                this.formData.closingTime = { hours: parseInt(closingTimeParts[0]), minutes: parseInt(closingTimeParts[1]), seconds: 0 }
+                if (runcourseData.reg_Endtime !== null) {
+                    const closingTimeParts = runcourseData.reg_Endtime.split(":");
+                    this.formData.closingTime = { hours: parseInt(closingTimeParts[0]), minutes: parseInt(closingTimeParts[1]), seconds: 0 }
+                } else {
+                    this.formData.closingTime = null
+                }
 
-                this.formData.courseFee = (runcourseData.course_Fee).toString();
+                this.formData.courseFee = runcourseData.course_Fee !== null ? runcourseData.course_Fee.toString() : null;
 
                 this.templateID = runcourseData.template_ID;
 
@@ -607,9 +623,10 @@ export default {
         },
         async fetchCoachByID() {
             try {
-                const coachData = await UserService.getCoachById(this.instructorID);
-
-                this.formData.selectedInstructor = coachData.user_Name;
+                if(this.instructorID) {
+                    const coachData = await UserService.getCoachById(this.instructorID);
+                    this.formData.selectedInstructor = coachData.user_Name;
+                }
 
             } catch (error) {
                 console.error('Error fetching coach by ID:', error);
@@ -618,10 +635,10 @@ export default {
         },
         async fetchTemplateByID() {
             try {
-                const templateData = await FeedbackTemplateService.getTemplateById(this.templateID);
-
-                this.formData.selectedTemplate = templateData.template_Name;
-
+                if(this.templateID) {
+                    const templateData = await FeedbackTemplateService.getTemplateById(this.templateID);
+                    this.formData.selectedTemplate = templateData.template_Name;
+                }
             } catch (error) {
                 console.error('Error fetching template by ID:', error);
                 this.errorMsg.push('Error fetching template by ID:', error);

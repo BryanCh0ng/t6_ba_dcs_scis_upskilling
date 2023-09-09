@@ -43,7 +43,7 @@ body {
 }
 
 .btn-success, .btn-success:hover, .btn-success:focus, .btn-success:active, .btn-success:focus-visible {
-  background-color: #007E94;
+  background-color: #007E94 !important;
   color: white;
   padding: 10px;
   border-radius: 10px;

@@ -89,11 +89,11 @@ class ChangeRegistrationStatus(Resource):
                 if rcourse.runcourse_Status == "Closed":
                     setattr(rcourse, "runcourse_Status", "Ongoing")
                     setattr(rcourse, "course_Status", "Active")
-                    message = 'Run Course registration closed'
+                    message = 'Run Course registration Opened'
                 else:
                     setattr(rcourse, "runcourse_Status", "Closed")
                     setattr(rcourse, "course_Status", "Inactive")
-                    message = 'Run Course registration Open'
+                    message = 'Run Course registration Closed'
 
                 db.session.commit()
                 return json.loads(json.dumps({"message": message, "code": 200}, default=str))
@@ -196,39 +196,6 @@ class CreateRuncourse(Resource):
         minutes += end['minutes'] - start['minutes']
         return minutes
     
-# change_registration_status() --------------------------------
-change_registration_status_model = api.model("change_registration_status_model", {
-    "rcourse_ID": fields.Integer(description="Runcourse ID", required=True),
-})
-    
-@api.route("/change_registration_status", methods=["POST"])
-@api.doc(description="Change registration status between ongoing and closed")
-class ChangeRegistrationStatus(Resource):
-    @api.expect(change_registration_status_model)
-    def post(self):
-        data = request.get_json()
-
-        try:
-            rcourseID = data["rcourse_ID"]
-            rcourse = RunCourse.query.filter_by(rcourse_ID=rcourseID).first()
-            message = ''            
-            if(rcourse):
-                if rcourse.runcourse_Status == "Closed":
-                    setattr(rcourse, "runcourse_Status", "Ongoing")
-                    setattr(rcourse, "course_Status", "Active")
-                    message = 'Run Course registration closed'
-                else:
-                    setattr(rcourse, "runcourse_Status", "Closed")
-                    setattr(rcourse, "course_Status", "Inactive")
-                    message = 'Run Course registration Open'
-
-                db.session.commit()
-                return json.loads(json.dumps({"message": message, "code": 200}, default=str))
-
-            return json.loads(json.dumps({"message": "There is no such runcourse", "code": 404}, default=str))
-
-        except Exception as e:
-            return "Failed" + str(e), 500
         
 # create_runcourse() --------------------------------------
 create_runcourse_model = api.model("create_runcourse_model", {
@@ -248,6 +215,22 @@ create_runcourse_model = api.model("create_runcourse_model", {
     "courseFee" : fields.Integer(description="", required=True),
     "selectedTemplate" : fields.Integer(description="", required=True)
 })
+
+get_runcourse_by_id = api.parser()
+get_runcourse_by_id.add_argument("runcourse_id", help="Enter runcourse id")
+@api.route("/get_runcourse_by_id")
+@api.doc(description="Get run course by runcourse id")
+class GetRunCourse(Resource):
+    @api.expect(get_runcourse_by_id)
+    def get(self):
+        rcourse_id = get_runcourse_by_id.parse_args().get("runcourse_id")  # Use "runcourse_id" instead of "rcourse_ID"
+        runcourse = RunCourse.query.filter_by(rcourse_ID=rcourse_id).first()  # Use "rcourse_ID" instead of "rcourse_id"
+        db.session.close()
+
+        if runcourse:
+            return json.loads(json.dumps(runcourse.json(), default=str)), 200
+
+        return json.loads(json.dumps({"message": "There is no such runcourse"})), 404
 
 @api.route("/create_runcourse", methods=["POST"])
 @api.doc(description = "Create a new runcourse")
