@@ -49,10 +49,10 @@
               </td>
               <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course" @click="goToCreateRunCourse(course.course_ID)"></course-action></td>
               <td v-if="course.course_Status =='Inactive' && course.runcourse_Status=='Closed'">
-                <course-action status="open_for_registration" :course="course" :courseName="course.courseName" ></course-action>
+                <course-action @action-and-message-updated="handleActionData" status="open_for_registration" :course="course" :courseName="course.courseName" ></course-action>
               </td>
               <td v-else-if="course.course_Status =='Active' && course.runcourse_Status=='Ongoing'">
-                <course-action status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
+                <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
               </td>
             </tr>               
           </tbody>

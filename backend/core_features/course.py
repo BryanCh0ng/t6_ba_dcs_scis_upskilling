@@ -276,14 +276,14 @@ class GetUnregisteredActiveCourses(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    "run_Startdate": result[2].run_Startdate.strftime('%Y-%m-%d'),
-                    "run_Enddate": result[2].run_Enddate.strftime('%Y-%m-%d'),
-                    "run_Starttime": result[2].run_Starttime.strftime('%H:%M:%S'),
-                    "run_Endtime": result[2].run_Endtime.strftime('%H:%M:%S'),
-                    "reg_Startdate": result[2].reg_Startdate.strftime('%Y-%m-%d'),
-                    "reg_Enddate": result[2].reg_Enddate.strftime('%Y-%m-%d'),
-                    "reg_Starttime": result[2].reg_Starttime.strftime('%H:%M:%S'),
-                    "reg_Endtime": result[2].reg_Endtime.strftime('%H:%M:%S'),
+                    'run_Startdate': format_date_time(result[2].run_Startdate),
+                    'run_Enddate': format_date_time(result[2].run_Enddate),
+                    'run_Starttime': format_date_time(result[2].run_Starttime),
+                    'run_Endtime': format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -590,14 +590,14 @@ class GetCompletedCourses(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[1].run_Startdate),
-                    'run_Enddate': format_date_time(result[1].run_Enddate),
-                    'run_Starttime': format_date_time(result[1].run_Starttime),
-                    'run_Endtime': format_date_time(result[1].run_Endtime),
-                    'reg_Startdate': format_date_time(result[1].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[1].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[1].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[1].reg_Endtime),
+                    'run_Startdate': format_date_time(result[2].run_Startdate),
+                    'run_Enddate': format_date_time(result[2].run_Enddate),
+                    'run_Starttime': format_date_time(result[2].run_Starttime),
+                    'run_Endtime': format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
                 }
 
                 modified_run_course = {**result[1].json(), **run_course_attrs}

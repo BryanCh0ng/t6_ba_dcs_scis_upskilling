@@ -46,8 +46,15 @@ class runCourseService extends BaseApiService {
         return this.handleError(error);
      }
   }
-  
-
+  async changeRegistrationStatus(updatedData) {
+    try {
+      let response = await axiosClient.post("/runcourse/change_registration_status", updatedData);
+      console.log(response)
+      return response.data
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
 }
 
 export default new runCourseService();
