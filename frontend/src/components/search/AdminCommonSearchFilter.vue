@@ -45,14 +45,15 @@ export default({
         return {
             courseName: "",
             category: "",
-            status: "",
             categoryDropdownOptions: [],
             statusDropdownOptions: [],
+            status: this.defaultStatus,
         };
     },
     props: {
         statusOptions: Array, 
         searchApi: Function,
+        defaultStatus: String,
     },
     components: {
         DropdownField,

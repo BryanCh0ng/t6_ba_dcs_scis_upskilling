@@ -3,7 +3,8 @@
     <search-filter
       :status-options="statusOptions"
       :search-api="searchAllCoursesAdmin" 
-      @search-complete="handleSearchComplete" />
+      @search-complete="handleSearchComplete" 
+      :default-status="'Active'" />
     <div class="container col-12 table-responsive">
       <h5 class="pb-3">All Run Courses</h5>
       <div v-if="courses && courses.length > 0">
