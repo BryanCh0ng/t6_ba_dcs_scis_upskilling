@@ -32,7 +32,6 @@
           <div v-if="v$?.formData.courseDescription?.$error" class="text-danger">
             <span v-for="error in v$?.formData.courseDescription?.$errors" :key="error.$uid">{{ error.$message }}</span>
           </div>
-          <div class="text-muted mt-2">Character Count: {{ courseDescLength }}/800</div>
         </div>
         <!--Instructor Name-->
         <div class="form-group mb-4">

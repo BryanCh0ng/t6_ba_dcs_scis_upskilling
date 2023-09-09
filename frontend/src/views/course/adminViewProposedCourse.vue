@@ -205,7 +205,7 @@ export default {
           coursecat_ID,
           status
         );
-        console.log(response.data)
+        // console.log(response.data)
         this.proposed_courses = response.data;
         return this.proposed_courses;
       } catch (error) {
@@ -251,6 +251,7 @@ export default {
       try {
         let pending_response = await CourseService.searchAllSubmittedProposedCoursesAdmin(null, null)
         this.pending_courses = pending_response.data
+        
         let proposed_response = await CourseService.searchAllApprovedRejectedProposedCoursesAdmin(null, null, null)
         this.proposed_courses = proposed_response.data
       } catch (error) {

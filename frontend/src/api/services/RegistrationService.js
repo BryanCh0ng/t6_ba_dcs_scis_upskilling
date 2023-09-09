@@ -9,7 +9,7 @@ class RegistrationService extends BaseApiService {
                 user_ID: user_ID,
                 reg_Status: reg_Status
             });
-            console.log(response.data);
+            // console.log(response.data);
             return response.data;
             
         } catch (error) {

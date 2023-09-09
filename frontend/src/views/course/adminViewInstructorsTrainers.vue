@@ -76,7 +76,7 @@ export default {
       this.$emit('page-change', newPage);
     },
     async handleSearchComplete(searchResults) {
-      console.log(searchResults)
+      // console.log(searchResults)
       this.courses = searchResults;
     },
     async getAllInstructorsAndTrainers(user_Name, role_Name, organizationName) {

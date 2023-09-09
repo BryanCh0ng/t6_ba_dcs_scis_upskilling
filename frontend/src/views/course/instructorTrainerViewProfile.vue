@@ -221,7 +221,6 @@ import courseAction from '../../components/course/courseAction.vue';
 import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
-// import courseDateTime from '@/components/course/courseDateTime.vue';
 import courseDate from '@/components/course/courseDate.vue';
 import courseDuration from '@/components/course/courseDuration.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
@@ -284,7 +283,7 @@ export default {
       this.showModal = false;
     },
     handleActionData(actionData) {
-      console.log(actionData.message)
+      // console.log(actionData.message)
       this.receivedMessage = actionData.message;
       this.actionCourse = actionData.course
       const modalButtonElement = this.$el.querySelector('.invisible-btn')
@@ -347,7 +346,7 @@ export default {
           status
         );
         this.assigned_courses = response.data;
-        console.log(this.assigned_courses)
+        // console.log(this.assigned_courses)
         return this.assigned_courses;
       } catch (error) {
         console.error("Error fetching info:", error);
@@ -382,8 +381,7 @@ export default {
         let response = await CourseService.searchInstructorCompletedCourseInfo(
           user_ID,
           course_Name,
-          coursecat_ID,
-          status
+          coursecat_ID
         );
         this.conducted_courses = response.data;
         return this.conducted_courses;
@@ -411,9 +409,9 @@ export default {
     async sortCourse(action) {
         if (action == 'assigned') {
           let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.assigned_courses)
-          console.log(this.sortColumn)
-          console.log(this.sortDirection)
-          console.log(sort_response)
+          // console.log(this.sortColumn)
+          // console.log(this.sortDirection)
+          // console.log(sort_response)
           if (sort_response.code == 200) {
             this.assigned_courses = sort_response.data
           }
@@ -421,9 +419,7 @@ export default {
 
         if (action == 'proposed') {
           let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
-          console.log(this.sortColumn)
-          console.log(this.sortDirection)
-          console.log(sort_response)
+         
           if (sort_response.code == 200) {
             this.proposed_courses = sort_response.data
           }
@@ -431,9 +427,7 @@ export default {
 
         if (action == 'conducted') {
           let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.conducted_courses)
-          console.log(this.sortColumn)
-          console.log(this.sortDirection)
-          console.log(sort_response)
+          
           if (sort_response.code == 200) {
             this.conducted_courses = sort_response.data
           }

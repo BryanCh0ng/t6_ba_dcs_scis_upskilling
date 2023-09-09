@@ -893,7 +893,7 @@ class GetAllProposedCoursesAdmin(Resource):
         course_Name = args.get("course_name", "")
         coursecat_ID = args.get("coursecat_id", "")
 
-        app.logger.debug(coursecat_ID)
+        # app.logger.debug(coursecat_ID)
 
         query = db.session.query(
             ProposedCourse,
@@ -915,7 +915,7 @@ class GetAllProposedCoursesAdmin(Resource):
         results = query.all()
         db.session.close()
 
-        app.logger.debug(results)
+        # app.logger.debug(results)
 
         if results:
             result_data = []
@@ -986,7 +986,7 @@ class GetAllProposedCoursesAdmin(Resource):
                     **result[2].json(),
                     "coursecat_Name": result[3]
                 }
-                app.logger.debug(proposed_course_info)
+                # app.logger.debug(proposed_course_info)
                 result_data.append(proposed_course_info)
 
             return jsonify({"code": 200, "data": result_data})

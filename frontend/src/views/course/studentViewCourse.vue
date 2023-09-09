@@ -178,7 +178,7 @@ export default {
     },
     async searchUnregisteredActiveInfo(user_ID, course_Name, coursecat_ID) {
       try {
-        console.log(course_Name)
+        // console.log(course_Name)
         let response = await CourseService.searchUnregisteredActiveInfo(
           user_ID,
           course_Name,
@@ -193,7 +193,7 @@ export default {
     },
     async searchUnvotedActiveInfo(user_ID, course_Name, coursecat_ID) {
       try {
-        console.log(coursecat_ID)
+        // console.log(coursecat_ID)
         let response = await CourseService.searchUnvotedActiveInfo(
           user_ID,
           course_Name,

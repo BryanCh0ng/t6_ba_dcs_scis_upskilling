@@ -111,7 +111,7 @@ import VoteCourseService from "@/api/services/voteCourseService.js";
 
 export default {
   setup() {
-    const v$ = useVuelidate(); // Initialize Vuelidate
+    const v$ = useVuelidate();
     return { v$ };
   },
 
@@ -121,7 +121,7 @@ export default {
       category: "",
       course_name: "",
       course_desc: "",
-      errorMessage: "", // Error message for validation
+      errorMessage: "",
       showSuccessModal: false,
       descPlaceholder: "Course Description",
       categoryDropdownOptions: []
@@ -245,21 +245,21 @@ export default {
 
           if (this.action == 'approve') {
             const course = await ProposedCourseService.getProposedCourseByCourseId(courseId);
-            console.log(course);
+            // console.log(course);
             const acceptPromise = ProposedCourseService.approveProposedCourse({ "pcourseID": course['data'].pcourse_ID });
             approve_result = await acceptPromise;
-            console.log(approve_result);
+            // console.log(approve_result);
         
           } else if (this.action == 'promote_to_course') {
             const course = await VoteCourseService.getVoteCourseByCourseId(courseId);
-            console.log(course);
+            // console.log(course);
             const updatePromise = VoteCourseService.promoteToCourse({ "vote_id": course['data'].vote_ID });
             approve_result = await updatePromise;
           } else {
             approve_result = { code: 200 };
           }
           
-          console.log(approve_result);
+          // console.log(approve_result);
               
           if (approve_result.code == 200) {
             this.showSuccessModal = true;

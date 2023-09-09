@@ -111,9 +111,6 @@ class CreateProposedCourse(Resource):
             # Commit the changes to the database
             db.session.commit()
 
-            # Inside the create_proposed_course route
-            #print("Data before returning:", new_proposed_course.json())
-
             # Return the newly created course as JSON response
             return json.loads(json.dumps(new_proposed_course.json(), default=str)), 201
 
@@ -171,7 +168,7 @@ class RemoveProposedCourse(Resource):
             args = delete_proposed_course.parse_args()
             pcourse_id = args.get("pcourse_ID")
 
-            app.logger.debug(pcourse_id)
+            # app.logger.debug(pcourse_id)
 
             # Find the proposed course by its ID.
             proposed_course = ProposedCourse.query.get(pcourse_id)
@@ -181,11 +178,11 @@ class RemoveProposedCourse(Resource):
 
             # Get the associated course ID.
             course_id = proposed_course.course_ID
-            app.logger.debug("delete")
+
             # Delete the proposed course.
             db.session.delete(proposed_course)
             db.session.commit()
-            app.logger.debug("delete111")
+
             # Now, delete the corresponding course if it exists.
             course = Course.query.get(course_id)
             if course is not None:
