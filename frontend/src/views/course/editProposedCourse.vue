@@ -1,8 +1,12 @@
 <template>
   <div id="editProposedCourse">
     <div class="container mt-5">
-      <h2 v-if="action == 'approve'" class="text-center mb-4">Edit Course (Proposed Course Approved)</h2>
-      <h2 v-else-if="action == 'promote_to_course'" class="text-center mb-4">Edit Course (Promote to course)</h2>
+      <h2 v-if="action == 'approve'" class="text-center mb-4">
+        Edit Course (Proposed Course Approved)
+      </h2>
+      <h2 v-else-if="action == 'promote_to_course'" class="text-center mb-4">
+        Edit Course (Promote to course)
+      </h2>
       <h2 v-else class="text-center mb-4">Edit Proposed Course</h2>
 
       <!-- Error Message -->
@@ -10,44 +14,81 @@
 
       <form @submit.prevent="submitForm">
         <div class="form-group mt-5 mb-4">
-          <input v-model="course_name" type="text" placeholder="Course Name" class="form-control border-0 shadow-sm px-4 field mb-3"/>
-
+          <input
+            v-model="course_name"
+            type="text"
+            placeholder="Course Name"
+            class="form-control border-0 shadow-sm px-4 field mb-3"
+          />
         </div>
         <div class="form-group">
-          <dropdown-field v-model="category" :default-placeholder="'Course Category'">
-            <option v-for="option in categoryDropdownOptions" :key="option.coursecat_ID" :value="option.coursecat_ID">{{ option.coursecat_Name }}</option>
+          <dropdown-field
+            v-model="category"
+            :default-placeholder="'Course Category'"
+          >
+            <option
+              v-for="option in categoryDropdownOptions"
+              :key="option.coursecat_ID"
+              :value="option.coursecat_ID"
+            >
+              {{ option.coursecat_Name }}
+            </option>
           </dropdown-field>
         </div>
         <div class="form-group">
-          <textarea v-model="course_desc" class="form-control border-0 shadow-sm px-4 field" :placeholder="descPlaceholder" style="height: 200px" @input="limitCourseDescription"></textarea>
-          <div class="text-muted mt-2">Character Count: {{ courseDescLength }}/800</div>
+          <textarea
+            v-model="course_desc"
+            class="form-control border-0 shadow-sm px-4 field"
+            :placeholder="descPlaceholder"
+            style="height: 200px"
+            @input="limitCourseDescription"
+          ></textarea>
+          <div class="text-muted mt-2">
+            Character Count: {{ courseDescLength }}/800
+          </div>
         </div>
         <div class="row mt-5">
           <div class="col-md-6 mb-2">
-            <button type="button" class="btn btn-secondary shadow-sm w-100 mt-2 field cancelbtn" @click="cancelForm">
+            <button
+              type="button"
+              class="btn btn-secondary shadow-sm w-100 mt-2 field cancelbtn"
+              @click="cancelForm"
+            >
               Cancel
             </button>
           </div>
           <div class="col-md-6 mb-2">
-            <button v-if="action == 'approve'" type="submit" class="btn btn-block shadow-sm w-100 mt-2 field submitbtn">
+            <button
+              v-if="action == 'approve'"
+              type="submit"
+              class="btn btn-block shadow-sm w-100 mt-2 field submitbtn"
+            >
               Approve Proposed Course
             </button>
-            <button v-else-if="action == 'promote_to_course'" type="submit" class="btn btn-block shadow-sm w-100 mt-2 field submitbtn">
+            <button
+              v-else-if="action == 'promote_to_course'"
+              type="submit"
+              class="btn btn-block shadow-sm w-100 mt-2 field submitbtn"
+            >
               Promote to course
             </button>
-            <button  v-else type="submit" class="btn btn-block shadow-sm w-100 mt-2 field submitbtn">
+            <button
+              v-else
+              type="submit"
+              class="btn btn-block shadow-sm w-100 mt-2 field submitbtn"
+            >
               Save
             </button>
           </div>
         </div>
-
       </form>
     </div>
     <!-- Success modal -->
     <div v-if="showSuccessModal" class="modal-backdrop">
       <div class="modal-content">
         <p>
-          You have updated the content of your proposed course successfully. Please refer to your profile to check its status. 
+          You have updated the content of your proposed course successfully.
+          Please refer to your profile to check its status.
         </p>
         <button @click="hideSuccessModal" class="btn btn-secondary close-btn">
           Close
@@ -170,91 +211,99 @@ export default {
     },
 
     async submitForm() {
-        // Trigger Vuelidate validation
-        this.v$.$touch();
+      // Trigger Vuelidate validation
+      this.v$.$touch();
 
-        // Check for validation errors
-         if (!this.course_name || !this.course_desc || !this.category) {
-          this.errorMessage = "Please ensure all fields are filled.";
-          return;
-        }
+      // Check for validation errors
+      if (!this.course_name || !this.course_desc || !this.category) {
+        this.errorMessage = "Please ensure all fields are filled.";
+        return;
+      }
 
-        if (this.course_desc.length > 800) {
-          this.errorMessage = "Course description must be 800 characters or less.";
-          return;
-        }
+      if (this.course_desc.length > 800) {
+        this.errorMessage = "Course description must be 800 characters or less.";
+        return;
+      }
 
-        if (this.v$.$invalid) {
-            this.errorMessage = "Please fix the validation errors.";
-            return;
-        }
+      if (this.v$.$invalid) {
+        this.errorMessage = "Please fix the validation errors.";
+        return;
+      }
 
-        const courseId = this.$route.params.courseId;
+      const courseId = this.$route.params.courseId;
 
-        const formData = {
-            course_Name: this.course_name,
-            course_Desc: this.course_desc,
-            coursecat_ID: this.category,
-        };
+      const formData = {
+        course_Name: this.course_name,
+        course_Desc: this.course_desc,
+        coursecat_ID: this.category,
+      };
 
-        try {
-          const result = await CourseService.adminUpdateCourse(courseId, formData);
-          if (result.success) {
-              let approve_result;
-              if (this.action == 'approve') {
-                const course = await ProposedCourseService.getProposedCourseByCourseId(courseId);
-                console.log(course);
-                const acceptPromise = ProposedCourseService.approveProposedCourse({ "pcourseID": course['data'].pcourse_ID });
-                approve_result = await acceptPromise;
-                console.log(approve_result);
+      try {
+        const result = await CourseService.adminUpdateCourse(courseId, formData);
+        if (result.success) {
+          let approve_result;
+
+          if (this.action == 'approve') {
+            const course = await ProposedCourseService.getProposedCourseByCourseId(courseId);
+            console.log(course);
+            const acceptPromise = ProposedCourseService.approveProposedCourse({ "pcourseID": course['data'].pcourse_ID });
+            approve_result = await acceptPromise;
+            console.log(approve_result);
         
-              } else if (this.action == 'promote_to_course') {
-                const course = await VoteCourseService.getVoteCourseByCourseId(courseId);
-                console.log(course);
-                const updatePromise = VoteCourseService.promoteToCourse({ "vote_id": course['data'].vote_ID });
-                approve_result = await updatePromise;
-              } else {
-                approve_result = { code: 200 };
-              }
-              console.log(approve_result);
+          } else if (this.action == 'promote_to_course') {
+            const course = await VoteCourseService.getVoteCourseByCourseId(courseId);
+            console.log(course);
+            const updatePromise = VoteCourseService.promoteToCourse({ "vote_id": course['data'].vote_ID });
+            approve_result = await updatePromise;
+          } else {
+            approve_result = { code: 200 };
+          }
+          
+          console.log(approve_result);
               
-              if (approve_result.code == 200) {
-                this.showSuccessModal = true;
-              } else {
-                this.errorMessage = approve_result.message;
-              }
+          if (approve_result.code == 200) {
+            this.showSuccessModal = true;
+          } else {
+            this.errorMessage = approve_result.message;
+          }
           }
         } catch (error) {
             console.error('Error submitting form:', error);
         }
-        },
+      },
 
-    hideSuccessModal() {
-      this.showSuccessModal = false;
-      if (this.action == 'approve')
-        this.$router.push({ name: 'adminViewProposedCourse'});
-      else if (this.action == 'promote_to_course') {
-        this.$router.push({ name: 'adminViewVoteCourse'});
-      }
-      else {
-        this.$router.push({ name: 'adminViewRunCourse'});
-      }
-    },
-    cancelForm() {
-      this.$router.go(-1);
-    },
+      async hideSuccessModal() {
+        this.showSuccessModal = false;
+        if (this.action == 'approve')
+          this.$router.push({ name: 'adminViewProposedCourse'});
+        else if (this.action == 'promote_to_course') {
+          this.$router.push({ name: 'adminViewVoteCourse'});
+        }
+        else {
+          this.userRole = await UserService.getUserRole();
+          
+          if (this.userRole === 'Student' ) {
+            this.$router.push({ name: 'studentViewProfile'});
+          } else if (this.userRole === 'Instructor' || this.userRole === 'Trainer') {
+            this.$router.push({ name: 'instructorTrainerViewProfile'});
+          }
+        }
+      },
+      cancelForm() {
+        this.$router.go(-1);
+      },
 
-    limitCourseDescription() {
-      if (this.course_desc.length > 800) {
-        this.course_desc = this.course_desc.substring(0, 800); // Limit the description to 800 characters
-      }
+      limitCourseDescription() {
+        if (this.course_desc.length > 800) {
+          this.course_desc = this.course_desc.substring(0, 800); // Limit the description to 800 characters
+        }
+      },
     },
-  },
-  computed: {
-    courseDescLength() {
-      return this.course_desc.length;
+    computed: {
+      courseDescLength() {
+        return this.course_desc.length;
+      },
     },
-  },
 };
 </script>
 
