@@ -53,22 +53,42 @@ class CreateNewRegistration(Resource):
     @api.expect(create_registration_model)
     def post(self):
         data = request.get_json()
-        registration = Registration(**data)
+        rcourse_ID = data.get("rcourse_ID")
+        user_ID = data.get("user_ID")
 
-        try:
-            db.session.add(registration)
-            db.session.commit()
-            return jsonify(
-                {
-                    "code": 201,
-                    "data": registration.json(),
-                    "message": "Registration has been successfully created!"
-                }
-            )
-        
-        
-        except Exception as e:
-            return "Failed" + str(e), 500
+        # Check if a registration with the given rcourse_ID and user_ID exists
+        existing_registration = Registration.query.filter_by(rcourse_ID=rcourse_ID, user_ID=user_ID).first()
+
+        if existing_registration:
+            # If the registration exists, update its reg_Status to "pending"
+            existing_registration.reg_Status = "Pending"
+            try:
+                db.session.commit()
+                return jsonify(
+                    {
+                        "code": 200,
+                        "data": existing_registration.json(),
+                        "message": "You have successfully registered for the course again. Please refer to your profile to find out the status."
+                    }
+                )
+            except Exception as e:
+                return "Failed to update registration status: " + str(e), 500
+        else:
+            # If the registration does not exist, create a new one
+            registration = Registration(**data)
+
+            try:
+                db.session.add(registration)
+                db.session.commit()
+                return jsonify(
+                    {
+                        "code": 201,
+                        "data": registration.json(),
+                        "message": "You have successfully registered for the course. Please refer to your profile to find out the status."
+                    }
+                )
+            except Exception as e:
+                return "Failed to create new registration: " + str(e), 500
 
 #update_registration()
 update_registration_model = api.model("update_registration_model", {
@@ -141,3 +161,31 @@ class GetRegistrationByUserID(Resource):
                 "message": "No such registration record exists"
             }
         )
+    
+# Drop registered course
+drop_registered_course = api.parser()
+drop_registered_course.add_argument("rcourse_ID", type=int, help="Run Course ID")
+drop_registered_course.add_argument("user_ID", type=int, help="User ID")
+
+@api.route('/drop_registered_course')
+@api.doc(description="Update Registration Status to 'Dropped'")
+class dropRegisteredCourse(Resource):
+    @api.expect(drop_registered_course)
+    def put(self):
+        try:
+            args = drop_registered_course.parse_args()
+            rcourse_ID = args.get("rcourse_ID")
+            user_ID = args.get("user_ID")
+
+            registration = Registration.query.filter_by(rcourse_ID=rcourse_ID, user_ID=user_ID).first()
+
+            if registration is None:
+                return {"message": "Registration record not found for the specified course and user"}, 404
+
+            registration.reg_Status = 'Dropped'
+            db.session.commit()
+
+            return {"message": "The course has been dropped successfully."}, 200
+
+        except Exception as e:
+            return {"message": "Failed to drop the course: " + str(e)}, 500

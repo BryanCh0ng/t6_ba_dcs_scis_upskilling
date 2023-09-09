@@ -9,7 +9,7 @@
     <button class="btn btn-activate approve text-light font-weight-bold text-nowrap" v-else-if="status == 'pending_approve'">Approve</button>
     <button class="btn btn-danger reject text-light font-weight-bold text-nowrap" v-else-if="status == 'pending_reject'">Reject</button>
     <button class="btn btn-info open_for_voting text-light font-weight-bold text-nowrap" v-else-if="status == 'Approved'">Open for Voting</button>
-    <button class="btn btn-danger close text-light font-weight-bold text-nowrap" v-else-if="status == 'Close'">Close</button>
+    <button @click=voteAction(course.course_ID) class="btn btn-danger close text-light font-weight-bold text-nowrap" v-else-if="status == 'Close'">Close</button>
     <button class="btn btn-success promote_to_course text-light font-weight-bold text-nowrap" v-else-if="status == 'promote_to_course'">Promote to course</button>
     <button class="btn btn-primary open_for_voting text-light font-weight-bold text-nowrap" v-else-if="status == 'open_for_voting'">Open for Voting</button>
     <button class="btn btn-danger close text-light font-weight-bold text-nowrap" v-else-if="status == 'proposed_delete'">Delete</button>
@@ -18,7 +18,7 @@
     <button class="btn btn-success create_run text-light font-weight-bold text-nowrap" v-else-if="status == 'create_run'">Create Run</button> 
     <button class="btn btn-success attendance-list text-light font-weight-bold text-nowrap" v-else-if="status == 'attendance'">Attendance List</button>
     <button class="btn btn-success feedback-analysis text-light font-weight-bold text-nowrap" v-else-if="status == 'feedback-analysis'">Feedback Analysis</button>
-    <button class="btn btn-danger registered_drop text-light font-weight-bold text-nowrap" v-else-if="status == 'registered_drop'">Drop</button>
+    <button @click=runCourseAction(course.rcourse_ID) class="btn btn-danger registered_drop text-light font-weight-bold text-nowrap" v-else-if="status == 'registered_drop'">Drop</button>
     <button @click=voteAction(course.vote_ID) class="btn btn-warning say-pass text-light font-weight-bold text-nowrap" v-else-if="status == 'say-pass'">Say Pass</button>   
     <button class="btn btn-primary edit-proposal text-light font-weight-bold text-nowrap" v-else-if="status == 'edit-proposal'">Edit</button>   
     <button @click=proposalAction(course.pcourse_ID) class="btn btn-danger remove-proposal text-light font-weight-bold text-nowrap" v-else-if="status == 'remove-proposal'">Remove</button>   
@@ -62,8 +62,9 @@ export default {
         } else if (this.status == 'Deactivate') {
           response = await CourseService.deactivateRunCourse(this.course.course_ID);
         } else  if (this.status == 'Active') {
-          this.get_user_id();
-          response = await RegistrationService.createNewRegistration(this.course.rcourse_ID, this.user_ID, "Pending");
+          response = await RegistrationService.createNewRegistration(this.course.rcourse_ID, 1, "Pending");
+        } else if (this.status == "registered_drop") {
+          response = await RegistrationService.dropRegisteredCourse(this.course.rcourse_ID, 1);
         }
         this.message = response.message;
         this.$emit('action-and-message-updated', {message: this.message, course: this.course});
@@ -82,6 +83,8 @@ export default {
           response = await CourseService.unvoteCourse(this.course.vote_ID, 1);
         } else if (this.status == 'unoffered-vote') {
           response = await CourseService.unofferedVoteCourse(this.course.course_ID);
+        } else if (this.status == 'Close') {
+          response = await CourseService.closeVote(this.course.course_ID);
         } 
         this.message = response.message;
         this.$emit('action-and-message-updated', {message: this.message, course: this.course});

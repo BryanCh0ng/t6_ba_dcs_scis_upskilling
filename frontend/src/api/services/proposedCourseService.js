@@ -52,7 +52,7 @@ class ProposedCourseService extends BaseApiService {
 
   async removeProposedCourse(pcourse_ID) {
     try {
-      console.log("im here")
+      // console.log(pcourse_ID)
       let response = await axiosClient.delete("/proposedcourse/delete_proposed_course", { params: { pcourse_ID: pcourse_ID } });
       return response.data;
     } catch (error) {
@@ -69,9 +69,9 @@ class ProposedCourseService extends BaseApiService {
     }
   }
 
-  async acceptProposedCourse(updatedData) {
+  async approveProposedCourse(updatedData) {
     try {
-      let response = await axiosClient.post("/proposedcourse/accept_proposed_course", updatedData);
+      let response = await axiosClient.post("/proposedcourse/approve_proposed_course", updatedData);
         return response.data;
     } catch (error) {
         return this.handleError(error)

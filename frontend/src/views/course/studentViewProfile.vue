@@ -43,6 +43,7 @@
                   <th scope="col">Action(s)</th>
                 </tr>
               </thead>
+
               <tbody>
                 <tr v-for="(registered_course, key) in displayedRegisteredCourses" :key="key">
                   <td>
@@ -61,17 +62,19 @@
                     {{ registered_course.reg_Status }}
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(registered_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td v-if="registered_course.reg_Status === 'Enrolled' && isClosingDateValid(registered_course.reg_Enddate)">
+                  <td v-if="(registered_course.reg_Status === 'Enrolled' || registered_course.reg_Status === 'Pending') && isClosingDateValid(registered_course.reg_Enddate)">
                       <course-action status="registered_drop" @action-and-message-updated="handleActionData" :course="registered_course"></course-action>
                   </td>
                 </tr>
               </tbody>
+
             </table>
+
           </div>
           <div v-else-if="registered_courses=[] && onInitialEmptyRegistered">
             <div class="pt-5 text-center">
-              <p>You have not yet enrolled in any courses</p>
-              <button class="btn btn-edit">Register for a Course</button>
+              <p>You have not yet enrolled in any courses.</p>
+              <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Register for a Course</router-link>
             </div>
           </div>
           <div v-else-if="registered_courses=[]">
@@ -120,8 +123,9 @@
           </div>
           <div v-else-if="interested_courses=[] && onInitialEmptyInterested">
             <div class="pt-5 text-center">
-              <p>You have not yet expressed interest in any courses</p>
-              <button class="btn btn-edit">Indicate Interest</button>
+              <p>You have not yet expressed interest in any courses.</p>
+              <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Indicate Interest</router-link>
+              
             </div>
           </div>
           <div v-else-if="interested_courses=[]">
@@ -147,6 +151,8 @@
                   <th scope="col">
                     <a href="" @click.prevent="sort('course_Name', 'proposed')" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                   <th scope="col">
+                      <a href="" @click.prevent="sort('proposed_Date', 'proposed')" class="text-decoration-none text-dark">Proposed Date <sort-icon :sortColumn="sortColumn === 'proposed_Date'" :sortDirection="getSortDirection('proposed_Date')"/></a></th>
+                  <th scope="col">
                     <a href="" @click.prevent="sort('pcourse_Status', 'proposed')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'pcourse_Status'" :sortDirection="getSortDirection('pcourse_Status')"/></a></th>
                   <th scope="col">Course Details</th>
                   <th scope="col">Action(s)</th>
@@ -156,6 +162,9 @@
                 <tr v-for="(proposed_course, key) in displayedProposedCourses" :key="key">
                   <td>
                     <course-name-desc :name="proposed_course.course_Name" :category="proposed_course.coursecat_Name" :description="proposed_course.course_Desc"></course-name-desc>
+                  </td>
+                  <td class="proposed_date">
+                    <course-date :date="proposed_course.proposed_Date"></course-date>
                   </td>
                   <td>{{ proposed_course.pcourse_Status }}</td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
@@ -172,8 +181,8 @@
           </div>
           <div v-else-if="proposed_courses=[] && onInitialEmptyProposed">
             <div class="pt-5 text-center">
-              <p>You have not yet proposed any courses</p>
-              <button class="btn btn-edit">Proposed a Course</button>
+              <p>You have not yet proposed any courses.</p>
+               <router-link :to="{ name: 'proposeCourse' }" class="btn btn-edit">Propose a Course</router-link>
             </div>
           </div>
           <div v-else-if="proposed_courses=[]">
@@ -224,8 +233,8 @@
           </div>
           <div v-else-if="completed_courses=[] && onInitialEmptyCompleted">
             <div class="pt-5 text-center">
-              <p>You have not yet completed any courses</p>
-              <button class="btn btn-edit">Register for a Course</button>
+              <p>You have not yet completed any courses.</p>
+              <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Register for a Course</router-link>
             </div>
           </div>
           <div v-else-if="completed_courses=[]">
@@ -267,6 +276,7 @@ import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
 import courseDateTime from '@/components/course/courseDateTime.vue';
+import courseDate from '@/components/course/courseDate.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/CommonSearchFilter.vue";
 import StudentSearchFilter from "@/components/search/StudentCourseSearchFilter.vue";
@@ -286,7 +296,8 @@ export default {
     StudentSearchFilter,
     courseDateTime,
     modalAfterAction,
-    modalRejectedReason
+    modalRejectedReason,
+    courseDate,
   },
   data() {
     return {
@@ -381,9 +392,10 @@ export default {
     },
     async searchCourseRegistrationInfo(user_ID, course_Name, coursecat_ID, status) {
       try {
-        // const user_id = await UserService.getUserID()
-        const user_id = 1
+        // let user_id = await UserService.getUserID()
+        let user_id = 1 
         user_ID = user_id
+
         let response = await CourseService.searchCourseRegistrationInfo(
           user_ID,
           course_Name,
@@ -401,9 +413,10 @@ export default {
 
     async searchCourseVoteInfo(user_ID, course_Name, coursecat_ID, status) {
       try {
-        // const user_id = await UserService.getUserID()
-        const user_id = 1
+        // let user_id = await UserService.getUserID()
+        let user_id = 1
         user_ID = user_id
+
         let response = await CourseService.searchCourseVoteInfo(
           user_ID,
           course_Name,
@@ -423,6 +436,7 @@ export default {
         // const user_id = await UserService.getUserID()
         const user_id = 1
         user_ID = user_id
+
         let response = await CourseService.searchProposedInfo(
           user_ID,
           course_Name,
@@ -442,6 +456,7 @@ export default {
         // const user_id = await UserService.getUserID()
         const user_id = 1
         user_ID = user_id
+
         let response = await CourseService.searchCompletedInfo(
           user_ID,
           course_Name,
@@ -457,7 +472,10 @@ export default {
 
     async unvoteCourse(vote_Id) {
       try {
-        let response = await CourseService.unvoteCourse(vote_Id, 1); // Assuming user ID is 1
+        // let user_id = await UserService.getUserID()
+        let user_ID = 1
+
+        let response = await CourseService.unvoteCourse(vote_Id, user_ID);
         console.log(response); 
         this.loadData();
       } catch (error) {
@@ -467,8 +485,8 @@ export default {
 
     async loadData() {
       try {
-        // const user_ID = await UserService.getUserID()
-        const user_ID = 1
+        // let  user_ID = await UserService.getUserID()
+        let user_ID = 1
 
         let registered_courses = await CourseService.searchCourseRegistrationInfo(user_ID, null, null, null)
         this.registered_courses = registered_courses.data
@@ -559,8 +577,8 @@ export default {
   },
   async created() {
     try {
-      // const user_ID = await UserService.getUserID()
-      const user_ID = 1
+      // let user_ID = await UserService.getUserID()
+      let user_ID = 1
 
       let registered_response= await CourseService.searchCourseRegistrationInfo(user_ID, null, null, null)
       this.registered_courses = registered_response.data
@@ -584,6 +602,7 @@ export default {
       // console.log(this.proposed_courses)
 
       let completed_response = await CourseService.searchCompletedInfo(user_ID, null, null, null)
+      // console.log(completed_response.data)
       this.completed_courses = completed_response.data
       if (this.completed_courses == undefined || this.completed_courses.length == 0) {
         this.onInitialEmptyCompleted = true

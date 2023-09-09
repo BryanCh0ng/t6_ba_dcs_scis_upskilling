@@ -111,9 +111,6 @@ class CreateProposedCourse(Resource):
             # Commit the changes to the database
             db.session.commit()
 
-            # Inside the create_proposed_course route
-            #print("Data before returning:", new_proposed_course.json())
-
             # Return the newly created course as JSON response
             return json.loads(json.dumps(new_proposed_course.json(), default=str)), 201
 
@@ -171,7 +168,7 @@ class RemoveProposedCourse(Resource):
             args = delete_proposed_course.parse_args()
             pcourse_id = args.get("pcourse_ID")
 
-            app.logger.debug(pcourse_id)
+            # app.logger.debug(pcourse_id)
 
             # Find the proposed course by its ID.
             proposed_course = ProposedCourse.query.get(pcourse_id)
@@ -189,8 +186,8 @@ class RemoveProposedCourse(Resource):
             # Now, delete the corresponding course if it exists.
             course = Course.query.get(course_id)
             if course is not None:
-                db.session.delete(course)
-                db.session.commit()
+              db.session.delete(course)
+              db.session.commit()
 
             return {"message": "Proposed course deleted successfully"}
 
@@ -223,23 +220,27 @@ class RejectProposedCourse(Resource):
       return jsonify({"message": "Failed " + str(e), "code": 500})
     
 
-accept_proposed_course_model = api.model("accept_proposed_course_model", {
+approve_proposed_course_model = api.model("accept_proposed_course_model", {
     "pcourseID" : fields.Integer(description="", required=True),
 })
-@api.route('/accept_proposed_course', methods=["POST"])
-@api.doc(description="Accept Proposed Course")
-class AcceptProposedCourse(Resource):
-  @api.expect(accept_proposed_course_model)
+@api.route('/approve_proposed_course', methods=["POST"])
+@api.doc(description="Approve Proposed Course")
+class ApproveProposedCourse(Resource):
+  @api.expect(approve_proposed_course_model)
   def post(self):
     try:
       data = request.get_json()
-      print(data)
-
       proposed_course = ProposedCourse.query.filter_by(pcourse_ID = data['pcourseID']).first()
 
       if proposed_course:
-        proposed_course.pcourse_Status = 'Accepted'
+        proposed_course.pcourse_Status = 'Approved'
+        newVoteCourse = VoteCourse(
+          course_ID= proposed_course.course_ID,
+          vote_Status='Ongoing'
+        )
+        db.session.add(newVoteCourse)
         db.session.commit()
+      
         return jsonify({"message": "Proposed Course is successfully accepted", "code": 200})
   
       else:

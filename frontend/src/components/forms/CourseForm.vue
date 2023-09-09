@@ -146,8 +146,17 @@ export default {
         
     },
     methods: {
-        handleModalClosed(value){
+        async handleModalClosed(value){
             this.showAlert = value;
+            this.userRole = await UserService.getUserRole();
+
+            if (!this.showAlert) {
+                if (this.userRole === 'Student' ) {
+                    this.$router.push({ name: 'studentViewProfile'});
+                } else if (this.userRole === 'Instructor' || this.userRole === 'Trainer') {
+                    this.$router.push({ name: 'instructorTrainerViewProfile'});
+                }
+            }
         },
         async fetchCourseCategories() {
             try {
@@ -278,6 +287,7 @@ export default {
             this.message = `${action} was successful`;
             this.buttonType = "success";
             this.showAlert = !this.showAlert;
+
         },
         async onSubmit() {
             this.v$.$touch();
@@ -321,6 +331,7 @@ export default {
                         await this.createProposedCourse();
 
                         this.setSuccessAlert("Propose Course Creation");
+
 
                     } else {
                         await this.updateCourse();

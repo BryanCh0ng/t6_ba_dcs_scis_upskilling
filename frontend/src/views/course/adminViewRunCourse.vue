@@ -157,7 +157,7 @@ export default {
     },
     async loadData() {
       try {
-        let response = await CourseService.searchAllCoursesAdmin(null, null, null)
+        let response = await CourseService.searchAllCoursesAdmin(null, null, "Active")
         this.courses = response.data
       } catch (error) {
         console.error("Error fetching course details:", error);

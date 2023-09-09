@@ -430,7 +430,6 @@ class CourseService extends BaseApiService {
 
     async unofferedVoteCourse(course_ID) {
         try {
-            console.log("im here")
             const response = await axiosClient.put("/course/update_vote_unoffered_course", {
                 course_ID: course_ID,
             });
@@ -441,7 +440,34 @@ class CourseService extends BaseApiService {
             return this.handleError(error);
         }
     }
-    
+
+    async closeVote(course_ID) {
+        try {
+            const response = await axiosClient.put("/course/close_vote_course", {
+                course_ID: course_ID,
+            });
+            // console.log(response);
+            return response.data;
+            
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+    async adminUpdateCourse(courseId, courseData) {
+      try {
+          const apiUrl = `/course/admin_update_course/${courseId}`;
+          const response = await axiosClient.put(apiUrl, courseData);
+          if (response.status === 200) {
+            return { success: true, message: response.data.message };
+          } else {
+            return { success: false, message: 'Failed to update the proposed course' };
+          }
+        } catch (error) {
+          console.error('Error updating proposed course:', error);
+          return { success: false, message: 'An error occurred while updating the proposed course' };
+        }
+    }
 }
 
 export default new CourseService();
