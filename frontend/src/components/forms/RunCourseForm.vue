@@ -523,6 +523,10 @@ export default {
     methods: {
         handleModalClosed(value) {
             this.showAlert = value;
+
+            if(!this.showAlert) {
+                this.$router.push('/adminViewRunCourse');
+            }
         },
         async fetchCoaches() {
             try {
