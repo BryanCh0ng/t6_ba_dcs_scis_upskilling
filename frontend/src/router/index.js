@@ -165,7 +165,7 @@ const routes = [
   {
     path: '/studentViewProfile',
     name: 'studentViewProfile',
-    component: () => import('../views/course/studentViewProfile.vue'),
+    component: () => import('../views/profile/studentViewProfile.vue'),
     meta: {
         title: 'Student View Profile',
     },
@@ -173,9 +173,18 @@ const routes = [
   {
     path: '/instructorTrainerViewProfile',
     name: 'instructorTrainerViewProfile',
-    component: () => import('../views/course/instructorTrainerViewProfile.vue'),
+    component: () => import('../views/profile/instructorTrainerViewProfile.vue'),
     meta: {
         title: 'Instructor Trainer View Profile',
+   
+    }
+  },
+  {
+    path: '/instructorTrainerViewVotingCampaign',
+    name: 'instructorTrainerViewVotingCampaign',
+    component: () => import('../views/course/instructorTrainerViewVotingCampaign.vue'),
+    meta: {
+        title: 'Instructor Trainer View Voting Campaign',
    
     }
   }
