@@ -144,25 +144,23 @@ export default {
         console.log(courseId)
         const response = await ProposedCourseService.getProposedCourseByCourseId(courseId);
         console.log(response)
-        const courseData = response.data // Assuming your API response structure
+        const courseData = response.data 
 
         if (courseData) {
-          // Update the component data with the retrieved course details
           this.course_name = courseData.course_Name;
-          console.log(this.course_name)
+          // console.log(this.course_name)
           this.course_desc = courseData.course_Desc;
 
-          // Update the category using the ID, assuming categoryDropdownOptions contains all possible options
           const coursecat_ID = courseData.coursecat_ID;
           this.category = coursecat_ID;
 
           this.pcourse_ID = courseData.pcourse_ID
 
-          // Optional: You can set the default dropdown option if it exists
           const defaultOption = this.categoryDropdownOptions.find(option => option.coursecat_ID === coursecat_ID);
           if (defaultOption) {
             this.category = defaultOption.coursecat_ID;
           }
+
         } else {
           console.error('Proposed course not found.');
         }
@@ -242,7 +240,6 @@ export default {
         this.$router.push({ name: 'adminViewRunCourse'});
       }
     },
-
     cancelForm() {
       this.$router.go(-1);
     },

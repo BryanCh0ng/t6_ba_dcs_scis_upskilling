@@ -43,6 +43,7 @@
                   <th scope="col">Action(s)</th>
                 </tr>
               </thead>
+
               <tbody>
                 <tr v-for="(registered_course, key) in displayedRegisteredCourses" :key="key">
                   <td>
@@ -66,7 +67,9 @@
                   </td>
                 </tr>
               </tbody>
+
             </table>
+
           </div>
           <div v-else-if="registered_courses=[] && onInitialEmptyRegistered">
             <div class="pt-5 text-center">
@@ -390,7 +393,7 @@ export default {
     async searchCourseRegistrationInfo(user_ID, course_Name, coursecat_ID, status) {
       try {
         // let user_id = await UserService.getUserID()
-        let user_id = 1
+        let user_id = 1 
         user_ID = user_id
 
         let response = await CourseService.searchCourseRegistrationInfo(

@@ -7,9 +7,6 @@
 
         <!-- Form content half -->
         <form-container>
-          <!-- <template v-slot:logo>
-            <img src="../assets/smulogo.png" title="smu logo" id="logo"/>
-          </template> -->
             <error-message :error-message="errorMessage" />
 
             <form @submit.prevent="onSubmit">
@@ -52,8 +49,8 @@ export default {
   name: "LoginForm",
 
   setup() {
-    const v$ = useVuelidate(); // Initialize Vuelidate
-    const router = useRouter(); // Define the router variable here
+    const v$ = useVuelidate(); 
+    const router = useRouter(); 
     return { v$, router };
   },
 
@@ -79,12 +76,10 @@ export default {
   },
   methods: {
     onSubmit() {
-      // Trigger Vuelidate validation
       this.v$.$touch();
 
-      this.errorMessage = ""; // Reset error message
+      this.errorMessage = ""; 
 
-      // Check for empty fields
       if (!this.email || !this.password) {
         this.errorMessage = "Please ensure all fields are filled.";
         return;
@@ -101,17 +96,16 @@ export default {
     async performLogin() {
       try {
         const response = await UserService.login(this.email,this.password)
-        
-        // const user_id = await UserService.getUserID()
-        // console.log(user_id)
-        // const role = await UserService.getUserRole()
-        // console.log(role)
-
         console.log(response);
 
-        // sessionStorage.setItem("role", role.data)
-
-        this.router.push('/ContactUs')
+        let userRole = await UserService.getUserRole()
+        if (userRole === 'Student') {
+          this.router.push('/studentViewCourse')
+        } else if (userRole === 'Instructor' || userRole === 'Trainer') {
+          this.router.push('/instructorTrainerViewProfile') // will need to change the route
+        } else if (userRole === 'Admin') {
+          this.router.push('/adminViewRunCourse')
+        }
 
       } catch (error) {
         this.errorMessage = "Login failed. Please check your credentials.";
