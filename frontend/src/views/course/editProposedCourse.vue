@@ -84,17 +84,7 @@
       </form>
     </div>
     <!-- Success modal -->
-    <div v-if="showSuccessModal" class="modal-backdrop">
-      <div class="modal-content">
-        <p>
-          You have updated the content of your proposed course successfully.
-          Please refer to your profile to check its status.
-        </p>
-        <button @click="hideSuccessModal" class="btn btn-secondary close-btn">
-          Close
-        </button>
-      </div>
-    </div>
+    <success-modal :show="showSuccessModal" :message="successMessage" @close="hideSuccessModal"/>
   </div>
 </template>
 
@@ -108,6 +98,7 @@ import CourseCategoryService from "@/api/services/CourseCategoryService.js";
 import ProposedCourseService from "@/api/services/proposedCourseService.js";
 import CourseService from "@/api/services/CourseService.js";
 import VoteCourseService from "@/api/services/voteCourseService.js";
+import SuccessModal from "../../components/SuccessModal.vue";
 
 export default {
   setup() {
@@ -123,6 +114,7 @@ export default {
       course_desc: "",
       errorMessage: "",
       showSuccessModal: false,
+      successMessage: "You have successfully updated the proposed course.",
       descPlaceholder: "Course Description",
       categoryDropdownOptions: []
     };
@@ -140,6 +132,7 @@ export default {
   components: {
     ErrorMessage,
     DropdownField,
+    SuccessModal
   },
 
   created() {
