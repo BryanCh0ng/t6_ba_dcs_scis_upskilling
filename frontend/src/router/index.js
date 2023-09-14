@@ -194,11 +194,17 @@ const routes = [
     component: () => import('../views/course/adminViewCourse.vue'),
     meta: {
         title: 'Admin View Course',
+    }
+  },
+  {
+    path: '/createFeedbackTemplate',
+    name: 'createFeedbackTemplate',
+    component: () => import('../views/feedbackTemplate/createFeedbackTemplate.vue'),
+    meta: {
+        title: 'Create Feedback Template',
    
     }
   }
-  
-
   // },
   // {
   //     path: '/deleteCourse',

@@ -1,0 +1,188 @@
+<template>
+  <div>
+    <div class="form-group mb-4">
+      <label>{{ qnNum }}. Question To Ask</label>
+      <textarea v-model="textareaValue" placeholder="Enter Question" class="w-100 mt-2 form-control" required></textarea>
+    </div>
+    <div class="form-group mb-4">
+      <label>{{ qnNum }}. Input Type</label>
+      <dropdown-field v-model="selectedInputType" :default-placeholder="'Text Field'" class="mt-2">
+        <option v-for="inputType in inputTypeSelect" :key="inputType" :value="inputType">
+          {{ inputType }}
+        </option>
+      </dropdown-field>
+    </div>
+    <div v-if="selectedInputType === 'Likert Scale'">
+      <label>{{ qnNum }}. Likert Scale (Sequence from left to right)</label>
+      <draggable v-model="likertScaleText" tag="v-layout" :group="{ name: 'row' }" class="form-control mt-2 mb-2 likert-scale-draggable" item-key="id">
+        <template v-slot:item="{ element, index }">
+          <div class="d-flex mt-2 option-container" :class="index">
+            <input class="form-control" v-model="likertScaleText[index].text" type="text" :placeholder="'Likert Scale Option'" required />
+            <button class="btn btn-danger remove-option" @click="removeOption(element.id)">Remove</button>
+          </div>
+        </template>
+      </draggable>
+      <div>
+        <a class="d-flex justify-content-center text-dark likert-scale-add" @click="addLikertScaleField">+ Add Likert Scale Option</a>
+      </div>
+    </div>
+    <div v-else-if="selectedInputType === 'Radio Button'">
+      <label>{{ qnNum }}. Radio Button (Sequence from top to bottom)</label>
+      <draggable v-model="radioButtonText" tag="v-layout" :group="{ name: 'row' }" class="form-control mt-2 mb-2 radio-button-draggable" item-key="id">
+        <template v-slot:item="{ element, index }">
+          <div class="d-flex mt-2 option-container" :class="index">
+            <input class="form-control" v-model="radioButtonText[index].text" type="text" :placeholder="'Radio Button Option'" required />
+            <button class="btn btn-danger remove-option" @click="removeOption(element.id)">Remove</button>
+          </div>
+        </template>
+      </draggable>
+      <div>
+        <a class="d-flex justify-content-center text-dark radio-button-add" @click="addRadioButtonField">+ Add Radio Button Option</a>
+      </div>
+    </div>
+    <div v-else-if="selectedInputType === 'Single Select'">
+      <label>{{ qnNum }}. Single Select (Sequence from top to bottom)</label>
+      <draggable v-model="singleSelectText" tag="v-layout" :group="{ name: 'row' }" class="form-control mt-2 mb-2 single-select-draggable" item-key="id">
+        <template v-slot:item="{ element, index }">
+          <div class="d-flex mt-2 option-container" :class="index">
+            <input class="form-control" v-model="singleSelectText[index].text" type="text" :placeholder="'Single Select Option'" required />
+            <button class="btn btn-danger remove-option" @click="removeOption(element.id)">Remove</button>
+          </div>
+        </template>
+      </draggable>
+      <div>
+        <a class="d-flex justify-content-center text-dark single-select-add" @click="addSingleSelectField">+ Add Single Select Option</a>
+      </div>
+    </div>
+  </div>
+</template>
+    
+<script>
+  import DropdownField from "../../components/forms/DropdownField.vue";
+  import draggable from 'vuedraggable';
+  
+  export default {
+    components: {
+      DropdownField,
+      draggable
+    },
+    props: {
+      qnNum: Number,
+      childIndex: Number,
+      childData: Object,
+      id: Number,
+      destroyed: Boolean,
+      originalQnNum: Number
+    },
+    data() {
+      return {
+        textareaValue: '',
+        selectedInputType: 'Text Field',
+        inputTypeSelect: ['Text Field', 'Number Field', 'Likert Scale', 'Radio Button', 'Single Select'],
+        optionId: 1,
+        likertScaleText: [{ id: 1, text: '', displayedId: 1 }],
+        radioButtonText: [{ id: 1, text: '', displayedId: 1 }],
+        singleSelectText: [{ id: 1, text: '', displayedId: 1 }],
+        draggable: true
+      };
+    },
+    methods: {
+      addLikertScaleField() {
+        const newId = this.optionId++;
+        this.likertScaleText.push({ id: newId, text: '', displayedId: this.likertScaleText.length + 1 });
+        this.optionId++;
+      },
+      addRadioButtonField() {
+        const newId = this.optionId++;
+        this.radioButtonText.push({ id: newId, text: '', displayedId: this.radioButtonText.length + 1 });
+        this.optionId++;
+      },
+      addSingleSelectField() {
+        const newId = this.optionId++;
+        this.singleSelectText.push({ id: newId, text: '', displayedId: this.singleSelectText.length + 1 });
+        this.optionId++;
+      },
+      onDataChange() {
+        if(this.destroyed == false) {
+          let dataToEmit = {
+            textareaValue: this.textareaValue,
+            selectedInputType: this.selectedInputType,
+            index: this.qnNum,
+            originalQnNum: this.originalQnNum,
+            id: this.id
+          };
+          console.log(this.likertScaleText);
+          console.log(this.radioButtonText);
+          console.log(this.singleSelectText)
+          if (this.selectedInputType === 'Likert Scale') {
+            dataToEmit.inputOptions = this.likertScaleText;
+          } else if (this.selectedInputType === 'Radio Button') {
+            dataToEmit.inputOptions = this.radioButtonText;
+          } else if (this.selectedInputType === 'Single Select') {
+            dataToEmit.inputOptions = this.singleSelectText;
+          }
+          this.$emit('templateDataChanged', dataToEmit);
+        }
+      },
+      removeOption(id) {
+        console.log(this.likertScaleText)
+        console.log(this.radioButtonText)
+        console.log(this.singleSelectText)
+        console.log(id)
+        if (this.selectedInputType === 'Likert Scale') {
+          const index = this.likertScaleText.findIndex(option => option.id === id);
+          if (index !== -1) {
+            this.likertScaleText.splice(index, 1);
+          }
+        } else if (this.selectedInputType === 'Radio Button') {
+          const index = this.radioButtonText.findIndex(option => option.id === id);
+          if (index !== -1) {
+            this.radioButtonText.splice(index, 1);
+          }
+        } else if (this.selectedInputType === 'Single Select') { 
+          const index = this.singleSelectText.findIndex(option => option.id === id);
+          if (index !== -1) {
+            this.singleSelectText.splice(index, 1);
+          }
+        }
+      },
+    },
+    watch: {
+      textareaValue: {
+        handler: 'onDataChange',
+        immediate: true,
+      },
+      selectedInputType: {
+        handler: 'onDataChange',
+        immediate: true,
+      },
+      likertScaleText: {
+        handler: 'onDataChange',
+        immediate: true,
+      },
+      radioButtonText: {
+        handler: 'onDataChange',
+        immediate: true,
+      },
+      singleSelectText: {
+        handler: 'onDataChange',
+        immediate: true,
+      }
+    },
+}
+  
+</script>
+
+<style scoped>
+.likert-scale-draggable > input, .radio-button-draggable > input, .single-select-draggable > input {
+  cursor: grab;
+}
+
+.likert-scale-add, .radio-button-add, .single-select-add {
+  cursor: pointer;
+}
+
+.remove-option {
+  margin-left: 10px !important;
+}
+</style>
