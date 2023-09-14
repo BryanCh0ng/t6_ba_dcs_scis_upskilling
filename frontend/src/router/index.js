@@ -187,9 +187,16 @@ const routes = [
         title: 'Instructor Trainer View Voting Campaign',
    
     }
+  },
+  {
+    path: '/createFeedbackTemplate',
+    name: 'createFeedbackTemplate',
+    component: () => import('../views/feedbackTemplate/createFeedbackTemplate.vue'),
+    meta: {
+        title: 'Create Feedback Template',
+   
+    }
   }
-  
-
   // },
   // {
   //     path: '/deleteCourse',
