@@ -1,8 +1,9 @@
 <template>
   <div>
-    <div class="form-group mb-4">
+    <div class="form-group mb-4" :class="{ 'form-group--error': v$.textareaValue.$error && v$.textareaValue.$dirty }">
       <label>{{ qnNum }}. Question To Ask</label>
-      <textarea v-model="textareaValue" placeholder="Enter Question" class="w-100 mt-2 form-control" required></textarea>
+      <textarea v-model.trim="v$.textareaValue.$model" placeholder="Enter Question" class="w-100 mt-2 form-control" required></textarea>
+      <div v-if="v$.textareaValue.$error && v$.textareaValue.$dirty" class="error-message mt-1 text-danger">This field is required.</div>
     </div>
     <div class="form-group mb-4">
       <label>{{ qnNum }}. Input Type</label>
@@ -14,11 +15,14 @@
     </div>
     <div v-if="selectedInputType === 'Likert Scale'">
       <label>{{ qnNum }}. Likert Scale (Sequence from left to right)</label>
-      <draggable v-model="likertScaleText" tag="v-layout" :group="{ name: 'row' }" class="form-control mt-2 mb-2 likert-scale-draggable" item-key="id">
+      <draggable v-model="likertScaleText" tag="v-layout" :group="{ name: 'row' }" class="form-control pb-5 mt-2 mb-2 likert-scale-draggable" item-key="id">
         <template v-slot:item="{ element, index }">
-          <div class="d-flex mt-2 option-container" :class="index">
-            <input class="form-control" v-model="likertScaleText[index].text" type="text" :placeholder="'Likert Scale Option'" required />
-            <button class="btn btn-danger remove-option" @click="removeOption(element.id)">Remove</button>
+          <div class="mt-3">
+            <div class="d-flex mt-2 option-container" :class="index">
+              <input class="form-control" v-model="element.text" type="text" :placeholder="'Likert Scale Option'" required />
+              <button class="btn btn-danger remove-option" @click="removeOption(element.id)">Remove</button>
+            </div>
+            <div v-if="likertScaleTextErrors[index]" class="error-message mt-1 text-danger">{{ likertScaleTextErrors[index] }}</div>
           </div>
         </template>
       </draggable>
@@ -28,11 +32,14 @@
     </div>
     <div v-else-if="selectedInputType === 'Radio Button'">
       <label>{{ qnNum }}. Radio Button (Sequence from top to bottom)</label>
-      <draggable v-model="radioButtonText" tag="v-layout" :group="{ name: 'row' }" class="form-control mt-2 mb-2 radio-button-draggable" item-key="id">
+      <draggable v-model="radioButtonText" tag="v-layout" :group="{ name: 'row' }" class="form-control pb-5 mt-2 mb-2 radio-button-draggable" item-key="id">
         <template v-slot:item="{ element, index }">
-          <div class="d-flex mt-2 option-container" :class="index">
-            <input class="form-control" v-model="radioButtonText[index].text" type="text" :placeholder="'Radio Button Option'" required />
-            <button class="btn btn-danger remove-option" @click="removeOption(element.id)">Remove</button>
+          <div class="mt-3">
+            <div class="d-flex mt-2 option-container" :class="index">
+              <input class="form-control" v-model="element.text" type="text" :placeholder="'Radio Button Option'" required />
+              <button class="btn btn-danger remove-option" @click="removeOption(element.id)">Remove</button>
+            </div>
+            <div v-if="radioButtonTextErrors[index]" class="error-message mt-1 text-danger">{{ radioButtonTextErrors[index] }}</div>
           </div>
         </template>
       </draggable>
@@ -42,11 +49,14 @@
     </div>
     <div v-else-if="selectedInputType === 'Single Select'">
       <label>{{ qnNum }}. Single Select (Sequence from top to bottom)</label>
-      <draggable v-model="singleSelectText" tag="v-layout" :group="{ name: 'row' }" class="form-control mt-2 mb-2 single-select-draggable" item-key="id">
+      <draggable v-model="singleSelectText" tag="v-layout" :group="{ name: 'row' }" class="form-control pb-5 mt-2 mb-2 single-select-draggable" item-key="id">
         <template v-slot:item="{ element, index }">
-          <div class="d-flex mt-2 option-container" :class="index">
-            <input class="form-control" v-model="singleSelectText[index].text" type="text" :placeholder="'Single Select Option'" required />
-            <button class="btn btn-danger remove-option" @click="removeOption(element.id)">Remove</button>
+          <div class="mt-3">
+            <div class="d-flex mt-2 option-container" :class="index">
+              <input class="form-control" v-model="element.text" type="text" :placeholder="'Single Select Option'" required />
+              <button class="btn btn-danger remove-option" @click="removeOption(element.id)">Remove</button>
+            </div>
+            <div v-if="singleSelectTextErrors[index]" class="error-message mt-1 text-danger">{{ singleSelectTextErrors[index] }}</div>
           </div>
         </template>
       </draggable>
@@ -60,6 +70,9 @@
 <script>
   import DropdownField from "../../components/forms/DropdownField.vue";
   import draggable from 'vuedraggable';
+  import { useVuelidate } from "@vuelidate/core";
+  import { required } from "@vuelidate/validators";
+  import { ref, computed } from "vue";
   
   export default {
     components: {
@@ -68,21 +81,124 @@
     },
     props: {
       qnNum: Number,
-      childIndex: Number,
-      childData: Object,
       id: Number,
       destroyed: Boolean,
       originalQnNum: Number
     },
+    setup() {
+      const textareaValue = ref('');
+      const likertScaleText = ref([{ id: 1, text: '', displayedId: 1 }]);
+      const radioButtonText = ref([{ id: 1, text: '', displayedId: 1 }]);
+      const singleSelectText = ref([{ id: 1, text: '', displayedId: 1 }]);
+      const selectedInputType = ref('Text Field');
+
+      const rules = {
+        textareaValue: { required },
+        likertScaleText: {},
+        radioButtonText: {},
+        singleSelectText: {}
+      };
+
+      const requiredTextRule = (val) => val.trim() !== '';
+  
+      const radioButtonTextErrors = computed(() => {
+        return radioButtonText.value.map((option) => {
+          if (!requiredTextRule(option.text)) {
+            return 'This field is required.';
+          } else {
+            return '';
+          }
+        });
+      });
+
+      const likertScaleTextErrors = computed(() => {
+        return likertScaleText.value.map((option) => {
+          if (!requiredTextRule(option.text)) {
+            return 'This field is required.';
+          } else {
+            return '';
+          }
+        });
+      });
+
+      const singleSelectTextErrors = computed(() => {
+        return singleSelectText.value.map((option) => {
+          if (!requiredTextRule(option.text)) {
+            return 'This field is required.';
+          } else {
+            return '';
+          }
+        });
+      });
+
+      const v$  = useVuelidate(rules, {textareaValue, likertScaleText, radioButtonText, singleSelectText});
+
+      const isFormValid = true;
+
+      const submitData = () => {
+        v$.value.$touch();
+
+        console.log('radioButtonTextErrors:', radioButtonTextErrors.value);
+        console.log('likertScaleTextErrors:', likertScaleTextErrors.value);
+        console.log('singleSelectTextErrors:', singleSelectTextErrors.value);
+
+        const hasTextareaError = v$.value.$dirty && v$.value.textareaValue.$invalid;
+        const hasRadioErrors = radioButtonTextErrors.value.some((error) => !!error);
+        const hasLikertScaleErrors = likertScaleTextErrors.value.some((error) => !!error);
+        const hasSingleSelectErrors = singleSelectTextErrors.value.some((error) => !!error);
+        
+        const formData = {
+          textareaValue: textareaValue.value,
+          selectedInputType: selectedInputType.value
+        }
+
+        var haveError = false;
+    
+        if (selectedInputType.value == 'Likert Scale') {
+          if (!hasLikertScaleErrors && !hasTextareaError) {
+            formData.t = likertScaleText.value;
+          } else {
+            haveError = true;
+          }
+        } else if (selectedInputType.value == 'Radio Button') {
+          if (!hasRadioErrors && !hasTextareaError) {
+            formData.t = radioButtonText.value;
+          } else {
+            haveError = true;
+          }
+        } else if (selectedInputType.value == 'Single Select') {
+          if (!hasSingleSelectErrors && !hasTextareaError) {
+            formData.t = singleSelectText.value;
+          } else {
+            haveError = true;
+          }
+        } else if (selectedInputType.value == 'Text Field' || selectedInputType.value == 'Number Field') {
+          if (hasTextareaError) {
+            haveError = true;
+          }
+        }    
+        console.log(formData);
+        console.log(haveError)
+      };
+
+      return {
+        v$,
+        textareaValue,
+        likertScaleText,
+        radioButtonText,
+        singleSelectText,
+        isFormValid,
+        selectedInputType,
+        submitData,
+        radioButtonTextErrors,
+        likertScaleTextErrors,
+        singleSelectTextErrors
+      };
+    },
     data() {
       return {
-        textareaValue: '',
-        selectedInputType: 'Text Field',
         inputTypeSelect: ['Text Field', 'Number Field', 'Likert Scale', 'Radio Button', 'Single Select'],
         optionId: 1,
-        likertScaleText: [{ id: 1, text: '', displayedId: 1 }],
-        radioButtonText: [{ id: 1, text: '', displayedId: 1 }],
-        singleSelectText: [{ id: 1, text: '', displayedId: 1 }],
         draggable: true
       };
     },
@@ -146,6 +262,10 @@
           }
         }
       },
+      // submitData() {
+      //   console.log('called')
+      //   this.$v.$touch();
+      // }
     },
     watch: {
       textareaValue: {
@@ -168,7 +288,7 @@
         handler: 'onDataChange',
         immediate: true,
       }
-    },
+    }
 }
   
 </script>

@@ -2,9 +2,9 @@
   <div>
     <div class="container">
       <div class="form-group mt-2 mb-2" v-for="(element, index) in questions" :key="element.id">
-        <feedback-template :originalQnNum="element.originalQnNum" v-if="!element.destroyed" :destroyed="element.destroyed" 
+        <feedback-template ref="feedbackTemplates" :originalQnNum="element.originalQnNum" v-if="!element.destroyed" :destroyed="element.destroyed" 
         :id="element.id" @destroy-me="destroyChild" :qnNum="element.qnNum" @templateDataChanged="handleTemplateDataChange" 
-        @removeQuestion="removeQuestion(index)"></feedback-template>
+        @removeQuestion="removeQuestion(index)" @submitData="submitData"></feedback-template>
         <div>
           <button  v-if="!element.destroyed" @click="destroyComponent(element.id)" class="btn btn-secondary mt-5 mb-5 col-12">
             Remove Question {{ element.qnNum }}
@@ -30,7 +30,8 @@ export default {
     return {
       qnNum: 1,
       templateData: {},
-      questions: []
+      questions: [],
+      textareaValue: ''
     }
   },
   methods: {
@@ -54,8 +55,23 @@ export default {
         this.updateQuestionNumbers();
       }
     },
+    handleFormSubmit(data) {
+      console.log('Form submitted with data:', data);
+    },
     submitFeedbackTemplate() {
-      console.log(this.templateData);
+      const feedbackTemplates = this.$refs.feedbackTemplates;
+      if (Array.isArray(feedbackTemplates)) {
+        console.log(feedbackTemplates)
+        feedbackTemplates.forEach((feedbackTemplate) => {
+          console.log(feedbackTemplate)
+          if (feedbackTemplate) {
+            feedbackTemplate.submitData();
+          }
+        });
+      } else if (feedbackTemplates) {
+        // If there's only one child component
+        feedbackTemplates.submitData();
+      }
     },
     handleTemplateDataChange(data) {
       this.templateData[data.originalQnNum] = data;
