@@ -138,16 +138,12 @@
       const submitData = () => {
         v$.value.$touch();
 
-        console.log('radioButtonTextErrors:', radioButtonTextErrors.value);
-        console.log('likertScaleTextErrors:', likertScaleTextErrors.value);
-        console.log('singleSelectTextErrors:', singleSelectTextErrors.value);
-
         const hasTextareaError = v$.value.$dirty && v$.value.textareaValue.$invalid;
         const hasRadioErrors = radioButtonTextErrors.value.some((error) => !!error);
         const hasLikertScaleErrors = likertScaleTextErrors.value.some((error) => !!error);
         const hasSingleSelectErrors = singleSelectTextErrors.value.some((error) => !!error);
         
-        const formData = {
+        var formData = {
           textareaValue: textareaValue.value,
           selectedInputType: selectedInputType.value
         }
@@ -156,19 +152,19 @@
     
         if (selectedInputType.value == 'Likert Scale') {
           if (!hasLikertScaleErrors && !hasTextareaError) {
-            formData.t = likertScaleText.value;
+            formData.options = likertScaleText.value;
           } else {
             haveError = true;
           }
         } else if (selectedInputType.value == 'Radio Button') {
           if (!hasRadioErrors && !hasTextareaError) {
-            formData.t = radioButtonText.value;
+            formData.options = radioButtonText.value;
           } else {
             haveError = true;
           }
         } else if (selectedInputType.value == 'Single Select') {
           if (!hasSingleSelectErrors && !hasTextareaError) {
-            formData.t = singleSelectText.value;
+            formData.options = singleSelectText.value;
           } else {
             haveError = true;
           }
@@ -176,9 +172,9 @@
           if (hasTextareaError) {
             haveError = true;
           }
-        }    
-        console.log(formData);
-        console.log(haveError)
+        }
+        formData.haveError = haveError;
+        return formData;
       };
 
       return {
@@ -227,9 +223,6 @@
             originalQnNum: this.originalQnNum,
             id: this.id
           };
-          console.log(this.likertScaleText);
-          console.log(this.radioButtonText);
-          console.log(this.singleSelectText)
           if (this.selectedInputType === 'Likert Scale') {
             dataToEmit.inputOptions = this.likertScaleText;
           } else if (this.selectedInputType === 'Radio Button') {
@@ -241,10 +234,6 @@
         }
       },
       removeOption(id) {
-        console.log(this.likertScaleText)
-        console.log(this.radioButtonText)
-        console.log(this.singleSelectText)
-        console.log(id)
         if (this.selectedInputType === 'Likert Scale') {
           const index = this.likertScaleText.findIndex(option => option.id === id);
           if (index !== -1) {
@@ -262,10 +251,6 @@
           }
         }
       },
-      // submitData() {
-      //   console.log('called')
-      //   this.$v.$touch();
-      // }
     },
     watch: {
       textareaValue: {
