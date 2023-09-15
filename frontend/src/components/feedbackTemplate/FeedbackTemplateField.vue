@@ -74,6 +74,112 @@
       destroyed: Boolean,
       originalQnNum: Number
     },
+    setup() {
+      const textareaValue = ref('');
+      const likertScaleText = ref([{ id: 1, text: '', displayedId: 1 }]);
+      const radioButtonText = ref([{ id: 1, text: '', displayedId: 1 }]);
+      const singleSelectText = ref([{ id: 1, text: '', displayedId: 1 }]);
+      const selectedInputType = ref('Text Field');
+
+      const rules = {
+        textareaValue: { required },
+        likertScaleText: {},
+        radioButtonText: {},
+        singleSelectText: {}
+      };
+
+      const requiredTextRule = (val) => val.trim() !== '';
+  
+      const radioButtonTextErrors = computed(() => {
+        return radioButtonText.value.map((option) => {
+          if (!requiredTextRule(option.text)) {
+            return 'This field is required.';
+          } else {
+            return '';
+          }
+        });
+      });
+
+      const likertScaleTextErrors = computed(() => {
+        return likertScaleText.value.map((option) => {
+          if (!requiredTextRule(option.text)) {
+            return 'This field is required.';
+          } else {
+            return '';
+          }
+        });
+      });
+
+      const singleSelectTextErrors = computed(() => {
+        return singleSelectText.value.map((option) => {
+          if (!requiredTextRule(option.text)) {
+            return 'This field is required.';
+          } else {
+            return '';
+          }
+        });
+      });
+
+      const v$  = useVuelidate(rules, {textareaValue, likertScaleText, radioButtonText, singleSelectText});
+
+      const isFormValid = true;
+
+      const submitData = () => {
+        v$.value.$touch();
+
+        const hasTextareaError = v$.value.$dirty && v$.value.textareaValue.$invalid;
+        const hasRadioErrors = radioButtonTextErrors.value.some((error) => !!error);
+        const hasLikertScaleErrors = likertScaleTextErrors.value.some((error) => !!error);
+        const hasSingleSelectErrors = singleSelectTextErrors.value.some((error) => !!error);
+        
+        var formData = {
+          textareaValue: textareaValue.value,
+          selectedInputType: selectedInputType.value
+        }
+
+        var haveError = false;
+    
+        if (selectedInputType.value == 'Likert Scale') {
+          if (!hasLikertScaleErrors && !hasTextareaError) {
+            formData.options = likertScaleText.value;
+          } else {
+            haveError = true;
+          }
+        } else if (selectedInputType.value == 'Radio Button') {
+          if (!hasRadioErrors && !hasTextareaError) {
+            formData.options = radioButtonText.value;
+          } else {
+            haveError = true;
+          }
+        } else if (selectedInputType.value == 'Single Select') {
+          if (!hasSingleSelectErrors && !hasTextareaError) {
+            formData.options = singleSelectText.value;
+          } else {
+            haveError = true;
+          }
+        } else if (selectedInputType.value == 'Text Field' || selectedInputType.value == 'Number Field') {
+          if (hasTextareaError) {
+            haveError = true;
+          }
+        }
+        formData.haveError = haveError;
+        return formData;
+      };
+
+      return {
+        v$,
+        textareaValue,
+        likertScaleText,
+        radioButtonText,
+      singleSelectText,
+        isFormValid,
+        selectedInputType,
+        submitData,
+        radioButtonTextErrors,
+        likertScaleTextErrors,
+        singleSelectTextErrors
+      };
+    },
     data() {
       return {
         textareaValue: '',
@@ -111,9 +217,6 @@
             originalQnNum: this.originalQnNum,
             id: this.id
           };
-          console.log(this.likertScaleText);
-          console.log(this.radioButtonText);
-          console.log(this.singleSelectText)
           if (this.selectedInputType === 'Likert Scale') {
             dataToEmit.inputOptions = this.likertScaleText;
           } else if (this.selectedInputType === 'Radio Button') {
@@ -125,10 +228,6 @@
         }
       },
       removeOption(id) {
-        console.log(this.likertScaleText)
-        console.log(this.radioButtonText)
-        console.log(this.singleSelectText)
-        console.log(id)
         if (this.selectedInputType === 'Likert Scale') {
           const index = this.likertScaleText.findIndex(option => option.id === id);
           if (index !== -1) {
