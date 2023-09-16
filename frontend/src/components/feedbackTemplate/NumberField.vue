@@ -1,7 +1,7 @@
 <template>
   <div class="form-group row">
     <label class="mb-1">{{ label }}</label>
-    <input type="text" :number="id" class="form-control" placeholder="Number Field">
+    <input type="number" :number="id" class="form-control" placeholder="Number Field">
   </div>
 </template>
   

@@ -3,8 +3,8 @@
     <label for="">{{ label }}</label>
     <ul class='likert'>
       <li  v-for="option in options" :key="option.id">
-        <input type="radio" name="likert" :value="option.text">
-        <label>{{ option.text }}</label>
+        <input type="radio" name="likert" :value="option.option">
+        <label>{{ option.option }}</label>
       </li>
     </ul>
   </div>
