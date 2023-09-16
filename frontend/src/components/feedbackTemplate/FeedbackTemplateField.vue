@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="form-group mb-4" :class="{ 'form-group--error': v$.textareaValue.$error && v$.textareaValue.$dirty }">
+    <div class="form-group mb-4" :class="{ 'form-group--error': v$.question.$error && v$.question.$dirty }">
       <label>{{ qnNum }}. Question To Ask</label>
-      <textarea v-model.trim="v$.textareaValue.$model" placeholder="Enter Question" class="w-100 mt-2 form-control" required></textarea>
-      <div v-if="v$.textareaValue.$error && v$.textareaValue.$dirty" class="error-message mt-1 text-danger">This field is required.</div>
+      <textarea v-model.trim="v$.question.$model" placeholder="Enter Question" class="w-100 mt-2 form-control" required></textarea>
+      <div v-if="v$.question.$error && v$.question.$dirty" class="error-message mt-1 text-danger">This field is required.</div>
     </div>
     <div class="form-group mb-4">
       <label>{{ qnNum }}. Input Type</label>
@@ -19,7 +19,7 @@
         <template v-slot:item="{ element, index }">
           <div class="mt-3">
             <div class="d-flex mt-2 option-container" :class="index">
-              <input class="form-control" v-model="element.text" type="text" :placeholder="'Likert Scale Option'" required />
+              <input class="form-control" v-model="element.option" type="text" :placeholder="'Likert Scale Option'" required />
               <button class="btn btn-danger remove-option" @click="removeOption(element.id)">Remove</button>
             </div>
             <div v-if="likertScaleTextErrors[index]" class="error-message mt-1 text-danger">{{ likertScaleTextErrors[index] }}</div>
@@ -36,7 +36,7 @@
         <template v-slot:item="{ element, index }">
           <div class="mt-3">
             <div class="d-flex mt-2 option-container" :class="index">
-              <input class="form-control" v-model="element.text" type="text" :placeholder="'Radio Button Option'" required />
+              <input class="form-control" v-model="element.option" type="text" :placeholder="'Radio Button Option'" required />
               <button class="btn btn-danger remove-option" @click="removeOption(element.id)">Remove</button>
             </div>
             <div v-if="radioButtonTextErrors[index]" class="error-message mt-1 text-danger">{{ radioButtonTextErrors[index] }}</div>
@@ -53,7 +53,7 @@
         <template v-slot:item="{ element, index }">
           <div class="mt-3">
             <div class="d-flex mt-2 option-container" :class="index">
-              <input class="form-control" v-model="element.text" type="text" :placeholder="'Single Select Option'" required />
+              <input class="form-control" v-model="element.option" type="text" :placeholder="'Single Select Option'" required />
               <button class="btn btn-danger remove-option" @click="removeOption(element.id)">Remove</button>
             </div>
             <div v-if="singleSelectTextErrors[index]" class="error-message mt-1 text-danger">{{ singleSelectTextErrors[index] }}</div>
@@ -86,14 +86,14 @@
       originalQnNum: Number
     },
     setup() {
-      const textareaValue = ref('');
-      const likertScaleText = ref([{ id: 1, text: '', displayedId: 1 }]);
-      const radioButtonText = ref([{ id: 1, text: '', displayedId: 1 }]);
-      const singleSelectText = ref([{ id: 1, text: '', displayedId: 1 }]);
+      const question = ref('');
+      const likertScaleText = ref([{ id: 1, option: '', displayedId: 1 }]);
+      const radioButtonText = ref([{ id: 1, option: '', displayedId: 1 }]);
+      const singleSelectText = ref([{ id: 1, option: '', displayedId: 1 }]);
       const selectedInputType = ref('Text Field');
 
       const rules = {
-        textareaValue: { required },
+        question: { required },
         likertScaleText: {},
         radioButtonText: {},
         singleSelectText: {}
@@ -103,7 +103,7 @@
   
       const radioButtonTextErrors = computed(() => {
         return radioButtonText.value.map((option) => {
-          if (!requiredTextRule(option.text)) {
+          if (!requiredTextRule(option.option)) {
             return 'This field is required.';
           } else {
             return '';
@@ -113,7 +113,7 @@
 
       const likertScaleTextErrors = computed(() => {
         return likertScaleText.value.map((option) => {
-          if (!requiredTextRule(option.text)) {
+          if (!requiredTextRule(option.option)) {
             return 'This field is required.';
           } else {
             return '';
@@ -123,7 +123,7 @@
 
       const singleSelectTextErrors = computed(() => {
         return singleSelectText.value.map((option) => {
-          if (!requiredTextRule(option.text)) {
+          if (!requiredTextRule(option.option)) {
             return 'This field is required.';
           } else {
             return '';
@@ -131,20 +131,20 @@
         });
       });
 
-      const v$  = useVuelidate(rules, {textareaValue, likertScaleText, radioButtonText, singleSelectText});
+      const v$  = useVuelidate(rules, {question, likertScaleText, radioButtonText, singleSelectText});
 
       const isFormValid = true;
 
       const submitData = () => {
         v$.value.$touch();
 
-        const hasTextareaError = v$.value.$dirty && v$.value.textareaValue.$invalid;
+        const hasTextareaError = v$.value.$dirty && v$.value.question.$invalid;
         const hasRadioErrors = radioButtonTextErrors.value.some((error) => !!error);
         const hasLikertScaleErrors = likertScaleTextErrors.value.some((error) => !!error);
         const hasSingleSelectErrors = singleSelectTextErrors.value.some((error) => !!error);
         
         var formData = {
-          textareaValue: textareaValue.value,
+          question: question.value,
           selectedInputType: selectedInputType.value
         }
 
@@ -152,19 +152,19 @@
     
         if (selectedInputType.value == 'Likert Scale') {
           if (!hasLikertScaleErrors && !hasTextareaError) {
-            formData.options = likertScaleText.value;
+            formData.inputOptions = likertScaleText.value;
           } else {
             haveError = true;
           }
         } else if (selectedInputType.value == 'Radio Button') {
           if (!hasRadioErrors && !hasTextareaError) {
-            formData.options = radioButtonText.value;
+            formData.inputOptions = radioButtonText.value;
           } else {
             haveError = true;
           }
         } else if (selectedInputType.value == 'Single Select') {
           if (!hasSingleSelectErrors && !hasTextareaError) {
-            formData.options = singleSelectText.value;
+            formData.inputOptions = singleSelectText.value;
           } else {
             haveError = true;
           }
@@ -179,7 +179,7 @@
 
       return {
         v$,
-        textareaValue,
+        question,
         likertScaleText,
         radioButtonText,
         singleSelectText,
@@ -201,23 +201,23 @@
     methods: {
       addLikertScaleField() {
         const newId = this.optionId++;
-        this.likertScaleText.push({ id: newId, text: '', displayedId: this.likertScaleText.length + 1 });
+        this.likertScaleText.push({ id: newId, option: '', displayedId: this.likertScaleText.length + 1 });
         this.optionId++;
       },
       addRadioButtonField() {
         const newId = this.optionId++;
-        this.radioButtonText.push({ id: newId, text: '', displayedId: this.radioButtonText.length + 1 });
+        this.radioButtonText.push({ id: newId, option: '', displayedId: this.radioButtonText.length + 1 });
         this.optionId++;
       },
       addSingleSelectField() {
         const newId = this.optionId++;
-        this.singleSelectText.push({ id: newId, text: '', displayedId: this.singleSelectText.length + 1 });
+        this.singleSelectText.push({ id: newId, option: '', displayedId: this.singleSelectText.length + 1 });
         this.optionId++;
       },
       onDataChange() {
         if(this.destroyed == false) {
           let dataToEmit = {
-            textareaValue: this.textareaValue,
+            question: this.question,
             selectedInputType: this.selectedInputType,
             index: this.qnNum,
             originalQnNum: this.originalQnNum,
@@ -253,7 +253,7 @@
       },
     },
     watch: {
-      textareaValue: {
+      question: {
         handler: 'onDataChange',
         immediate: true,
       },

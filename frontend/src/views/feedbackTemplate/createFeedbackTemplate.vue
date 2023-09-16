@@ -55,7 +55,7 @@ export default {
       qnNum: 1,
       templateData: {},
       questions: [],
-      textareaValue: ''
+      question: ''
     }
   },
   methods: {
@@ -106,6 +106,8 @@ export default {
         }
         formDataArray.push(formData);
       }
+      console.log(haveError)
+      return formDataArray
     },
     handleTemplateDataChange(data) {
       this.templateData[data.originalQnNum] = data;
