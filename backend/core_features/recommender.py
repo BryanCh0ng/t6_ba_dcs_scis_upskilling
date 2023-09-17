@@ -13,9 +13,9 @@ api = Namespace('recommender', description='Recommender')
 
 recommender_user_similarity = api.parser()
 recommender_user_similarity.add_argument("user_ID", help="Enter user ID")
-@api.route("/recommender_user_similarity ")
+@api.route("/recommender_user_similarity")
 @api.doc(description="Recommender function based on user similarity")
-class Recommender(Resource):
+class RecommenderUser(Resource):
     @api.expect(recommender_user_similarity)
     def get(self):
         arg = recommender_user_similarity.parse_args().get("user_ID")
@@ -48,9 +48,9 @@ class Recommender(Resource):
 
         def recommend_courses(user, num_recommendations):
             user_courses = pivot_df.loc[user]
-            similar_users = user_similarity_df[user].sort_values(ascending=False)[1:]  # Exclude the user itself
+            similar_users = user_similarity_df[user].sort_values(ascending=False)[1:]  
             
-            recommended_courses = set()  # Use a set to store unique course titles
+            recommended_courses = set()  
             for similar_user, similarity_score in similar_users.iteritems():
                 if similarity_score > 0:
                     similar_user_courses = pivot_df.loc[similar_user]
@@ -58,19 +58,30 @@ class Recommender(Resource):
                         if registration == 1 and user_courses[course] == 0:
                             recommended_courses.add(course)
                             if len(recommended_courses) == num_recommendations:
-                                return list(recommended_courses)  # Return when reaching the desired number of recommendations
+                                return list(recommended_courses) 
             
-            return list(recommended_courses)  # Convert the set to a list and return all unique recommended courses
+            return list(recommended_courses)  
 
         try:
             recommendations_rcourses_id = recommend_courses(target_user_id, 4)
             course_list = []
             for recommondations_rcourse_id in recommendations_rcourses_id:
                 rcourse = RunCourse.query.filter(RunCourse.rcourse_ID == recommondations_rcourse_id).first()
-                course_id = rcourse.json()["course_ID"]
+                rcourse = rcourse.json()
+                course_id = rcourse["course_ID"]
                 course = Course.query.filter(Course.course_ID == course_id).first()
-                course_list.append(course.json())
+                datapoint = course.json()
 
+                datapoint["rcourse_ID"] = recommondations_rcourse_id
+                datapoint["run_Startdate"] = rcourse["run_Startdate"]
+                datapoint["run_Enddate"] = rcourse["run_Enddate"]
+                datapoint["run_Starttime"] = rcourse["run_Starttime"].strftime('%H:%M:%S')
+                datapoint["run_Endtime"] = rcourse["run_Endtime"].strftime('%H:%M:%S')
+
+                course_list.append(datapoint)
+
+            db.session.close()
+            
             return jsonify(
                 {
                     "code": 200,
@@ -86,4 +97,83 @@ class Recommender(Resource):
                     "message": "User does not exist"
                 }
             )
+        
+recommender_course_similarity = api.parser()
+recommender_course_similarity.add_argument("rcourse_ID", help="Enter rcourse ID")
+@api.route("/recommender_course_similarity")
+@api.doc(description="Recommender function based on course similarity")
+class RecommenderCourse(Resource): 
+    @api.expect(recommender_course_similarity)
+    def get(self): 
+        arg = recommender_course_similarity.parse_args().get("rcourse_ID")
+        target_course_id = int(arg) if arg else ""
 
+        #userid as rows and courseid as columns
+        regList = Registration.query.all()
+        reg_list = []
+        for reg in regList:
+            reg = reg.json()
+            rcourseid = reg["rcourse_ID"]
+            userid = reg["user_ID"]
+            datapoint = {
+                "rcourse_ID": rcourseid,
+                "user_ID": userid
+            }
+            reg_list.append(datapoint)
+
+        df = pd.DataFrame(reg_list)
+        df["registered"] = 1
+        pivot_df = df.pivot(index="rcourse_ID", columns="user_ID", values="registered").fillna(0).astype(int)
+        pivot_df.reset_index(inplace=True)
+        pivot_df.columns.name = None 
+        pivot_df.set_index("rcourse_ID", inplace=True)
+
+        #cosine similarity table
+        course_similarity = cosine_similarity(pivot_df)
+        course_similarity_df = pd.DataFrame(course_similarity, index=pivot_df.index, columns=pivot_df.index)
+
+        def recommend_courses(target_course_id):
+            similarity_scores = course_similarity_df[target_course_id]
+            similar_courses = similarity_scores.drop(target_course_id).sort_values(ascending=False)
+            recommended_courses = []
+            for course, score in similar_courses.iteritems():
+                recommended_courses.append(course)
+            return recommended_courses
+
+        try: 
+            similar_courses = recommend_courses(target_course_id)
+            course_list = []
+            for recommondations_rcourse_id in similar_courses:
+                rcourse = RunCourse.query.filter(RunCourse.rcourse_ID == recommondations_rcourse_id).first()
+                rcourse = rcourse.json()
+                course_id = rcourse["course_ID"]
+                course = Course.query.filter(Course.course_ID == course_id).first()
+                datapoint = course.json()
+
+                datapoint["rcourse_ID"] = recommondations_rcourse_id
+                datapoint["run_Startdate"] = rcourse["run_Startdate"]
+                datapoint["run_Enddate"] = rcourse["run_Enddate"]
+                datapoint["run_Starttime"] = rcourse["run_Starttime"].strftime('%H:%M:%S')
+                datapoint["run_Endtime"] = rcourse["run_Endtime"].strftime('%H:%M:%S')
+
+                course_list.append(datapoint)
+
+            db.session.close()
+            
+            return jsonify(
+                {
+                    "code": 200,
+                    "data": {
+                        "course_list": course_list
+                    }
+                }
+            )
+
+        except KeyError as e:
+            print(e)
+            return jsonify(
+                {
+                    "code": 404,
+                    "message": "Course does not exist"
+                }
+            )
