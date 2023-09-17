@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
+import datetime
 from allClasses import *
 import json
 
@@ -38,3 +39,70 @@ class GetTemplate(Resource):
             return json.loads(json.dumps(template.json())), 200
 
         return json.loads(json.dumps({"message": "There is no such template"})), 404
+    
+
+
+post_feedback_student = api.parser()
+post_feedback_student.add_argument("input_type", help="Enter student input")
+post_feedback_student.add_argument("question", help="Enter question")
+post_feedback_student.add_argument("template_ID", help="Enter template id")
+@api.route("/post_feedback_student", methods=["POST","GET"])
+@api.doc(description="Post feedback template attribute")
+class GetTemplate(Resource):
+    @api.expect(post_feedback_student)
+    def get(self):
+
+        args = post_feedback_student.parse_args()
+        templateID = args.get("template_ID")
+        inputType = args.get("input_type")
+        question = args.get("question")
+        try:
+            
+            # TemplateAttributeList = TemplateAttribute.query.filter(TemplateAttribute.template_Attribute_ID.contains("")).all()
+            # finalAttribute = TemplateAttributeList[-1]
+            # templateAttributeID = finalAttribute.template_Attribute_ID + 1
+            newTemplateAttribute = TemplateAttribute( None  ,question, inputType,templateID)
+            db.session.add(newTemplateAttribute)
+
+            # Commit the changes to the database
+            db.session.commit()
+
+            # Return the newly created course as JSON response
+            return json.loads(json.dumps(newTemplateAttribute.json(), default=str)), 201
+        
+        
+        except Exception as e:
+            print("Error:", str(e))
+            return "Failed to create a new feedback attribute: " + str(e), 500
+        
+
+    
+post_feedback_student_feedback_template = api.parser()
+post_feedback_student_feedback_template.add_argument("template_Name", help="Enter template name")
+post_feedback_student_feedback_template.add_argument("template_ID", help="Enter template id")
+@api.route("/post_feedback_student_feedback_template" ,methods=["POST", "GET"])
+@api.doc(description="Search if template id exists, if does get template, else create new template")
+class GetTemplate(Resource):
+    @api.expect(post_feedback_student_feedback_template)
+    def get(self):
+
+        templateName = post_feedback_student_feedback_template.parse_args().get("template_Name")
+        templateID = post_feedback_student_feedback_template.parse_args().get("template_ID")
+        current_date = datetime.now().strftime('%d-%m-%Y')
+
+
+        template = FeedbackTemplate.query.filter_by(template_ID=templateID).first()
+
+        if not template:
+            NewFeedbackTemplate = FeedbackTemplate(templateID, templateName, current_date)
+            try:
+                db.session.add(NewFeedbackTemplate)
+                return json.loads(json.dumps(NewFeedbackTemplate.json())), 200
+           
+            except Exception as e:
+                return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
+        else:
+            return {"message": "Template ID already exists"}, 409
+
+get_all_template_attributes_by_feedback_template_id = api.parser()
+            
