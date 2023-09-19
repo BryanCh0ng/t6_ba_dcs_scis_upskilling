@@ -196,7 +196,23 @@ const routes = [
         title: 'Create Feedback Template',
    
     }
-  }
+  },
+  {
+    path: '/editFeedbackTemplate',
+    name: 'editFeedbackTemplate',
+    component: () => import('../views/feedbackTemplate/editFeedbackTemplate.vue'),
+    meta: {
+        title: 'Edit Feedback Template',
+    },
+  },
+  {
+    path: '/adminViewFeedbackTemplate',
+    name: 'adminViewFeedbackTemplate',
+    component: () => import('../views/feedbackTemplate/adminViewFeedbackTemplate.vue'),
+    meta: {
+        title: 'Admin View Feedback Template',
+    },
+  },
   // },
   // {
   //     path: '/deleteCourse',

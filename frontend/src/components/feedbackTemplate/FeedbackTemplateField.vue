@@ -72,7 +72,7 @@
   import draggable from 'vuedraggable';
   import { useVuelidate } from "@vuelidate/core";
   import { required } from "@vuelidate/validators";
-  import { ref, computed } from "vue";
+  import { ref, computed, watch } from "vue";
   
   export default {
     components: {
@@ -83,14 +83,32 @@
       qnNum: Number,
       id: Number,
       destroyed: Boolean,
-      originalQnNum: Number
+      originalQnNum: Number,
+      existingFeedbackTemplate: Object
     },
-    setup() {
-      const question = ref('');
-      const likertScaleText = ref([{ id: 1, option: '', displayedId: 1 }]);
-      const radioButtonText = ref([{ id: 1, option: '', displayedId: 1 }]);
-      const singleSelectText = ref([{ id: 1, option: '', displayedId: 1 }]);
-      const selectedInputType = ref('Text Field');
+    setup(props) {
+      const question = ref(props.existingFeedbackTemplate && props.existingFeedbackTemplate.edit ? props.existingFeedbackTemplate.question : '');
+      const selectedInputType = ref(props.existingFeedbackTemplate && props.existingFeedbackTemplate.edit ? props.existingFeedbackTemplate.selectedInputType : 'Text Field');
+      const likertScaleText = ref(props.existingFeedbackTemplate && props.existingFeedbackTemplate.edit && props.existingFeedbackTemplate.selectedInputType == 'Likert Scale' ? props.existingFeedbackTemplate.inputOptions : [{ id: 1, option: '', displayedId: 1 }]);
+      const radioButtonText = ref(props.existingFeedbackTemplate && props.existingFeedbackTemplate.edit && props.existingFeedbackTemplate.selectedInputType == 'Radio Button' ? props.existingFeedbackTemplate.inputOptions : [{ id: 1, option: '', displayedId: 1 }]);
+      const singleSelectText = ref(props.existingFeedbackTemplate && props.existingFeedbackTemplate.edit && props.existingFeedbackTemplate.selectedInputType == 'Single Select' ? props.existingFeedbackTemplate.inputOptions : [{ id: 1, option: '', displayedId: 1 }]);
+
+      watch(
+        () => props.existingFeedbackTemplate,
+        (newData) => {
+          if (newData) {
+            question.value = newData.question;
+            selectedInputType.value = newData.selectedInputType
+            if (newData.selectedInputType === 'Likert Scale') {
+              likertScaleText.value = newData.inputOptions;
+            } else if (newData.selectedInputType === 'Radio Button') {
+              radioButtonText.value = newData.inputOptions;
+            } else if (newData.selectedInputType === 'Single Select') {
+              singleSelectText.value = newData.inputOptions;
+            } 
+          }
+        }
+      );
 
       const rules = {
         question: { required },
