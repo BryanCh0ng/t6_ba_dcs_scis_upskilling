@@ -590,14 +590,14 @@ class GetCompletedCourses(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[2].run_Startdate),
-                    'run_Enddate': format_date_time(result[2].run_Enddate),
-                    'run_Starttime': format_date_time(result[2].run_Starttime),
-                    'run_Endtime': format_date_time(result[2].run_Endtime),
-                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                    'run_Startdate': format_date_time(result[1].run_Startdate),
+                    'run_Enddate': format_date_time(result[1].run_Enddate),
+                    'run_Starttime': format_date_time(result[1].run_Starttime),
+                    'run_Endtime': format_date_time(result[1].run_Endtime),
+                    'reg_Startdate': format_date_time(result[1].reg_Startdate),
+                    'reg_Enddate': format_date_time(result[1].reg_Enddate),
+                    'reg_Starttime': format_date_time(result[1].reg_Starttime),
+                    'reg_Endtime': format_date_time(result[1].reg_Endtime),
                 }
 
                 modified_run_course = {**result[1].json(), **run_course_attrs}
