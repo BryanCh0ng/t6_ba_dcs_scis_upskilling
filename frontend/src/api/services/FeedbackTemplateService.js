@@ -5,7 +5,6 @@ class FeedbackTemplateService extends BaseApiService {
     async getAllTemplates() {
         try {
             let response = await axiosClient.get("/feedbacktemplate/get_all_templates");
-            
             return response.data.data.templates;
 
         } catch (error) {

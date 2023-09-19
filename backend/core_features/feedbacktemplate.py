@@ -2,6 +2,7 @@ from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 import datetime
 from allClasses import *
+from sqlalchemy import asc
 import json
 
 api = Namespace('feedbacktemplate', description='Feedback template related operations')
@@ -16,14 +17,14 @@ get_all_templates = api.parser()
 class GetAllTemplates(Resource):
     @api.expect(get_all_templates)
     def get(self):
-        templates = FeedbackTemplate.query.all()
-        db.session.close()
-        
-        if templates:
-            templates_json = [template.json() for template in templates]
-            return {"code": 200, "data": {"templates": templates_json}}, 200
+      templates = FeedbackTemplate.query.all()
+      db.session.close()
+      
+      if templates:
+        templates_json = [template.json() for template in templates]
+        return {"code": 200, "data": {"templates": templates_json}}, 200
 
-        return {"code": 404, "message": "No templates found"}, 404
+      return {"code": 404, "message": "No templates found"}, 404
 
 get_template_by_id = api.parser()
 get_template_by_id.add_argument("template_id", help="Enter template id")
@@ -33,12 +34,59 @@ class GetTemplate(Resource):
     @api.expect(get_template_by_id)
     def get(self):
         templateID = get_template_by_id.parse_args().get("template_id")
-        template = FeedbackTemplate.query.filter_by(template_ID=templateID).first()
+        query = db.session.query(
+            FeedbackTemplate,
+            TemplateAttribute,
+            LikertScale,
+        ).select_from(FeedbackTemplate).join(
+            TemplateAttribute, FeedbackTemplate.template_ID == TemplateAttribute.template_ID
+        ).join(
+            LikertScale, TemplateAttribute.template_Attribute_ID == LikertScale.template_Attribute_ID
+        ).filter(
+            FeedbackTemplate.template_ID == templateID
+        ).order_by(
+            asc(LikertScale.position)
+        )
+        template_query = query.all()
         db.session.close()
-        if template:
-            return json.loads(json.dumps(template.json())), 200
+        if template_query:
+          template_data = {
+              'feedback_template_name': None,
+              'template_id': None,
+              'created_on': None,
+              'data': []
+          }
+          question_dict = {}
+          for template, attribute, likert_scale in template_query:
+            if attribute.template_Attribute_ID not in template_data:
+              if template_data['feedback_template_name'] is None:
+                template_data['feedback_template_name'] = template.template_Name
+                template_data['template_id'] = template.template_ID
+                template_data['created_on'] = format_date_time(template.created_On)
 
-        return json.loads(json.dumps({"message": "There is no such template"})), 404
+              if attribute.question in question_dict:
+                question_dict[attribute.question]['inputOptions'].append({
+                    'id': likert_scale.likert_Scale_ID,
+                    'position': likert_scale.position,
+                    'option': likert_scale.textlabel
+                })
+              else:
+                question_data = {
+                  'question': attribute.question,
+                  'selectedInputType': attribute.input_Type,
+                  'inputOptions': [{
+                      'id': likert_scale.likert_Scale_ID,
+                      'position': likert_scale.position,
+                      'option': likert_scale.textlabel
+                  }],
+                }
+                question_dict[attribute.question] = question_data
+
+
+          template_data['data'] = list(question_dict.values())
+          return {"code": 200, "data": {"templates": template_data}}, 200
+
+        return {"code": 404, "message": "There is no such template"}, 404
     
 
 
@@ -104,5 +152,11 @@ class GetTemplate(Resource):
         else:
             return {"message": "Template ID already exists"}, 409
 
-get_all_template_attributes_by_feedback_template_id = api.parser()
-            
+
+def format_date_time(value):
+    if isinstance(value, (date, datetime)):
+        return value.strftime('%Y-%m-%d')
+    elif isinstance(value, time):
+        return value.strftime('%H:%M:%S')
+    else:
+        return None
