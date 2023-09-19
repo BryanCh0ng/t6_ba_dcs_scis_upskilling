@@ -636,8 +636,8 @@ export default {
         async fetchTemplateByID() {
             try {
                 if(this.templateID) {
-                    const templateData = await FeedbackTemplateService.getTemplateById(this.templateID);
-                    this.formData.selectedTemplate = templateData.template_Name;
+                    const response = await FeedbackTemplateService.getTemplateById(this.templateID);
+                    this.formData.selectedTemplate = response.data.templates.feedback_template_name;
                 }
             } catch (error) {
                 console.error('Error fetching template by ID:', error);

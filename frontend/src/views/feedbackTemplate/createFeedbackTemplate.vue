@@ -116,7 +116,6 @@ export default {
         haveError = true;
       }
       var formData = this.getFormData();
-      console.log(formData)
       if (formData.some(item => item.haveError === true)) {
         haveError = true
       }
@@ -131,31 +130,21 @@ export default {
     },
     getFormData() {
       const feedbackTemplates = this.$refs.feedbackTemplates;
-      var haveError = false
-    
       let formDataArray = [];
       if (Array.isArray(feedbackTemplates)) {
         feedbackTemplates.forEach((feedbackTemplate) => {
           if (feedbackTemplate) {
             const formData = feedbackTemplate.submitData();
-            if (formData.haveError) {
-              haveError = true
-            }
             formDataArray.push(formData);
           }
         });
       } else if (feedbackTemplates) {
         const formData = feedbackTemplates.submitData();
-        if (formData.haveError) {
-          haveError = true
-        }
         formDataArray.push(formData);
       }
-      console.log(haveError)
       return formDataArray
     },
     handleTemplateDataChange(data) {
-      console.log(data)
       this.templateData[data.originalQnNum] = data;
     },
     updateQuestionNumbers() {
@@ -166,7 +155,6 @@ export default {
           qnNum++;
         }
       });
-      console.log(this.questions)
     },
     openModal() {
       this.getFormData();

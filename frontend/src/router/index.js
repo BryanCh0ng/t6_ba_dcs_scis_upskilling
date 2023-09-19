@@ -198,7 +198,7 @@ const routes = [
     }
   },
   {
-    path: '/editFeedbackTemplate',
+    path: '/editFeedbackTemplate/:id',
     name: 'editFeedbackTemplate',
     component: () => import('../views/feedbackTemplate/editFeedbackTemplate.vue'),
     meta: {
