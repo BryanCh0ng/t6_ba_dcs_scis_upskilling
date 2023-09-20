@@ -95,7 +95,6 @@ class CreateFeedbackStudent(Resource):
         req = request.json
         templateName = req.get("feedback_template_name")
         currentDate = datetime.now().strftime('%Y-%m-%d')
-        position = 1
 
         NewFeedbackTemplate = FeedbackTemplate(None, templateName, currentDate)
 
@@ -112,6 +111,7 @@ class CreateFeedbackStudent(Resource):
             attributeList = req.get("data")
             
             for attribute in attributeList:
+                position = 1
                 question = attribute.get("question")
                 inputType = attribute.get("selectedInputType")
 
@@ -122,7 +122,7 @@ class CreateFeedbackStudent(Resource):
                 newTemplateAttribute = TemplateAttribute(templateAttributeID, question, inputType, templateID)
                 db.session.add(newTemplateAttribute)
 
-            # commit first to fulfil foreign key constraint
+                # commit first to fulfil foreign key constraint
                 db.session.commit()
 
                 if inputType == "Likert Scale" or inputType == "Radio Button" or inputType == "Single Select":
