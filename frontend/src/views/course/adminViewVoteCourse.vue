@@ -45,13 +45,13 @@
                     <td class="current_interest">
                         {{ vote_course.voteCount }}
                     </td>
-                    <td>{{ vote_status[vote_course.vote_Status] }}</td>
+                    <td class="text-nowrap">{{ vote_status[vote_course.vote_Status] }}</td>
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(vote_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                     <div v-if="vote_course.vote_Status === 'Ongoing'">
                       <td><course-action status="Close" @action-and-message-updated="handleActionData" :course="vote_course"></course-action></td>
                     </div>
                     <div v-else-if="vote_course.vote_Status === 'Closed'">
-                      <td ><course-action status="promote_to_course" :course="vote_course" @click="editCourse(vote_course.course_ID, 'promote_to_course')"></course-action></td>
+                      <td ><course-action status="promote_to_course" @action-and-message-updated="handleActionData" :course="vote_course"></course-action></td>
                       <td><course-action @action-and-message-updated="handleActionData" status="unoffered-vote" :course="vote_course"></course-action></td>
                     </div>
                     <div v-else></div>
@@ -98,7 +98,6 @@
                     <td class="current_interest">
                         {{ notoffered_course.voteCount }}
                     </td>
-                    
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(notoffered_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                   </tr>
                   </tbody>
@@ -271,9 +270,6 @@ export default {
 
       let course = await CourseService.searchAllNotOfferedVotingCoursesAdmin(null, null)
       this.notoffered_courses = course.data
-    },
-    editCourse(courseId, action) {
-      this.$router.push({ name: 'editProposedCourse', params: { courseId, action } });
     }
   },
   computed: {

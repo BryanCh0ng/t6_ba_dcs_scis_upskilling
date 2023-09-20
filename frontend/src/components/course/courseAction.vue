@@ -10,7 +10,7 @@
     <button class="btn btn-danger reject text-light font-weight-bold text-nowrap" v-else-if="status == 'pending_reject'">Reject</button>
     <button class="btn btn-info open_for_voting text-light font-weight-bold text-nowrap" v-else-if="status == 'Approved'">Open for Voting</button>
     <button @click=voteAction(course.course_ID) class="btn btn-danger close text-light font-weight-bold text-nowrap" v-else-if="status == 'Close'">Close</button>
-    <button class="btn btn-success promote_to_course text-light font-weight-bold text-nowrap" v-else-if="status == 'promote_to_course'">Promote to course</button>
+    <button @click="promote_to_course()" class="btn btn-success promote_to_course text-light font-weight-bold text-nowrap" v-else-if="status == 'promote_to_course'">Promote to course</button>
     <button class="btn btn-primary open_for_voting text-light font-weight-bold text-nowrap" v-else-if="status == 'open_for_voting'">Open for Voting</button>
     <button class="btn btn-danger close text-light font-weight-bold text-nowrap" v-else-if="status == 'proposed_delete'">Delete</button>
     <button @click="registerCourse()" class="btn btn-success open_for_registration text-light font-weight-bold text-nowrap" v-else-if="status == 'open_for_registration'">Open for Registeration</button>
@@ -36,6 +36,7 @@ import RegistrationService from "@/api/services/RegistrationService.js"
 import ProposedCourseService from "@/api/services/proposedCourseService.js"
 import RunCourseService from "@/api/services/runCourseService.js"
 import UserService from "@/api/services/UserService.js";
+import VoteCourseService from "@/api/services/voteCourseService.js";
 
 export default {
   props: {
@@ -125,6 +126,16 @@ export default {
       console.log(response)
       this.message = response.message;
       this.$emit('action-and-message-updated', {message: this.message, course: this.course});
+    },
+    async promote_to_course() {
+      try {
+        let response = await VoteCourseService.promoteToCourse(this.course.course_ID);
+        console.log(response)
+        this.$emit('action-and-message-updated', {message: response.message, course: this.course});
+      } catch (error) {
+        console.error("Error fetching info:", error);
+        throw error;
+      }
     }
   }
 };
