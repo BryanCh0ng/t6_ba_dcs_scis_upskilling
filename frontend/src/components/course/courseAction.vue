@@ -14,7 +14,7 @@
     <button class="btn btn-primary open_for_voting text-light font-weight-bold text-nowrap" v-else-if="status == 'open_for_voting'">Open for Voting</button>
     <button class="btn btn-danger close text-light font-weight-bold text-nowrap" v-else-if="status == 'proposed_delete'">Delete</button>
     <button @click="registerCourse()" class="btn btn-success open_for_registration text-light font-weight-bold text-nowrap" v-else-if="status == 'open_for_registration'">Open for Registeration</button>
-    <button @click="registerCourse()" class="btn btn-danger close_registration text-light font-weight-bold text-nowrap" v-else-if="status == 'close_registration'">Close registration</button>  
+    <button @click="registerCourse()" class="btn btn-danger close_registration text-light font-weight-bold text-nowrap w-100" v-else-if="status == 'close_registration'">Close registration</button>  
     <button class="btn btn-success create_run text-light font-weight-bold text-nowrap" v-else-if="status == 'create_run'">Create Run</button> 
     <button class="btn btn-success attendance-list text-light font-weight-bold text-nowrap" v-else-if="status == 'attendance'">Attendance List</button>
     <button class="btn btn-success feedback-analysis text-light font-weight-bold text-nowrap" v-else-if="status == 'feedback-analysis'">Feedback Analysis</button>
@@ -26,6 +26,7 @@
     <button class="btn btn-success view-feedback text-light font-weight-bold text-nowrap" v-else-if="status == 'view-feedback'">View Feedback</button>  
     <button class="btn btn-secondary rejected-reason text-light font-weight-bold text-nowrap" v-else-if="status == 'rejected-reason'">View Rejected Reason</button>  
     <button @click=voteAction(course.course_ID) class="btn btn-danger unoffered-vote text-light font-weight-bold text-nowrap" v-else-if="status == 'unoffered-vote'">Delete</button>
+    <button class="btn btn-danger delete-run-course text-light font-weight-bold text-nowrap" v-else-if="status == 'delete-run-course'">Delete</button>
   </div>
 </template>
   

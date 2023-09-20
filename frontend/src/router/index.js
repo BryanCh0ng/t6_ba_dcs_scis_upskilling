@@ -187,6 +187,15 @@ const routes = [
         title: 'Instructor Trainer View Voting Campaign',
    
     }
+  },
+  {
+    path: '/adminViewCourse',
+    name: 'adminViewCourse',
+    component: () => import('../views/course/adminViewCourse.vue'),
+    meta: {
+        title: 'Admin View Course',
+   
+    }
   }
   
 
