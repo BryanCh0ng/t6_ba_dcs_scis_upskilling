@@ -38,24 +38,24 @@ class GetAllCourses(Resource):
 			)
 		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
 
-retrieve_all_courses_hr = api.parser()
-@api.route("/get_all_courses_admin")
-@api.doc(description="Get all courses (Admin)")
-class GetAllCoursesHR(Resource):
-	@api.expect(retrieve_all_courses_hr)
-	def get(self):
-		courseList = Course.query.all()
-		db.session.close()
-		if len(courseList):
-			return jsonify(
-				{
-					"code": 200,
-					"data": {
-						"course": [course.json() for course in courseList]
-					}
-				}
-			)
-		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
+# retrieve_all_courses_hr = api.parser()
+# @api.route("/get_all_courses_admin")
+# @api.doc(description="Get all courses (Admin)")
+# class GetAllCoursesHR(Resource):
+# 	@api.expect(retrieve_all_courses_hr)
+# 	def get(self):
+# 		courseList = Course.query.all()
+# 		db.session.close()
+# 		if len(courseList):
+# 			return jsonify(
+# 				{
+# 					"code": 200,
+# 					"data": {
+# 						"course": [course.json() for course in courseList]
+# 					}
+# 				}
+# 			)
+# 		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
 
 retrieve_all_courses_filter_search = api.parser()
 retrieve_all_courses_filter_search.add_argument("course_name", help="Enter course name")
@@ -1110,7 +1110,7 @@ class GetAllCoursesWithRegistrationCount(Resource):
         args = retrieve_all_courses_admin.parse_args()
         course_name = args.get("course_name", "")
         course_category_id = args.get("coursecat_id", "")
-        course_status = args.get("course_status", "")
+        runcourse_status = args.get("course_status", "")
 
         query = db.session.query(
             Course,
@@ -1125,8 +1125,8 @@ class GetAllCoursesWithRegistrationCount(Resource):
             query = query.filter(Course.course_Name.contains(course_name))
         if course_category_id:
             query = query.filter(Course.coursecat_ID == course_category_id)
-        if course_status:
-            query = query.filter(Course.course_Status == course_status)
+        if runcourse_status:
+            query = query.filter(RunCourse.runcourse_Status == runcourse_status)
 
         results = query.all()
         db.session.close()
@@ -1216,16 +1216,16 @@ class GetAllInstructorsAndTrainers(Resource):
         return jsonify({"code": 404, "message": "No instructors or trainers found"})
 
 
-# Admin - Get All Run Course
-retrieve_all_run_courses_admin = api.parser()
-retrieve_all_run_courses_admin.add_argument("course_name", help="Enter course name")
-retrieve_all_run_courses_admin.add_argument("coursecat_id", help="Enter course category id")
-retrieve_all_run_courses_admin.add_argument("course_status", help="Enter run course status")
+# Admin - Get All Course
+retrieve_all_courses_admin = api.parser()
+retrieve_all_courses_admin.add_argument("course_name", help="Enter course name")
+retrieve_all_courses_admin.add_argument("coursecat_id", help="Enter course category id")
+retrieve_all_courses_admin.add_argument("course_status", help="Enter run course status")
 
-@api.route("/get_all_run_courses")
+@api.route("/get_all_courses")
 @api.doc(description="Get all run courses")
 class GetAllCourses(Resource):
-    @api.expect(retrieve_all_run_courses_admin)
+    @api.expect(retrieve_all_courses_admin)
     def get(self):
         args = retrieve_all_courses_admin.parse_args()
         course_name = args.get("course_name", "")
@@ -1235,8 +1235,7 @@ class GetAllCourses(Resource):
         query = db.session.query(
             Course,
             CourseCategory.coursecat_Name,
-            RunCourse,
-        ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).join(
+        ).select_from(Course).join(
             CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
         )
 

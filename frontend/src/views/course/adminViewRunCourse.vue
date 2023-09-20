@@ -3,8 +3,7 @@
     <search-filter
       :status-options="statusOptions"
       :search-api="searchAllCoursesAdmin" 
-      @search-complete="handleSearchComplete" 
-      :default-status="'Active'" />
+      @search-complete="handleSearchComplete"/>
     <div class="container col-12 table-responsive">
       <h5 class="pb-3">All Run Courses</h5>
       <div v-if="courses && courses.length > 0">
@@ -109,7 +108,7 @@ export default {
       selectedCourse: null,
       itemsPerPage: 10,
       localCurrentPageCourses: 1,
-      statusOptions: ["Active", "Inactive", "Retired"],
+      statusOptions: ["Ongoing", "Closed"],
       receivedMessage: '',
       actionCourse: {}
     }
@@ -158,7 +157,7 @@ export default {
     },
     async loadData() {
       try {
-        let response = await CourseService.searchAllCoursesAdmin(null, null, "Active")
+        let response = await CourseService.searchAllCoursesAdmin(null, null, null)
         this.courses = response.data
       } catch (error) {
         console.error("Error fetching course details:", error);

@@ -10,14 +10,14 @@ class CourseService extends BaseApiService {
             return this.handleError(error);
         }
     }
-    async getAllCoursesAdmin() {
-        try {
-            let courses = await axiosClient.get("/course/get_all_courses_admin");
-            return courses.data
-        } catch (error) {
-            return this.handleError(error);
-        }
-    }
+    // async getAllCoursesAdmin() {
+    //     try {
+    //         let courses = await axiosClient.get("/course/get_all_courses_admin");
+    //         return courses.data
+    //     } catch (error) {
+    //         return this.handleError(error);
+    //     }
+    // }
     async getCourseById(courseId) {
         try {
             let course = await axiosClient.get("/course/get_course_by_id", { params: { course_id: courseId } });
@@ -320,11 +320,11 @@ class CourseService extends BaseApiService {
     }
 
 
-    // Admin - All Run Courses
-    async searchAllRunCourseAdmin(course_Name, coursecat_ID, course_Status) {
+    // Admin - All Courses
+    async searchAllCourseAdmin(course_Name, coursecat_ID, course_Status) {
         try {
 
-            let response = await axiosClient.get("/course/get_all_run_courses", {
+            let response = await axiosClient.get("/course/get_all_courses", {
                 params: {
                     course_name: course_Name,
                     coursecat_id: coursecat_ID,
