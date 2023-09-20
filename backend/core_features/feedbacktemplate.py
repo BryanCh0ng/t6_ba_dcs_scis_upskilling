@@ -88,29 +88,54 @@ class GetTemplate(Resource):
 
         return {"code": 404, "message": "There is no such template"}, 404
     
-
-
-post_feedback_student = api.parser()
-post_feedback_student.add_argument("input_type", help="Enter student input")
-post_feedback_student.add_argument("question", help="Enter question")
-post_feedback_student.add_argument("template_ID", help="Enter template id")
-@api.route("/post_feedback_student", methods=["POST","GET"])
+@api.route("/post_feedback_student", methods=["GET", "POST"])
 @api.doc(description="Post feedback template attribute")
-class GetTemplate(Resource):
-    @api.expect(post_feedback_student)
-    def get(self):
+class CreateFeedbackStudent(Resource):
+    def post(self):
+        req = request.json
+        templateName = req.get("feedback_template_name")
+        currentDate = datetime.now().strftime('%Y-%m-%d')
 
-        args = post_feedback_student.parse_args()
-        templateID = args.get("template_ID")
-        inputType = args.get("input_type")
-        question = args.get("question")
+        NewFeedbackTemplate = FeedbackTemplate(None, templateName, currentDate)
+
         try:
+            db.session.add(NewFeedbackTemplate)
+            db.session.commit()
+
+        except Exception as e:
+            return json.loads(json.dumps({"message": "Failed to create feedback template: " + str(e)})), 500
+        
+        templateID = NewFeedbackTemplate.json().get("template_ID")
+
+        try:
+            attributeList = req.get("data")
             
-            # TemplateAttributeList = TemplateAttribute.query.filter(TemplateAttribute.template_Attribute_ID.contains("")).all()
-            # finalAttribute = TemplateAttributeList[-1]
-            # templateAttributeID = finalAttribute.template_Attribute_ID + 1
-            newTemplateAttribute = TemplateAttribute( None  ,question, inputType,templateID)
-            db.session.add(newTemplateAttribute)
+            for attribute in attributeList:
+                question = attribute.get("question")
+                inputType = attribute.get("selectedInputType")
+
+                TemplateAttributeList = TemplateAttribute.query.filter(TemplateAttribute.template_Attribute_ID.contains("")).all()
+                finalAttribute = TemplateAttributeList[-1]
+                templateAttributeID = finalAttribute.template_Attribute_ID + 1
+
+                newTemplateAttribute = TemplateAttribute(templateAttributeID, question, inputType, templateID)
+                db.session.add(newTemplateAttribute)
+
+            # commit first to fulfil foreign key constraint
+            db.session.commit()
+
+            # don't think our db allows us to store radio and single select options
+            # if inputType == "Likert Scale" or inputType == "Radio Button" or inputType == "Single Select":
+            if inputType == "Likert Scale":
+                inputOptions = attribute.get("inputOptions")
+
+                for inputOption in inputOptions:
+                    position = inputOption.get("displayedId")
+                    textlabel = inputOption.get("option")
+
+                    newInputOption = LikertScale(None, templateAttributeID, position, textlabel)
+
+                    db.session.add(newInputOption)
 
             # Commit the changes to the database
             db.session.commit()
@@ -118,13 +143,12 @@ class GetTemplate(Resource):
             # Return the newly created course as JSON response
             return json.loads(json.dumps(newTemplateAttribute.json(), default=str)), 201
         
-        
         except Exception as e:
             print("Error:", str(e))
             return "Failed to create a new feedback attribute: " + str(e), 500
         
 
-    
+# Not in use, use /post_feedback_student
 post_feedback_student_feedback_template = api.parser()
 post_feedback_student_feedback_template.add_argument("template_Name", help="Enter template name")
 post_feedback_student_feedback_template.add_argument("template_ID", help="Enter template id")
