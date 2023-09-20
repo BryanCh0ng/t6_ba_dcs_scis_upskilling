@@ -244,18 +244,18 @@ class TemplateAttribute(db.Model):
         return result
     
 ##################  Likert Scale Class Creation ##################
-class LikertScale(db.Model):
-    __tablename__ = 'likertscale'
+class InputOption(db.Model):
+    __tablename__ = 'inputoption'
 
-    likert_Scale_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    input_Option_ID = db.Column(db.Integer, nullable=False, primary_key=True)
     template_Attribute_ID = db.Column(db.Integer,db.ForeignKey('templateattribute.template_Attribute_ID'),  nullable=False)
     position = db.Column(db.Integer,  nullable=False)
     textlabel = db.Column(db.String(255), nullable=False) 
 
 
 
-    def __init__(self, likert_Scale_ID, template_Attribute_ID, position, textlabel ):
-        self.likert_Scale_ID = likert_Scale_ID
+    def __init__(self, input_Option_ID, template_Attribute_ID, position, textlabel ):
+        self.input_Option_ID = input_Option_ID
         self.template_Attribute_ID = template_Attribute_ID
         self.position = position
         self.textlabel = textlabel

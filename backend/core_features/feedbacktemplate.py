@@ -37,15 +37,15 @@ class GetTemplate(Resource):
         query = db.session.query(
             FeedbackTemplate,
             TemplateAttribute,
-            LikertScale,
+            InputOption,
         ).select_from(FeedbackTemplate).join(
             TemplateAttribute, FeedbackTemplate.template_ID == TemplateAttribute.template_ID
         ).join(
-            LikertScale, TemplateAttribute.template_Attribute_ID == LikertScale.template_Attribute_ID
+            InputOption, TemplateAttribute.template_Attribute_ID == InputOption.template_Attribute_ID
         ).filter(
             FeedbackTemplate.template_ID == templateID
         ).order_by(
-            asc(LikertScale.position)
+            asc(InputOption.position)
         )
         template_query = query.all()
         db.session.close()
@@ -57,7 +57,7 @@ class GetTemplate(Resource):
               'data': []
           }
           question_dict = {}
-          for template, attribute, likert_scale in template_query:
+          for template, attribute, input_option in template_query:
             if attribute.template_Attribute_ID not in template_data:
               if template_data['feedback_template_name'] is None:
                 template_data['feedback_template_name'] = template.template_Name
@@ -66,18 +66,18 @@ class GetTemplate(Resource):
 
               if attribute.question in question_dict:
                 question_dict[attribute.question]['inputOptions'].append({
-                    'id': likert_scale.likert_Scale_ID,
-                    'position': likert_scale.position,
-                    'option': likert_scale.textlabel
+                    'id': input_option.input_Option_ID,
+                    'position': input_option.position,
+                    'option': input_option.textlabel
                 })
               else:
                 question_data = {
                   'question': attribute.question,
                   'selectedInputType': attribute.input_Type,
                   'inputOptions': [{
-                      'id': likert_scale.likert_Scale_ID,
-                      'position': likert_scale.position,
-                      'option': likert_scale.textlabel
+                      'id': input_option.input_Option_ID,
+                      'position': input_option.position,
+                      'option': input_option.textlabel
                   }],
                 }
                 question_dict[attribute.question] = question_data
@@ -95,6 +95,7 @@ class CreateFeedbackStudent(Resource):
         req = request.json
         templateName = req.get("feedback_template_name")
         currentDate = datetime.now().strftime('%Y-%m-%d')
+        position = 1
 
         NewFeedbackTemplate = FeedbackTemplate(None, templateName, currentDate)
 
@@ -122,23 +123,22 @@ class CreateFeedbackStudent(Resource):
                 db.session.add(newTemplateAttribute)
 
             # commit first to fulfil foreign key constraint
-            db.session.commit()
+                db.session.commit()
 
-            # don't think our db allows us to store radio and single select options
-            # if inputType == "Likert Scale" or inputType == "Radio Button" or inputType == "Single Select":
-            if inputType == "Likert Scale":
-                inputOptions = attribute.get("inputOptions")
+                if inputType == "Likert Scale" or inputType == "Radio Button" or inputType == "Single Select":
+                    inputOptions = attribute.get("inputOptions")
 
-                for inputOption in inputOptions:
-                    position = inputOption.get("displayedId")
-                    textlabel = inputOption.get("option")
+                    for inputOption in inputOptions:
+                        textlabel = inputOption.get("option")
 
-                    newInputOption = LikertScale(None, templateAttributeID, position, textlabel)
+                        newInputOption = InputOption(None, templateAttributeID, position, textlabel)
 
-                    db.session.add(newInputOption)
+                        db.session.add(newInputOption)
 
-            # Commit the changes to the database
-            db.session.commit()
+                        position += 1
+
+                # Commit the changes to the database
+                db.session.commit()
 
             # Return the newly created course as JSON response
             return json.loads(json.dumps(newTemplateAttribute.json(), default=str)), 201
