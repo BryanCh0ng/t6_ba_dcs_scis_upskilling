@@ -341,7 +341,7 @@ class CourseService extends BaseApiService {
     // Cancel/Deactivate Button in adminViewRunCourse
     async deactivateRunCourse(course_ID) {
         try {
-            let deactivateRunCourse = await axiosClient.post("/course/deactivate_runcourse", { course_id: course_ID } );
+            let deactivateRunCourse = await axiosClient.post("/course/deactivate_course", { course_id: course_ID } );
             console.log(deactivateRunCourse)
             return deactivateRunCourse.data
         } catch (error) {
