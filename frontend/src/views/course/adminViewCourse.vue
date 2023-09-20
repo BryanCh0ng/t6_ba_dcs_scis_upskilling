@@ -5,8 +5,13 @@
         :search-api="searchAllCourseAdmin" 
         @search-complete="handleSearchComplete" 
         :default-status="'Active'" />
+
+      <div class="container col-12 d-flex mb-3">
+          <h5 class="col m-auto">All Courses</h5>
+          <button class="btn btn-primary" @click="goToCreateCourse">Create Course</button>
+      </div>
+
       <div class="container col-12 table-responsive">
-        <h5 class="pb-3">All Courses</h5>
         <div v-if="courses && courses.length > 0">
           <table class="table bg-white">
             <thead>
@@ -32,6 +37,7 @@
                 <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
                 <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course" @click="goToEditRunCourseWithId(course.rcourse_ID)"></course-action></td>
                 <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course" @click="goToCreateRunCourse(course.course_ID)"></course-action></td>
+                <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Retire" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
               </tr>               
             </tbody>
           </table>
@@ -86,7 +92,10 @@
         localCurrentPageCourses: 1,
         statusOptions: ["Active", "Inactive", "Retired"],
         receivedMessage: '',
-        actionCourse: {}
+        actionCourse: {},
+        search_status: 'Active',
+        search_course_name: null,
+        search_course_category: null
       }
     },
     computed: {
@@ -115,6 +124,9 @@
         
       },
       async searchAllCourseAdmin(courseName, coursecat_ID, status) {
+        this.search_course_name = courseName
+        this.search_course_category = coursecat_ID
+        this.search_status = status
         try {
           let response = await CourseService.searchAllCourseAdmin(courseName, coursecat_ID, status);
           this.courses = response.data;
@@ -133,7 +145,7 @@
       },
       async loadData() {
         try {
-          let response = await CourseService.searchAllCourseAdmin(null, null, "Active")
+          let response = await CourseService.searchAllCourseAdmin(this.search_course_name, this.search_course_category, this.search_status)
           
           this.courses = response.data
           console.log(this.courses)
@@ -169,6 +181,9 @@
       },
       goToCreateRunCourse(courseID){
         this.$router.push({ name: 'createRunCourse', params: {id: courseID}});
+      },
+      goToCreateCourse() {
+        this.$router.push({ name: 'createCourse'});
       }
     },
     created() {

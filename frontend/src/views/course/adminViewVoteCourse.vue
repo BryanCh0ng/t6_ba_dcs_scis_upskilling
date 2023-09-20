@@ -165,10 +165,13 @@ export default {
         statusOptions: ["Ongoing", "Offered", "Closed"],
         actionCourse: {},
         vote_status: {
-        "Ongoing": "Open for voting",
-        "Offered": "Offered for students to register",
-        "Closed": "Voting closed for students"
-        }
+          "Ongoing": "Open for voting",
+          "Offered": "Offered for students to register",
+          "Closed": "Voting closed for students"
+        },
+        search_vote_status: 'Active',
+        search_course_name: null,
+        search_course_category: null
     }
   },
 
@@ -207,7 +210,9 @@ export default {
       this.notoffered_courses = searchResults; // Always update the courses array
     },
     async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, vote_status) {
-      console.log("vote status",vote_status)
+      this.search_course_name = course_Name
+      this.search_course_category = coursecat_ID
+      this.vote_status = vote_status
       try {
         let response = await CourseService.searchAllVotingCoursesAdmin(
           course_Name,
@@ -223,6 +228,8 @@ export default {
       }
     },
     async searchAllNotOfferedVotingCoursesAdmin(course_Name, coursecat_ID) {
+      this.search_course_name = course_Name
+      this.search_course_category = coursecat_ID
       try {
         let response = await CourseService.searchAllNotOfferedVotingCoursesAdmin(
           course_Name,
@@ -265,10 +272,10 @@ export default {
       }
     },
     async loadData() {
-      let response = await CourseService.searchAllVotingCoursesAdmin(null, null, null)
+      let response = await CourseService.searchAllVotingCoursesAdmin(this.search_course_name, this.search_course_category, this.search_vote_status)
       this.vote_courses = response.data
 
-      let course = await CourseService.searchAllNotOfferedVotingCoursesAdmin(null, null)
+      let course = await CourseService.searchAllNotOfferedVotingCoursesAdmin(this.search_course_name, this.search_course_category)
       this.notoffered_courses = course.data
     }
   },

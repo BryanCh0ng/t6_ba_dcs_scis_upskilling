@@ -103,7 +103,10 @@ export default {
       localCurrentPageCourses: 1,
       statusOptions: ["Ongoing", "Closed"],
       receivedMessage: '',
-      actionCourse: {}
+      actionCourse: {},
+      search_status: 'Active',
+      search_course_name: null,
+      search_course_category: null
     }
   },
   computed: {
@@ -132,6 +135,9 @@ export default {
       
     },
     async searchAllRunCoursesAdmin(courseName, coursecat_ID, status) {
+      this.search_course_name = courseName
+      this.search_course_category = coursecat_ID
+      this.search_status = status
       try {
         let response = await CourseService.searchAllRunCoursesAdmin(courseName, coursecat_ID, status);
         this.courses = response.data;
@@ -150,7 +156,7 @@ export default {
     },
     async loadData() {
       try {
-        let response = await CourseService.searchAllRunCoursesAdmin(null, null, null)
+        let response = await CourseService.searchAllRunCoursesAdmin(this.search_course_name, this.search_course_category, this.search_status)
         this.courses = response.data
       } catch (error) {
         console.error("Error fetching course details:", error);
