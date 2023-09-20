@@ -2,11 +2,11 @@
     <div>
       <search-filter
         :status-options="statusOptions"
-        :search-api="searchAllCoursesAdmin" 
+        :search-api="searchAllCourseAdmin" 
         @search-complete="handleSearchComplete" 
         :default-status="'Active'" />
       <div class="container col-12 table-responsive">
-        <h5 class="pb-3">All Run Courses</h5>
+        <h5 class="pb-3">All Courses</h5>
         <div v-if="courses && courses.length > 0">
           <table class="table bg-white">
             <thead>
@@ -54,9 +54,9 @@
   
     </div>
   
-  </template>
-    
-  <script>
+</template>
+  
+<script>
   import courseAction from '@/components/course/courseAction.vue';
   import sortIcon from '@/components/common/sort-icon.vue';
   import modalCourseContent from '@/components/course/modalCourseContent.vue';
@@ -114,9 +114,9 @@
         this.courses = searchResults;
         
       },
-      async searchAllCoursesAdmin(courseName, coursecat_ID, status) {
+      async searchAllCourseAdmin(courseName, coursecat_ID, status) {
         try {
-          let response = await CourseService.searchAllCoursesAdmin(courseName, coursecat_ID, status);
+          let response = await CourseService.searchAllCourseAdmin(courseName, coursecat_ID, status);
           this.courses = response.data;
           
           return this.courses;
@@ -133,8 +133,10 @@
       },
       async loadData() {
         try {
-          let response = await CourseService.searchAllCoursesAdmin(null, null, "Active")
+          let response = await CourseService.searchAllCourseAdmin(null, null, "Active")
+          
           this.courses = response.data
+          console.log(this.courses)
         } catch (error) {
           console.error("Error fetching course details:", error);
         }
@@ -186,7 +188,7 @@
       modalElement.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
     },
     }
-  </script>
+</script>
   
   <style>
     @import '../../assets/css/course.css';

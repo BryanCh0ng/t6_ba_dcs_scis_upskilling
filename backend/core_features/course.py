@@ -16,27 +16,27 @@ api = Namespace('course', description='Course related operations')
 # get_course_by_id()
 # create_new_course()
 
-retrieve_all_courses = api.parser()
-retrieve_all_courses.add_argument("course_name", help="Enter course name")
-@api.route("/get_all_courses")
-@api.doc(description="Get all courses")
-class GetAllCourses(Resource):
-	@api.expect(retrieve_all_courses)
-	def get(self):
-		arg = retrieve_all_courses.parse_args().get("course_name")
-		course_Name = arg if arg else ""
-		courseList = Course.query.filter(Course.course_Name.contains(course_Name)).all()
-		db.session.close()
-		if len(courseList):
-			return jsonify(
-				{
-					"code": 200,
-					"data": {
-						"course": [course.json() for course in courseList]
-					}
-				}
-			)
-		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
+# retrieve_all_courses = api.parser()
+# retrieve_all_courses.add_argument("course_name", help="Enter course name")
+# @api.route("/get_all_courses")
+# @api.doc(description="Get all courses")
+# class GetAllCourses(Resource):
+# 	@api.expect(retrieve_all_courses)
+# 	def get(self):
+# 		arg = retrieve_all_courses.parse_args().get("course_name")
+# 		course_Name = arg if arg else ""
+# 		courseList = Course.query.filter(Course.course_Name.contains(course_Name)).all()
+# 		db.session.close()
+# 		if len(courseList):
+# 			return jsonify(
+# 				{
+# 					"code": 200,
+# 					"data": {
+# 						"course": [course.json() for course in courseList]
+# 					}
+# 				}
+# 			)
+# 		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
 
 # retrieve_all_courses_hr = api.parser()
 # @api.route("/get_all_courses_admin")
@@ -110,16 +110,16 @@ class DeleteCourse(Resource):
             return "Failed. " + str(e), 500
         
 delete_runcourse = api.parser()
-delete_runcourse.add_argument("course_id", help="Enter course id")
+delete_runcourse.add_argument("runcourse_id", help="Enter run course id")
 @api.route("/delete_runcourse")
 @api.doc(description="Delete run course")
 class DeleteCourse(Resource):
     @api.expect(delete_runcourse)
     def delete(self):    
         try:
-            courseID = delete_runcourse.parse_args().get("course_id")
+            runcourse_ID = delete_runcourse.parse_args().get("course_id")
             
-            runCourse = RunCourse.query.filter_by(course_ID=courseID).first()            
+            runCourse = RunCourse.query.filter_by(runcourse_ID=runcourse_ID).first()            
             if(runCourse):
                     try:
                         db.session.delete(runCourse)              
@@ -1252,23 +1252,9 @@ class GetAllCourses(Resource):
         if results:
             result_data = []
             for result in results:
-                run_course_attrs = {
-                    'run_Startdate': format_date_time(result[2].run_Startdate),
-                    'run_Enddate': format_date_time(result[2].run_Enddate),
-                    'run_Starttime': format_date_time(result[2].run_Starttime),
-                    'run_Endtime': format_date_time(result[2].run_Endtime),
-                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
-                }
-
-                modified_run_course = {**result[2].json(), **run_course_attrs}
-
                 course_info = {
                     **result[0].json(),
                     "coursecat_Name": result[1],
-                    **modified_run_course
                 }
                 result_data.append(course_info)
             return jsonify({"code": 200, "data": result_data})

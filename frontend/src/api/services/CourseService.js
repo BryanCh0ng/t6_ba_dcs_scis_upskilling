@@ -286,7 +286,7 @@ class CourseService extends BaseApiService {
     }
 
     // Admin - All Courses with Reg Count 
-    async searchAllCoursesAdmin(course_Name, coursecat_ID, course_Status) {
+    async searchAllRunCoursesAdmin(course_Name, coursecat_ID, course_Status) {
         try {
 
             let response = await axiosClient.get("/course/get_all_courses_with_registration_count", {

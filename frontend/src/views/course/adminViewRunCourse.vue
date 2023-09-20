@@ -2,7 +2,7 @@
   <div>
     <search-filter
       :status-options="statusOptions"
-      :search-api="searchAllCoursesAdmin" 
+      :search-api="searchAllRunCoursesAdmin" 
       @search-complete="handleSearchComplete"/>
     <div class="container col-12 table-responsive">
       <h5 class="pb-3">All Run Courses</h5>
@@ -133,7 +133,7 @@ export default {
     },
     async searchAllCoursesAdmin(courseName, coursecat_ID, status) {
       try {
-        let response = await CourseService.searchAllCoursesAdmin(courseName, coursecat_ID, status);
+        let response = await CourseService.searchAllRunCoursesAdmin(courseName, coursecat_ID, status);
         this.courses = response.data;
         
         return this.courses;
@@ -150,7 +150,7 @@ export default {
     },
     async loadData() {
       try {
-        let response = await CourseService.searchAllCoursesAdmin(null, null, null)
+        let response = await CourseService.searchAllRunCoursesAdmin(null, null, null)
         this.courses = response.data
       } catch (error) {
         console.error("Error fetching course details:", error);
