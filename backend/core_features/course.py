@@ -65,7 +65,7 @@ retrieve_all_courses_filter_search.add_argument("coursecat_id", help="Enter cour
 class GetAllCoursesFilterSearch(Resource):
 	@api.expect(retrieve_all_courses_filter_search)
 	def get(self):
-		arg = retrieve_all_courses.parse_args().get("course_name")
+		arg = retrieve_all_courses_filter_search.parse_args().get("course_name")
 		course_Name = arg if arg else ""
 		arg2 = retrieve_all_courses_filter_search.parse_args().get("coursecat_id")
 		coursecat_ID = arg2 if arg2 else ""
@@ -110,16 +110,17 @@ class DeleteCourse(Resource):
             return "Failed. " + str(e), 500
         
 delete_runcourse = api.parser()
-delete_runcourse.add_argument("runcourse_id", help="Enter run course id")
+delete_runcourse.add_argument("rcourse_ID", help="Enter run course id")
 @api.route("/delete_runcourse")
 @api.doc(description="Delete run course")
 class DeleteCourse(Resource):
     @api.expect(delete_runcourse)
     def delete(self):    
         try:
-            runcourse_ID = delete_runcourse.parse_args().get("course_id")
-            
-            runCourse = RunCourse.query.filter_by(runcourse_ID=runcourse_ID).first()            
+            rcourse_ID = delete_runcourse.parse_args().get("rcourse_ID")
+            # app.logger.debug(rcourse_ID)
+
+            runCourse = RunCourse.query.filter_by(rcourse_ID=rcourse_ID).first()            
             if(runCourse):
                     try:
                         db.session.delete(runCourse)              

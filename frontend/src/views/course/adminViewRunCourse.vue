@@ -131,7 +131,7 @@ export default {
       this.courses = searchResults;
       
     },
-    async searchAllCoursesAdmin(courseName, coursecat_ID, status) {
+    async searchAllRunCoursesAdmin(courseName, coursecat_ID, status) {
       try {
         let response = await CourseService.searchAllRunCoursesAdmin(courseName, coursecat_ID, status);
         this.courses = response.data;

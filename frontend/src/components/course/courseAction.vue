@@ -26,7 +26,7 @@
     <button class="btn btn-success view-feedback text-light font-weight-bold text-nowrap" v-else-if="status == 'view-feedback'">View Feedback</button>  
     <button class="btn btn-secondary rejected-reason text-light font-weight-bold text-nowrap" v-else-if="status == 'rejected-reason'">View Rejected Reason</button>  
     <button @click=voteAction(course.course_ID) class="btn btn-danger unoffered-vote text-light font-weight-bold text-nowrap" v-else-if="status == 'unoffered-vote'">Delete</button>
-    <button class="btn btn-danger delete-run-course text-light font-weight-bold text-nowrap" v-else-if="status == 'delete-run-course'">Delete</button>
+    <button @click=runCourseAction(course.rcourse_ID) class="btn btn-danger delete-run-course text-light font-weight-bold text-nowrap" v-else-if="status == 'delete-run-course'">Delete</button>
   </div>
 </template>
   
@@ -68,6 +68,9 @@ export default {
           response = await RegistrationService.createNewRegistration(this.course.rcourse_ID, 1, "Pending");
         } else if (this.status == "registered_drop") {
           response = await RegistrationService.dropRegisteredCourse(this.course.rcourse_ID, 1);
+        } else if (this.status == "delete-run-course") {
+          response = await CourseService.deleteRunCourse(this.course.rcourse_ID);
+          console.log(response.message)
         }
         this.message = response.message;
         this.$emit('action-and-message-updated', {message: this.message, course: this.course});
