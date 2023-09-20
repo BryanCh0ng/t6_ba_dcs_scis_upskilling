@@ -6,13 +6,13 @@
         @search-complete="handleSearchComplete" 
         :default-status="'Active'" />
 
-      <div class="container col-12 d-flex mb-3">
+      <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Courses</h5>
           <button class="btn btn-primary" @click="goToCreateCourse">Create Course</button>
       </div>
 
-      <div class="container col-12 table-responsive">
-        <div v-if="courses && courses.length > 0">
+      <div class="container col-12">
+        <div v-if="courses && courses.length > 0" class="table-responsive">
           <table class="table bg-white">
             <thead>
               <tr class="text-nowrap">

@@ -4,9 +4,9 @@
       :status-options="statusOptions"
       :search-api="searchAllRunCoursesAdmin" 
       @search-complete="handleSearchComplete"/>
-    <div class="container col-12 table-responsive">
+    <div class="container col-12">
       <h5 class="pb-3">All Run Courses</h5>
-      <div v-if="courses && courses.length > 0">
+      <div v-if="courses && courses.length > 0" class="table-responsive">
         <table class="table bg-white">
           <thead>
             <tr class="text-nowrap">
@@ -104,7 +104,7 @@ export default {
       statusOptions: ["Ongoing", "Closed"],
       receivedMessage: '',
       actionCourse: {},
-      search_status: 'Active',
+      search_status: null,
       search_course_name: null,
       search_course_category: null
     }

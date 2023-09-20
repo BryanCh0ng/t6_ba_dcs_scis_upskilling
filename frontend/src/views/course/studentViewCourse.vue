@@ -14,9 +14,9 @@
       :search-api="searchUnregisteredActiveInfo"
       @search-complete="handleSearchCompleteRun" />
   
-      <div class="container col-12 table-responsive">
+      <div class="container col-12">
         <h5 class="pb-3">All Courses Available to Register</h5>
-        <div v-if="run_courses && run_courses.length > 0">
+        <div v-if="run_courses && run_courses.length > 0" class="table-responsive">
           <table class="table bg-white">
             <thead>
               <tr class="text-nowrap">
