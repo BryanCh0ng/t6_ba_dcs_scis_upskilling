@@ -27,7 +27,7 @@ INSERT INTO user VALUES
 	(1, 'Johnathan Lee', 'jonathan.2020@smu.edu.sg', 'jonathan', 'Student'),
 	(2, 'Javier Ang', 'javier.ang@smu.edu.sg', 'javier', 'Admin'),
 	(3, 'Amanda Lee', 'amandalee@gmail.com', 'amanda', 'Trainer'),
-	(4, 'Christina Lee', 'christina.lee@smu.edu.sg', 'christina', 'Instructors'),
+	(4, 'Christina Lee', 'christina.lee@smu.edu.sg', 'christina', 'Instructor'),
 	(5, 'Aaron Tan', 'aarontan@gmail.com', 'aaron', 'Trainer'),
 	(6, 'Samuel Tan', 'samuel.tan.2020@smu.edu.sg', 'samuel', 'Student'),
 	(7, 'James Lee', 'james.lee.2020@smu.edu.sg', 'james', 'Student'),
