@@ -221,6 +221,17 @@ const routes = [
         title: 'Admin View Feedback Template',
     },
   },
+  {
+    path: '/adminViewCourse',
+    name: 'adminViewCourse',
+    component: () => import('../views/course/adminViewCourse.vue'),
+    meta: {
+        title: 'Admin View Course',
+   
+    }
+  }
+  
+
   // },
   // {
   //     path: '/deleteCourse',
