@@ -314,6 +314,8 @@ export default {
                     this.submitFormData["coursecat_ID"] = this.formData.courseCategories.find(i => i.coursecat_Name === this.formData.selectedCategory).coursecat_ID;
 
                     this.submitFormData["course_Status"] = "Active";
+
+                    this.submitFormData["template_ID"] = null
                     
                     if(this.view === "createCourse") {
 

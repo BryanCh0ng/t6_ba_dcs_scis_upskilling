@@ -171,7 +171,7 @@
                         </div>
                     </div>
                     <!--Feedback Template-->
-                    <div class="col-md-6 form-group mt-4 mt-md-0">
+                    <!--<div class="col-md-6 form-group mt-4 mt-md-0">
                         <dropdown-field v-model="formData.selectedTemplate" :default-placeholder="'Feedback Template'"
                             :errors="v$?.formData.selectedTemplate?.$errors[0]?.$message">
                             <option v-for="feedbackTemplate in formData.feedbackTemplates"
@@ -179,7 +179,7 @@
                                 {{ feedbackTemplate.template_Name }}
                             </option>
                         </dropdown-field>
-                    </div>
+                    </div>-->
                 </div>
 
                 <!--<button v-if="status" type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
@@ -228,7 +228,7 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import RunCourseService from "@/api/services/runCourseService.js";
 import UserService from "@/api/services/UserService.js";
-import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js"; //need to import
+//import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js"; 
 import { useVuelidate } from "@vuelidate/core";
 import { required, numeric, helpers } from "@vuelidate/validators";
 import DefaultModal from '../DefaultModal.vue';
@@ -461,8 +461,8 @@ export default {
                 closingDate: null,
                 closingTime: null,
                 courseFee: "",
-                selectedTemplate: "",
-                feedbackTemplates: [],
+                //selectedTemplate: "",
+                //feedbackTemplates: [],
             },
             errorMsg: [],
             //Modal 
@@ -472,7 +472,7 @@ export default {
             showAlert: false,
             //Edit Run Course
             instructorID: 0,
-            templateID: 0,
+            //templateID: 0,
             courseID: 0,
             createRunCourseResponse: {},
             editRunCourseResponse: {},
@@ -501,14 +501,16 @@ export default {
                 openingTime: { required: helpers.withMessage('Please select a valid opening time for registration', required) },
                 closingDate: { required: helpers.withMessage('Please select a valid closing date for registration', required), closingDateGreaterThanOpeningDate: closingDateGreaterThanOpeningDateValidatorWithMessage },
                 closingTime: { required: helpers.withMessage('Please select a valid closing time for registration', required) },
-                courseFee: { required: helpers.withMessage('Please provide a valid course fee', required), currency: currencyValidatorWithMessage },
-                selectedTemplate: { requiredL: helpers.withMessage('Please select a valid feedback template', required) }
+                courseFee: { required: helpers.withMessage('Please provide a valid course fee', required), currency: currencyValidatorWithMessage }
+                //selectedTemplate: { requiredL: helpers.withMessage('Please select a valid feedback template', required) }
             }
         }
     },
     async mounted() {
         try {
-            await this.fetchFormFieldsData();
+            //await this.fetchFormFieldsData();
+
+            await this.fetchCoaches();
 
             if (!this.create) {
                 await this.fetchEditRunCourseData();
@@ -534,10 +536,13 @@ export default {
             } catch (error) {
                 console.error('Error fetching instructors:', error);
 
-                this.errorMsg.push('Error fetching instructors:', error);
+                //this.errorMsg.push('Error fetching instructors:', error);
+
+                this.title = "Form Data Retrieval Error";
+                throw new Error("There is a problem retrieving the data for the form field")
             }
         },
-        async fetchFeedbackTemplates() {
+        /*async fetchFeedbackTemplates() {
             try {
                 this.formData.feedbackTemplates = await FeedbackTemplateService.getAllTemplates();
             } catch (error) {
@@ -548,13 +553,13 @@ export default {
         },
         async fetchFormFieldsData() {
             await this.fetchCoaches();
-            await this.fetchFeedbackTemplates();
+            //await this.fetchFeedbackTemplates();
 
             if (this.errorMsg.length > 0) {
                 this.title = "Form Data Retrieval Error";
                 throw new Error("There is a problem retrieving the data for the form fields")
             }
-        },
+        },*/
         async fetchRunCourseByID() {
             try {
                 const runcourseData = await RunCourseService.getRunCourseById(this.runcourseId);
@@ -616,7 +621,7 @@ export default {
                 this.errorMsg.push('Error fetching coach by ID:', error);
             }
         },
-        async fetchTemplateByID() {
+        /*async fetchTemplateByID() {
             try {
                 const templateData = await FeedbackTemplateService.getTemplateById(this.templateID);
 
@@ -626,7 +631,7 @@ export default {
                 console.error('Error fetching template by ID:', error);
                 this.errorMsg.push('Error fetching template by ID:', error);
             }
-        },
+        },*/
         async fetchEditRunCourseData() {
             try {
                 await this.fetchRunCourseByID();
@@ -635,7 +640,7 @@ export default {
                 await this.fetchCoachByID();
 
                 //need template id from runcourse 
-                await this.fetchTemplateByID();
+                //await this.fetchTemplateByID();
 
                 if (this.errorMsg.length > 0) {
 
@@ -809,7 +814,7 @@ export default {
 
                     this.submitFormData["reg_Endtime"] = this.formatTimeObjectToString(this.formData.closingTime);
 
-                    this.submitFormData["template_ID"] = this.formData.feedbackTemplates.find(i => i.template_Name === this.formData.selectedTemplate).template_ID;
+                    //this.submitFormData["template_ID"] = this.formData.feedbackTemplates.find(i => i.template_Name === this.formData.selectedTemplate).template_ID;
 
 
                     //For Edit Course (Updating the run course and course)
