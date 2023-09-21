@@ -1,6 +1,6 @@
 <template>
   <div class="word-cloud">
-    <svg ref="wordCloudSvg" width="300" height="300"></svg>
+    <svg ref="wordCloudSvg" :width="width" :height="height"></svg>
   </div>
 </template>
 
@@ -12,69 +12,80 @@ export default {
   props: {
     wordData: {
       type: Array,
-      default: () => [], // set default value to an empty array
-    }
-  },
-  created() {
-    // console.log("Received wordData prop:", this.wordData);
+      default: () => [],
+    },
+    width: {
+      type: Number,
+      default: 350,
+    },
+    height: {
+      type: Number,
+      default: 250, 
+    },
+    scalingFactor: {
+      type: Number,
+      default: 30,
+    },
+    padding: {
+      type: Number,
+      default: 5,
+    },
   },
   mounted() {
     this.createWordCloud();
   },
-methods: {
-  createWordCloud() {
-    // console.log("Word Data:", this.wordData); 
+  methods: {
+    createWordCloud() {
+      const wordCloudData = this.wordData.map((item) => ({
+        size: item.size,
+        word: item.word,
+      }));
 
-    var fill = d3.scaleOrdinal(d3.schemeCategory10);
+      const fill = d3.scaleOrdinal(d3.schemeCategory10);
 
-    var svg = d3.select(this.$refs.wordCloudSvg).append("g")
-      .attr("transform", "translate(150,150)");
+      const svg = d3.select(this.$refs.wordCloudSvg);
 
+      const fontSizeScale = d3.scaleLinear()
+        .domain([0, d3.max(wordCloudData, (d) => d.size)])
+        .range([10, 40]); // Adjust the maximum font size as needed
 
-    function draw(words) {
-      // console.log(words); 
-      
-      var cloud = svg.selectAll("g text")
-        .data(words)
-        .enter()
-        .append("text")
-        .style("font-family", "Impact")
-        .style("fill", function (d, i) {
-          return fill(i);
-        })
-        .attr("text-anchor", "middle")
-        .attr("transform", function (d) {
-          return "translate(" + [d.x, d.y] + ")";
-        })
-        .style("fill-opacity", 1)
-        .text(function (d) {
-          return d.text;
-        });
+      const wordCloudLayout = cloud()
+        .size([this.width, this.height])
+        .words(wordCloudData)
+        .padding(this.padding)
+        .rotate(() => (Math.random() < 0.5 ? 0 : 90)) // Rotate words either 0 or 90 degrees
+        .font("Impact")
+        .fontSize((d) => fontSizeScale(d.size))
+        .on("end", draw);
 
-      cloud.exit()
-        .transition()
-        .duration(200)
-        .style('fill-opacity', 1e-6)
-        .remove();
-    }
+      wordCloudLayout.start();
 
-   var wordCloudLayout = cloud()
-    .size([300, 300])
-    .words(this.wordData.map(word => ({ text: word }))) // Convert the list of words to objects with a 'text' property
-    .padding(5)
-    .rotate(function () {
-      return ~~(Math.random() * 2) * 90;
-    })
-    .font("Impact")
-    .fontSize(25) // constant font size
-    .on("end", draw)
-    .start();
-      
-    return wordCloudLayout
+      function draw(words) {
+        const cloud = svg
+          .append("g")
+          .attr("transform", `translate(${svg.attr("width") / 2},${svg.attr("height") / 2})`)
+          .selectAll("text")
+          .data(words)
+          .enter()
+          .append("text")
+          .style("font-family", "Impact")
+          .style("fill", (d, i) => fill(i))
+          .attr("text-anchor", "middle")
+          .attr("transform", (d) => `translate(${d.x},${d.y})`)
+          .style("fill-opacity", 1)
+          .text((d) => d.word)
+          .style("font-size", (d) => d.size * 0.85);
+
+        cloud
+          .exit()
+          .transition()
+          .duration(1)
+          .style("fill-opacity", 1e-6)
+          .remove();
+      }
+    },
 
   },
-},
-
 };
 </script>
 
