@@ -3,6 +3,7 @@ from flask_restx import Namespace, Resource, fields
 import datetime
 from allClasses import *
 from sqlalchemy import asc
+from sqlalchemy.orm import aliased
 import json
 
 api = Namespace('feedbacktemplate', description='Feedback template related operations')
@@ -147,6 +148,7 @@ class CreateFeedbackStudent(Resource):
             print("Error:", str(e))
             return "Failed to create a new feedback attribute: " + str(e), 500
         
+        
 
 # Not in use, use /post_feedback_student
 post_feedback_student_feedback_template = api.parser()
@@ -175,6 +177,133 @@ class GetTemplate(Resource):
                 return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
         else:
             return {"message": "Template ID already exists"}, 409
+
+get_run_courses_by_template_id = api.parser()
+get_run_courses_by_template_id.add_argument("template_id", help="Enter template id")
+@api.route("/get_run_courses_by_template_id")
+@api.doc(description="Get Run Courses by tempate id")
+class GetTemplate(Resource):
+    @api.expect(get_run_courses_by_template_id)
+    def get(self):
+      templateID = get_run_courses_by_template_id.parse_args().get("template_id")
+      query = db.session.query(
+          FeedbackTemplate,
+          RunCourse,
+          Course
+      ).select_from(FeedbackTemplate).join(
+          RunCourse, FeedbackTemplate.template_ID == RunCourse.template_ID
+      ).join(
+          Course, RunCourse.course_ID == Course.course_ID
+      ).filter(
+          FeedbackTemplate.template_ID == templateID
+      )
+      query_results = query.all()
+      db.session.close()
+      if query_results:
+        courses = []
+        for _, runcourse, course in query_results:
+            courses.append({
+              "course_Name": course.course_Name,
+              "runcourse_id": runcourse.rcourse_ID
+            })
+        return {"code": 200, "data": {"courses": courses}}, 200
+      return {"code": 404, "message": "Failed to retrieve run courses by template id"}, 404
+
+get_all_feedback_template_names = api.parser()
+@api.route("/get_all_feedback_template_names")
+@api.doc(description="Get all feedback template Names")
+class GetAllFeedbackTemplateNames(Resource):
+    @api.expect(get_all_feedback_template_names)
+    def get(self):
+      templates = FeedbackTemplate.template_Name.query.all()
+      db.session.close()
+      
+      if templates:
+        template_names_json = [template.template_Name.json() for template in templates]
+        return {"code": 200, "feedback_template_names": template_names_json}, 200
+
+      return {"code": 404, "message": "No templates found"}, 404
+    
+get_course_names_by_feedback_template_id = api.parser()
+get_course_names_by_feedback_template_id.add_argument("template_id", help="Enter template id")
+@api.route("/get_course_names_by_feedback_template_id")
+@api.doc(description="Get course names by feedback template id")
+class GetCourseNamesByFeedbackTemplateId(Resource):
+    @api.expect(get_course_names_by_feedback_template_id)
+    def get(self):
+      try:
+        templateID = get_course_names_by_feedback_template_id.parse_args().get("template_id")
+        print(templateID)
+        query = (
+          db.session.query(FeedbackTemplate, Course)
+          .join(Course, FeedbackTemplate.template_ID == Course.template_ID)
+          .filter(FeedbackTemplate.template_ID == templateID)
+          .distinct()
+        )
+
+        no_template_query =(
+          db.session.query(FeedbackTemplate, Course)
+          .join(Course, FeedbackTemplate.template_ID == Course.template_ID)
+          .filter(FeedbackTemplate.template_ID == None)
+          .distinct()
+        )
+
+        courses_using_template = query.all()
+        courses_no_template = no_template_query.all()
+        db.session.close()
+
+        course_names_using = []
+        course_name_no_template = []
+
+        if courses_using_template:
+          for _, course in courses_using_template:
+            course_names_using.append({
+              'course_ID': course.course_ID,
+              'course_Name': course.course_Name
+            })
+    
+        if courses_no_template:
+          for _, course in courses_no_template:
+            course_name_no_template.append({
+              'course_ID': course.course_ID,
+              'course_Name': course.course_Name
+            })
+
+        print(course_names_using)
+        print(course_name_no_template)
+        return {"code": 200, "course_names_using": course_names_using, "course_name_no_template": course_name_no_template}, 200
+
+      except Exception as e:
+        return {"code": 404, "message": "Failed" + str(e)}, 404
+         
+
+         
+
+# delete_feedback_template = api.parser()
+# delete_feedback_template.add_argument("template_ID", help="Feedback Template ID")
+# delete_feedback_template.add_argument("user_ID", help="User ID")
+# @api.route('/delete_feedback_template')
+# @api.doc(description="Delete Feedback Template")
+# class DeleteFeedbackTemplate(Resource):
+#     @api.expect(delete_feedback_template)
+#     def post(self):
+#       try:
+#         args = delete_feedback_template.parse_args()
+#         templateID = args.get("template_ID")
+#         userID = args.get("user_ID") # not sure if is needed
+#         feedback_template = FeedbackTemplate.query.filter_by(template_ID = templateID).first()
+#         if feedback_template:
+#           template_attributes = TemplateAttribute.query.filter_by(template_ID = templateID).all()
+#           if template_attributes:
+#             template_attributes_options = InputOption.query.filter_by(template_Attribute_ID in template_attributes.template_attribute_ID).all()
+#             if template_attributes_options:
+#               db.session.delete(template_attributes_options)
+#             db.session.delete(template_attributes)
+#           db.session.delete(feedback_template)                                 
+#         db.session.commit()
+#         return {"code": 200, "message": "Delete Feedback Template Successfully"}, 200
+#       except Exception as e:
+#         return {"code": 404, "message": "Failed " + str(e)}, 404
 
 
 def format_date_time(value):
