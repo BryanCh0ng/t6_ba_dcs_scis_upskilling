@@ -1,9 +1,8 @@
 <template>
     <div>
-    
-      <div class="container col-12 table-responsive">
+      <div class="container col-12">
         <h5 class="pb-3">All Feedback Templates</h5>
-        <div v-if="feedback_templates && feedback_templates.length > 0">
+        <div v-if="feedback_templates && feedback_templates.length > 0" class="table-responsive">
           <table class="table bg-white" style="table-layout: fixed;">
             <thead>
               <tr class="text-nowrap">
@@ -23,9 +22,9 @@
                   {{ convertDate(feedback_template.created_On) }}
                 </td>
                 <td class="d-flex">
-                  <div><button class="btn btn-info apply_to_course text-light font-weight-bold text-nowrap">Apply to Course(s)</button></div>
+                  <div><button class="btn btn-info apply_to_course text-light font-weight-bold text-nowrap" @click="openModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#assign_feedback_template_modal">Apply to Course(s)</button></div>
                   <div><button class="m-4 mt-0 mb-0 btn btn-edit edit text-light font-weight-bold text-nowrap" @click="goToEditFeedbackTemplate(feedback_template.template_ID)">Edit</button></div>
-                  <div><button class="btn btn-danger delete text-light font-weight-bold text-nowrap">Delete</button></div>
+                  <div><button class="btn btn-danger delete text-light font-weight-bold text-nowrap" @click="openModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#delete_feedback_template_modal">Delete</button></div>
                 </td>
               </tr>               
             </tbody>
@@ -38,11 +37,17 @@
       </div>
       <vue-awesome-paginate v-if="feedback_templates.length/itemsPerPage > 0" v-model="localCurrentPageFeedbackTemplates" :totalItems="feedback_templates.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeFeedbackTemplates" class="justify-content-center pagination-container"/>
       
-      <!-- <div class="modal fade" id="after_action_modal" tabindex="-1" aria-hidden="true" ref="afterActionModal">
+      <div class="modal fade" id="delete_feedback_template_modal" tabindex="-1" aria-hidden="true" ref="deleteFeedbackTemplateModal">
         <div class="modal-dialog modal-lg"> 
-          <modal-after-action  @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
+          <delete-feedback-template-modal  v-if="showModal" @model-after-action-close="modalAfterActionClose" :feedback_template="selectedFeedbackTemplate" @close-modal="closeModal" />
         </div>
-      </div> -->
+      </div>
+
+      <div class="modal fade" id="assign_feedback_template_modal" tabindex="-1" aria-hidden="true" ref="assignFeedbackTemplateModal">
+        <div class="modal-dialog modal-lg"> 
+          <assign-feedback-template-modal  v-if="showModal" @model-after-action-close="modalAfterActionClose" :feedback_template="selectedFeedbackTemplate" @close-modal="closeModal" />
+        </div>
+      </div>
   
     </div>
   
@@ -54,13 +59,15 @@
   import CourseService from "@/api/services/CourseService.js";
   import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js";
   import {convertDate} from '@/scripts/common/convertDateTime.js'
-  // import modalAfterAction from '@/components/course/modalAfterAction.vue';
+  import DeleteFeedbackTemplateModal from '@/components/feedbackTemplate/DeleteFeedbackTemplateModal.vue'
+  import AssignFeedbackTemplateModal from '@/components/feedbackTemplate/AssignFeedbackTemplateModal.vue'
   
   export default {
     components: {
       sortIcon,
       VueAwesomePaginate,
-      // modalAfterAction
+      DeleteFeedbackTemplateModal,
+      AssignFeedbackTemplateModal
     },
     data() {
       return {
@@ -70,8 +77,9 @@
         selectedCourse: null,
         itemsPerPage: 10,
         localCurrentPageFeedbackTemplates: 1,
-        receivedMessage: '',
-        actionCourse: {}
+        actionCourse: {},
+        showModal: false,
+        selectedFeedbackTemplate: null
       }
     },
     computed: {
@@ -95,6 +103,7 @@
       },
       async loadData() {
         try {
+          console.log('load')
           let response = await FeedbackTemplateService.getAllTemplates()
           this.feedback_templates = response
         } catch (error) {
@@ -128,23 +137,27 @@
       goToEditFeedbackTemplate(feedback_template_id) {
         this.$router.push({ name: 'editFeedbackTemplate', params: {id: feedback_template_id}})
       },
+      openModal(feedback_template) {
+        this.selectedFeedbackTemplate = feedback_template;
+        this.showModal = true;
+      }
     },
     created() {
      this.loadData();
     },
-    // mounted() {
-    //   const buttonElement = document.createElement('button');
-    //   buttonElement.className = 'btn btn-primary d-none invisible-btn';
-    //   buttonElement.setAttribute('data-bs-toggle', 'modal');
-    //   buttonElement.setAttribute('data-bs-target', '#after_action_modal');
-    //   this.$el.appendChild(buttonElement);
-    //   const modalElement = this.$refs.afterActionModal;
-    //   modalElement.addEventListener('hidden.bs.modal', this.modalAfterActionClose);
-    // },
-    // beforeUnmount() {
-    //   const modalElement = this.$refs.afterActionModal;
-    //   modalElement.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
-    // },
+    mounted() {
+      const buttonElement = document.createElement('button');
+      buttonElement.className = 'btn btn-primary d-none invisible-btn';
+      buttonElement.setAttribute('data-bs-toggle', 'modal');
+      buttonElement.setAttribute('data-bs-target', '#delete_feedback_template_modal');
+      this.$el.appendChild(buttonElement);
+      const modalElement = this.$refs.deleteFeedbackTemplateModal;
+      modalElement.addEventListener('hidden.bs.modal', this.modalAfterActionClose);
+    },
+    beforeUnmount() {
+      const modalElement = this.$refs.deleteFeedbackTemplateModal;
+      modalElement.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
+    },
     }
   </script>
   
