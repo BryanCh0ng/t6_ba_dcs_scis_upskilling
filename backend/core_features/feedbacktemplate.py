@@ -178,22 +178,19 @@ class GetTemplate(Resource):
         else:
             return {"message": "Template ID already exists"}, 409
 
-get_run_courses_by_template_id = api.parser()
-get_run_courses_by_template_id.add_argument("template_id", help="Enter template id")
-@api.route("/get_run_courses_by_template_id")
-@api.doc(description="Get Run Courses by tempate id")
-class GetTemplate(Resource):
-    @api.expect(get_run_courses_by_template_id)
+get_courses_by_template_id = api.parser()
+get_courses_by_template_id.add_argument("template_id", help="Enter template id")
+@api.route("/get_courses_by_template_id")
+@api.doc(description="Get Courses by tempate id")
+class GetCoursesByTemplateId(Resource):
+    @api.expect(get_courses_by_template_id)
     def get(self):
-      templateID = get_run_courses_by_template_id.parse_args().get("template_id")
+      templateID = get_courses_by_template_id.parse_args().get("template_id")
       query = db.session.query(
           FeedbackTemplate,
-          RunCourse,
           Course
       ).select_from(FeedbackTemplate).join(
-          RunCourse, FeedbackTemplate.template_ID == RunCourse.template_ID
-      ).join(
-          Course, RunCourse.course_ID == Course.course_ID
+          Course, FeedbackTemplate.template_ID == Course.template_ID
       ).filter(
           FeedbackTemplate.template_ID == templateID
       )
@@ -201,10 +198,10 @@ class GetTemplate(Resource):
       db.session.close()
       if query_results:
         courses = []
-        for _, runcourse, course in query_results:
+        for _, course in query_results:
             courses.append({
               "course_Name": course.course_Name,
-              "runcourse_id": runcourse.rcourse_ID
+              "course_ID": course.course_ID
             })
         return {"code": 200, "data": {"courses": courses}}, 200
       return {"code": 404, "message": "Failed to retrieve run courses by template id"}, 404
@@ -269,16 +266,13 @@ class GetCourseNamesByFeedbackTemplateId(Resource):
               'course_Name': course.course_Name
             })
 
-        print(course_names_using)
-        print(course_name_no_template)
         return {"code": 200, "course_names_using": course_names_using, "course_name_no_template": course_name_no_template}, 200
 
       except Exception as e:
         return {"code": 404, "message": "Failed" + str(e)}, 404
          
 
-         
-
+        
 # delete_feedback_template = api.parser()
 # delete_feedback_template.add_argument("template_ID", help="Feedback Template ID")
 # delete_feedback_template.add_argument("user_ID", help="User ID")
