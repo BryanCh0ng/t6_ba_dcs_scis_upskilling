@@ -35,8 +35,8 @@
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                 <td v-if="course.course_Status === 'Active'"><course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
                 <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-                <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course" @click="goToEditRunCourseWithId(course.rcourse_ID)"></course-action></td>
-                <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course" @click="goToCreateRunCourse(course.course_ID)"></course-action></td>
+                <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action></td>
+                <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course" @click="goToCreateRunCourseWithId(course.course_ID)"></course-action></td>
                 <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Retire" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
               </tr>               
             </tbody>
@@ -176,10 +176,10 @@
             this.courses = sort_response.data
           }
       },
-      goToEditRunCourseWithId(runcourseID) {
-        this.$router.push({ name: 'editRunCourse', params: {id: runcourseID}})
+      goToEditCourseWithId(courseID) {
+        this.$router.push({ name: 'editCourse', params: {id: courseID}})
       },
-      goToCreateRunCourse(courseID){
+      goToCreateRunCourseWithId(courseID){
         this.$router.push({ name: 'createRunCourse', params: {id: courseID}});
       },
       goToCreateCourse() {

@@ -86,6 +86,9 @@ export default {
         view: {
             type: String,
             required: true
+        },
+        courseId: {
+            type: Number
         }
     },
     setup() {
@@ -107,7 +110,7 @@ export default {
             buttonType: "",
             showAlert: false,
             //Suppose to get from the view proposed course page 
-            courseID: 1,
+            courseID: 0,
             coursecatID: 0,
             createCourseResponse: {},
             userID: 0,
@@ -151,11 +154,16 @@ export default {
             this.userRole = await UserService.getUserRole();
 
             if (!this.showAlert) {
-                if (this.userRole === 'Student' ) {
-                    this.$router.push({ name: 'studentViewProfile'});
-                } else if (this.userRole === 'Instructor' || this.userRole === 'Trainer') {
-                    this.$router.push({ name: 'instructorTrainerViewProfile'});
+                if(this.view === "proposeCourse"){
+                    if (this.userRole === 'Student' ) {
+                        this.$router.push({ name: 'studentViewProfile'});
+                    } else if (this.userRole === 'Instructor' || this.userRole === 'Trainer') {
+                        this.$router.push({ name: 'instructorTrainerViewProfile'});
+                    }
+                } else{
+                    this.$router.push('/adminViewCourse');
                 }
+               
             }
         },
         async fetchCourseCategories() {
@@ -171,7 +179,7 @@ export default {
         },
         async fetchCourseByID() {
             try {
-                const courseData = await CourseService.getCourseById(this.courseID);
+                const courseData = await CourseService.getCourseById(this.courseId);
 
                 this.formData.courseName = courseData.data.course[0].course_Name;
                 this.coursecatID = courseData.data.course[0].coursecat_ID;
@@ -240,7 +248,8 @@ export default {
         },
         async updateCourse() {
             try {
-                this.updateCourseResponse = await CourseService.editCourse(this.courseID, this.submitFormData);
+                console.log(this.courseId)
+                this.updateCourseResponse = await CourseService.editCourse(this.courseId, this.submitFormData);
 
             } catch (error) {
                 console.error('Error updating the course:', error);
@@ -303,13 +312,18 @@ export default {
                     this.submitFormData["course_Desc"] = this.formData.courseDescription;
 
                     this.submitFormData["coursecat_ID"] = this.formData.courseCategories.find(i => i.coursecat_Name === this.formData.selectedCategory).coursecat_ID;
+
+                    this.submitFormData["course_Status"] = "Active";
                     
                     if(this.view === "createCourse") {
+
                         await this.createCourse();
                         
                         this.setSuccessAlert("Course Creation");
 
                     } else if (this.view === "proposeCourse") {
+                        this.submitFormData["course_Status"] = "Inactive";
+
                         await this.createCourse();
                         
                         this.submitFormData = {};
