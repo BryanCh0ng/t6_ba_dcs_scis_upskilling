@@ -196,6 +196,15 @@ const routes = [
         title: 'Admin View Course',
    
     }
+  },
+  {
+    path: '/viewDashboard',
+    name: 'viewDashboard',
+    component: () => import('../views/dashboard/viewDashboard.vue'),
+    meta: {
+        title: 'View Dashboard',
+   
+    }
   }
   
 
