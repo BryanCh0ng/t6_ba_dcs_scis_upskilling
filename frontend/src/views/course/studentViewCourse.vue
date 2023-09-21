@@ -14,9 +14,9 @@
       :search-api="searchUnregisteredActiveInfo"
       @search-complete="handleSearchCompleteRun" />
   
-      <div class="container col-12 table-responsive">
+      <div class="container col-12">
         <h5 class="pb-3">All Courses Available to Register</h5>
-        <div v-if="run_courses && run_courses.length > 0">
+        <div v-if="run_courses && run_courses.length > 0" class="table-responsive">
           <table class="table bg-white">
             <thead>
               <tr class="text-nowrap">
@@ -141,7 +141,9 @@ export default {
       localCurrentPageVoteCourse: 1,
       activeTab: 'course_reg',
       receivedMessage: '',
-      actionCourse: {}
+      actionCourse: {},
+      search_course_name: null,
+      search_course_category: null
     }
   },
   computed: {
@@ -177,6 +179,8 @@ export default {
       this.vote_courses = searchResults;
     },
     async searchUnregisteredActiveInfo(user_ID, course_Name, coursecat_ID) {
+      this.search_course_name = course_Name
+      this.search_course_category = coursecat_ID
       try {
         // console.log(course_Name)
         let response = await CourseService.searchUnregisteredActiveInfo(
@@ -192,6 +196,8 @@ export default {
       }
     },
     async searchUnvotedActiveInfo(user_ID, course_Name, coursecat_ID) {
+      this.search_course_name = course_Name
+      this.search_course_category = coursecat_ID
       try {
         // console.log(coursecat_ID)
         let response = await CourseService.searchUnvotedActiveInfo(
@@ -214,10 +220,10 @@ export default {
     },
     async loadData() {
       try {
-        let run_response = await CourseService.searchUnregisteredActiveInfo(1, null, null)
+        let run_response = await CourseService.searchUnregisteredActiveInfo(1, this.search_course_name, this.search_course_category)
         this.run_courses = run_response.data
         
-        let vote_response = await CourseService.searchUnvotedActiveInfo(1, null, null)
+        let vote_response = await CourseService.searchUnvotedActiveInfo(1, this.search_course_name, this.search_course_category)
         this.vote_courses = vote_response.data
       } catch (error) {
         console.error("Error fetching course details:", error);

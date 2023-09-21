@@ -2,12 +2,11 @@
   <div>
     <search-filter
       :status-options="statusOptions"
-      :search-api="searchAllCoursesAdmin" 
-      @search-complete="handleSearchComplete" 
-      :default-status="'Active'" />
-    <div class="container col-12 table-responsive">
+      :search-api="searchAllRunCoursesAdmin" 
+      @search-complete="handleSearchComplete"/>
+    <div class="container col-12">
       <h5 class="pb-3">All Run Courses</h5>
-      <div v-if="courses && courses.length > 0">
+      <div v-if="courses && courses.length > 0" class="table-responsive">
         <table class="table bg-white">
           <thead>
             <tr class="text-nowrap">
@@ -19,8 +18,6 @@
                 <a href="" @click.prevent="sort('reg_Enddate')" class="text-decoration-none text-dark">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
               <th scope="col">
                 <a href="" @click.prevent="sort('runcourse_Status')" class="text-decoration-none text-dark">Run Status <sort-icon :sortColumn="sortColumn === 'runcourse_Status'" :sortDirection="getSortDirection('runcourse_Status')"/></a></th>
-              <th scope="col">
-                <a href="" @click.prevent="sort('course_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'course_Status'" :sortDirection="getSortDirection('course_Status')"/></a></th>
               <th scope="col">Feedback Analysis</th>
               <th scope="col">Course Details</th>
               <th scope="col">Action(s)</th>
@@ -38,22 +35,17 @@
                 <course-date-time :date="course.reg_Enddate" :time="course.reg_Endtime"></course-date-time>
               </td>
               <td>{{ course.runcourse_Status }}</td>
-              <td>{{ course.course_Status }}</td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-              <td v-if="course.course_Status === 'Active'"><course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-              <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-              <td v-else><course-action :status="course.course_Status" :course="course"></course-action></td>
-              <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course" @click="goToEditRunCourseWithId(course.rcourse_ID)"></course-action></td>
-              <td v-if="course.course_Status =='Inactive' && course.runcourse_Status=='Closed'">
-                <course-action @action-and-message-updated="handleActionData"  status="Retire" :course="course" :courseName="course.courseName" ></course-action>
+              <td v-if="course.runcourse_Status=='Ongoing'">
+                <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
               </td>
-              <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course" @click="goToCreateRunCourse(course.course_ID)"></course-action></td>
-              <td v-if="course.course_Status =='Inactive' && course.runcourse_Status=='Closed'">
+              <td v-else-if="course.runcourse_Status=='Closed'">
                 <course-action @action-and-message-updated="handleActionData" status="open_for_registration" :course="course" :courseName="course.courseName" ></course-action>
               </td>
-              <td v-else-if="course.course_Status =='Active' && course.runcourse_Status=='Ongoing'">
-                <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
+              <td><course-action status="Edit" :course="course" @click="goToEditRunCourseWithId(course.rcourse_ID)"></course-action></td>
+              <td v-if="course.runcourse_Status=='Closed'">
+                <course-action @action-and-message-updated="handleActionData" status="delete-run-course" :course="course" :courseName="course.courseName" ></course-action>
               </td>
             </tr>               
           </tbody>
@@ -109,9 +101,12 @@ export default {
       selectedCourse: null,
       itemsPerPage: 10,
       localCurrentPageCourses: 1,
-      statusOptions: ["Active", "Inactive", "Retired"],
+      statusOptions: ["Ongoing", "Closed"],
       receivedMessage: '',
-      actionCourse: {}
+      actionCourse: {},
+      search_status: null,
+      search_course_name: null,
+      search_course_category: null
     }
   },
   computed: {
@@ -139,9 +134,12 @@ export default {
       this.courses = searchResults;
       
     },
-    async searchAllCoursesAdmin(courseName, coursecat_ID, status) {
+    async searchAllRunCoursesAdmin(courseName, coursecat_ID, status) {
+      this.search_course_name = courseName
+      this.search_course_category = coursecat_ID
+      this.search_status = status
       try {
-        let response = await CourseService.searchAllCoursesAdmin(courseName, coursecat_ID, status);
+        let response = await CourseService.searchAllRunCoursesAdmin(courseName, coursecat_ID, status);
         this.courses = response.data;
         
         return this.courses;
@@ -158,7 +156,7 @@ export default {
     },
     async loadData() {
       try {
-        let response = await CourseService.searchAllCoursesAdmin(null, null, "Active")
+        let response = await CourseService.searchAllRunCoursesAdmin(this.search_course_name, this.search_course_category, this.search_status)
         this.courses = response.data
       } catch (error) {
         console.error("Error fetching course details:", error);

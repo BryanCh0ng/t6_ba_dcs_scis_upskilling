@@ -16,46 +16,46 @@ api = Namespace('course', description='Course related operations')
 # get_course_by_id()
 # create_new_course()
 
-retrieve_all_courses = api.parser()
-retrieve_all_courses.add_argument("course_name", help="Enter course name")
-@api.route("/get_all_courses")
-@api.doc(description="Get all courses")
-class GetAllCourses(Resource):
-	@api.expect(retrieve_all_courses)
-	def get(self):
-		arg = retrieve_all_courses.parse_args().get("course_name")
-		course_Name = arg if arg else ""
-		courseList = Course.query.filter(Course.course_Name.contains(course_Name)).all()
-		db.session.close()
-		if len(courseList):
-			return jsonify(
-				{
-					"code": 200,
-					"data": {
-						"course": [course.json() for course in courseList]
-					}
-				}
-			)
-		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
+# retrieve_all_courses = api.parser()
+# retrieve_all_courses.add_argument("course_name", help="Enter course name")
+# @api.route("/get_all_courses")
+# @api.doc(description="Get all courses")
+# class GetAllCourses(Resource):
+# 	@api.expect(retrieve_all_courses)
+# 	def get(self):
+# 		arg = retrieve_all_courses.parse_args().get("course_name")
+# 		course_Name = arg if arg else ""
+# 		courseList = Course.query.filter(Course.course_Name.contains(course_Name)).all()
+# 		db.session.close()
+# 		if len(courseList):
+# 			return jsonify(
+# 				{
+# 					"code": 200,
+# 					"data": {
+# 						"course": [course.json() for course in courseList]
+# 					}
+# 				}
+# 			)
+# 		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
 
-retrieve_all_courses_hr = api.parser()
-@api.route("/get_all_courses_admin")
-@api.doc(description="Get all courses (Admin)")
-class GetAllCoursesHR(Resource):
-	@api.expect(retrieve_all_courses_hr)
-	def get(self):
-		courseList = Course.query.all()
-		db.session.close()
-		if len(courseList):
-			return jsonify(
-				{
-					"code": 200,
-					"data": {
-						"course": [course.json() for course in courseList]
-					}
-				}
-			)
-		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
+# retrieve_all_courses_hr = api.parser()
+# @api.route("/get_all_courses_admin")
+# @api.doc(description="Get all courses (Admin)")
+# class GetAllCoursesHR(Resource):
+# 	@api.expect(retrieve_all_courses_hr)
+# 	def get(self):
+# 		courseList = Course.query.all()
+# 		db.session.close()
+# 		if len(courseList):
+# 			return jsonify(
+# 				{
+# 					"code": 200,
+# 					"data": {
+# 						"course": [course.json() for course in courseList]
+# 					}
+# 				}
+# 			)
+# 		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
 
 retrieve_all_courses_filter_search = api.parser()
 retrieve_all_courses_filter_search.add_argument("course_name", help="Enter course name")
@@ -65,7 +65,7 @@ retrieve_all_courses_filter_search.add_argument("coursecat_id", help="Enter cour
 class GetAllCoursesFilterSearch(Resource):
 	@api.expect(retrieve_all_courses_filter_search)
 	def get(self):
-		arg = retrieve_all_courses.parse_args().get("course_name")
+		arg = retrieve_all_courses_filter_search.parse_args().get("course_name")
 		course_Name = arg if arg else ""
 		arg2 = retrieve_all_courses_filter_search.parse_args().get("coursecat_id")
 		coursecat_ID = arg2 if arg2 else ""
@@ -110,16 +110,17 @@ class DeleteCourse(Resource):
             return "Failed. " + str(e), 500
         
 delete_runcourse = api.parser()
-delete_runcourse.add_argument("course_id", help="Enter course id")
+delete_runcourse.add_argument("rcourse_ID", help="Enter run course id")
 @api.route("/delete_runcourse")
 @api.doc(description="Delete run course")
 class DeleteCourse(Resource):
     @api.expect(delete_runcourse)
     def delete(self):    
         try:
-            courseID = delete_runcourse.parse_args().get("course_id")
-            
-            runCourse = RunCourse.query.filter_by(course_ID=courseID).first()            
+            rcourse_ID = delete_runcourse.parse_args().get("rcourse_ID")
+            # app.logger.debug(rcourse_ID)
+
+            runCourse = RunCourse.query.filter_by(rcourse_ID=rcourse_ID).first()            
             if(runCourse):
                     try:
                         db.session.delete(runCourse)              
@@ -252,7 +253,7 @@ class GetUnregisteredActiveCourses(Resource):
             CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
         ).filter(
             ~RunCourse.rcourse_ID.in_(registered_course_ids),
-            RunCourse.course_Status == "active",
+            Course.course_Status == "active",
             RunCourse.runcourse_Status == "ongoing",
             RunCourse.reg_Enddate >= current_datetime.date(),
             (RunCourse.reg_Enddate > current_datetime.date()) | (RunCourse.reg_Endtime > current_time)
@@ -1110,7 +1111,7 @@ class GetAllCoursesWithRegistrationCount(Resource):
         args = retrieve_all_courses_admin.parse_args()
         course_name = args.get("course_name", "")
         course_category_id = args.get("coursecat_id", "")
-        course_status = args.get("course_status", "")
+        runcourse_status = args.get("course_status", "")
 
         query = db.session.query(
             Course,
@@ -1125,8 +1126,8 @@ class GetAllCoursesWithRegistrationCount(Resource):
             query = query.filter(Course.course_Name.contains(course_name))
         if course_category_id:
             query = query.filter(Course.coursecat_ID == course_category_id)
-        if course_status:
-            query = query.filter(RunCourse.course_Status == course_status)
+        if runcourse_status:
+            query = query.filter(RunCourse.runcourse_Status == runcourse_status)
 
         results = query.all()
         db.session.close()
@@ -1216,16 +1217,16 @@ class GetAllInstructorsAndTrainers(Resource):
         return jsonify({"code": 404, "message": "No instructors or trainers found"})
 
 
-# Admin - Get All Run Course
-retrieve_all_run_courses_admin = api.parser()
-retrieve_all_run_courses_admin.add_argument("course_name", help="Enter course name")
-retrieve_all_run_courses_admin.add_argument("coursecat_id", help="Enter course category id")
-retrieve_all_run_courses_admin.add_argument("course_status", help="Enter run course status")
+# Admin - Get All Course
+retrieve_all_courses_admin = api.parser()
+retrieve_all_courses_admin.add_argument("course_name", help="Enter course name")
+retrieve_all_courses_admin.add_argument("coursecat_id", help="Enter course category id")
+retrieve_all_courses_admin.add_argument("course_status", help="Enter run course status")
 
-@api.route("/get_all_run_courses")
+@api.route("/get_all_courses")
 @api.doc(description="Get all run courses")
 class GetAllCourses(Resource):
-    @api.expect(retrieve_all_run_courses_admin)
+    @api.expect(retrieve_all_courses_admin)
     def get(self):
         args = retrieve_all_courses_admin.parse_args()
         course_name = args.get("course_name", "")
@@ -1235,8 +1236,7 @@ class GetAllCourses(Resource):
         query = db.session.query(
             Course,
             CourseCategory.coursecat_Name,
-            RunCourse,
-        ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).join(
+        ).select_from(Course).join(
             CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
         )
 
@@ -1245,7 +1245,7 @@ class GetAllCourses(Resource):
         if course_category_id:
             query = query.filter(Course.coursecat_ID == course_category_id)
         if course_status:
-            query = query.filter(RunCourse.course_Status == course_status)
+            query = query.filter(Course.course_Status == course_status)
 
         results = query.all()
         db.session.close()
@@ -1253,23 +1253,9 @@ class GetAllCourses(Resource):
         if results:
             result_data = []
             for result in results:
-                run_course_attrs = {
-                    'run_Startdate': format_date_time(result[2].run_Startdate),
-                    'run_Enddate': format_date_time(result[2].run_Enddate),
-                    'run_Starttime': format_date_time(result[2].run_Starttime),
-                    'run_Endtime': format_date_time(result[2].run_Endtime),
-                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
-                }
-
-                modified_run_course = {**result[2].json(), **run_course_attrs}
-
                 course_info = {
                     **result[0].json(),
                     "coursecat_Name": result[1],
-                    **modified_run_course
                 }
                 result_data.append(course_info)
             return jsonify({"code": 200, "data": result_data})
@@ -1277,41 +1263,59 @@ class GetAllCourses(Resource):
         return jsonify({"code": 404, "message": "No courses found"})
     
 
-# Cancel/Deactivate Button in adminViewRunCourse
-deactivate_runcourse = api.parser()
-deactivate_runcourse.add_argument("course_id", help="Enter course id")
-@api.route("/deactivate_runcourse")
+# Cancel/Deactivate Button in adminViewCourse
+deactivate_course = api.parser()
+deactivate_course.add_argument("course_id", help="Enter course id")
+@api.route("/deactivate_course")
 @api.doc(description="Cancel or deactivate a run course")
 class DeactivateCourse(Resource):
-    @api.expect(deactivate_runcourse)
+    @api.expect(deactivate_course)
     def post(self):
         try:
-            args = deactivate_runcourse.parse_args()
-            courseID = args.get("course_id")
-            
-            runCourse = RunCourse.query.filter_by(course_ID=courseID).first()
-            
-            if runCourse:
-                if runCourse.course_Status == 'Active':
-                    if runCourse.runcourse_Status == 'Ongoing':
-                        # Update the course and registration status
-                        runCourse.course_Status = 'Inactive'
-                        runCourse.runcourse_Status = 'Closed'
-                    elif runCourse.runcourse_Status == 'Closed':
-                        # Update only the course status
-                        runCourse.course_Status = 'Inactive'
-                    db.session.commit()
+            args = deactivate_course.parse_args()
+            course_id = args.get("course_id")
 
-                    return jsonify({"code": 200, "message": "Run Course has been canceled or deactivated"})
- 
+            current_datetime = datetime.now()
+            current_time = current_datetime.strftime('%H:%M:%S')
+            
+            # Query the database for the RunCourse with the specified course_id
+            run_course = RunCourse.query.filter_by(course_ID=course_id).first()
+            course = Course.query.filter_by(course_ID=course_id).first()
+            
+            if run_course:
+                if course.course_Status == 'Active':
+                    if run_course.runcourse_Status == 'Closed':
+                        # Check if there are any ongoing run courses for this course ID and date
+                        ongoing_classes = RunCourse.query.filter(
+                            RunCourse.course_ID == course_id
+                        ).filter(RunCourse.run_Startdate <= current_datetime.date(),
+                            RunCourse.run_Enddate >= current_datetime.date(),
+                            RunCourse.run_Endtime >= current_time).all()
+                        
+                        length_of_ongoing_classes = len(ongoing_classes)
+                        # app.logger.debug(length_of_ongoing_classes)
+
+                        
+                        if length_of_ongoing_classes == 0:
+                            # No ongoing run courses, update the course and registration status
+                            course.course_Status = 'Inactive'
+                            db.session.commit()
+                            return jsonify({"code": 200, "message": "Course has been canceled or deactivated"})
+                        else:
+                            return jsonify({"code": 400, "message": "Cannot deactivate. There are ongoing classes."})
+                    elif run_course.runcourse_Status == 'Ongoing':
+                        # Update only the course status
+                        course.course_Status = 'Inactive'
+                        run_course.runcourse_Status = 'Closed'
+                        db.session.commit()
+                        return jsonify({"code": 200, "message": "Course has been canceled or deactivated"})
                 else:
                     return jsonify({"code": 400, "message": "Course is not active, cannot be canceled"})
             else:
-                return json.loads(json.dumps({"message": "Course is not active, cannot be canceled"})), 404
+                return jsonify({"code": 404, "message": "Course not found"})
 
         except Exception as e:
-            return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
-
+            return jsonify({"code": 500, "message": "Failed: " + str(e)})
 
 # Retire button in the adminViewRunCourse 
 # when course_Status = Inactive and runcourse_Status = Closed, changed the course_Status to Retired
@@ -1326,15 +1330,23 @@ class RetireCourse(Resource):
             args = retire_course.parse_args()
             courseID = args.get("course_id")
             
-            runCourse = RunCourse.query.filter_by(course_ID=courseID).first()
-            
-            if runCourse:
-                if runCourse.course_Status == 'Inactive' and runCourse.runcourse_Status == 'Closed':
-                    runCourse.course_Status = 'Retired'
-                    db.session.commit()
-                    return jsonify({"code": 200, "message": "Course has been retired"})
+            course = Course.query.filter_by(course_ID=courseID).first()
+            runCourses = RunCourse.query.filter_by(course_ID=courseID).all()
+            app.logger.debug(runCourses)
+
+            if course:
+                # Check if the course is inactive
+                if course.course_Status == 'Inactive':
+                    # Check if all associated run courses are closed
+                    if all(runCourse.runcourse_Status == 'Closed' for runCourse in runCourses):
+                        # Activate the course and commit the changes
+                        course.course_Status = 'Retired'
+                        db.session.commit()
+                        return jsonify({"code": 200, "message": "Course has been retired"})
+                    else:
+                        return jsonify({"code": 400, "message": "Course cannot be retired"})
                 else:
-                    return jsonify({"code": 400, "message": "Course cannot be retired"})
+                    return jsonify({"code": 400, "message": "There is no such run course to retire"})
             else:
                 return jsonify({"code": 404, "message": "There is no such run course"})
 
@@ -1354,15 +1366,22 @@ class ActivateCourse(Resource):
             args = activate_course.parse_args()
             courseID = args.get("course_id")
             
-            runCourse = RunCourse.query.filter_by(course_ID=courseID).first()
+            course = Course.query.filter_by(course_ID=courseID).first()
+            runCourses = RunCourse.query.filter_by(course_ID=courseID).all()
             
-            if runCourse:
-                if runCourse.course_Status == 'Inactive' and runCourse.runcourse_Status == 'Closed':
-                    runCourse.course_Status = 'Active'
-                    db.session.commit()
-                    return jsonify({"code": 200, "message": "Course has been activated"})
+            if course:
+                # Check if the course is inactive
+                if course.course_Status == 'Inactive':
+                    # Check if all associated run courses are closed
+                    if all(runCourse.runcourse_Status == 'Closed' for runCourse in runCourses):
+                        # Activate the course and commit the changes
+                        course.course_Status = 'Active'
+                        db.session.commit()
+                        return jsonify({"code": 200, "message": "Course has been activated"})
+                    else:
+                        return jsonify({"code": 400, "message": "Course cannot be activated because not all run courses are closed"})
                 else:
-                    return jsonify({"code": 400, "message": "Course cannot be activated"})
+                    return jsonify({"code": 400, "message": "There is no such run course to activate"})
             else:
                 return jsonify({"code": 404, "message": "There is no such run course"})
 

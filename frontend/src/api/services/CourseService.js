@@ -2,22 +2,22 @@ import { axiosClient } from "../axiosClient";
 import BaseApiService from "../BaseApiService";
 
 class CourseService extends BaseApiService {
-    async getAllCourses(filter) {
-        try {
-            let courses = await axiosClient.get("/course/get_all_courses", { params: { skill_name: filter } });
-            return courses.data
-        } catch (error) {
-            return this.handleError(error);
-        }
-    }
-    async getAllCoursesAdmin() {
-        try {
-            let courses = await axiosClient.get("/course/get_all_courses_admin");
-            return courses.data
-        } catch (error) {
-            return this.handleError(error);
-        }
-    }
+    // async getAllCourses(filter) {
+    //     try {
+    //         let courses = await axiosClient.get("/course/get_all_courses", { params: { skill_name: filter } });
+    //         return courses.data
+    //     } catch (error) {
+    //         return this.handleError(error);
+    //     }
+    // }
+    // async getAllCoursesAdmin() {
+    //     try {
+    //         let courses = await axiosClient.get("/course/get_all_courses_admin");
+    //         return courses.data
+    //     } catch (error) {
+    //         return this.handleError(error);
+    //     }
+    // }
     async getCourseById(courseId) {
         try {
             let course = await axiosClient.get("/course/get_course_by_id", { params: { course_id: courseId } });
@@ -26,14 +26,14 @@ class CourseService extends BaseApiService {
             return this.handleError(error);
         }
     }
-    async searchFilterCourses(courseId, coursecatId) {
-        try {
-            let courses = await axiosClient.get("/course/retrieve_all_courses_filter_search", { params: { course_id: courseId, coursecat_id: coursecatId } })
-            return courses.data
-        } catch (error) {
-            return this.handleError(error);
-        }
-    }
+    // async searchFilterCourses(courseId, coursecatId) {
+    //     try {
+    //         let courses = await axiosClient.get("/course/retrieve_all_courses_filter_search", { params: { course_id: courseId, coursecat_id: coursecatId } })
+    //         return courses.data
+    //     } catch (error) {
+    //         return this.handleError(error);
+    //     }
+    // }
     async deleteCourse(course_ID) {
         try {
             let deleteCourse = await axiosClient.delete("/course/delete_course", { params: { course_id: course_ID } });
@@ -43,9 +43,9 @@ class CourseService extends BaseApiService {
             return this.handleError(error);
         }
     }
-    async deleteRunCourse(course_ID) {
+    async deleteRunCourse(rcourse_ID) {
         try {
-            let deleteRunCourse = await axiosClient.delete("/course/delete_runcourse", { params: { course_id: course_ID } });
+            let deleteRunCourse = await axiosClient.delete("/course/delete_runcourse", { params: { rcourse_ID: rcourse_ID } });
             return deleteRunCourse.data
         } catch (error) {
             console.log("Cannot delete or update a parent row: a foreign key constraint fails");
@@ -286,7 +286,7 @@ class CourseService extends BaseApiService {
     }
 
     // Admin - All Courses with Reg Count 
-    async searchAllCoursesAdmin(course_Name, coursecat_ID, course_Status) {
+    async searchAllRunCoursesAdmin(course_Name, coursecat_ID, course_Status) {
         try {
 
             let response = await axiosClient.get("/course/get_all_courses_with_registration_count", {
@@ -320,11 +320,11 @@ class CourseService extends BaseApiService {
     }
 
 
-    // Admin - All Run Courses
-    async searchAllRunCourseAdmin(course_Name, coursecat_ID, course_Status) {
+    // Admin - All Courses
+    async searchAllCourseAdmin(course_Name, coursecat_ID, course_Status) {
         try {
 
-            let response = await axiosClient.get("/course/get_all_run_courses", {
+            let response = await axiosClient.get("/course/get_all_courses", {
                 params: {
                     course_name: course_Name,
                     coursecat_id: coursecat_ID,
@@ -341,7 +341,7 @@ class CourseService extends BaseApiService {
     // Cancel/Deactivate Button in adminViewRunCourse
     async deactivateRunCourse(course_ID) {
         try {
-            let deactivateRunCourse = await axiosClient.post("/course/deactivate_runcourse", { course_id: course_ID } );
+            let deactivateRunCourse = await axiosClient.post("/course/deactivate_course", { course_id: course_ID } );
             console.log(deactivateRunCourse)
             return deactivateRunCourse.data
         } catch (error) {
