@@ -123,15 +123,16 @@ class Course(db.Model):
     course_Name = db.Column(db.String(255), nullable=False)
     course_Desc = db.Column(db.String(800), nullable=False)
     coursecat_ID = db.Column(db.Integer, db.ForeignKey('coursecategory.coursecat_ID'), nullable=False)
+    course_Status = db.Column(db.String(255), nullable=False)
     template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'), nullable=False)
 
-
-    def __init__(self, course_ID, course_Name, course_Desc, coursecat_ID, template_ID):
+    def __init__(self, course_ID, course_Name, course_Desc, coursecat_ID, course_Status, template_ID):
         self.course_ID = course_ID
         self.course_Name = course_Name
         self.course_Desc = course_Desc
         self.coursecat_ID = coursecat_ID
         self.template_ID = template_ID        
+        self.course_Status = course_Status
 
 
     def json(self):
@@ -323,13 +324,12 @@ class RunCourse(db.Model):
     reg_Starttime = db.Column(Time, nullable=False)
     reg_Endtime = db.Column(Time, nullable=False)
     course_ID = db.Column(db.Integer, db.ForeignKey('course.course_ID'), nullable=False)
-    course_Status = db.Column(db.String(255), nullable=False)
 
 
     def __init__(self, run_Startdate, run_Enddate, run_Starttime, run_Endtime, instructor_ID,
                  course_Format, course_Venue, runcourse_Status, course_Size, course_Minsize, course_Fee,
                  class_Duration, reg_Startdate, reg_Enddate, reg_Starttime, reg_Endtime,
-                  course_ID, course_Status ):
+                  course_ID):
         self.run_Startdate = run_Startdate
         self.run_Enddate = run_Enddate
         self.run_Starttime = run_Starttime
@@ -347,7 +347,6 @@ class RunCourse(db.Model):
         self.reg_Starttime = reg_Starttime
         self.reg_Endtime = reg_Endtime
         self.course_ID = course_ID
-        self.course_Status =  course_Status    
 
 
     def json(self):

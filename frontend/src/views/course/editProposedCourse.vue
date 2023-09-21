@@ -4,9 +4,6 @@
       <h2 v-if="action == 'approve'" class="text-center mb-4">
         Edit Course (Proposed Course Approved)
       </h2>
-      <h2 v-else-if="action == 'promote_to_course'" class="text-center mb-4">
-        Edit Course (Promote to course)
-      </h2>
       <h2 v-else class="text-center mb-4">Edit Proposed Course</h2>
 
       <!-- Error Message -->
@@ -66,13 +63,6 @@
               Approve Proposed Course
             </button>
             <button
-              v-else-if="action == 'promote_to_course'"
-              type="submit"
-              class="btn btn-block shadow-sm w-100 mt-2 field submitbtn"
-            >
-              Promote to course
-            </button>
-            <button
               v-else
               type="submit"
               class="btn btn-block shadow-sm w-100 mt-2 field submitbtn"
@@ -97,7 +87,6 @@ import UserService from "@/api/services/UserService.js";
 import CourseCategoryService from "@/api/services/CourseCategoryService.js";
 import ProposedCourseService from "@/api/services/proposedCourseService.js";
 import CourseService from "@/api/services/CourseService.js";
-import VoteCourseService from "@/api/services/voteCourseService.js";
 import SuccessModal from "../../components/SuccessModal.vue";
 
 export default {
@@ -243,11 +232,6 @@ export default {
             approve_result = await acceptPromise;
             // console.log(approve_result);
         
-          } else if (this.action == 'promote_to_course') {
-            const course = await VoteCourseService.getVoteCourseByCourseId(courseId);
-            // console.log(course);
-            const updatePromise = VoteCourseService.promoteToCourse({ "vote_id": course['data'].vote_ID });
-            approve_result = await updatePromise;
           } else {
             approve_result = { code: 200 };
           }
@@ -269,9 +253,6 @@ export default {
         this.showSuccessModal = false;
         if (this.action == 'approve')
           this.$router.push({ name: 'adminViewProposedCourse'});
-        else if (this.action == 'promote_to_course') {
-          this.$router.push({ name: 'adminViewVoteCourse'});
-        }
         else {
           this.userRole = await UserService.getUserRole();
           

@@ -4,9 +4,9 @@
       :search-api="searchAllOngoingVoteCourse" 
       @search-complete="handleSearchComplete" />
 
-    <div class="container col-12 table-responsive">
+    <div class="container col-12">
       <h5 class="pb-3">Courses Available for Students to Indicate Interest</h5>
-      <div v-if="courses && courses.length > 0">
+      <div v-if="courses && courses.length > 0" class="table-responsive">
         <table class="table bg-white">
           <thead>
             <tr class="text-nowrap">

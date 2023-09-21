@@ -8,6 +8,14 @@
               <slot name="logo">
                 <img src="../assets/smulogo.png" title="smu logo" id="logo"/>
               </slot>
+              <div class="login_text mb-3 text-start">
+                <p class="lh-lg">
+                  <strong>SMU Student & Instructor (from SMU): </strong> Sign in with your SMU email address
+                  <br>
+                  <strong>External Trainer: </strong> Sign in with your organization email address
+                  <br><br>
+                </p>
+              </div>
             </div>
 
             <!-- Slot for form content -->
