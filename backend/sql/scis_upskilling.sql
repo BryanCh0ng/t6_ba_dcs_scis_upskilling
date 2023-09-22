@@ -126,7 +126,11 @@ CREATE TABLE IF NOT EXISTS `feedbacktemplate`(
 
 INSERT INTO feedbacktemplate VALUES
 	(1, 'Feedback 1', '2023-07-25');
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 4c333b1 (fix sql)
 DROP TABLE IF EXISTS `course`;
 CREATE TABLE IF NOT EXISTS `course`(
 	course_id int NOT NULL AUTO_INCREMENT,
@@ -329,8 +333,6 @@ INSERT INTO interest VALUES
 
 	-- vote_id 18
     (222, 18, 6), (223, 18, 7), (224, 18, 11), (225, 18, 12), (226, 18, 13), (227, 18, 14), (228, 18, 15), (229, 18, 16), (230, 18, 17), (231, 18, 18), (232, 18, 19), (233, 18, 20);
-	
-
 
 DROP TABLE IF EXISTS `templateattribute`;
 CREATE TABLE IF NOT EXISTS `templateattribute`(
