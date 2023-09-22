@@ -175,7 +175,8 @@ class CreateCourse(Resource):
                 return {"message": "Course name already exists"}, 409  # Conflict
 
             # Create a new course object with the data
-            new_course = Course(None, course_Name=new_course_name, course_Desc=new_course_data.get("course_Desc"), coursecat_ID=new_course_data.get("coursecat_ID"))
+            #new_course = Course(None, course_Name=new_course_name, course_Desc=new_course_data.get("course_Desc"), coursecat_ID=new_course_data.get("coursecat_ID"))
+            new_course = Course(None, **new_course_data)
 
             # Add the new course to the database
             db.session.add(new_course)

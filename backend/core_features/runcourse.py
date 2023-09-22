@@ -102,119 +102,6 @@ class ChangeRegistrationStatus(Resource):
 
         except Exception as e:
             return "Failed" + str(e), 500
-        
-# create_runcourse() --------------------------------------
-create_runcourse_model = api.model("create_runcourse_model", {
-    "selectedInstructor" : fields.Integer(description="", required=True),
-    "startDate" : fields.Date(description="", required=True),
-    "endDate" : fields.Date(description="", required=True),
-    "startTime" : fields.String(description="", required=True),
-    "endTime" : fields.String(description="", required=True),
-    "selectedFormat" : fields.Integer(description="", required=True), # Holds the selected course format ID
-    "venue" : fields.String(description="", required=True),
-    "courseSize" : fields.Integer(description="", required=True),
-    "minimumSlots" : fields.Integer(description="", required=True),
-    "openingDate" : fields.Date(description="", required=True),
-    "openingTime" : fields.String(description="", required=True),
-    "closingDate" : fields.Date(description="", required=True),
-    "closingTime" : fields.String(description="", required=True),
-    "courseFee" : fields.Integer(description="", required=True),
-    "selectedTemplate" : fields.Integer(description="", required=True)
-})
-
-@api.route("/create_runcourse", methods=["POST"])
-@api.doc(description = "Create a new runcourse")
-class CreateRuncourse(Resource):
-    @api.expect(create_runcourse_model)
-    def post(self):
-        data = request.get_json()
-
-        # get all the courseID templateID instructorID if input data is name instead of id
-        # convert date time fields to sql ready
-        # get duration (i assume system auto inserts duration and runcourse status, maybe even course status?)
-        try:
-            course_ID = Course.query.filter_by(course_Name=data['courseName']).first().course_ID
-            # this sections assume coursecat name and template names are unique
-            template_ID = FeedbackTemplate.query.filter_by(template_Name=data['selectedTemplate']).first().template_ID
-            # assumes that instructors have unique names, may need to change the process including the data input
-            instructor_ID = User.query.filter_by(user_Name=data['selectedInstructor'], role_Name="Instructor").first().user_ID
-
-            newRunCourse = RunCourse(
-                run_Startdate=self.convertDate(data['startDate']),
-                run_Enddate=self.convertDate(data['endDate']),
-                run_Starttime=self.convertTime(data['startTime']),
-                run_Endtime=self.convertTime(data['endTime']),
-                instructor_ID=instructor_ID,
-                course_Format=data['selectedFormat'],
-                course_Venue=data['venue'],
-                runcourse_Status='Ongoing',
-                course_Size=data['courseSize'],
-                course_Minsize=data['minimumSlots'],
-                course_Fee=data['courseFee'],
-                class_Duration=self.getDuration(data['startTime'], data['endTime']),
-                reg_Startdate=self.convertDate(data['openingDate']),
-                reg_Enddate=self.convertDate(data['closingDate']),
-                reg_Starttime=self.convertTime(data['openingTime']),
-                reg_Endtime=self.convertTime(data['closingTime']),
-                template_ID=template_ID,
-                course_ID=course_ID,
-                course_Status='Active'
-            )
-            db.session.add(newRunCourse)
-            db.session.commit()
-            return json.loads(json.dumps(newRunCourse.json(), default=str)), 200
-
-        except Exception as e:
-            return "Failed" + str(e), 500
-
-    def convertTime(self, time):
-        # input format: {'hours': 0, 'minutes': 57, 'seconds': 0}
-        # output to database format: 00:00:00
-        res = ""
-        if int(time['hours']) < 10:
-            res += "0" + str(time['hours']) + ":"
-        else:
-            res += str(time['hours']) + ":"
-        if int(time['minutes']) < 10:
-            res += "0" + str(time['minutes']) + ":00"
-        else:
-            res += str(time['minutes']) + ":00"
-        return res
-
-    def convertDate(self, date):
-        # input format: 2023-08-31T16:57:00.000Z
-        # output to database format: 2023-08-03
-        newdate = str(date)
-        return newdate.split("T")[0]
-
-    def getDuration(self, start, end):
-        # inputs: {'hours': 0, 'minutes': 57, 'seconds': 0}
-        # output: integer of minutes
-        # assumes end time does not cross midnight and start time is not before midnight
-        minutes = 0
-        minutes += (end['hours'] - start['hours']) * 60
-        minutes += end['minutes'] - start['minutes']
-        return minutes
-    
-        
-# create_runcourse() --------------------------------------
-create_runcourse_model = api.model("create_runcourse_model", {
-    "selectedInstructor" : fields.Integer(description="", required=True),
-    "startDate" : fields.Date(description="", required=True),
-    "endDate" : fields.Date(description="", required=True),
-    "startTime" : fields.String(description="", required=True),
-    "endTime" : fields.String(description="", required=True),
-    "selectedFormat" : fields.Integer(description="", required=True), # Holds the selected course format ID
-    "venue" : fields.String(description="", required=True),
-    "courseSize" : fields.Integer(description="", required=True),
-    "minimumSlots" : fields.Integer(description="", required=True),
-    "openingDate" : fields.Date(description="", required=True),
-    "openingTime" : fields.String(description="", required=True),
-    "closingDate" : fields.Date(description="", required=True),
-    "closingTime" : fields.String(description="", required=True),
-    "courseFee" : fields.Integer(description="", required=True),
-    "selectedTemplate" : fields.Integer(description="", required=True)
-})
 
 get_runcourse_by_id = api.parser()
 get_runcourse_by_id.add_argument("runcourse_id", help="Enter runcourse id")
@@ -232,76 +119,61 @@ class GetRunCourse(Resource):
 
         return json.loads(json.dumps({"message": "There is no such runcourse"})), 404
 
-@api.route("/create_runcourse", methods=["POST"])
-@api.doc(description = "Create a new runcourse")
-class CreateRuncourse(Resource):
-    @api.expect(create_runcourse_model)
-    def post(self):
-        data = request.get_json()
+edit_runcourse = api.parser()
+@api.route("/edit_runcourse/<int:runcourse_id>", methods=["PUT"])
+class EditRunCourse(Resource):
+    @api.expect(edit_runcourse)
+    def put(self, runcourse_id):
 
-        # get all the courseID templateID instructorID if input data is name instead of id
-        # convert date time fields to sql ready
-        # get duration (i assume system auto inserts duration and runcourse status, maybe even course status?)
-        try:
-            course_ID = Course.query.filter_by(course_Name=data['courseName']).first().course_ID
-            # this sections assume coursecat name and template names are unique
-            template_ID = FeedbackTemplate.query.filter_by(template_Name=data['selectedTemplate']).first().template_ID
-            # assumes that instructors have unique names, may need to change the process including the data input
-            instructor_ID = User.query.filter_by(user_Name=data['selectedInstructor'], role_Name="Instructor").first().user_ID
+        try: 
+            #Get the updated data from the request body 
+            updated_data = request.json
+        
+            runcourse = RunCourse.query.filter_by(rcourse_ID=runcourse_id).first()
 
-            newRunCourse = RunCourse(
-                run_Startdate=self.convertDate(data['startDate']),
-                run_Enddate=self.convertDate(data['endDate']),
-                run_Starttime=self.convertTime(data['startTime']),
-                run_Endtime=self.convertTime(data['endTime']),
-                instructor_ID=instructor_ID,
-                course_Format=data['selectedFormat'],
-                course_Venue=data['venue'],
-                runcourse_Status='Ongoing',
-                course_Size=data['courseSize'],
-                course_Minsize=data['minimumSlots'],
-                course_Fee=data['courseFee'],
-                class_Duration=self.getDuration(data['startTime'], data['endTime']),
-                reg_Startdate=self.convertDate(data['openingDate']),
-                reg_Enddate=self.convertDate(data['closingDate']),
-                reg_Starttime=self.convertTime(data['openingTime']),
-                reg_Endtime=self.convertTime(data['closingTime']),
-                template_ID=template_ID,
-                course_ID=course_ID,
-                course_Status='Active'
-            )
-            db.session.add(newRunCourse)
-            db.session.commit()
-            return json.loads(json.dumps(newRunCourse.json(), default=str)), 200
+            if runcourse:
+                # Update the fields based on updated_data
+                for field, value in updated_data.items():
+                    #print(f"Updating {field} to {value}")
+                    setattr(runcourse, field, value)
+
+                #Commit the changes to the database 
+                db.session.commit()
+
+                return json.loads(json.dumps(runcourse.json(), default=str)), 200
+
+            return json.loads(json.dumps({"message": "There is no such runcourse"})), 404
 
         except Exception as e:
+            print("Error:", str(e))
             return "Failed" + str(e), 500
 
-    def convertTime(self, time):
-        # input format: {'hours': 0, 'minutes': 57, 'seconds': 0}
-        # output to database format: 00:00:00
-        res = ""
-        if int(time['hours']) < 10:
-            res += "0" + str(time['hours']) + ":"
-        else:
-            res += str(time['hours']) + ":"
-        if int(time['minutes']) < 10:
-            res += "0" + str(time['minutes']) + ":00"
-        else:
-            res += str(time['minutes']) + ":00"
-        return res
+@api.route("/create_runcourse/<int:course_id>", methods=["POST"])
+@api.doc(description="Create run course")
+class CreateRunCourse(Resource):
+    def post(self, course_id):
+        try: 
+            
+            # Get the data for creating a new run course from the request body
+            new_run_course_data = request.json
 
-    def convertDate(self, date):
-        # input format: 2023-08-31T16:57:00.000Z
-        # output to database format: 2023-08-03
-        newdate = str(date)
-        return newdate.split("T")[0]
+            print(new_run_course_data)
 
-    def getDuration(self, start, end):
-        # inputs: {'hours': 0, 'minutes': 57, 'seconds': 0}
-        # output: integer of minutes
-        # assumes end time does not cross midnight and start time is not before midnight
-        minutes = 0
-        minutes += (end['hours'] - start['hours']) * 60
-        minutes += end['minutes'] - start['minutes']
-        return minutes
+            # Create a new run course object with the data
+            new_run_course = RunCourse(**new_run_course_data)
+
+            # Add the new course to the database
+            db.session.add(new_run_course)
+
+            # Commit the changes to the database
+            db.session.commit()
+
+            # Inside the create_proposed_course route
+            #print("Data before returning:", new_proposed_course.json())
+
+            # Return the newly created course as JSON response
+            return json.loads(json.dumps(new_run_course.json(), default=str)), 201
+
+        except Exception as e:
+            print("Error:", str(e))
+            return "Failed to create a new course: " + str(e), 500
