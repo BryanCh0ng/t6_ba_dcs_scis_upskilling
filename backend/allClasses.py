@@ -280,17 +280,17 @@ class Feedback(db.Model):
     submitted_By = db.Column(db.Integer,  nullable=False)
     template_Attribute_ID = db.Column(db.Integer ,db.ForeignKey('templateattribute.template_Attribute_ID'), nullable=False) 
     answer = db.Column(db.String(255), nullable=False) 
-    course_ID = db.Column(db.Integer, db.ForeignKey('course.course_ID'), nullable=False) 
+    rcourse_ID = db.Column(db.Integer, db.ForeignKey('runcourse.rcourse_ID'), nullable=False) 
 
 
 
-    def __init__(self, feedback_ID, feedback_Template_ID, submitted_By, template_Attribute_ID, answer, course_ID):
+    def __init__(self, feedback_ID, feedback_Template_ID, submitted_By, template_Attribute_ID, answer, rcourse_ID):
         self.feedback_ID = feedback_ID
         self.feedback_Template_ID = feedback_Template_ID
         self.submitted_By = submitted_By
         self.template_Attribute_ID = template_Attribute_ID
         self.answer = answer
-        self.course_ID = course_ID
+        self.rcourse_ID = rcourse_ID
 
 
 
