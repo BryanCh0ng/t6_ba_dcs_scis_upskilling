@@ -133,7 +133,7 @@ class Course(db.Model):
         self.coursecat_ID = coursecat_ID
         self.template_ID = template_ID        
         self.course_Status = course_Status
-
+        self.template_ID = template_ID   
 
     def json(self):
         columns = self.__mapper__.column_attrs.keys()
@@ -277,19 +277,19 @@ class Feedback(db.Model):
     feedback_ID = db.Column(db.Integer, nullable=False, primary_key=True)
     feedback_Template_ID = db.Column(db.Integer,  nullable=False)
     submitted_By = db.Column(db.Integer,  nullable=False)
-    template_Attribute_ID = db.Column(db.Integer ,db.ForeignKey('templateattribute.template_attribute_ID'), nullable=False) 
+    template_Attribute_ID = db.Column(db.Integer ,db.ForeignKey('templateattribute.template_Attribute_ID'), nullable=False) 
     answer = db.Column(db.String(255), nullable=False) 
-    course_ID = db.Column(db.Integer, db.ForeignKey('course.course_ID'), nullable=False) 
+    rcourse_ID = db.Column(db.Integer, db.ForeignKey('runcourse.rcourse_ID'), nullable=False) 
 
 
 
-    def __init__(self, feedback_ID, feedback_Template_ID, submitted_By, template_Attribute_ID, answer, course_ID):
+    def __init__(self, feedback_ID, feedback_Template_ID, submitted_By, template_Attribute_ID, answer, rcourse_ID):
         self.feedback_ID = feedback_ID
         self.feedback_Template_ID = feedback_Template_ID
         self.submitted_By = submitted_By
         self.template_Attribute_ID = template_Attribute_ID
         self.answer = answer
-        self.course_ID = course_ID
+        self.rcourse_ID = rcourse_ID
 
 
 
@@ -326,8 +326,7 @@ class RunCourse(db.Model):
 
     def __init__(self, run_Startdate, run_Enddate, run_Starttime, run_Endtime, instructor_ID,
                  course_Format, course_Venue, runcourse_Status, course_Size, course_Minsize, course_Fee,
-                 class_Duration, reg_Startdate, reg_Enddate, reg_Starttime, reg_Endtime,
-                  course_ID):
+                 class_Duration, reg_Startdate, reg_Enddate, reg_Starttime, reg_Endtime, course_ID):
         self.run_Startdate = run_Startdate
         self.run_Enddate = run_Enddate
         self.run_Starttime = run_Starttime
@@ -344,8 +343,8 @@ class RunCourse(db.Model):
         self.reg_Enddate = reg_Enddate
         self.reg_Starttime = reg_Starttime
         self.reg_Endtime = reg_Endtime
-        self.course_ID = course_ID
-
+        self.course_ID = course_ID  
+ 
 
     def json(self):
         columns = self.__mapper__.column_attrs.keys()

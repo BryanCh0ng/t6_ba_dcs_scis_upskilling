@@ -219,6 +219,57 @@ const routes = [
     component: () => import('../views/course/adminViewCourse.vue'),
     meta: {
         title: 'Admin View Course',
+    }
+  },
+  {
+    path: '/createFeedbackTemplate',
+    name: 'createFeedbackTemplate',
+    component: () => import('../views/feedbackTemplate/createFeedbackTemplate.vue'),
+    meta: {
+        title: 'Create Feedback Template',
+   
+    }
+  },
+  {
+    path: '/editFeedbackTemplate/:id',
+    name: 'editFeedbackTemplate',
+    component: () => import('../views/feedbackTemplate/editFeedbackTemplate.vue'),
+    meta: {
+        title: 'Edit Feedback Template',
+    },
+  },
+  {
+    path: '/adminViewFeedbackTemplate',
+    name: 'adminViewFeedbackTemplate',
+    component: () => import('../views/feedbackTemplate/adminViewFeedbackTemplate.vue'),
+    meta: {
+        title: 'Admin View Feedback Template',
+    },
+  },
+  {
+    path: '/adminViewCourse',
+    name: 'adminViewCourse',
+    component: () => import('../views/course/adminViewCourse.vue'),
+    meta: {
+        title: 'Admin View Course',
+   
+    }
+  },
+  {
+    path: '/viewDashboard',
+    name: 'viewDashboard',
+    component: () => import('../views/dashboard/viewDashboard.vue'),
+    meta: {
+        title: 'View Dashboard',
+   
+    }
+  },
+  {
+    path: '/viewDashboard',
+    name: 'viewDashboard',
+    component: () => import('../views/dashboard/viewDashboard.vue'),
+    meta: {
+        title: 'View Dashboard',
    
     }
   }

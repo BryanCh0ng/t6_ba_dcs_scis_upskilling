@@ -348,6 +348,33 @@ class EditFeedbackTemplate(Resource):
 #       except Exception as e:
 #         return {"code": 404, "message": "Failed " + str(e)}, 404
 
+    #     if feedback_template:
+    #         course_to_change = Course.query.filter_by(template_ID = templateID)
+    #         for course in course_to_change:
+    #            course.template_ID = None
+          
+    #         template_attributes = TemplateAttribute.query.filter_by(template_ID = templateID).all() # get all template attributes linked to the feedback       
+            
+    #         if template_attributes:
+    #             for template_attri in template_attributes:
+    #                 template_attri_ID = template_attri.template_Attribute_ID
+    #                 feedback_to_delete = Feedback.query.filter_by(template_Attribute_ID = template_attri_ID).all()
+    #                 if feedback_to_delete:
+    #                     for feedback in feedback_to_delete:
+    #                         db.session.delete(feedback) # delete feedback containing template id and attribute id
+    #                 template_attributes_options = InputOption.query.filter_by(template_Attribute_ID = template_attri_ID).all() # get all input options linked to template attributes
+    #                 if template_attributes_options:
+    #                     for option in template_attributes_options:
+    #                         db.session.delete(option) #delete template attribute options                      
+    #                 db.session.delete(template_attri)                                        
+    #     db.session.commit()
+    #     if feedback_template:
+    #         db.session.delete(feedback_template)
+    #         db.session.commit()
+
+    #     return {"code": 200, "message": "Delete Feedback Template Successfully"}, 200
+    #   except Exception as e:
+    #     return {"code": 404, "message": "Failed " + str(e)}, 404
 
 def format_date_time(value):
     if isinstance(value, (date, datetime)):
