@@ -224,15 +224,14 @@ class Interest(db.Model):
 class TemplateAttribute(db.Model):
     __tablename__ = 'templateattribute'
 
-    template_Attribute_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    template_Attribute_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     question = db.Column(db.String(255), nullable=False)
     input_Type = db.Column(db.String(255),  nullable=False)
     template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'),  nullable=False) 
 
 
 
-    def __init__(self, template_Attribute_ID, question, input_Type, template_ID ):
-        self.template_Attribute_ID = template_Attribute_ID
+    def __init__(self, question, input_Type, template_ID ):
         self.question = question
         self.input_Type = input_Type
         self.template_ID = template_ID
@@ -250,15 +249,14 @@ class TemplateAttribute(db.Model):
 class InputOption(db.Model):
     __tablename__ = 'inputoption'
 
-    input_Option_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    input_Option_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     template_Attribute_ID = db.Column(db.Integer,db.ForeignKey('templateattribute.template_Attribute_ID'),  nullable=False)
     position = db.Column(db.Integer,  nullable=False)
     textlabel = db.Column(db.String(255), nullable=False) 
 
 
 
-    def __init__(self, input_Option_ID, template_Attribute_ID, position, textlabel ):
-        self.input_Option_ID = input_Option_ID
+    def __init__(self, template_Attribute_ID, position, textlabel ):
         self.template_Attribute_ID = template_Attribute_ID
         self.position = position
         self.textlabel = textlabel

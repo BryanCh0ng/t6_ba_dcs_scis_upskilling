@@ -271,8 +271,57 @@ class GetCourseNamesByFeedbackTemplateId(Resource):
       except Exception as e:
         return {"code": 404, "message": "Failed" + str(e)}, 404
          
+edit_feedback_template = api.parser()
+@api.route("/edit_feedback_template", methods=["PUT"])
+class EditFeedbackTemplate(Resource):
+    @api.expect(edit_feedback_template)
+    def put(self):
 
+        try: 
+            #Get the updated data from the request body 
+            data = request.json
         
+            template = FeedbackTemplate.query.filter_by(template_Name=data['feedback_template_name']).first()
+            template_ID = template.template_ID
+
+            if template:
+                # Update the fields based on data
+                for editAttribute in data['data']:
+                    attribute = TemplateAttribute.query.filter_by(template_ID=template_ID).filter_by(question=editAttribute['question']).first()
+                    if attribute:
+                        setattr(attribute, 'input_Type', editAttribute['selectedInputType'])
+                        if editAttribute['inputOptions']:
+                            options = InputOption.query.filter_by(template_Attribute_ID=attribute.template_Attribute_ID).all()
+                            if options:
+                                db.session.delete(options)
+                            position = 1
+                            for editOption in editAttribute['inputOptions']: 
+                                new_option = InputOption(template_Attribute_ID=attribute.template_Attribute_ID, position=position, textlabel=editOption['option'])
+                                position += 1
+                                db.session.add(new_option)
+                    else:
+                        new_attribute = TemplateAttribute(question=editAttribute['question'], input_Type=editAttribute['selectedInputType'], template_ID=template_ID)
+                        db.session.add(new_attribute)
+                        if editAttribute['inputOptions']:
+                            template_Attribute_ID = TemplateAttribute.query.filter_by(template_ID=template_ID).filter_by(question=editAttribute['question']).first().template_Attribute_ID
+                            position = 1
+                            for editOption in editAttribute['inputOptions']: 
+                                new_option = InputOption(template_Attribute_ID=template_Attribute_ID, position=position, textlabel=editOption['option'])
+                                position += 1
+                                db.session.add(new_option)
+
+                #Commit the changes to the database 
+                db.session.commit()
+
+                return json.loads(json.dumps(template.json(), default=str)), 200
+
+            return json.loads(json.dumps({"message": "There is no such feedback template"})), 404
+
+        except Exception as e:
+            print("Error:", str(e))
+            return "Failed" + str(e), 500
+        
+
 # delete_feedback_template = api.parser()
 # delete_feedback_template.add_argument("template_ID", help="Feedback Template ID")
 # delete_feedback_template.add_argument("user_ID", help="User ID")
