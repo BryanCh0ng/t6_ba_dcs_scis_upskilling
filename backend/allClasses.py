@@ -124,14 +124,12 @@ class Course(db.Model):
     course_Desc = db.Column(db.String(800), nullable=False)
     coursecat_ID = db.Column(db.Integer, db.ForeignKey('coursecategory.coursecat_ID'), nullable=False)
     course_Status = db.Column(db.String(255), nullable=False)
-    template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'), nullable=False)
 
-    def __init__(self, course_ID, course_Name, course_Desc, coursecat_ID, course_Status, template_ID):
+    def __init__(self, course_ID, course_Name, course_Desc, coursecat_ID, course_Status):
         self.course_ID = course_ID
         self.course_Name = course_Name
         self.course_Desc = course_Desc
-        self.coursecat_ID = coursecat_ID
-        self.template_ID = template_ID        
+        self.coursecat_ID = coursecat_ID        
         self.course_Status = course_Status
 
 
@@ -279,7 +277,7 @@ class Feedback(db.Model):
     feedback_ID = db.Column(db.Integer, nullable=False, primary_key=True)
     feedback_Template_ID = db.Column(db.Integer,  nullable=False)
     submitted_By = db.Column(db.Integer,  nullable=False)
-    template_Attribute_ID = db.Column(db.Integer ,db.ForeignKey('templateattribute.template_attribute_ID'), nullable=False) 
+    template_Attribute_ID = db.Column(db.Integer ,db.ForeignKey('templateattribute.template_Attribute_ID'), nullable=False) 
     answer = db.Column(db.String(255), nullable=False) 
     course_ID = db.Column(db.Integer, db.ForeignKey('course.course_ID'), nullable=False) 
 
