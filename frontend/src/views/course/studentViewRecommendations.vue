@@ -11,7 +11,7 @@
     <div class="tab-content ">
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'for_registration' }">
         <div class="pt-5 container col-12 table-responsive">
-          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For you</h1>
+          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
           <div v-if="reg_courses_for_you && reg_courses_for_you.length > 0"> 
             <table class="table bg-white">
               <thead>
@@ -48,8 +48,9 @@
               </tbody>
             </table>
           </div>
-          <div v-else-if="reg_courses_for_you=[]">
-            <p>No records found</p>
+          <div v-else-if="reg_courses_for_you=[]" class="text-center pt-2 pb-5">
+            <p>Currently, there are no recommendations for you.</p>
+            <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
         <vue-awesome-paginate v-model="localCurrentPageRegCourseForYou" v-if="reg_courses_for_you.length/itemsPerPage > 0" :totalItems="reg_courses_for_you.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseForYou" class="justify-content-center pagination-container"/>
@@ -92,15 +93,16 @@
               </tbody>
             </table>
           </div>
-          <div v-else-if="reg_courses_others=[]">
-            <p>No records found</p>
+          <div v-else-if="reg_courses_others=[]" class="text-center pt-2 pb-5">
+              <p>Currently, there are no recommendations for you.</p>
+              <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
         <vue-awesome-paginate v-model="localCurrentPageRegCourseOthers" v-if="reg_courses_others.length/itemsPerPage > 0" :totalItems="reg_courses_others.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseOthers" class="justify-content-center pagination-container"/>
       </div>
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'express_interest' }">
         <div class="pt-5 container col-12 table-responsive">
-          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
+          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
           <div v-if="interest_courses && interest_courses.length > 0"> 
             <table class="table bg-white">
               <thead>
@@ -114,16 +116,17 @@
               <tbody>
                 <tr v-for="(interest_course, key) in displayedInterestCourses" :key="key">
                   <td class="name">
-                      <course-name-desc :name="interest_course.course_Name" :category="interest_course.coursecat_Name" :description="interest_course.course_Name"></course-name-desc>
+                      <course-name-desc :name="interest_course.course_Name" :category="interest_course.coursecat_Name" :description="interest_course.course_Desc"></course-name-desc>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(interest_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action :status="interest_course.vote_Status" :course="interest_course"></course-action></td>
+                  <td><course-action @action-and-message-updated="handleActionData" status="Vote" :course="course"></course-action></td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <div v-else-if="interest_courses=[]">
-            <p>No records found</p>
+          <div v-else-if="interest_courses=[]" class="text-center pt-2 pb-5">
+            <p>Currently, there are no recommendations for you.</p>
+            <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
         <vue-awesome-paginate v-model="localCurrentInterestCourses" v-if="interest_courses.length/itemsPerPage > 0" :totalItems="interest_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageInterestCourses" class="justify-content-center pagination-container"/>
@@ -150,8 +153,9 @@
               </tbody>
             </table>
           </div>
-          <div v-else-if="interest_others=[]">
-            <p>No records found</p>
+          <div v-else-if="interest_others=[]" class="text-center pt-2 pb-5">
+            <p>Currently, there are no recommendations for you.</p>
+            <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
         <vue-awesome-paginate v-model="localCurrentInterestOthers" v-if="interest_others.length/itemsPerPage > 0" :totalItems="interest_others.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeInterestOthers" class="justify-content-center pagination-container"/>
@@ -170,8 +174,8 @@ import modalCourseContent from '@/components/course/modalCourseContent.vue';
 import courseNameDesc from '@/components/course/courseNameDesc.vue';
 import courseDateTime from '@/components/course/courseDateTime.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
-import {convertDate, convertTime} from '@/scripts/common/convertDateTime.js'
-import CourseService from "@/api/services/CourseService.js";
+// import {convertDate, convertTime} from '@/scripts/common/convertDateTime.js'
+import Recommender from "@/api/services/recommenderService.js";
 
 export default {
   components: {
@@ -191,7 +195,7 @@ export default {
       sortColumn: 'name',
       sortDirection: 'asc',
       selectedCourse: null,
-      itemsPerPage: 10,
+      itemsPerPage: 5,
       localCurrentPageRegCourseForYou: 1,
       localCurrentPageRegCourseOthers: 1,
       localCurrentInterestOthers: 1,
@@ -223,6 +227,13 @@ export default {
     handlePageInterestCourses(newPage) {
       this.localCurrentInterestCourses = newPage;
       this.$emit('page-change', newPage);
+    },
+    async loadData() {
+      let run_response = await Recommender.getUserSimilarityRegistration(6)
+      this.reg_courses_for_you = run_response.data.course_list
+
+      let interest_response = await Recommender.getUserSimilarityInterest(1)
+      this.interest_courses = interest_response.data.course_list
     }
   },
   computed: {
@@ -245,36 +256,39 @@ export default {
       const startIndex = (this.localCurrentInterestCourses - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
       return this.interest_courses.slice(startIndex, endIndex);
-    }
+    },
   },
   async created() {
     try {
-      let run_response = await CourseService.searchUnregisteredActiveInfo(null, null, null)
-      this.reg_courses_for_you = run_response.data
-      this.reg_courses_others = run_response.data
-      this.reg_courses_for_you.map(course => {
-        course.reg_Enddate = convertDate(course.reg_Enddate)
-        course.reg_Startdate = convertDate(course.reg_Startdate)
-        course.run_Enddate = convertDate(course.run_Enddate)
-        course.run_Startdate = convertDate(course.run_Startdate)
-        course.reg_Endtime = convertTime(course.reg_Endtime)
-        course.reg_Starttime = convertTime(course.reg_Starttime)
-        course.run_Endtime = convertTime(course.run_Endtime)
-        course.run_Starttime = convertTime(course.run_Starttime)
-      }); 
-      this.reg_courses_others.map(course => {
-        course.reg_Enddate = convertDate(course.reg_Enddate)
-        course.reg_Startdate = convertDate(course.reg_Startdate)
-        course.run_Enddate = convertDate(course.run_Enddate)
-        course.run_Startdate = convertDate(course.run_Startdate)
-        course.reg_Endtime = convertTime(course.reg_Endtime)
-        course.reg_Starttime = convertTime(course.reg_Starttime)
-        course.run_Endtime = convertTime(course.run_Endtime)
-        course.run_Starttime = convertTime(course.run_Starttime)
-      }); 
-      let interest_response = await CourseService.searchUnvotedActiveInfo(null, null, null)
-      this.interest_courses = interest_response.data
-      this.interest_others = interest_response.data
+      this.loadData();
+      // console.log("hi")
+      // let run_response = await Recommender.getUserSimilarityRegistration(5)
+      // console.log("hi")
+      // this.reg_courses_for_you = run_response
+      // this.reg_courses_others = run_response.data
+      // this.reg_courses_for_you.map(course => {
+      //   course.reg_Enddate = convertDate(course.reg_Enddate)
+      //   course.reg_Startdate = convertDate(course.reg_Startdate)
+      //   course.run_Enddate = convertDate(course.run_Enddate)
+      //   course.run_Startdate = convertDate(course.run_Startdate)
+      //   course.reg_Endtime = convertTime(course.reg_Endtime)
+      //   course.reg_Starttime = convertTime(course.reg_Starttime)
+      //   course.run_Endtime = convertTime(course.run_Endtime)
+      //   course.run_Starttime = convertTime(course.run_Starttime)
+      // }); 
+      // this.reg_courses_others.map(course => {
+      //   course.reg_Enddate = convertDate(course.reg_Enddate)
+      //   course.reg_Startdate = convertDate(course.reg_Startdate)
+      //   course.run_Enddate = convertDate(course.run_Enddate)
+      //   course.run_Startdate = convertDate(course.run_Startdate)
+      //   course.reg_Endtime = convertTime(course.reg_Endtime)
+      //   course.reg_Starttime = convertTime(course.reg_Starttime)
+      //   course.run_Endtime = convertTime(course.run_Endtime)
+      //   course.run_Starttime = convertTime(course.run_Starttime)
+      // }); 
+      // let interest_response = await CourseService.searchUnvotedActiveInfo(null, null, null)
+      // this.interest_courses = interest_response.data
+      // this.interest_others = interest_response.data
     } catch (error) {
       console.error("Error fetching course details:", error);
     }

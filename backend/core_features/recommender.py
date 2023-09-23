@@ -1,6 +1,7 @@
 from flask import request, jsonify, sessions
 from flask_restx import Namespace, Resource, fields
 from allClasses import *
+from datetime import datetime, date, time
 
 import pandas as pd
 import numpy as np
@@ -45,38 +46,46 @@ class RecommenderUserRegistration(Resource):
         #cosine similarity table
         user_similarity = cosine_similarity(pivot_df)
         user_similarity_df = pd.DataFrame(user_similarity, index=pivot_df.index, columns=pivot_df.index)
-
+        
         def recommend_courses(user, num_recommendations):
             user_courses = pivot_df.loc[user]
-            similar_users = user_similarity_df[user].sort_values(ascending=False)[1:]  
-            
-            recommended_courses = set()  
-            for similar_user, similarity_score in similar_users.iteritems():
+            similar_users = user_similarity_df[user].sort_values(ascending=False)[1:]
+
+            recommended_courses = set()
+            for similar_user, similarity_score in similar_users.items():
                 if similarity_score > 0:
                     similar_user_courses = pivot_df.loc[similar_user]
-                    for course, registration in similar_user_courses.iteritems():
+                    for course, registration in similar_user_courses.items():
+                        # Check if the course is not registered by the input user and not already in the recommendations and not in reg_list
                         if registration == 1 and user_courses[course] == 0:
-                            recommended_courses.add(course)
-                            if len(recommended_courses) == num_recommendations:
-                                return list(recommended_courses) 
-            
-            return list(recommended_courses)  
+                            rcourse = RunCourse.query.filter(RunCourse.rcourse_ID == course).first()
+                            if rcourse and rcourse.runcourse_Status == "Ongoing":
+                                recommended_courses.add(course)
+                                if len(recommended_courses) == num_recommendations:
+                                    return list(recommended_courses)
 
+            return list(recommended_courses)
+            
         try:
             recommendations_rcourses_id = recommend_courses(target_user_id, 10)
+            
             course_list = []
             for recommondations_rcourse_id in recommendations_rcourses_id:
                 rcourse = RunCourse.query.filter(RunCourse.rcourse_ID == recommondations_rcourse_id).first()
                 rcourse = rcourse.json()
                 course_id = rcourse["course_ID"]
                 course = Course.query.filter(Course.course_ID == course_id).first()
+                coursecat = CourseCategory.query.filter(CourseCategory.coursecat_ID == Course.coursecat_ID).first()
                 datapoint = course.json()
-
+                
+                datapoint["coursecat_Name"] = coursecat.coursecat_Name
                 datapoint["rcourse_ID"] = recommondations_rcourse_id
-                datapoint["run_Startdate"] = rcourse["run_Startdate"]
-                datapoint["run_Enddate"] = rcourse["run_Enddate"]
-                datapoint["run_Starttime"] = rcourse["run_Starttime"].strftime('%H:%M:%S')
-                datapoint["run_Endtime"] = rcourse["run_Endtime"].strftime('%H:%M:%S')
+                datapoint["reg_Enddate"] = format_date_time(rcourse["reg_Enddate"])
+                datapoint["run_Startdate"] = format_date_time(rcourse["run_Startdate"])
+                datapoint["run_Enddate"] = format_date_time(rcourse["run_Enddate"])
+                datapoint["reg_Endtime"] = format_date_time(rcourse["reg_Endtime"])
+                datapoint["run_Starttime"] = format_date_time(rcourse["run_Starttime"])
+                datapoint["run_Endtime"] = format_date_time(rcourse["run_Endtime"])
 
                 course_list.append(datapoint)
 
@@ -150,7 +159,7 @@ class RecommenderCourseRegistration(Resource):
                         course_dict[similar_course] += 1
             # {rcourseid1: 4, rcourseid2: 2, rcourseid3: 1}
             sorted_dict = dict(sorted(course_dict.items(), key=lambda item: item[1], reverse=True))
-            print(sorted_dict)
+            # print(sorted_dict)
             
             # descending order (most significant -> least)
             course_list = []
@@ -159,13 +168,18 @@ class RecommenderCourseRegistration(Resource):
                 rcourse = rcourse.json()
                 course_id = rcourse["course_ID"]
                 course = Course.query.filter(Course.course_ID == course_id).first()
+                coursecat = CourseCategory.query.filter(CourseCategory.coursecat_ID == Course.coursecat_ID).first()
                 datapoint = course.json()
+                
+                datapoint["coursecat_Name"] = coursecat.coursecat_Name
 
                 datapoint["rcourse_ID"] = recommondations_rcourse_id
-                datapoint["run_Startdate"] = rcourse["run_Startdate"]
-                datapoint["run_Enddate"] = rcourse["run_Enddate"]
-                datapoint["run_Starttime"] = rcourse["run_Starttime"].strftime('%H:%M:%S')
-                datapoint["run_Endtime"] = rcourse["run_Endtime"].strftime('%H:%M:%S')
+                datapoint["reg_Enddate"] = format_date_time(rcourse["reg_Enddate"])
+                datapoint["run_Startdate"] = format_date_time(rcourse["run_Startdate"])
+                datapoint["run_Enddate"] = format_date_time(rcourse["run_Enddate"])
+                datapoint["reg_Endtime"] = format_date_time(rcourse["reg_Endtime"])
+                datapoint["run_Starttime"] = format_date_time(rcourse["run_Starttime"])
+                datapoint["run_Endtime"] = format_date_time(rcourse["run_Endtime"])
 
                 course_list.append(datapoint)
 
@@ -239,14 +253,16 @@ class RecommenderUserInterest(Resource):
             similar_users = user_similarity_df[user].sort_values(ascending=False)[1:]
             
             recommended_courses = set()  
-            for similar_user, similarity_score in similar_users.iteritems():
+            for similar_user, similarity_score in similar_users.items():
                 if similarity_score > 0:
                     similar_user_courses = pivot_df.loc[similar_user]
-                    for course, registration in similar_user_courses.iteritems():
+                    for course, registration in similar_user_courses.items():
                         if registration == 1 and user_courses[course] == 0:
-                            recommended_courses.add(course)
-                            if len(recommended_courses) == num_recommendations:
-                                return list(recommended_courses) 
+                            vcourse = VoteCourse.query.filter(VoteCourse.course_ID == course).first()
+                            if vcourse and vcourse.vote_Status == "Ongoing":
+                                recommended_courses.add(course)
+                                if len(recommended_courses) == num_recommendations:
+                                    return list(recommended_courses) 
             
             return list(recommended_courses)  
         
@@ -255,9 +271,14 @@ class RecommenderUserInterest(Resource):
             course_list = []
             for recommondations_course_id in recommendations_courses_id:
                 course = Course.query.filter(Course.course_ID == recommondations_course_id).first()
-                course_data = course.json()
+                coursecat = CourseCategory.query.filter(CourseCategory.coursecat_ID == Course.coursecat_ID).first()
+                vcourse = VoteCourse.query.filter(VoteCourse.course_ID == recommondations_course_id).first()
+                datapoint = course.json()
+                
+                datapoint["coursecat_Name"] = coursecat.coursecat_Name
+                datapoint["votecourse_status"] = vcourse.vote_Status
 
-                course_list.append(course_data)
+                course_list.append(datapoint)
 
             db.session.close()
             
@@ -341,15 +362,18 @@ class RecommenderCourseInterest(Resource):
                         course_dict[similar_course] += 1
             # {rcourseid1: 4, rcourseid2: 2, rcourseid3: 1}
             sorted_dict = dict(sorted(course_dict.items(), key=lambda item: item[1], reverse=True))
-            print(sorted_dict)
+            # print(sorted_dict)
             
             # descending order (most significant -> least)
             course_list = []
             for recommondations_course_id in sorted_dict:
                 course = Course.query.filter(Course.course_ID == recommondations_course_id).first()
-                course_data = course.json()
+                coursecat = CourseCategory.query.filter(CourseCategory.coursecat_ID == Course.coursecat_ID).first()
+                datapoint = course.json()
+                
+                datapoint["coursecat_Name"] = coursecat.coursecat_Name
 
-                course_list.append(course_data)
+                course_list.append(datapoint)
 
             db.session.close()
             
@@ -369,3 +393,11 @@ class RecommenderCourseInterest(Resource):
                     "message": "Course does not exist"
                 }
             )
+        
+def format_date_time(value):
+    if isinstance(value, (date, datetime)):
+        return value.strftime('%Y-%m-%d')
+    elif isinstance(value, time):
+        return value.strftime('%H:%M:%S')
+    else:
+        return None
