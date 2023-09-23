@@ -291,15 +291,15 @@ class DeleteFeedbackTemplate(Resource):
               return {"code": 404, "message": "Failed the feedback template is in use" }, 404
         for runcourse in runningcourse:
            runcourse.template_ID = None
-        
+
         isdelete = False
         if feedback_template:
             course_to_change = Course.query.filter_by(template_ID = templateID)
             for course in course_to_change:
                course.template_ID = None
-          
+
             template_attributes = TemplateAttribute.query.filter_by(template_ID = templateID).all() # get all template attributes linked to the feedback       
-            
+
             if template_attributes:
                 for template_attri in template_attributes:
                     template_attri_ID = template_attri.template_Attribute_ID
@@ -316,7 +316,8 @@ class DeleteFeedbackTemplate(Resource):
         if feedback_template:
             db.session.delete(feedback_template)
             db.session.commit()
-
+      except Exception as e:
+        return {"code": 404, "message": "Failed" + str(e)}, 404
 
 def format_date_time(value):
     if isinstance(value, (date, datetime)):
