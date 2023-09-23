@@ -279,7 +279,7 @@ class Feedback(db.Model):
     feedback_ID = db.Column(db.Integer, nullable=False, primary_key=True)
     feedback_Template_ID = db.Column(db.Integer,  nullable=False)
     submitted_By = db.Column(db.Integer,  nullable=False)
-    template_Attribute_ID = db.Column(db.Integer ,db.ForeignKey('templateattribute.template_attribute_ID'), nullable=False) 
+    template_Attribute_ID = db.Column(db.Integer ,db.ForeignKey('templateattribute.template_Attribute_ID'), nullable=False) 
     answer = db.Column(db.String(255), nullable=False) 
     course_ID = db.Column(db.Integer, db.ForeignKey('course.course_ID'), nullable=False) 
 
