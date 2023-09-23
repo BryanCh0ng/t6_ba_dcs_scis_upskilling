@@ -419,9 +419,11 @@ CREATE TABLE IF NOT EXISTS `runcourse`(
 	reg_enddate date,
 	reg_starttime time,
 	reg_endtime time,
+	template_id int,
 	course_id int,
 	PRIMARY KEY (`rcourse_id`),
 	FOREIGN KEY (instructor_id) REFERENCES user(user_id),
+	FOREIGN KEY (template_id) REFERENCES feedbacktemplate(template_id),
 	FOREIGN KEY (course_id) REFERENCES course(course_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
