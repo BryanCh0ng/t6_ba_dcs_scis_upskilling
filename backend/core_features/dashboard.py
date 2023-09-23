@@ -13,9 +13,6 @@ from nltk.corpus import stopwords # Import NLTK's stopwords corpus
 from nltk.stem import WordNetLemmatizer # Import the WordNet lemmatizer from NLTK
 import re # Import the regular expressions library for text processing
 import ast
-import contractions  # Import the contractions library
-import gensim # Import Gensim, a library for topic modeling and document similarity
-from gensim import corpora # Import Gensim's corpora module for document representation
 from sklearn.decomposition import NMF
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import silhouette_score
@@ -221,8 +218,6 @@ def preprocess_text(text_series):
     def process_text(text):
         
         text = text.lower() # Convert text to lowercase
-
-        text = contractions.fix(text) # Expand contractions using the contractions library
 
         text = re.sub(r'[^a-zA-Z\s-]', '', text) # Remove non-alphabetic characters and split hyphenated words
 
