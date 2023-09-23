@@ -1,5 +1,5 @@
 <template>
-    <CourseForm :view="view"></CourseForm>
+    <CourseForm :view="view" :courseId="courseId"></CourseForm>
 </template>
   
 <script>
@@ -9,7 +9,8 @@ export default {
     name: "EditCourse",
     data() {
         return {
-            view: "editCourse"
+            view: "editCourse",
+            courseId: null
         };
     },
     components: {
@@ -17,7 +18,8 @@ export default {
     },
     created() {
         document.title = "Edit Course";
-
+        this.courseId = this.$route.params.id;
+        console.log(this.courseId)
     },
 };
 </script>

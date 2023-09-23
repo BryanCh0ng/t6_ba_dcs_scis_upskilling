@@ -36,7 +36,7 @@
 // import { axiosClient } from "../api/axiosClient";
 import DropdownField from "../DropdownField.vue";
 import InputField from "../InputField.vue";
-import CourseService from "@/api/services/CourseService.js"
+// import CourseService from "@/api/services/CourseService.js"
 import CourseCategoryService from "@/api/services/CourseCategoryService.js"
 // import UserService from "@/api/services/UserService.js"
 
@@ -60,16 +60,16 @@ export default({
         InputField,
     },
     async mounted() {
-        await this.getAllCourses();
+        // await this.getAllCourses();
         // await this.searchFilterCourses();
         await this.fetchCategoryDropdownOptions();
         this.statusDropdownOptions = this.statusOptions;
     },
     methods: {
-        async getAllCourses() {
-            let response = await CourseService.getAllCourses();
-            this.courseList = response.data.course;
-        },
+        // async getAllCourses() {
+        //     let response = await CourseService.getAllCourses();
+        //     this.courseList = response.data.course;
+        // },
         async fetchCategoryDropdownOptions() {
             try {
                 const categoryOptions = await CourseCategoryService.getAllCourseCategory(); // Use the CourseCategoryService

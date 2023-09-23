@@ -131,7 +131,7 @@ const routes = [
     },
   }, 
   {
-    path: '/editCourse',
+    path: '/editCourse/:id',
     name: 'editCourse',
     component: () => import('../views/course/EditCourse.vue'),
     meta: {
@@ -185,6 +185,15 @@ const routes = [
     component: () => import('../views/course/instructorTrainerViewVotingCampaign.vue'),
     meta: {
         title: 'Instructor Trainer View Voting Campaign',
+   
+    }
+  },
+  {
+    path: '/adminViewCourse',
+    name: 'adminViewCourse',
+    component: () => import('../views/course/adminViewCourse.vue'),
+    meta: {
+        title: 'Admin View Course',
    
     }
   }

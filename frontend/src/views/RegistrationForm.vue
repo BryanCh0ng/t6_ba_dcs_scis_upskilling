@@ -134,6 +134,22 @@ export default {
         return;
       }
 
+      const smuStudentEmailPattern = /^[\w.-]+@(?:[a-zA-Z]+\.)?smu\.edu\.sg$/i;
+      if (this.role === "Student") {
+        if (!smuStudentEmailPattern.test(this.email)) {
+          this.errorMessage = "Please sign up with your SMU email address."
+          return;
+        }
+      }
+
+      const smuEmailPattern = /^[\w.-]+@smu\.edu\.sg$/i;
+      if (this.role === "Instructor") {
+        if (!smuEmailPattern.test(this.email)) {
+          this.errorMessage = "Please sign up with your SMU email address."
+          return;
+        }
+      }
+
       // Additional validation for Trainer role - required fields
       if (this.role === "Trainer" && (!this.organizationName || !this.alumni)) {
         this.errorMessage = "Please ensure all fields are filled.";

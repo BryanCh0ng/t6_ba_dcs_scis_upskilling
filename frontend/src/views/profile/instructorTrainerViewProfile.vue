@@ -18,9 +18,9 @@
             :search-api="searchInstructorAssignedCourseInfo"
             @search-complete="handleSearchCompleteAssigned" />
 
-            <div class="container col-12 table-responsive">
+            <div class="container col-12">
             <h5 class="pb-3">Course(s) Assigned to Me</h5>
-            <div v-if="assigned_courses && assigned_courses.length > 0">
+            <div v-if="assigned_courses && assigned_courses.length > 0" class="table-responsive">
                 <table class="table bg-white">
                 <thead>
                     <tr class="text-nowrap">
@@ -79,9 +79,9 @@
             :search-api="searchInstructorProposedCourseInfo"
             @search-complete="handleSearchCompleteProposed" />
 
-            <div class="container col-12 table-responsive">
+            <div class="container col-12">
             <h5 class="pb-3">Course(s) Proposed by Me</h5>
-            <div v-if="proposed_courses && proposed_courses.length > 0">
+            <div v-if="proposed_courses && proposed_courses.length > 0" class="table-responsive">
                 <table class="table bg-white">
                 <thead>
                     <tr class="text-nowrap">
@@ -140,9 +140,9 @@
             :search-api="searchInstructorCompletedCourseInfo"
             @search-complete="handleSearchCompleteConducted" />
 
-            <div class="container col-12 table-responsive">
+            <div class="container col-12">
             <h5 class="pb-3">Course(s) Taught by Me</h5>
-            <div v-if="conducted_courses && conducted_courses.length > 0">
+            <div v-if="conducted_courses && conducted_courses.length > 0" class="table-responsive">
                 <table class="table bg-white">
                 <thead>
                     <tr class="text-nowrap">

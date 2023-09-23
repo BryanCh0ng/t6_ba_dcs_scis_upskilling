@@ -10,49 +10,29 @@ app.logger.setLevel(logging.DEBUG)
 
 api = Namespace('votecourse', description='Vote Course related operations')
 
-promote_to_course_model = api.model("promote_to_course_model", {
-    "vote_id" : fields.Integer(description="", required=True),
-})
+promote_to_course = api.parser()
+promote_to_course.add_argument("course_id", help="Enter course id")
 @api.route('/promote_to_course', methods=["POST"])
 @api.doc(description="Promote To Course")
 class PromoteToCourse(Resource):
-  @api.expect(promote_to_course_model)
+  @api.expect(promote_to_course)
   def post(self):
     try:
-      data = request.get_json()
-      print(data)
-      vote_course = VoteCourse.query.filter_by(vote_ID = data['vote_id']).first()
-
+      args = promote_to_course.parse_args()
+      course_id = args.get("course_id")
+      vote_course = VoteCourse.query.filter_by(course_ID = course_id).first()
       if vote_course:
         vote_course.vote_Status = 'Offered'
-        newRunCourse = RunCourse(
-          run_Startdate=None,
-          run_Enddate=None,
-          run_Starttime=None,
-          run_Endtime=None,
-          instructor_ID=None,
-          course_Format=None,
-          course_Venue=None,
-          runcourse_Status=None,
-          course_Size=None,
-          course_Minsize=None,
-          course_Fee=None,
-          class_Duration=None,
-          reg_Startdate=None,
-          reg_Enddate=None,
-          reg_Starttime=None,
-          reg_Endtime=None,
-          template_ID=None,
-          course_ID= vote_course.course_ID,
-          course_Status='Active'
-        )
-        db.session.add(newRunCourse)
+        course = Course.query.filter_by(course_ID = vote_course.course_ID).first()
+        if course:
+          course.course_Status = 'Active'
         db.session.commit()
-        return jsonify({"message": "Vote Course is successfully offered", "code": 200})
+        return jsonify({"message": "Vote Course is successfully promoted to course", "code": 200})
       else:
-        return jsonify({"message": "Course does not exist", "code": 404})
+        return jsonify({"message": "Vote Course does not exist", "code": 404})
     except Exception as e:
         return jsonify({"message": "Failed " + str(e), "code": 500})
+    
 
 retrieve_vote_course = api.parser()
 retrieve_vote_course.add_argument("course_id", help="Enter course id")

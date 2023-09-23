@@ -48,6 +48,7 @@ export default {
   },
   methods: {
     reject() {
+      this.showResponse = false
       if (this.selectedRadio == 'with-reason' && /^[^a-zA-Z]*$/.test(this.rejectionReason)){
         this.showResponse = true
         this.responseText = "Please Specify reason for rejecting"

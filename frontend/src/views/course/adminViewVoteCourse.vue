@@ -16,9 +16,9 @@
               :search-api="searchAllVotingCoursesAdmin"
               @search-complete="handleSearchComplete" />
 
-            <div class="container col-12 table-responsive">
+            <div class="container col-12">
               <h5 class="pb-3">Courses Available for Students to Indicate Interest</h5>
-              <div v-if="vote_courses && vote_courses.length > 0">
+              <div v-if="vote_courses && vote_courses.length > 0" class="table-responsive">
                 <table class="table bg-white">
                   <thead>
                     <tr class="text-nowrap">
@@ -45,13 +45,13 @@
                     <td class="current_interest">
                         {{ vote_course.voteCount }}
                     </td>
-                    <td>{{ vote_status[vote_course.vote_Status] }}</td>
+                    <td class="text-nowrap">{{ vote_status[vote_course.vote_Status] }}</td>
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(vote_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                     <div v-if="vote_course.vote_Status === 'Ongoing'">
                       <td><course-action status="Close" @action-and-message-updated="handleActionData" :course="vote_course"></course-action></td>
                     </div>
                     <div v-else-if="vote_course.vote_Status === 'Closed'">
-                      <td ><course-action status="promote_to_course" :course="vote_course" @click="editCourse(vote_course.course_ID, 'promote_to_course')"></course-action></td>
+                      <td ><course-action status="promote_to_course" @action-and-message-updated="handleActionData" :course="vote_course"></course-action></td>
                       <td><course-action @action-and-message-updated="handleActionData" status="unoffered-vote" :course="vote_course"></course-action></td>
                     </div>
                     <div v-else></div>
@@ -98,7 +98,6 @@
                     <td class="current_interest">
                         {{ notoffered_course.voteCount }}
                     </td>
-                    
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(notoffered_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                   </tr>
                   </tbody>
@@ -166,10 +165,13 @@ export default {
         statusOptions: ["Ongoing", "Offered", "Closed"],
         actionCourse: {},
         vote_status: {
-        "Ongoing": "Open for voting",
-        "Offered": "Offered for students to register",
-        "Closed": "Voting closed for students"
-        }
+          "Ongoing": "Open for voting",
+          "Offered": "Offered for students to register",
+          "Closed": "Voting closed for students"
+        },
+        search_vote_status: null,
+        search_course_name: null,
+        search_course_category: null
     }
   },
 
@@ -208,7 +210,9 @@ export default {
       this.notoffered_courses = searchResults; // Always update the courses array
     },
     async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, vote_status) {
-      console.log("vote status",vote_status)
+      this.search_course_name = course_Name
+      this.search_course_category = coursecat_ID
+      this.vote_status = vote_status
       try {
         let response = await CourseService.searchAllVotingCoursesAdmin(
           course_Name,
@@ -224,6 +228,8 @@ export default {
       }
     },
     async searchAllNotOfferedVotingCoursesAdmin(course_Name, coursecat_ID) {
+      this.search_course_name = course_Name
+      this.search_course_category = coursecat_ID
       try {
         let response = await CourseService.searchAllNotOfferedVotingCoursesAdmin(
           course_Name,
@@ -266,14 +272,11 @@ export default {
       }
     },
     async loadData() {
-      let response = await CourseService.searchAllVotingCoursesAdmin(null, null, null)
+      let response = await CourseService.searchAllVotingCoursesAdmin(this.search_course_name, this.search_course_category, this.search_vote_status)
       this.vote_courses = response.data
 
-      let course = await CourseService.searchAllNotOfferedVotingCoursesAdmin(null, null)
+      let course = await CourseService.searchAllNotOfferedVotingCoursesAdmin(this.search_course_name, this.search_course_category)
       this.notoffered_courses = course.data
-    },
-    editCourse(courseId, action) {
-      this.$router.push({ name: 'editProposedCourse', params: { courseId, action } });
     }
   },
   computed: {

@@ -22,9 +22,9 @@
             :search-api="searchCourseRegistrationInfo"
             @search-complete="handleSearchCompleteRegistered" />
 
-        <div class="container col-12 table-responsive">
+        <div class="container col-12">
           <h5 class="pb-3">My Registered Course</h5>
-          <div v-if="registered_courses && registered_courses.length > 0">
+          <div v-if="registered_courses && registered_courses.length > 0" class="table-responsive">
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
@@ -91,9 +91,9 @@
             :search-api="searchCourseVoteInfo"
             @search-complete="handleSearchCompleteInterested" />
 
-        <div class="container col-12 table-responsive">
+        <div class="container col-12">
           <h5 class="pb-3">My Interested Course</h5>
-          <div  v-if="interested_courses && interested_courses.length > 0">
+          <div v-if="interested_courses && interested_courses.length > 0" class="table-responsive">
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
@@ -142,9 +142,9 @@
             :search-api="searchProposedInfo"
             @search-complete="handleSearchCompleteProposed" />
 
-        <div class="container col-12 table-responsive">
+        <div class="container col-12">
           <h5 class="pb-3">My Proposed Course</h5>
-          <div  v-if="proposed_courses && proposed_courses.length > 0">
+          <div  v-if="proposed_courses && proposed_courses.length > 0" class="table-responsive">
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
@@ -198,9 +198,9 @@
             :search-api="searchCompletedInfo"
             @search-complete="handleSearchCompleteCompleted" />
 
-        <div class="container col-12 table-responsive">
+        <div class="container col-12">
           <h5 class="pb-3">My Completed Courses</h5>
-          <div  v-if="completed_courses && completed_courses.length > 0">
+          <div  v-if="completed_courses && completed_courses.length > 0" class="table-responsive">
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
