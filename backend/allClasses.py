@@ -322,7 +322,6 @@ class RunCourse(db.Model):
     reg_Enddate = db.Column(db.Date, nullable=False)
     reg_Starttime = db.Column(Time, nullable=False)
     reg_Endtime = db.Column(Time, nullable=False)
-    template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'), nullable=False)
     course_ID = db.Column(db.Integer, db.ForeignKey('course.course_ID'), nullable=False)
 
 
