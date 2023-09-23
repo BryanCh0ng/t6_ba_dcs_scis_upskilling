@@ -60,6 +60,7 @@ import PreviewModal from "@/components/feedbackTemplate/PreviewModal.vue";
 import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import { ref } from "vue";
+import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js";
 
 export default {
   components: {
@@ -110,8 +111,9 @@ export default {
         this.updateQuestionNumbers();
       }
     },
-    submitFeedbackTemplate() {
+    async submitFeedbackTemplate() {
       var haveError = false
+      
       if (this.v$.feedback_template_name.$error && this.v$.feedback_template_name.$dirty) {
         haveError = true;
       }
@@ -120,12 +122,13 @@ export default {
         haveError = true
       }
       if (haveError == false) {
-        const output = {
+        const data = {
           feedback_template_name: this.feedback_template_name,
           data: formData
         }
-        console.log(output)
-        console.log('submitted')
+        const response = await FeedbackTemplateService.createFeedbackTemplate(data)
+        console.log(response)
+        alert(response.message)
       }
     },
     getFormData() {

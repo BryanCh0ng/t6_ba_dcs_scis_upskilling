@@ -272,9 +272,15 @@ const routes = [
         title: 'View Dashboard',
    
     }
-  }
-  
-
+  },
+  {
+    path: '/submitFeedback/:id',
+    name: 'submitFeedback',
+    component: () => import('../views/feedback/submitFeedback.vue'),
+    meta: {
+        title: 'Submit Feedback',
+    },
+  },
   // },
   // {
   //     path: '/deleteCourse',

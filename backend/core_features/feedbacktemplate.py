@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
-import datetime
+from datetime import datetime, date, time
 from allClasses import *
 from sqlalchemy import asc
 from sqlalchemy.orm import aliased
@@ -85,7 +85,7 @@ class GetTemplate(Resource):
 
 
           template_data['data'] = list(question_dict.values())
-          return {"code": 200, "data": {"templates": template_data}}, 200
+          return {"code": 200, "data": {"template": template_data}}, 200
 
         return {"code": 404, "message": "There is no such template"}, 404
     
@@ -104,7 +104,7 @@ class CreateFeedbackStudent(Resource):
             db.session.commit()
 
         except Exception as e:
-            return json.loads(json.dumps({"message": "Failed to create feedback template: " + str(e)})), 500
+          return {"code": 500, "message": "Failed to create feedback template: "}, 500
         
         templateID = NewFeedbackTemplate.json().get("template_ID")
 
@@ -141,12 +141,12 @@ class CreateFeedbackStudent(Resource):
                 # Commit the changes to the database
                 db.session.commit()
 
-            # Return the newly created course as JSON response
-            return json.loads(json.dumps(newTemplateAttribute.json(), default=str)), 201
+
+            return {"code": 200, "message": "Feedback Template successfully created"}, 200
         
         except Exception as e:
-            print("Error:", str(e))
-            return "Failed to create a new feedback attribute: " + str(e), 500
+          print("Error:", str(e))
+          return {"code": 500, "message": "Failed to create a new feedback attribute"}, 500
         
         
 
@@ -212,11 +212,11 @@ get_all_feedback_template_names = api.parser()
 class GetAllFeedbackTemplateNames(Resource):
     @api.expect(get_all_feedback_template_names)
     def get(self):
-      templates = FeedbackTemplate.template_Name.query.all()
+      template_names = db.session.query(FeedbackTemplate.template_Name).all()
       db.session.close()
       
-      if templates:
-        template_names_json = [template.template_Name.json() for template in templates]
+      if template_names:
+        template_names_json = [template_name[0] for template_name in template_names]
         return {"code": 200, "feedback_template_names": template_names_json}, 200
 
       return {"code": 404, "message": "No templates found"}, 404

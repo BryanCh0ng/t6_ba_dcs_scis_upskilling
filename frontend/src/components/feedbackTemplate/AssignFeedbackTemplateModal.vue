@@ -14,7 +14,7 @@
                 <h4>Available Course(s)</h4>
                 <tr v-for="(course, key) in courses" :key="key" class="mt-2">
                   <td class="mt-2"> {{ course.course_Name }} </td>
-                  <td class="mt-2"> <button class="btn btn-primary mt-2 bg-primary text-light2" @click="selectCourse(course)">Select</button> </td>
+                  <td class="mt-2"> <button class="btn btn-primary mt-2 bg-primary text-light" @click="selectCourse(course)">Select</button> </td>
                 </tr>
               </table>
             </div>

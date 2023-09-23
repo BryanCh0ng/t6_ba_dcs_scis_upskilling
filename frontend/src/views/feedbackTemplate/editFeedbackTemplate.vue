@@ -184,10 +184,8 @@ export default {
     try {
       if(template_id) {
         const response = await FeedbackTemplateService.getTemplateById(template_id);
-        console.log(response)
-        console.log(response.data)
         if (response.code == 200) {
-          this.questions = response.data.templates
+          this.questions = response.data.template
           this.questionsError = false
           this.questions.data.forEach((data, index) => {
             data.id = index + 1;

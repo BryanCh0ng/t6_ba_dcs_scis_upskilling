@@ -157,7 +157,7 @@ class GetCourse(Resource):
 						}
 					)
 
-        return json.loads(json.dumps({"message": "There is no such course"})), 404
+        return {"code": 404, "message": "There is no such course"}, 404
 
 @api.route("/create_course", methods=["POST"])
 @api.doc(description="Create course")

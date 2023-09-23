@@ -36,7 +36,7 @@
         </div>
       </div>
       <vue-awesome-paginate v-if="feedback_templates.length/itemsPerPage > 0" v-model="localCurrentPageFeedbackTemplates" :totalItems="feedback_templates.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeFeedbackTemplates" class="justify-content-center pagination-container"/>
-      
+        
       <div class="modal fade" id="delete_feedback_template_modal" tabindex="-1" aria-hidden="true" ref="deleteFeedbackTemplateModal">
         <div class="modal-dialog modal-lg"> 
           <delete-feedback-template-modal  v-if="showModal" @model-after-action-close="modalAfterActionClose" :feedback_template="selectedFeedbackTemplate" @close-modal="closeModal" />
