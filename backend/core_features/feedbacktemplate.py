@@ -284,15 +284,17 @@ class DeleteFeedbackTemplate(Resource):
         args = delete_feedback_template.parse_args()
         templateID = args.get("template_ID")
         feedback_template = FeedbackTemplate.query.filter_by(template_ID = templateID).first() # get first feedback template
+        if feedback_template == None:
+           return {"code": 404, "message": "Feedback template does not exist" }, 404
+           
         # check if feedback template in use
-        runningcourse = RunCourse.query.filter_by(template_ID = templateID).all()
-        for runcourse in runningcourse:
-           if runcourse.runcourse_Status == "Ongoing":
-              return {"code": 404, "message": "Failed the feedback template is in use" }, 404
-        for runcourse in runningcourse:
+        runningcourse = RunCourse.query.filter(RunCourse.template_ID == templateID, RunCourse.runcourse_Status == "Ongoing").all()
+        if runningcourse:
+           return {"code": 404, "message": "Failed the feedback template is in use" }, 404
+        allrunningcourrse = RunCourse.query.filter_by(template_ID = templateID).all()
+        for runcourse in allrunningcourrse:
            runcourse.template_ID = None
-        
-        isdelete = False
+
         if feedback_template:
             course_to_change = Course.query.filter_by(template_ID = templateID)
             for course in course_to_change:
