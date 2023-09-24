@@ -10,6 +10,7 @@
         <label class="mb-1">Enter Feedback Template Name</label>
         <input type="text" v-model="feedback_template_name" class="form-control" placeholder="Feedback Template Name" required>
         <div v-if="v$.feedback_template_name.$error && v$.feedback_template_name.$dirty" class="error-message mt-1 text-danger">Feedback Template Name Field is required.</div>
+        <div v-if="this.isPresent" class="error-message mt-1 text-danger">{{ templateNameErrorMsge }}</div>
       </div>
 
       <div class="form-group mt-2 mb-2" v-for="(element, index) in questions" :key="element.id">
@@ -51,6 +52,9 @@
         <preview-modal :feedbackTemplate="templateData" @close-modal="closeModal" />
       </div>
     </div>
+
+    <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
+
   </div>
 </template>
   
@@ -61,11 +65,13 @@ import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import { ref } from "vue";
 import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js";
+import DefaultModal from "@/components/DefaultModal.vue";
 
 export default {
   components: {
     FeedbackTemplate,
-    PreviewModal
+    PreviewModal,
+    DefaultModal
   },
   setup() {
     const feedback_template_name = ref('');
@@ -87,7 +93,13 @@ export default {
       qnNum: 1,
       templateData: {},
       questions: [],
-      question: ''
+      question: '',
+      isPresent: false,
+      templateNameErrorMsge: '',
+      showAlert: false,
+      message: '',
+      buttonType: '',
+      title: ''
     }
   },
   methods: {
@@ -121,14 +133,46 @@ export default {
       if (formData.some(item => item.haveError === true)) {
         haveError = true
       }
+
+      const get_all_template_name_response = await FeedbackTemplateService.getAllFeedbackTemplateNames()
+      if(get_all_template_name_response.code == 200) {
+        var convert_to_lower_case = get_all_template_name_response.feedback_template_names.map(function(item) {
+              return item.toLowerCase();
+          });
+        this.isPresent = convert_to_lower_case.includes(this.feedback_template_name.toLowerCase());
+        if(this.isPresent) {
+          haveError = true
+        }
+        this.templateNameErrorMsge = "Feedback Template Name already exists."
+      } else {
+        haveError = true
+        this.templateNameErrorMsge = get_all_template_name_response.message
+      }
       if (haveError == false) {
         const data = {
           feedback_template_name: this.feedback_template_name,
           data: formData
         }
-        const response = await FeedbackTemplateService.createFeedbackTemplate(data)
-        console.log(response)
-        alert(response.message)
+        try {
+          const response = await FeedbackTemplateService.createFeedbackTemplate(data)
+          if (response.code == 200) {
+            this.title = "Feedback Template Create Success"
+            this.message =  response.message
+            this.buttonType = "success"
+            this.showAlert = !this.showAlert;
+          } else {
+            this.title = "Feedback Template Create Failed"
+            this.message = response.message
+            this.buttonType = "danger"
+            this.showAlert = !this.showAlert;
+          }
+        } catch (error) {
+            this.title = "Feedback Template Creation Failed";
+            this.message = "Feedback Template Creation was unsuccessful"
+            this.buttonType = "danger"
+            this.showAlert = !this.showAlert;
+            throw new Error("Feedback Template Creation was unsuccessful");
+        }
       }
     },
     getFormData() {
@@ -165,6 +209,12 @@ export default {
     },
     closeModal() {
       this.showModal = false;
+    },
+    async handleModalClosed(value){
+      this.showAlert = value;
+      if (!this.showAlert) {
+        this.$router.push('/studentViewProfile');
+      }
     },
   }
 }
