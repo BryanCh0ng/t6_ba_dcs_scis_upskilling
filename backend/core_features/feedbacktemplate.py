@@ -75,6 +75,7 @@ class GetTemplate(Resource):
                 question_data = {
                   'question': attribute.question,
                   'selectedInputType': attribute.input_Type,
+                  'attribute_id': attribute.template_Attribute_ID,
                   'inputOptions': [{
                       'id': input_option.input_Option_ID,
                       'position': input_option.position,
@@ -89,9 +90,9 @@ class GetTemplate(Resource):
 
         return {"code": 404, "message": "There is no such template"}, 404
     
-@api.route("/post_feedback_student", methods=["GET", "POST"])
+@api.route("/post_feedback_template", methods=["GET", "POST"])
 @api.doc(description="Post feedback template attribute")
-class CreateFeedbackStudent(Resource):
+class CreateFeedbackTemplate(Resource):
     def post(self):
         req = request.json
         templateName = req.get("feedback_template_name")

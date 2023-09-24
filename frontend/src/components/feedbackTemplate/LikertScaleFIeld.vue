@@ -1,9 +1,9 @@
 <template>
   <div>
-    <label for="">{{ label }}</label>
+    <label for="">{{ qnNum }}. {{ label }}</label>
     <ul class='likert'>
-      <li  v-for="option in options" :key="option.id">
-        <input type="radio" name="likert" :value="option.option">
+      <li v-for="option in options" :key="option.id">
+        <input type="radio" :name="label" :value="option.option"  v-model="selectedOption">
         <label>{{ option.option }}</label>
       </li>
     </ul>
@@ -15,11 +15,17 @@ export default {
   props: {
     label: String,
     id: Number,
-    options: Array
+    options: Array,
+    qnNum: Number
   },
   data() {
     return {
       selectedOption: null
+    }
+  },
+  watch: {
+    selectedOption(newValue) {
+      this.$emit('input', {value: newValue, key: this.qnNum-1});
     }
   }
 };

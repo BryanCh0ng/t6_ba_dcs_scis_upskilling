@@ -1,8 +1,13 @@
 <template>
     <div>
-      <label for="">{{ label }}</label>
+      <label for="">{{ qnNum }}. {{ label }}</label>
       <div v-for="option in options" :key="option.id">
-        <input type="radio" :name="label" :value="option.id"> {{ option.option }}
+        <input
+        type="radio"
+        :name="label"
+        :value="option.option"
+        v-model="selectedOption"
+      />{{ option.option }}
       </div>
     </div>
   </template>
@@ -12,7 +17,20 @@
     props: {
       label: String,
       id: Number,
-      options: Array
+      options: Array,
+      qnNum: Number,
+      value: String
     },
+    data() {
+    return {
+      selectedOption: this.value || '', 
+      };
+    },
+    watch: {
+      selectedOption(newValue) {
+        this.$emit('input', {value: newValue, key: this.qnNum-1});
+      }
+    }
   };
   </script>
+
