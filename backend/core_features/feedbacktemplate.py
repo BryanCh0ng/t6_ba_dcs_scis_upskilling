@@ -383,3 +383,24 @@ def format_date_time(value):
         return value.strftime('%H:%M:%S')
     else:
         return None
+    
+
+get_feedback_template_records = api.parser()
+get_feedback_template_records.add_argument("template_ID", help="Feedback Template ID")
+get_feedback_template_records.add_argument("user_ID", help="User ID")
+get_feedback_template_records.add_argument("rcourse_ID", help="Run course ID")
+@api.route('/get_feedback_template_records')
+@api.doc(description= "get feedback records")
+class GetFeedbackTemplateRecords(Resource):
+    @api.expect(get_feedback_template_records)
+    def post(self):
+        args = get_feedback_template_records.parse_args()
+        templateID = args.get('template_ID')
+        userID = args.get('user_ID')
+        rcourseID = args.get('rcourse_ID')
+        feedback = Feedback.query.filter( Feedback.rcourse_ID == rcourseID, Feedback.feedback_Template_ID == templateID, Feedback.submitted_By == userID).all()
+        if feedback:
+          eachfeedback_json = [eachfeedback.json() for eachfeedback in feedback]
+          return {"code": 200, "feedback": eachfeedback_json}, 200
+
+        return {"code": 404, "message" : "feedback does not exist for this rcourse"},404
