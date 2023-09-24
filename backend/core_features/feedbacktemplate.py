@@ -100,7 +100,7 @@ class GetTemplate(Resource):
       except Exception as e :
             return {"code": 404, "message": str(e)}, 404
     
-@api.route("/post_feedback_template", methods=["GET", "POST"])
+@api.route("/post_feedback_template", methods=["POST"])
 @api.doc(description="Post feedback template attribute")
 class CreateFeedbackTemplate(Resource):
     def post(self):
@@ -154,7 +154,7 @@ class CreateFeedbackTemplate(Resource):
             return {"code": 200, "message": "Feedback Template successfully created"}, 200
         
         except Exception as e:
-          return {"code": 500, "message": "Failed to create a new feedback attribute"}, 500
+          return {"code": 500, "message": str(e)}, 500
         
         
 
@@ -197,7 +197,7 @@ class GetCoursesByTemplateId(Resource):
       query = db.session.query(
           FeedbackTemplate,
           Course
-      ).select_from(FeedbackTemplate).join(
+      ).select_from(FeedbackTemplate).outerjoin(
           Course, FeedbackTemplate.template_ID == Course.template_ID
       ).filter(
           FeedbackTemplate.template_ID == templateID
@@ -207,10 +207,11 @@ class GetCoursesByTemplateId(Resource):
       if query_results:
         courses = []
         for _, course in query_results:
-            courses.append({
-              "course_Name": course.course_Name,
-              "course_ID": course.course_ID
-            })
+            if course is not None:
+              courses.append({
+                "course_Name": course.course_Name,
+                "course_ID": course.course_ID
+              })
         return {"code": 200, "data": {"courses": courses}}, 200
       return {"code": 404, "message": "Failed to retrieve run courses by template id"}, 404
 
@@ -327,55 +328,55 @@ class EditFeedbackTemplate(Resource):
             print("Error:", str(e))
             return "Failed" + str(e), 500  
 
-delete_feedback_template = api.parser()
-delete_feedback_template.add_argument("template_ID", help="Feedback Template ID")
-@api.route('/delete_feedback_template')
-@api.doc(description="Delete Feedback Template ")
-class DeleteFeedbackTemplate(Resource):
-    @api.expect(delete_feedback_template)
-    def post(self):
-      try:
-        args = delete_feedback_template.parse_args()
-        templateID = args.get("template_ID")
-        feedback_template = FeedbackTemplate.query.filter_by(template_ID = templateID).first() # get first feedback template
-        if feedback_template == None:
-           return {"code": 404, "message": "Feedback template does not exist" }, 404
+# delete_feedback_template = api.parser()
+# delete_feedback_template.add_argument("template_ID", help="Feedback Template ID")
+# @api.route('/delete_feedback_template')
+# @api.doc(description="Delete Feedback Template ")
+# class DeleteFeedbackTemplate(Resource):
+#     @api.expect(delete_feedback_template)
+#     def post(self):
+#       try:
+#         args = delete_feedback_template.parse_args()
+#         templateID = args.get("template_ID")
+#         feedback_template = FeedbackTemplate.query.filter_by(template_ID = templateID).first() # get first feedback template
+#         if feedback_template == None:
+#            return {"code": 404, "message": "Feedback template does not exist" }, 404
            
-        # check if feedback template in use
-        runningcourse = RunCourse.query.filter(RunCourse.template_ID == templateID, RunCourse.runcourse_Status == "Ongoing").all()
-        if runningcourse:
-           return {"code": 404, "message": "Failed the feedback template is in use" }, 404
-        allrunningcourrse = RunCourse.query.filter_by(template_ID = templateID).all()
-        for runcourse in allrunningcourrse:
-           runcourse.template_ID = None
+#         # check if feedback template in use
+#         runningcourse = RunCourse.query.filter(RunCourse.template_ID == templateID, RunCourse.runcourse_Status == "Ongoing").all()
+#         if runningcourse:
+#            return {"code": 404, "message": "Failed the feedback template is in use" }, 404
+#         allrunningcourrse = RunCourse.query.filter_by(template_ID = templateID).all()
+#         for runcourse in allrunningcourrse:
+#            runcourse.template_ID = None
 
-        if feedback_template:
-            course_to_change = Course.query.filter_by(template_ID = templateID)
-            for course in course_to_change:
-               course.template_ID = None
+#         if feedback_template:
+#             course_to_change = Course.query.filter_by(template_ID = templateID)
+#             for course in course_to_change:
+#                course.template_ID = None
           
-            template_attributes = TemplateAttribute.query.filter_by(template_ID = templateID).all() # get all template attributes linked to the feedback       
+#             template_attributes = TemplateAttribute.query.filter_by(template_ID = templateID).all() # get all template attributes linked to the feedback       
             
-            if template_attributes:
-                for template_attri in template_attributes:
-                    template_attri_ID = template_attri.template_Attribute_ID
-                    feedback_to_delete = Feedback.query.filter_by(template_Attribute_ID = template_attri_ID).all()
-                    if feedback_to_delete:
-                        for feedback in feedback_to_delete:
-                            db.session.delete(feedback) # delete feedback containing template id and attribute id
-                    template_attributes_options = InputOption.query.filter_by(template_Attribute_ID = template_attri_ID).all() # get all input options linked to template attributes
-                    if template_attributes_options:
-                        for option in template_attributes_options:
-                            db.session.delete(option) #delete template attribute options                      
-                    db.session.delete(template_attri)                                        
-        db.session.commit()
-        if feedback_template:
-            db.session.delete(feedback_template)
-            db.session.commit()
+#             if template_attributes:
+#                 for template_attri in template_attributes:
+#                     template_attri_ID = template_attri.template_Attribute_ID
+#                     feedback_to_delete = Feedback.query.filter_by(template_Attribute_ID = template_attri_ID).all()
+#                     if feedback_to_delete:
+#                         for feedback in feedback_to_delete:
+#                             db.session.delete(feedback) # delete feedback containing template id and attribute id
+#                     template_attributes_options = InputOption.query.filter_by(template_Attribute_ID = template_attri_ID).all() # get all input options linked to template attributes
+#                     if template_attributes_options:
+#                         for option in template_attributes_options:
+#                             db.session.delete(option) #delete template attribute options                      
+#                     db.session.delete(template_attri)                                        
+#         db.session.commit()
+#         if feedback_template:
+#             db.session.delete(feedback_template)
+#             db.session.commit()
 
-        return {"code": 200, "message": "Delete Feedback Template Successfully"}, 200
-      except Exception as e:
-        return {"code": 404, "message": "Failed " + str(e)}, 404
+#         return {"code": 200, "message": "Delete Feedback Template Successfully"}, 200
+#       except Exception as e:
+#         return {"code": 404, "message": "Failed " + str(e)}, 404
 
 
 def format_date_time(value):

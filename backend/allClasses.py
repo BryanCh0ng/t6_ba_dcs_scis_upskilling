@@ -90,7 +90,7 @@ class CourseCategory(db.Model):
 class FeedbackTemplate(db.Model):
     __tablename__ = 'feedbacktemplate'
 
-    template_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    template_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     template_Name = db.Column(db.String(255), nullable=False)
     # created_on = db.Column(db.DateTime, default=datetime.now ,  nullable=False)
     created_On = db.Column(db.Date,  nullable=False)
@@ -230,8 +230,8 @@ class TemplateAttribute(db.Model):
     template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'),  nullable=False) 
 
 
-
-    def __init__(self, question, input_Type, template_ID ):
+    def __init__(self, template_Attribute_ID, question, input_Type, template_ID ):
+        self.template_Attribute_ID = template_Attribute_ID
         self.question = question
         self.input_Type = input_Type
         self.template_ID = template_ID

@@ -19,9 +19,10 @@
             </ul>
           </div>
           <div class="col-6 offset-6 d-flex justify-content-between">
-              <button type="button" class="mt-4 btn btn-danger float-right w-100 delete-feedback-template" data-bs-dismiss="modal" aria-label="Close" @click="deleteTemplate">Delete</button>
+              <button type="button" class="mt-4 btn delete btn-danger float-right w-100 delete-feedback-template" data-bs-dismiss="modal" aria-label="Close" @click="deleteTemplate">Delete</button>
               <button type="button" class="mt-4 btn btn-secondary float-right w-100" data-bs-dismiss="modal" aria-label="Close" @click="closeModal">Cancel</button>
           </div>
+          
         </div>
         <div v-else>
           <p>{{ errorMessage }}</p>
@@ -110,3 +111,4 @@
   }
 
   </style>
+

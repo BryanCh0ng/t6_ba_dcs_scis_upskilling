@@ -213,7 +213,7 @@ export default {
     async handleModalClosed(value){
       this.showAlert = value;
       if (!this.showAlert) {
-        this.$router.push('/studentViewProfile');
+        this.$router.push('/adminViewFeedbackTemplate');
       }
     },
   }
