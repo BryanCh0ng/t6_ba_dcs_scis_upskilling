@@ -73,6 +73,16 @@ class FeedbackTemplateService extends BaseApiService {
         }
     }
 
+    async deleteFeedbackTemplate(templateId) {
+        try {
+            let response = await axiosClient.post("/feedbacktemplate/delete_feedback_template", { params: { template_id: templateId } });
+            console.log(response)
+            return response.data
+        } catch (error) {
+            return this.handleError(error)
+        }
+    }
+
 }
 
 export default new FeedbackTemplateService();

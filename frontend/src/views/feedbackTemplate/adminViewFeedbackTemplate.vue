@@ -2,7 +2,7 @@
     <div>
       <div class="container col-12">
         <h5 class="pb-3">All Feedback Templates</h5>
-        <div v-if="feedback_templates && feedback_templates.length > 0" class="table-responsive">
+        <div v-if="feedback_templates && feedback_templates.length > 0" class="table-responsive bg-white">
           <table class="table bg-white" style="table-layout: fixed;">
             <thead>
               <tr class="text-nowrap">
@@ -24,7 +24,7 @@
                 <td class="d-flex">
                   <div><button class="btn btn-info apply_to_course text-light font-weight-bold text-nowrap" @click="openModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#assign_feedback_template_modal">Apply to Course(s)</button></div>
                   <div><button class="m-4 mt-0 mb-0 btn btn-edit edit text-light font-weight-bold text-nowrap" @click="goToEditFeedbackTemplate(feedback_template.template_ID)">Edit</button></div>
-                  <div><button class="btn btn-danger delete text-light font-weight-bold text-nowrap" @click="openModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#delete_feedback_template_modal">Delete</button></div>
+                  <div><button class="btn btn-danger delete text-light font-weight-bold text-nowrap" @click="openDeleteModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#delete_feedback_template_modal">Delete</button></div>
                 </td>
               </tr>               
             </tbody>
@@ -39,13 +39,13 @@
         
       <div class="modal fade" id="delete_feedback_template_modal" tabindex="-1" aria-hidden="true" ref="deleteFeedbackTemplateModal">
         <div class="modal-dialog modal-lg"> 
-          <delete-feedback-template-modal  v-if="showModal" @model-after-action-close="modalAfterActionClose" :feedback_template="selectedFeedbackTemplate" @close-modal="closeModal" />
+          <delete-feedback-template-modal :deleteModalOpen="deleteModalOpen" v-if="showDeleteModal" @model-after-action-close="modalAfterActionClose" :feedback_template="selectedFeedbackTemplate" @close-modal="closeDeleteModal" />
         </div>
       </div>
 
       <div class="modal fade" id="assign_feedback_template_modal" tabindex="-1" aria-hidden="true" ref="assignFeedbackTemplateModal">
         <div class="modal-dialog modal-lg"> 
-          <assign-feedback-template-modal  v-if="showModal" @model-after-action-close="modalAfterActionClose" :feedback_template="selectedFeedbackTemplate" @close-modal="closeModal" />
+          <assign-feedback-template-modal :modalOpen="modalOpen"  v-if="showModal" @model-after-action-close="modalAfterActionClose" :feedback_template="selectedFeedbackTemplate" @close-modal="closeModal" />
         </div>
       </div>
   
@@ -79,7 +79,10 @@
         localCurrentPageFeedbackTemplates: 1,
         actionCourse: {},
         showModal: false,
-        selectedFeedbackTemplate: null
+        selectedFeedbackTemplate: null,
+        modalOpen: false,
+        deleteModalOpen: false,
+        showDeleteModal: false
       }
     },
     computed: {
@@ -111,7 +114,8 @@
         }
       },
       // modalAfterActionClose() {
-      //   this.loadData();
+      //   console.log('close')
+      //   this.modalOpen = false
       // },
       sort(column) {
         if (this.sortColumn === column) {
@@ -138,8 +142,28 @@
         this.$router.push({ name: 'editFeedbackTemplate', params: {id: feedback_template_id}})
       },
       openModal(feedback_template) {
+        console.log('open')
         this.selectedFeedbackTemplate = feedback_template;
+        this.modalOpen = !this.modalOpen;
         this.showModal = true;
+      },
+      closeModal() {
+        console.log('close')
+        this.showModal = false;
+        this.modalOpen = false;
+        this.selectedFeedbackTemplate = null;
+      },
+      openDeleteModal(feedback_template) {
+        console.log('open')
+        this.selectedFeedbackTemplate = feedback_template;
+        this.deleteModalOpen = !this.deleteModalOpen;
+        this.showDeleteModal = true;
+      },
+      closeDeleteModal() {
+        console.log('close')
+        this.showDeleteModal = false;
+        this.deleteModalOpen = false;
+        this.selectedFeedbackTemplate = null;
       }
     },
     created() {

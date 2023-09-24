@@ -8,6 +8,7 @@
           <h3 class="text-center">Delete {{ feedback_template.template_Name }}</h3>
         </div>
         <div v-if="!error">
+          <p class="text-success">{{ deleteMsge }}</p>
           <div class="mt-3">
               This Action cannot be undone.  Once {{ feedback_template.template_Name }} is deleted, the following courses will no longer be able to receive feedback: 
           </div>
@@ -18,7 +19,7 @@
             </ul>
           </div>
           <div class="col-6 offset-6 d-flex justify-content-between">
-              <button type="button" class="mt-4 btn btn-danger float-right w-100 delete" data-bs-dismiss="modal" aria-label="Close" @click="closeModal">Delete</button>
+              <button type="button" class="mt-4 btn btn-danger float-right w-100 delete-feedback-template" data-bs-dismiss="modal" aria-label="Close" @click="deleteTemplate">Delete</button>
               <button type="button" class="mt-4 btn btn-secondary float-right w-100" data-bs-dismiss="modal" aria-label="Close" @click="closeModal">Cancel</button>
           </div>
         </div>
@@ -36,12 +37,14 @@
   export default {
   props: {
     feedback_template: Object,
+    deleteModalOpen: Boolean
   },
   data() {
     return {
       courses: {},
       error: false,
-      errorMessage: ''
+      errorMessage: '',
+      deleteMsge: ''
     }
   },
   methods: {
@@ -50,6 +53,8 @@
       this.$emit('model-after-action-close', true);
     },
     async fetchData() {
+      console.log('test')
+      console.log(this.feedback_template)
       try {
         if(this.feedback_template.template_ID) {
           const response = await FeedbackTemplateService.getCoursesByTemplateId(this.feedback_template.template_ID)
@@ -65,11 +70,37 @@
         this.error = true;
         this.errorMessage = 'Error fetching template by ID:' + error
       }
+    },
+    async deleteTemplate() {
+      try {
+        const response = await FeedbackTemplateService.deleteFeedbackTemplate(this.feedback_template.template_ID)
+        console.log(response)
+        if (response.code == 200) {
+          this.error = false
+          this.errorMessage = response.message
+          const button = document.getElementById("delete-feedback-template");
+          button.disabled = true;
+        } else {
+          this.error = true
+          this.errorMessage = response.message
+        }
+      } catch (error) {
+        console.log(error)
+        this.error = true;
+        this.errorMessage = error.toString()
+      }
     }
   },
+  watch: {
+    deleteModalOpen(newVal) {
+      console.log(newVal)
+      console.log('modal open')
+      this.fetchData(); 
+    },
+  },
   mounted() {
-    this.fetchData();
-  }
+    this.fetchData(); 
+  },
   };
   </script>
 

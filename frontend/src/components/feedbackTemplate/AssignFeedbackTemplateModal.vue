@@ -47,13 +47,14 @@
   export default {
   props: {
     feedback_template: Object,
+    modalOpen: Boolean
   },
   data() {
     return {
       courses: [],
       included_course: [],
       error: false,
-      errorMessage: ''
+      errorMessage: '',
     }
   },
   methods: {
@@ -63,6 +64,8 @@
     },
     async fetchData() {
       try {
+        console.log('load')
+        console.log(this.feedback_template)
         if(this.feedback_template.template_ID) {
           const response = await FeedbackTemplateService.getCourseNamesByFeedbackTemplateId(this.feedback_template.template_ID)
           console.log(response)
@@ -101,9 +104,16 @@
       console.log(this.feedback_template.template_ID);
     }
   },
+  watch: {
+    modalOpen(newVal) {
+      console.log(newVal)
+      console.log('modal open')
+      this.fetchData(); 
+    },
+  },
   mounted() {
-    this.fetchData();
-  }
+    this.fetchData(); 
+  },
   };
   </script>
 

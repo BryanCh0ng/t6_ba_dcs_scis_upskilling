@@ -344,14 +344,14 @@ INSERT INTO templateattribute VALUES
 	(1, 'Content - How would you rate the course content and course structure?', 'Likert Scale', 1),
 	(2, 'Duration - How would you rate the course content and course structure?', 'Likert Scale', 1),
 	(3, 'Relevancy - How would you rate the course content and course structure?', 'Likert Scale', 1),
-	(4, 'What are the areas of the course that was done well?', 'Text', 1),
-	(5, 'What are the areas of the course can we can improve?', 'Text', 1), 
+	(4, 'What are the areas of the course that was done well?', 'Text Field', 1),
+	(5, 'What are the areas of the course can we can improve?', 'Text Field', 1), 
 	(6, 'Clarity - How would you rate the Instructor?', 'Likert Scale', 1),
 	(7, 'Pace - How would you rate the Instructor?', 'Likert Scale', 1),
 	(8, 'Helpfulness - How would you rate the Instructor?', 'Likert Scale', 1),
 	(9, 'Knowledge - How would you rate the Instructor?', 'Likert Scale', 1),
-	(10, 'What are the areas that the instructor did well on?', 'Text', 1),
-	(11, 'What are the areas that the instructor can improve on?', 'Text', 1);
+	(10, 'What are the areas that the instructor did well on?', 'Text Field', 1),
+	(11, 'What are the areas that the instructor can improve on?', 'Text Field', 1);
 
 DROP TABLE IF EXISTS `inputoption`;
 CREATE TABLE IF NOT EXISTS `inputoption`(
