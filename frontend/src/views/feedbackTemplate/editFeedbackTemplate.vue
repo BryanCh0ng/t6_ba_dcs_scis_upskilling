@@ -12,6 +12,7 @@
           <label class="mb-1">Enter Feedback Template Name</label>
           <input type="text" v-model="feedback_template_name" class="form-control" placeholder="Feedback Template Name">
           <div v-if="v$.feedback_template_name.$error && v$.feedback_template_name.$dirty" class="error-message mt-1 text-danger">Feedback Template Name Field is required.</div>
+          <div v-if="this.isPresent" class="error-message mt-1 text-danger">{{ templateNameErrorMsge }}</div>
         </div>
 
         <div class="form-group mt-2 mb-2" v-for="(element, index) in questions.data" :key="element.id">
@@ -64,6 +65,9 @@
         <preview-modal :feedbackTemplate="templateData" @close-modal="closeModal" />
       </div>
     </div>
+
+    <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
+
   </div>
 </template>
 
@@ -74,11 +78,13 @@ import { useVuelidate } from "@vuelidate/core";
 import { required } from "@vuelidate/validators";
 import { ref } from "vue";
 import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js";
+import DefaultModal from "@/components/DefaultModal.vue";
 
 export default {
   components: {
     FeedbackTemplate,
-    PreviewModal
+    PreviewModal,
+    DefaultModal
   },
   setup() {
     const feedback_template_name = ref('');
@@ -101,7 +107,13 @@ export default {
       templateData: {},
       question: '',
       questionsError: false,
-      questionsErrorMessage: ''
+      questionsErrorMessage: '',
+      isPresent: false,
+      templateNameErrorMsge: '',
+      showAlert: false,
+      message: '',
+      buttonType: '',
+      title: ''
     };
   },
   methods: {
@@ -122,7 +134,7 @@ export default {
         this.updateQuestionNumbers();
       }
     },
-    submitFeedbackTemplate() {
+    async submitFeedbackTemplate() {
       var haveError = false
       if (this.v$.feedback_template_name.$error && this.v$.feedback_template_name.$dirty) {
         haveError = true;
@@ -132,13 +144,54 @@ export default {
       if (formData.some(item => item.haveError === true)) {
         haveError = true
       }
+
+      const get_all_template_name_response = await FeedbackTemplateService.getAllFeedbackTemplateNames()
+      if(get_all_template_name_response.code == 200) {
+        var index = get_all_template_name_response.feedback_template_names.indexOf(this.feedback_template_name)
+        if (index !== -1) {
+          get_all_template_name_response.feedback_template_names.splice(index, 1); 
+        }
+        console.log(get_all_template_name_response.feedback_template_names)
+        var convert_to_lower_case = get_all_template_name_response.feedback_template_names.map(function(item) {
+              return item.toLowerCase();
+          });
+        this.isPresent = convert_to_lower_case.includes(this.feedback_template_name.toLowerCase());
+        if(this.isPresent) {
+          haveError = true
+        }
+        this.templateNameErrorMsge = "Feedback Template Name already exists."
+      } else {
+        haveError = true
+        this.templateNameErrorMsge = get_all_template_name_response.message
+      }
+
       if (!haveError && !this.questionsError) {
-        const output = {
+        const data = {
           feedback_template_name: this.feedback_template_name,
+          template_id: this.$route.params.id,
           data: formData
         }
-        console.log(output)
-        console.log('submitted')
+        try {
+          console.log(data)
+          const response = await FeedbackTemplateService.editFeedbackTemplate(data)
+          if (response.code == 200) {
+            this.title = "Feedback Template Edit Success"
+            this.message =  response.message
+            this.buttonType = "success"
+            this.showAlert = !this.showAlert;
+          } else {
+            this.title = "Feedback Template Edit Failed"
+            this.message = response.message
+            this.buttonType = "danger"
+            this.showAlert = !this.showAlert;
+          }
+        } catch (error) {
+            this.title = "Feedback Template Edit Failed";
+            this.message = "Feedback Template Edit was unsuccessful"
+            this.buttonType = "danger"
+            this.showAlert = !this.showAlert;
+            throw new Error("Feedback Template Edit was unsuccessful");
+        }
       }
     },
     getFormData() {

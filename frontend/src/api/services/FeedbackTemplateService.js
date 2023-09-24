@@ -63,6 +63,16 @@ class FeedbackTemplateService extends BaseApiService {
         }
     }
 
+    async editFeedbackTemplate(data) {
+        try {
+            let response = await axiosClient.put("/feedbacktemplate/edit_feedback_template", data)
+            console.log(response)
+            return response.data
+        } catch (error) {
+            return this.handleError(error)
+        }
+    }
+
 }
 
 export default new FeedbackTemplateService();
