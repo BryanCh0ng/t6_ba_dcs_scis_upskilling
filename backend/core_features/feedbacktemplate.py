@@ -292,9 +292,7 @@ class EditFeedbackTemplate(Resource):
                     if attribute:
                         setattr(attribute, 'input_Type', editAttribute['selectedInputType'])
                         if editAttribute['inputOptions']:
-                            options = InputOption.query.filter_by(template_Attribute_ID=attribute.template_Attribute_ID).all()
-                            if options:
-                                db.session.delete(options)
+                            InputOption.query.filter_by(template_Attribute_ID=attribute.template_Attribute_ID).delete()
                             position = 1
                             for editOption in editAttribute['inputOptions']: 
                                 new_option = InputOption(template_Attribute_ID=attribute.template_Attribute_ID, position=position, textlabel=editOption['option'])
