@@ -1,7 +1,12 @@
 <template>
     <div>
       <div class="container col-12">
-        <h5 class="pb-3">All Feedback Templates</h5>
+
+        <div class="container col-12 d-flex mb-3 w-100">
+          <h5 class="col m-auto">All Feedback Templates</h5>
+          <button class="btn btn-primary" @click="goToCreateFeedbackTemplate">Create Feedback Template</button>
+        </div>
+
         <div v-if="feedback_templates && feedback_templates.length > 0" class="table-responsive bg-white">
           <table class="table bg-white" style="table-layout: fixed;">
             <thead>
@@ -22,7 +27,7 @@
                   {{ convertDate(feedback_template.created_On) }}
                 </td>
                 <td class="d-flex">
-                  <div><button class="btn btn-info apply_to_course text-light font-weight-bold text-nowrap" @click="openModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#assign_feedback_template_modal">Apply to Course(s)</button></div>
+                  <div><button class="btn btn-info apply_to_course text-light font-weight-bold text-nowrap" @click="openModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#apply_feedback_template_modal">Apply to Course(s)</button></div>
                   <div><button class="m-4 mt-0 mb-0 btn btn-edit edit text-light font-weight-bold text-nowrap" @click="goToEditFeedbackTemplate(feedback_template.template_ID)">Edit</button></div>
                   <div><button class="btn btn-danger delete text-light font-weight-bold text-nowrap" @click="openDeleteModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#delete_feedback_template_modal">Delete</button></div>
                 </td>
@@ -43,9 +48,9 @@
         </div>
       </div>
 
-      <div class="modal fade" id="assign_feedback_template_modal" tabindex="-1" aria-hidden="true" ref="assignFeedbackTemplateModal">
+      <div class="modal fade" id="apply_feedback_template_modal" tabindex="-1" aria-hidden="true" ref="applyFeedbackTemplateModal">
         <div class="modal-dialog modal-lg"> 
-          <assign-feedback-template-modal :modalOpen="modalOpen"  v-if="showModal" @model-after-action-close="modalAfterActionClose" :feedback_template="selectedFeedbackTemplate" @close-modal="closeModal" />
+          <apply-feedback-template-modal :modalOpen="modalOpen"  v-if="showModal" @model-after-action-close="modalAfterActionClose" :feedback_template="selectedFeedbackTemplate" @close-modal="closeModal" />
         </div>
       </div>
   
@@ -60,14 +65,14 @@
   import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js";
   import {convertDate} from '@/scripts/common/convertDateTime.js'
   import DeleteFeedbackTemplateModal from '@/components/feedbackTemplate/DeleteFeedbackTemplateModal.vue'
-  import AssignFeedbackTemplateModal from '@/components/feedbackTemplate/AssignFeedbackTemplateModal.vue'
+  import ApplyFeedbackTemplateModal from '@/components/feedbackTemplate/ApplyFeedbackTemplateModal.vue'
   
   export default {
     components: {
       sortIcon,
       VueAwesomePaginate,
       DeleteFeedbackTemplateModal,
-      AssignFeedbackTemplateModal
+      ApplyFeedbackTemplateModal
     },
     data() {
       return {
@@ -108,7 +113,11 @@
         try {
           console.log('load')
           let response = await FeedbackTemplateService.getAllTemplates()
-          this.feedback_templates = response
+          if (response.code == 200) {
+            this.feedback_templates = response.templates
+          } else {
+            console.log(response.message)
+          }
         } catch (error) {
           console.error("Error fetching feedback template details:", error);
         }
@@ -164,6 +173,9 @@
         this.showDeleteModal = false;
         this.deleteModalOpen = false;
         this.selectedFeedbackTemplate = null;
+      },
+      goToCreateFeedbackTemplate() {
+        this.$router.push({ name: 'createFeedbackTemplate'});
       }
     },
     created() {

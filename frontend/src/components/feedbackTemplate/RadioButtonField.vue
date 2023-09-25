@@ -1,6 +1,7 @@
 <template>
     <div>
-      <label for="">{{ qnNum }}. {{ label }}</label>
+      <label v-if="qnNum !== undefined" class="mb-1">{{ qnNum }}. {{ label }}</label>
+      <label v-else class="mb-1">{{ label }}</label>
       <div v-for="option in options" :key="option.id">
         <input
         type="radio"

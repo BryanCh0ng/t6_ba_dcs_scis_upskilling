@@ -14,7 +14,7 @@
         <single-select-field v-else-if="template.selectedInputType == 'Single Select'" class="mb-4" :options="template.inputOptions" :label="template.question"></single-select-field>
         <likert-scale-field v-else-if="template.selectedInputType == 'Likert Scale'"  class="mb-4" :options="template.inputOptions" :label="template.question"></likert-scale-field>
       </div>
-    </div>
+    </div> 
   </div>
 </template>
   

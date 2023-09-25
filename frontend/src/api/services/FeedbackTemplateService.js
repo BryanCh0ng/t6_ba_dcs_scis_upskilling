@@ -5,7 +5,7 @@ class FeedbackTemplateService extends BaseApiService {
     async getAllTemplates() {
         try {
             let response = await axiosClient.get("/feedbacktemplate/get_all_templates");
-            return response.data.data.templates;
+            return response.data;
 
         } catch (error) {
             return this.handleError(error);
@@ -74,8 +74,8 @@ class FeedbackTemplateService extends BaseApiService {
     }
 
     async deleteFeedbackTemplate(templateId) {
-        try {
-            let response = await axiosClient.post("/feedbacktemplate/delete_feedback_template", { params: { template_id: templateId } });
+        try { 
+            let response = await axiosClient.post("/feedbacktemplate/delete_feedback_template", { template_ID: templateId });
             console.log(response)
             return response.data
         } catch (error) {

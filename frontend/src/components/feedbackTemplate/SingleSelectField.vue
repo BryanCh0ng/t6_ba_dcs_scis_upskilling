@@ -1,6 +1,7 @@
 <template>
   <div class="form-group row">
-    <label class="mb-1">{{ qnNum }}. {{ label }}</label>
+    <label v-if="qnNum !== undefined" class="mb-1">{{ qnNum }}. {{ label }}</label>
+    <label v-else class="mb-1">{{ label }}</label>
     <select class="form-control" v-model="selectedOption" :id="id">
       <option value="" disabled selected>{{ label }}</option>
       <option v-for="option in options" :key="option.id" :value="option.option">{{ option.option }}</option>

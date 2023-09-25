@@ -303,6 +303,26 @@ class CourseService extends BaseApiService {
         }
     }
 
+    // Admin - All Run course based on course id
+    async searchAllRunCourseByCourseId(course_Name, coursecat_ID, course_Status, course_id) {
+        try {
+
+            let response = await axiosClient.get("/course/get_all_run_course_by_course_id", {
+                params: {
+                    course_name: course_Name,
+                    coursecat_id: coursecat_ID,
+                    course_status: course_Status,
+                    course_id: course_id
+                }
+            });
+            // console.log(response.data)
+            return response.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+
     // Admin - All Instructors
     async getAllInstructorsAndTrainers(user_Name, role_Name, organization_Name) {
         try {
@@ -466,6 +486,20 @@ class CourseService extends BaseApiService {
         } catch (error) {
           console.error('Error updating proposed course:', error);
           return { success: false, message: 'An error occurred while updating the proposed course' };
+        }
+    }
+
+    async CourseApplyFeedbackTemplate(course_id, template_id) {
+        try {
+            const response = await axiosClient.post("/course/course_apply_feedback_template", {
+                course_id: course_id,
+                template_id: template_id,
+            });
+            console.log(response.data);
+            return response.data;
+            
+        } catch (error) {
+            return this.handleError(error);
         }
     }
 }

@@ -281,6 +281,14 @@ const routes = [
         title: 'Submit Feedback',
     },
   },
+  {
+    path: '/adminViewCourseRun/:id',
+    name: 'adminViewCourseRun',
+    component: () => import('../views/course/adminViewCourseRun.vue'),
+    meta: {
+        title: 'Submit Feedback',
+    },
+  },
   // },
   // {
   //     path: '/deleteCourse',

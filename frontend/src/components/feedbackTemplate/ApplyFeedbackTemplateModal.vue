@@ -12,7 +12,7 @@
             <div class="col-lg-6">
               <table class="table table-responsive">
                 <h4>Available Course(s)</h4>
-                <tr v-for="(course, key) in courses" :key="key" class="mt-2">
+                <tr v-for="(course, key) in not_included_courses" :key="key" class="mt-2">
                   <td class="mt-2"> {{ course.course_Name }} </td>
                   <td class="mt-2"> <button class="btn btn-primary mt-2 bg-primary text-light" @click="selectCourse(course)">Select</button> </td>
                 </tr>
@@ -51,7 +51,7 @@
   },
   data() {
     return {
-      courses: [],
+      not_included_courses: [],
       included_course: [],
       error: false,
       errorMessage: '',
@@ -70,9 +70,9 @@
           const response = await FeedbackTemplateService.getCourseNamesByFeedbackTemplateId(this.feedback_template.template_ID)
           console.log(response)
           if(response.code == 200) {
-            this.courses = response.course_name_no_template;
+            this.not_included_courses = response.course_name_no_template;
             this.included_courses = response.course_names_using;
-            console.log(this.courses)
+            console.log(this.not_included_courses)
             console.log(this.included_courses)
           } else {
             this.error = true;
@@ -85,9 +85,9 @@
       }
     },
     selectCourse(course) {
-      const index = this.courses.findIndex((c) => c.course_ID === course.course_ID && c.course_Name === course.course_Name);
+      const index = this.not_included_courses.findIndex((c) => c.course_ID === course.course_ID && c.course_Name === course.course_Name);
       if (index !== -1) {
-        this.courses.splice(index, 1);
+        this.not_included_courses.splice(index, 1);
       }
       this.included_courses.push(course)
     },
@@ -96,12 +96,15 @@
       if (index !== -1) {
         this.included_courses.splice(index, 1);
       }
-      this.courses.push(course)
+      this.not_included_courses.push(course)
     },
     apply(){
-      console.log(this.courses);
-      console.log(this.included_courses);
-      console.log(this.feedback_template.template_ID);
+      const data = {
+        not_included_courses: this.not_included_courses,
+        included_courses: this.included_course,
+        template_ID: this.feedback_template.template_ID
+      }
+      console.log(data)
     }
   },
   watch: {

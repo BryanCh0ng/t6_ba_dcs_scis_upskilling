@@ -1159,6 +1159,70 @@ class GetAllCoursesWithRegistrationCount(Resource):
             return jsonify({"code": 200, "data": result_data})
 
         return jsonify({"code": 404, "message": "No courses found"})
+    
+retrieve_all_run_course_by_course_id_admin = api.parser()
+retrieve_all_run_course_by_course_id_admin.add_argument("course_name", help="Enter course name")
+retrieve_all_run_course_by_course_id_admin.add_argument("coursecat_id", help="Enter course category id")
+retrieve_all_run_course_by_course_id_admin.add_argument("course_status", help="Enter run course status")
+retrieve_all_run_course_by_course_id_admin.add_argument("course_id", help="Enter course id")
+@api.route("/get_all_run_course_by_course_id")
+@api.doc(description="Get all run course by course id")
+class GetAllCoursesWithRegistrationCount(Resource):
+    @api.expect(retrieve_all_run_course_by_course_id_admin)
+    def get(self):
+        args = retrieve_all_run_course_by_course_id_admin.parse_args()
+        course_name = args.get("course_name", "")
+        course_category_id = args.get("coursecat_id", "")
+        runcourse_status = args.get("course_status", "")
+        course_id = args.get("course_id", "")
+
+        query = db.session.query(
+            Course,
+            CourseCategory.coursecat_Name,
+            RunCourse,
+            func.coalesce(func.count(Registration.reg_ID), 0).label("registration_count")
+        ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).outerjoin(
+            Registration, RunCourse.rcourse_ID == Registration.rcourse_ID
+        ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID).group_by(Course.course_ID, RunCourse.rcourse_ID)
+
+        if course_name:
+            query = query.filter(Course.course_Name.contains(course_name))
+        if course_category_id:
+            query = query.filter(Course.coursecat_ID == course_category_id)
+        if runcourse_status:
+            query = query.filter(RunCourse.runcourse_Status == runcourse_status)
+        if course_id:
+            query = query.filter(RunCourse.course_ID == course_id)
+
+        results = query.all()
+        db.session.close()
+
+        if results:
+            result_data = []
+            for result in results:
+                run_course_attrs = {
+                    'run_Startdate': format_date_time(result[2].run_Startdate),
+                    'run_Enddate': format_date_time(result[2].run_Enddate),
+                    'run_Starttime': format_date_time(result[2].run_Starttime),
+                    'run_Endtime': format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                }
+
+                modified_run_course = {**result[2].json(), **run_course_attrs}
+
+                course_info = {
+                    **result[0].json(),
+                    "coursecat_Name": result[1],
+                    **modified_run_course,
+                    "registration_count": result[3]
+                }
+                result_data.append(course_info)
+            return jsonify({"code": 200, "data": result_data})
+
+        return jsonify({"code": 404, "message": "No courses found"})
 
 # Admin - All Instructors
 retrieve_instructors_trainers = api.parser()
@@ -1407,16 +1471,15 @@ class sortRecords(Resource):
       records_with_none_values = [record for record in records if record.get(sort_column) is None]
 
       if sort_column != "":
-          sorted_data = sorted(records_with_values, key=lambda x: x[sort_column], reverse=(sort_direction == "desc"))
+          sorted_data = sorted(records, key=lambda x: (
+                (x.get(sort_column) is None, x.get(sort_column).lower() if isinstance(x.get(sort_column), str) else x.get(sort_column))
+            ), reverse=(sort_direction == "desc"))
       else:
           sorted_data = records
 
       sorted_data = records_with_none_values + sorted_data
 
       return jsonify({"code": 200, "data": sorted_data, "sort": sort_column, "direction": sort_direction})
-
-
-
 
 
 add_interest = api.parser()
@@ -1569,6 +1632,34 @@ class AdminUpdateRunCourse(Resource):
             return jsonify({"message": f"Failed to update course: {str(e)}", "code": 500})
 
 
+# Apply Feedback Template to Course
+course_apply_feedback_template = api.parser()
+course_apply_feedback_template.add_argument("course_id", help="Enter course id")
+course_apply_feedback_template.add_argument("template_id", help="Enter template id")
+@api.route("/course_apply_feedback_template")
+@api.doc(description="Apply feedback template to a course")
+class CourseApplyFeedbackTemplate(Resource):
+    @api.expect(course_apply_feedback_template)
+    def post(self):
+        try:
+            args = course_apply_feedback_template.parse_args()
+            courseID = args.get("course_id")
+            templateID = args.get("template_id")
+            
+            course = Course.query.filter_by(course_ID=courseID).first()
+            print(course)
+            print(templateID)
+
+            # check if template id is valid
+            if course is None:
+                return jsonify({"message": "course not found", "code": 404}), 404
+
+            course.template_ID = templateID
+            db.session.commit()
+            return jsonify({"code": 200, "message": "Course assign feedback template success"})
+
+        except Exception as e:
+            return jsonify({"code": 500, "message": "Failed. " + str(e)})
 
 def format_date_time(value):
     if isinstance(value, (date, datetime)):
