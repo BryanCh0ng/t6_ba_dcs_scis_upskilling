@@ -281,7 +281,7 @@ import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/CommonSearchFilter.vue";
 import StudentSearchFilter from "@/components/search/StudentCourseSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
-// import UserService from "@/api/services/UserService.js";
+import UserService from "@/api/services/UserService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
 import modalRejectedReason from '@/components/course/modalRejectedReason.vue';
 

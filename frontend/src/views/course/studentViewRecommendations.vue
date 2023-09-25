@@ -417,6 +417,9 @@ export default {
     },
     async loadData() {
       let user_register = await Recommender.getUserSimilarityRegistration(this.user_ID)
+      if (user_register.length === 0) {
+        this.showRegisterJustForYou = false
+      }
       this.reg_courses_for_you = user_register.data.course_list
       if (this.reg_courses_for_you.length === 0) {
         this.showRegisterJustForYou = false

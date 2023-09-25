@@ -77,33 +77,37 @@ class RecommenderUserRegistration(Resource):
         
         
         def recommend_courses(user, num_recommendations):
-            user_courses = pivot_df.loc[user]
+            if user not in pivot_df.index:
+                return []
+            else:
+                user_courses = pivot_df.loc[user]
 
-            similar_users = user_similarity_df[user].sort_values(ascending=False)[1:]
-            
-            recommended_courses = set()
-            for similar_user, similarity_score in similar_users.items():
-                if similarity_score > 0:
-                    similar_user_courses = pivot_df.loc[similar_user]
-                    for course, registration in similar_user_courses.items():
-                        if ( registration == 1 and user_courses[course] == 0):
-                            registration_status = Registration.query.filter(
-                                (Registration.user_ID == similar_user) &
-                                (Registration.rcourse_ID == course)
-                            ).first().reg_Status
-                            
-                            if registration_status not in ["Pending", "Enrolled"]:
-                                rcourse = RunCourse.query.filter(RunCourse.rcourse_ID == course).first()
-                                if rcourse and rcourse.runcourse_Status == "Ongoing" and course not in rcourse_ids:
-                                    recommended_courses.add(course)
-                                    if len(recommended_courses) == num_recommendations:
-                                        return list(recommended_courses)
+                similar_users = user_similarity_df[user].sort_values(ascending=False)[1:]
+                
+                recommended_courses = set()
+                for similar_user, similarity_score in similar_users.items():
+                    if similarity_score > 0:
+                        similar_user_courses = pivot_df.loc[similar_user]
+                        for course, registration in similar_user_courses.items():
+                            if ( registration == 1 and user_courses[course] == 0):
+                                registration_status = Registration.query.filter(
+                                    (Registration.user_ID == similar_user) &
+                                    (Registration.rcourse_ID == course)
+                                ).first().reg_Status
+                                
+                                if registration_status not in ["Pending", "Enrolled"]:
+                                    rcourse = RunCourse.query.filter(RunCourse.rcourse_ID == course).first()
+                                    if rcourse and rcourse.runcourse_Status == "Ongoing" and course not in rcourse_ids:
+                                        recommended_courses.add(course)
+                                        if len(recommended_courses) == num_recommendations:
+                                            return list(recommended_courses)
 
-            return list(recommended_courses)
+                return list(recommended_courses)
 
             
         try:
             recommendations_rcourses_id = recommend_courses(target_user_id, 10)
+            
             
             course_list = []
             for recommondations_rcourse_id in recommendations_rcourses_id:
