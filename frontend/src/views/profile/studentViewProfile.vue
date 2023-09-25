@@ -318,7 +318,7 @@ export default {
       statusOptionsInterested: ["Offered", "Ongoing", "Closed"],
       statusOptionsProposed: ["Approved", "Rejected", "Pending"],
       currentDate: new Date(),
-      user_ID: null,
+      user_ID: 1,
       onInitialEmptyRegistered: false,
       onInitialEmptyInterested: false,
       onInitialEmptyProposed: false,
@@ -331,6 +331,16 @@ export default {
     }
   },
   methods: {
+    async get_user_id() {
+      try {
+        const user_ID = await UserService.getUserID()
+        this.user_ID = user_ID
+
+      } catch (error) {
+        this.message = error.message
+        this.user_ID = null;
+      }
+    },
     openModal(course) {
       this.selectedCourse = course;
       this.showModal = true;
@@ -485,19 +495,17 @@ export default {
 
     async loadData() {
       try {
-        // let  user_ID = await UserService.getUserID()
-        let user_ID = 1
 
-        let registered_courses = await CourseService.searchCourseRegistrationInfo(user_ID, null, null, null)
+        let registered_courses = await CourseService.searchCourseRegistrationInfo(this.user_ID, null, null, null)
         this.registered_courses = registered_courses.data
 
-        let interested_courses = await CourseService.searchCourseVoteInfo(user_ID, null, null, null)
+        let interested_courses = await CourseService.searchCourseVoteInfo(this.user_ID, null, null, null)
         this.interested_courses = interested_courses.data
 
-        let proposed_courses = await CourseService.searchProposedInfo(user_ID, null, null, null)
+        let proposed_courses = await CourseService.searchProposedInfo(this.user_ID, null, null, null)
         this.proposed_courses = proposed_courses.data
 
-        let completed_courses = await CourseService.searchCompletedInfo(user_ID, null, null)
+        let completed_courses = await CourseService.searchCompletedInfo(this.user_ID, null, null)
         this.completed_courses = completed_courses.data
         
       } catch (error) {
@@ -577,37 +585,31 @@ export default {
   },
   async created() {
     try {
-      // let user_ID = await UserService.getUserID()
-      let user_ID = 1
 
-      let registered_response= await CourseService.searchCourseRegistrationInfo(user_ID, null, null, null)
+      let registered_response= await CourseService.searchCourseRegistrationInfo(this.user_ID, null, null, null)
       this.registered_courses = registered_response.data
       if (this.registered_courses == undefined || this.registered_courses.length == 0) {
         this.onInitialEmptyRegistered = true
       }
-      // console.log(this.registered_courses)
 
-      let interested_response= await CourseService.searchCourseVoteInfo(user_ID, null, null, null)
+      let interested_response= await CourseService.searchCourseVoteInfo(this.user_ID, null, null, null)
       this.interested_courses = interested_response.data
       if (this.interested_courses == undefined || this.interested_courses.length == 0) {
         this.onInitialEmptyInterested = true
       }
-      // console.log(this.interested_courses)
 
-      let proposed_response = await CourseService.searchProposedInfo(user_ID, null, null, null)
+      let proposed_response = await CourseService.searchProposedInfo(this.user_ID, null, null, null)
       this.proposed_courses = proposed_response.data
       if (this.proposed_courses == undefined || this.proposed_courses.length == 0) {
         this.onInitialEmptyProposed = true
       }
-      // console.log(this.proposed_courses)
 
-      let completed_response = await CourseService.searchCompletedInfo(user_ID, null, null, null)
+      let completed_response = await CourseService.searchCompletedInfo(this.user_ID, null, null, null)
       // console.log(completed_response.data)
       this.completed_courses = completed_response.data
       if (this.completed_courses == undefined || this.completed_courses.length == 0) {
         this.onInitialEmptyCompleted = true
       }
-      // console.log(this.completed_courses)
     } catch (error) {
       console.error("Error fetching course details:", error);
     }

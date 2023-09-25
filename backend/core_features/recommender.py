@@ -11,6 +11,9 @@ import re
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+import logging
+app.logger.setLevel(logging.DEBUG)
+
 api = Namespace('recommender', description='Recommender')
 
 def preprocess_text(text):
@@ -59,12 +62,19 @@ class RecommenderUserRegistration(Resource):
         user_similarity = cosine_similarity(pivot_df)
         user_similarity_df = pd.DataFrame(user_similarity, index=pivot_df.index, columns=pivot_df.index)
 
-        user_ID = session.get('user_ID')
+        # user_ID = session.get('user_ID')
+        user_ID = 1
+
         reg_courses = Registration.query.filter(
             Registration.user_ID == user_ID,
             Registration.reg_Status.in_(["Enrolled", "Pending"])
         ).all()
+
+        if not reg_courses:
+            return jsonify({"code": 200, "data": {"course_list": []}})
+        
         rcourse_ids = [course.rcourse_ID for course in reg_courses]
+        
         
         def recommend_courses(user, num_recommendations):
             user_courses = pivot_df.loc[user]
@@ -150,8 +160,14 @@ class RecommenderCourseRegistration(Resource):
     def post(self):
         try:
             # Extract the last 3 registered courses from the request JSON
-            course_list_req = request.json['params']['course_list_req'][-3:]
-            rcourse_id_list = [course['rcourse_ID'] for course in course_list_req]
+            course_list_req = request.json['params']['course_list_req']
+            course_ids = [course['course_ID'] for course in course_list_req]
+            if not course_list_req:
+                return jsonify({"code": 200, "data": {"course_list": []}})
+            
+            last_three_reg = request.json['params']['course_list_req'][-3:]
+            
+            rcourse_id_list = [course['rcourse_ID'] for course in last_three_reg]
 
         #    user_ID = session.get('user_ID')
             user_ID = 1
@@ -181,6 +197,8 @@ class RecommenderCourseRegistration(Resource):
                         "course_Desc": course_info["course_Desc"], 
                     }
                     reg_list.append(datapoint)
+                
+            
 
             # Create a user-course interaction matrix
             df = pd.DataFrame(reg_list)
@@ -217,7 +235,9 @@ class RecommenderCourseRegistration(Resource):
                 for course, score in similar_courses.items():
                     if course not in rcourse_ids:
                         rcourse = RunCourse.query.filter(RunCourse.rcourse_ID == course).first()
-                        if rcourse and rcourse.runcourse_Status == "Ongoing":
+                        course_ids = [course['course_ID'] for course in course_list_req]
+                        # print(course_ids)
+                        if rcourse and rcourse.runcourse_Status == "Ongoing" and rcourse.rcourse_ID not in course_ids:
                             recommended_courses.append(course)
 
                 return recommended_courses
@@ -319,34 +339,44 @@ class RecommenderUserInterest(Resource):
         user_similarity_df = pd.DataFrame(user_similarity, index=pivot_df.index, columns=pivot_df.index)
 
         def recommend_courses(user, num_recommendations):
-            user_courses = pivot_df.loc[user]
-            similar_users = user_similarity_df[user].sort_values(ascending=False)[1:]
             
-            recommended_courses = set()  
-            for similar_user, similarity_score in similar_users.items():
-                if similarity_score > 0:
-                    similar_user_courses = pivot_df.loc[similar_user]
-                    for course, registration in similar_user_courses.items():
-                        if registration == 1 and user_courses[course] == 0:
-                            vcourse = VoteCourse.query.filter(VoteCourse.course_ID == course).first()
-                            if vcourse and vcourse.vote_Status == "Ongoing":
-                                recommended_courses.add(course)
-                                if len(recommended_courses) == num_recommendations:
-                                    return list(recommended_courses) 
+            if user not in pivot_df.index:
+                return []
+            else:
+                user_courses = pivot_df.loc[user]
             
-            return list(recommended_courses)  
+                similar_users = user_similarity_df[user].sort_values(ascending=False)[1:]
+                
+                recommended_courses = set()  
+                for similar_user, similarity_score in similar_users.items():
+                    if similarity_score > 0:
+                        similar_user_courses = pivot_df.loc[similar_user]
+                        for course, registration in similar_user_courses.items():
+                            if registration == 1 and user_courses[course] == 0:
+                                vcourse = VoteCourse.query.filter(VoteCourse.course_ID == course).first()
+                                if vcourse and vcourse.vote_Status == "Ongoing":
+                                    recommended_courses.add(course)
+                                    if len(recommended_courses) == num_recommendations:
+                                        return list(recommended_courses) 
+                
+                return list(recommended_courses)  
         
         try:
             recommendations_courses_id = recommend_courses(target_user_id, 10)
+            if (len(recommendations_courses_id) == 0):
+                return jsonify({"code": 200, "data": {"course_list": []}})
+            
             course_list = []
             for recommondations_course_id in recommendations_courses_id:
                 course = Course.query.filter(Course.course_ID == recommondations_course_id).first()
                 coursecat = CourseCategory.query.filter(CourseCategory.coursecat_ID == course.coursecat_ID).first()
                 vcourse = VoteCourse.query.filter(VoteCourse.course_ID == recommondations_course_id).first()
+                vcourse = vcourse.json()
                 datapoint = course.json()
                 
                 datapoint["coursecat_Name"] = coursecat.coursecat_Name
-                datapoint["votecourse_status"] = vcourse.vote_Status
+                for field in vcourse.keys():
+                    datapoint[field] = vcourse[field]
 
                 course_list.append(datapoint)
 
@@ -374,8 +404,9 @@ class ImprovedRecommenderCourseInterest(Resource):
     def post(self):
         try:
             # [courseid1, courseid2, courseid3]
-            course_list_req = request.json['params']['course_list_req'][-3:] # based on the last 3 interested courses
-            vcourse_id_list = [course['course_ID'] for course in course_list_req]
+            course_list_req = request.json['params']['course_list_req']
+            last_three_voted = request.json['params']['course_list_req'][-3:] # based on the last 3 interested courses
+            vcourse_id_list = [course['course_ID'] for course in last_three_voted]
 
             # Fetch all users and their course interests
             interest_list = self.get_interest_data()
@@ -387,7 +418,7 @@ class ImprovedRecommenderCourseInterest(Resource):
             course_similarity_df = self.calculate_course_similarity(pivot_df)
 
             # Recommend courses based on similarity
-            recommended_courses = self.recommend_courses(vcourse_id_list, course_similarity_df)
+            recommended_courses = self.recommend_courses(vcourse_id_list, course_similarity_df, course_list_req)
 
             return jsonify({"code": 200, "data": {"course_list": recommended_courses[:10]}})
         except Exception as e:
@@ -409,16 +440,20 @@ class ImprovedRecommenderCourseInterest(Resource):
                     .all()
                 )
 
-                for course, _ in user_interests:
-                    course_id = course.course_ID
-                    course_name = preprocess_text(course.course_Name)
-                    course_desc = preprocess_text(course.course_Desc)
+                if user_interests:
+                    for course, _ in user_interests:
+                        course_id = course.course_ID
+                        course_name = preprocess_text(course.course_Name)
+                        course_desc = preprocess_text(course.course_Desc)
 
-                    interest_list.append(
-                        {"course_ID": course_id, "user_ID": user_id, "course_name": course_name, "course_desc": course_desc}
-                    )
-
-            return interest_list
+                        interest_list.append(
+                            {"course_ID": course_id, "user_ID": user_id, "course_name": course_name, "course_desc": course_desc}
+                        )
+                else:
+                    return jsonify({"code": 200, "data": {"course_list": []}})
+                
+                return interest_list
+                
         except KeyError:
             return jsonify({"code": 404, "message": "No interest data"})
 
@@ -437,7 +472,6 @@ class ImprovedRecommenderCourseInterest(Resource):
                 Course.query.filter(Course.course_ID == course_id).first().course_Desc
                 for course_id in pivot_df.index
             ]
-
             # TF-IDF vectorization of course descriptions
             tfidf_vectorizer = TfidfVectorizer()
             tfidf_matrix = tfidf_vectorizer.fit_transform(course_descriptions)
@@ -450,7 +484,7 @@ class ImprovedRecommenderCourseInterest(Resource):
         except Exception as e:
             raise e
 
-    def recommend_courses(self, vcourse_id_list, course_similarity_df):
+    def recommend_courses(self, vcourse_id_list, course_similarity_df, course_list_req):
         try:
             course_dict = {}
             for course in vcourse_id_list:
@@ -458,7 +492,8 @@ class ImprovedRecommenderCourseInterest(Resource):
                 
                 for similar_course, score in similar_courses.items():
                     vcourse = VoteCourse.query.filter(VoteCourse.course_ID == similar_course).first()
-                    if vcourse and vcourse.vote_Status == "Ongoing" and similar_course not in vcourse_id_list:
+                    course_ids = [course['course_ID'] for course in course_list_req]
+                    if vcourse and vcourse.vote_Status == "Ongoing" and similar_course not in course_ids:
                         if similar_course not in course_dict:
                             course_dict[similar_course] = 1
                         else:
@@ -470,8 +505,14 @@ class ImprovedRecommenderCourseInterest(Resource):
             for recommended_course_id in sorted_dict:
                 course = Course.query.filter(Course.course_ID == recommended_course_id).first()
                 coursecat = CourseCategory.query.filter(CourseCategory.coursecat_ID == course.coursecat_ID).first()
+                vcourse = VoteCourse.query.filter(VoteCourse.course_ID == recommended_course_id).first()
+                vcourse = vcourse.json()
+
                 datapoint = course.json()
                 datapoint["coursecat_Name"] = coursecat.coursecat_Name
+                for field in vcourse.keys():
+                    datapoint[field] = vcourse[field]
+                    
                 course_list.append(datapoint)
 
             db.session.close()
@@ -566,7 +607,7 @@ retrieve_top_10_interest_course = api.parser()
 retrieve_top_10_interest_course.add_argument("user_id", type=int, help="Enter user ID")
 
 @api.route("/get_top_10_course_avail_for_voting")
-@api.doc(description="Get unvoted ongoing course information")
+@api.doc(description="Get top 10 course avail for voting")
 class GetUnvotedOngoingCourses(Resource):
     @api.expect(retrieve_top_10_interest_course)
     def get(self):
@@ -617,7 +658,70 @@ class GetUnvotedOngoingCourses(Resource):
             return jsonify({"code": 200, "data": result_data})
 
         return jsonify({"code": 404, "message": "No courses found"})
+    
+# Student Registration Search - course name, course cat, status
+retrieve_registration_info_filter_search = api.parser()
+retrieve_registration_info_filter_search.add_argument("user_id", type=int, help="Enter user ID")
+
+@api.route("/get_course_registration_info")
+@api.doc(description="Get course registration information")
+class GetCourseRegistrationInfo(Resource):
+    @api.expect(retrieve_registration_info_filter_search)
+    def get(self):
+        args = retrieve_registration_info_filter_search.parse_args()
+        user_ID = args.get("user_id")
+
+        current_datetime = datetime.now()
+
+        valid_reg_statuses = ["enrolled", "pending"]
+
+        query = db.session.query(
+            Course,
+            CourseCategory.coursecat_Name,
+            RunCourse,
+            Registration
+        ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).join(
+            Registration, RunCourse.rcourse_ID == Registration.rcourse_ID
+        ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)  \
+            .filter(RunCourse.run_Enddate > current_datetime,
+                    Registration.reg_Status.in_(valid_reg_statuses))
+
+        if user_ID:
+            query = query.filter(Registration.user_ID == user_ID)
+       
         
+        results = query.all()
+        db.session.close()
+
+        if results:
+            result_data = []
+            for result in results:
+                run_course_attrs = {
+                    "run_Startdate": result[2].run_Startdate.strftime('%Y-%m-%d'),
+                    "run_Enddate": result[2].run_Enddate.strftime('%Y-%m-%d'),
+                    "run_Starttime": result[2].run_Starttime.strftime('%H:%M:%S'),
+                    "run_Endtime": result[2].run_Endtime.strftime('%H:%M:%S'),
+                    "reg_Startdate": result[2].reg_Startdate.strftime('%Y-%m-%d'),
+                    "reg_Enddate": result[2].reg_Enddate.strftime('%Y-%m-%d'),
+                    "reg_Starttime": result[2].reg_Starttime.strftime('%H:%M:%S'),
+                    "reg_Endtime": result[2].reg_Endtime.strftime('%H:%M:%S'),
+                }
+
+                modified_run_course = {**result[2].json(), **run_course_attrs}
+
+                course_info = {
+                    **result[0].json(),
+                    "coursecat_Name": result[1],
+                    **modified_run_course,
+                    **result[3].json()
+                }
+                result_data.append(course_info)
+            # app.logger.debug("Debug message")
+            # app.logger.debug(result_data)
+            return jsonify({"code": 200, "data": result_data})
+
+        return jsonify({"code": 404, "message": "No matching course registration information found"})
+    
 def format_date_time(value):
     if isinstance(value, (date, datetime)):
         return value.strftime('%Y-%m-%d')

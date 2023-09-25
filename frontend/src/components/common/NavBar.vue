@@ -88,7 +88,7 @@ export default {
       if (this.user_ID) {
         if (this.user_role === "Student") {
           links.push(
-            { path: "/recommendations", label: "Recommendations" },
+            { path: "/studentViewRecommendations", label: "Recommendations" },
             { path: "/studentViewCourse", label: "View Courses" },
             { path: "/proposeCourse", label: "Propose Course" }
           );

@@ -93,6 +93,22 @@ class RecommenderService extends BaseApiService {
         }
     }
 
+    async getUserRegisteredCourses(user_ID) {
+        try {
+            // console.log(user_ID)
+            let response = await axiosClient.get("/recommender/get_course_registration_info", {
+                params: {
+                    user_id: user_ID,
+                }
+            });
+            // console.log(response.data);
+            return response.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+
 }
 
 export default new RecommenderService();

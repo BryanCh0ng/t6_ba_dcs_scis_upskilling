@@ -43,7 +43,7 @@
                     <course-date-time :date="reg_course.reg_Enddate" :time="reg_course.reg_Endtime"></course-date-time>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(reg_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action :status="reg_course.course_Status" :course="reg_course"></course-action></td>
+                  <td><course-action @action-and-message-updated="handleActionData" :status="reg_course.course_Status" :course="reg_course"></course-action></td>
                 </tr>
               </tbody>
             </table>
@@ -89,7 +89,7 @@
                     </td>
                     
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(top_pick)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                    <td><course-action :status="top_pick.course_Status" :course="top_pick"></course-action></td>
+                    <td><course-action @action-and-message-updated="handleActionData" :status="top_pick.course_Status" :course="top_pick"></course-action></td>
                   </tr>
                 </tbody>
               </table>
@@ -103,7 +103,7 @@
       
           
 
-        <div class="pt-5 container col-12 table-responsive">
+        <div class="pt-5 container col-12 table-responsive" v-if="showRegisterOthers">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
           <div v-if="reg_courses_others && reg_courses_others.length > 0"> 
             <table class="table bg-white">
@@ -136,7 +136,7 @@
                     <course-date-time :date="reg_course.reg_Enddate" :time="reg_course.reg_Endtime"></course-date-time>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(reg_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action :status="reg_course.course_Status" :course="reg_course"></course-action></td>
+                  <td><course-action @action-and-message-updated="handleActionData" :status="reg_course.course_Status" :course="reg_course"></course-action></td>
                   
                 </tr>
               </tbody>
@@ -226,6 +226,7 @@
               </thead>
               <tbody>
                 <tr v-for="(interest_other, key) in displayedInterestOthers" :key="key">
+                  {{interest_other}}
                   <td class="name">
                       <course-name-desc :name="interest_other.course_Name" :category="interest_other.coursecat_Name" :description="interest_other.course_Desc"></course-name-desc>
                   </td>
@@ -247,11 +248,11 @@
       <div class="modal fade" id="course_details_modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" /></div>
       </div>
-      <!-- <div class="modal fade" id="after_action_modal" tabindex="-1" aria-hidden="true" ref="afterActionModal">
+      <div class="modal fade" id="after_action_modal" tabindex="-1" aria-hidden="true" ref="afterActionModal">
         <div class="modal-dialog modal-lg"> 
           <modal-after-action :course="actionCourse" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
         </div>
-      </div> -->
+      </div>
 
     </div>
     
@@ -262,7 +263,7 @@
 import courseAction from '@/components/course/courseAction.vue';
 import sortIcon from '@/components/common/sort-icon.vue';
 import modalCourseContent from '@/components/course/modalCourseContent.vue';
-// import modalAfterAction from '@/components/course/modalAfterAction.vue';
+import modalAfterAction from '@/components/course/modalAfterAction.vue';
 import courseNameDesc from '@/components/course/courseNameDesc.vue';
 import courseDateTime from '@/components/course/courseDateTime.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
@@ -276,7 +277,7 @@ export default {
     courseAction,
     sortIcon,
     modalCourseContent,
-    // modalAfterAction,
+    modalAfterAction,
     VueAwesomePaginate,
     courseNameDesc,
     courseDateTime
@@ -304,7 +305,9 @@ export default {
       showRegisterJustForYou: true,
       showRegisterOthers: true,
       showInterestJustForYou: true,
-      showInterestOthers: true
+      showInterestOthers: true,
+      receivedMessage: '',
+      actionCourse: {},
     }
   },
   methods: {
@@ -326,15 +329,15 @@ export default {
       this.selectedCourse = null;
       this.showModal = false;
     },
-    // handleActionData(actionData) {
-    //   this.receivedMessage = actionData.message;
-    //   this.actionCourse = actionData.course
-    //   const modalButtonElement = this.$el.querySelector('.invisible-btn')
-    //   modalButtonElement.click();
-    // },
-    // modalAfterActionClose() {
-    //   this.loadData();
-    // },
+    handleActionData(actionData) {
+      this.receivedMessage = actionData.message;
+      this.actionCourse = actionData.course
+      const modalButtonElement = this.$el.querySelector('.invisible-btn')
+      modalButtonElement.click();
+    },
+    modalAfterActionClose() {
+      this.loadData();
+    },
     sort(column, action) {
       if (this.sortColumn === column) {
         this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -419,24 +422,39 @@ export default {
         this.showRegisterJustForYou = false
       }
 
-      let course_list_req = await CourseService.searchCourseRegistrationInfo(this.user_ID, null, null, null)
-      let course_register = await Recommender.getCourseSimilarityRegistration(course_list_req.data)
-      this.reg_courses_others = course_register.data.course_list
-      if (this.reg_courses_others.length === 0) {
+      
+      let course_list_req = await Recommender.getUserRegisteredCourses(this.user_ID)
+      if (course_list_req.message === "No matching course registration information found") {
         this.showRegisterOthers= false
+      } else {
+        let course_register = await Recommender.getCourseSimilarityRegistration(course_list_req.data)
+        // console.log(course_register)
+        this.reg_courses_others = course_register.data.course_list
+        if (this.reg_courses_others.length === 0) {
+          this.showRegisterOthers= false
+        }
+      }
+            
+      let user_interest = await Recommender.getUserSimilarityInterest(this.user_ID)
+      if (user_register.length === 0) {
+          this.showInterestJustForYou= false
+      } else {
+        this.interest_courses = user_interest.data.course_list
+        if (this.interest_courses.length === 0) {
+          this.showInterestJustForYou= false
+        }
       }
       
-      let user_interest = await Recommender.getUserSimilarityInterest(this.user_ID)
-      this.interest_courses = user_interest.data.course_list
-      if (this.interest_courses.length === 0) {
-        this.showInterestJustForYou= false
-      }
-
       let interest_list_req = await CourseService.searchCourseVoteInfo(this.user_ID, null, null, null)
-      let course_interest = await Recommender.getCourseSimilarityInterest(interest_list_req.data)
-      this.interest_others = course_interest.data.course_list
-      if (this.interest_others.length === 0) {
+      console.log(interest_list_req)
+      if (interest_list_req.message === "No matching course interest information found") {
         this.showInterestOthers = false
+      } else {
+        let course_interest = await Recommender.getCourseSimilarityInterest(interest_list_req.data)
+        this.interest_others = course_interest.data.course_list
+        if (this.interest_others.length === 0) {
+          this.showInterestOthers = false
+        }
       }
 
       let top_register_pick = await Recommender.getTopPicksForRegistration(this.user_ID)
@@ -506,19 +524,19 @@ export default {
       console.error("Error fetching course details:", error);
     }
   },
-  // mounted() {
-  //   const buttonElement = document.createElement('button');
-  //   buttonElement.className = 'btn btn-primary d-none invisible-btn';
-  //   buttonElement.setAttribute('data-bs-toggle', 'modal');
-  //   buttonElement.setAttribute('data-bs-target', '#after_action_modal');
-  //   this.$el.appendChild(buttonElement);
-  //   const modalElement = this.$refs.afterActionModal;
-  //   modalElement.addEventListener('hidden.bs.modal', this.modalAfterActionClose);
-  // },
-  // beforeUnmount() {
-  //   const modalElement = this.$refs.afterActionModal;
-  //   modalElement.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
-  // }
+  mounted() {
+    const buttonElement = document.createElement('button');
+    buttonElement.className = 'btn btn-primary d-none invisible-btn';
+    buttonElement.setAttribute('data-bs-toggle', 'modal');
+    buttonElement.setAttribute('data-bs-target', '#after_action_modal');
+    this.$el.appendChild(buttonElement);
+    const modalElement = this.$refs.afterActionModal;
+    modalElement.addEventListener('hidden.bs.modal', this.modalAfterActionClose);
+  },
+  beforeUnmount() {
+    const modalElement = this.$refs.afterActionModal;
+    modalElement.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
+  }
   }
 </script>
 

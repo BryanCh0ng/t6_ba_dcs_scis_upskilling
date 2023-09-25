@@ -145,7 +145,7 @@ export default {
       actionCourse: {},
       search_course_name: null,
       search_course_category: null,
-      user_ID: '',
+      user_ID: 1,
     }
   },
   computed: {
@@ -232,10 +232,10 @@ export default {
     },
     async loadData() {
       try {
-        let run_response = await CourseService.searchUnregisteredActiveInfo(1, this.search_course_name, this.search_course_category)
+        let run_response = await CourseService.searchUnregisteredActiveInfo(this.user_ID, this.search_course_name, this.search_course_category)
         this.run_courses = run_response.data
         
-        let vote_response = await CourseService.searchUnvotedActiveInfo(1, this.search_course_name, this.search_course_category)
+        let vote_response = await CourseService.searchUnvotedActiveInfo(this.user_ID, this.search_course_name, this.search_course_category)
         this.vote_courses = vote_response.data
       } catch (error) {
         console.error("Error fetching course details:", error);
