@@ -3,7 +3,7 @@ from flask_restx import Namespace, Resource, fields, reqparse
 from allClasses import *
 import json
 from sqlalchemy.orm import aliased
-from sqlalchemy import func, and_, exists
+from sqlalchemy import func, and_, exists, select
 from datetime import datetime, date, time
 import logging
 app.logger.setLevel(logging.DEBUG)
@@ -253,7 +253,7 @@ class GetUnregisteredActiveCourses(Resource):
         ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).join(
             CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
         ).filter(
-            ~RunCourse.rcourse_ID.in_(registered_course_ids),
+            ~RunCourse.rcourse_ID.in_(select([registered_course_ids])),
             Course.course_Status == "active",
             RunCourse.runcourse_Status == "ongoing",
             RunCourse.reg_Enddate >= current_datetime.date(),
@@ -353,8 +353,6 @@ class GetUnvotedOngoingCourses(Resource):
 
         return jsonify({"code": 404, "message": "No courses found"})
 
-
-
 # Student Registration Search - course name, course cat, status
 retrieve_registration_info_filter_search = api.parser()
 retrieve_registration_info_filter_search.add_argument("user_id", type=int, help="Enter user ID")
@@ -374,7 +372,7 @@ class GetCourseRegistrationInfo(Resource):
         coursecat_ID = args.get("coursecat_id", "")
         reg_Status = args.get("reg_status", "")
 
-        app.logger.debug(reg_Status)
+        # app.logger.debug(reg_Status)
 
         current_datetime = datetime.now()
 
@@ -423,7 +421,7 @@ class GetCourseRegistrationInfo(Resource):
                     **result[3].json()
                 }
                 result_data.append(course_info)
-            app.logger.debug("Debug message")
+            # app.logger.debug("Debug message")
             # app.logger.debug(result_data)
             return jsonify({"code": 200, "data": result_data})
 
@@ -448,7 +446,7 @@ class GetCourseInterestInfo(Resource):
         coursecat_ID = args.get("coursecat_id", "")
         vote_Status = args.get("vote_status", "")
 
-        app.logger.debug(user_ID)
+        # app.logger.debug(user_ID)
 
         query = db.session.query(
             Course,
@@ -1333,7 +1331,7 @@ class RetireCourse(Resource):
             
             course = Course.query.filter_by(course_ID=courseID).first()
             runCourses = RunCourse.query.filter_by(course_ID=courseID).all()
-            app.logger.debug(runCourses)
+            # app.logger.debug(runCourses)
 
             if course:
                 # Check if the course is inactive

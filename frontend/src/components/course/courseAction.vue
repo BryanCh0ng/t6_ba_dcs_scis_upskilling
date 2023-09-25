@@ -84,6 +84,7 @@ export default {
         let response;
         // let user_ID = this.get_user_id();
         if (this.status == 'Vote') {
+          console.log(this.course.vote_ID)
           response = await CourseService.voteCourse(this.course.vote_ID, 1);
         } else if (this.status == 'say-pass') {
           response = await CourseService.unvoteCourse(this.course.vote_ID, 1);
