@@ -133,7 +133,6 @@ class Course(db.Model):
         self.coursecat_ID = coursecat_ID
         self.template_ID = template_ID        
         self.course_Status = course_Status
-        self.template_ID = template_ID   
 
     def json(self):
         columns = self.__mapper__.column_attrs.keys()
