@@ -9,6 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 import re
 from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 import logging
@@ -165,9 +166,9 @@ class RecommenderCourseRegistration(Resource):
         try:
             # Extract the last 3 registered courses from the request JSON
             course_list_req = request.json['params']['course_list_req']
-            course_ids = [course['course_ID'] for course in course_list_req]
             if not course_list_req:
                 return jsonify({"code": 200, "data": {"course_list": []}})
+            
             
             last_three_reg = request.json['params']['course_list_req'][-3:]
             
@@ -197,11 +198,12 @@ class RecommenderCourseRegistration(Resource):
                     datapoint = {
                         "rcourse_ID": rcourse_id,
                         "user_ID": userid,
-                        "course_Name": course_info["course_Name"], 
-                        "course_Desc": course_info["course_Desc"], 
+                        "course_Name": preprocess_text(course_info["course_Name"]), 
+                        "course_Desc": preprocess_text(course_info["course_Desc"],) 
                     }
                     reg_list.append(datapoint)
-                
+                else:
+                    return jsonify({"code": 200, "data": {"course_list": []}})
             
 
             # Create a user-course interaction matrix
@@ -211,7 +213,7 @@ class RecommenderCourseRegistration(Resource):
 
             # Get the course descriptions
             course_descriptions = [
-                Course.query.filter(Course.course_ID == course_id).first().course_Desc
+                preprocess_text(Course.query.filter(Course.course_ID == course_id).first().course_Desc)
                 for course_id in pivot_df.index
             ]
 
@@ -409,6 +411,9 @@ class ImprovedRecommenderCourseInterest(Resource):
         try:
             # [courseid1, courseid2, courseid3]
             course_list_req = request.json['params']['course_list_req']
+            if not course_list_req:
+                return jsonify({"code": 200, "data": {"course_list": []}})
+            
             last_three_voted = request.json['params']['course_list_req'][-3:] # based on the last 3 interested courses
             vcourse_id_list = [course['course_ID'] for course in last_three_voted]
 
@@ -443,13 +448,15 @@ class ImprovedRecommenderCourseInterest(Resource):
                     .filter(Interest.user_ID == user_id)
                     .all()
                 )
-
+                
                 if user_interests:
                     for course, _ in user_interests:
-                        course_id = course.course_ID
-                        course_name = preprocess_text(course.course_Name)
-                        course_desc = preprocess_text(course.course_Desc)
-
+                        course = course.json()
+                        course_id = course['course_ID']
+                        
+                        course_name = preprocess_text(course['course_Name'])
+                        course_desc = preprocess_text(course['course_Desc'])
+                        
                         interest_list.append(
                             {"course_ID": course_id, "user_ID": user_id, "course_name": course_name, "course_desc": course_desc}
                         )
@@ -473,9 +480,10 @@ class ImprovedRecommenderCourseInterest(Resource):
         try:
             # Get the course descriptions
             course_descriptions = [
-                Course.query.filter(Course.course_ID == course_id).first().course_Desc
+                preprocess_text(Course.query.filter(Course.course_ID == course_id).first().course_Desc)
                 for course_id in pivot_df.index
             ]
+
             # TF-IDF vectorization of course descriptions
             tfidf_vectorizer = TfidfVectorizer()
             tfidf_matrix = tfidf_vectorizer.fit_transform(course_descriptions)

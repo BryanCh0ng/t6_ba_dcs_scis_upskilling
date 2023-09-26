@@ -449,15 +449,21 @@ export default {
       }
       
       let interest_list_req = await CourseService.searchCourseVoteInfo(this.user_ID, null, null, null)
-      console.log(interest_list_req)
+      // console.log(interest_list_req)
       if (interest_list_req.message === "No matching course interest information found") {
         this.showInterestOthers = false
       } else {
         let course_interest = await Recommender.getCourseSimilarityInterest(interest_list_req.data)
-        this.interest_others = course_interest.data.course_list
-        if (this.interest_others.length === 0) {
+        // console.log(course_interest)
+        if (course_interest.length === 0) {
           this.showInterestOthers = false
+        } else {
+          this.interest_others = course_interest.data.course_list
+          if (this.interest_others.length === 0) {
+            this.showInterestOthers = false
+          }
         }
+        
       }
 
       let top_register_pick = await Recommender.getTopPicksForRegistration(this.user_ID)
