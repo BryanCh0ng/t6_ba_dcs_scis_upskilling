@@ -142,8 +142,9 @@ class CreateFeedbackTemplate(Resource):
 
                     for inputOption in inputOptions:
                         textlabel = inputOption.get("option")
+                        print(textlabel)
 
-                        newInputOption = InputOption(None, templateAttributeID, position, textlabel)
+                        newInputOption = InputOption(templateAttributeID, position, textlabel)
                         db.session.add(newInputOption)
 
                         position += 1
@@ -167,7 +168,9 @@ post_feedback_student_feedback_template.add_argument("template_ID", help="Enter 
 class GetTemplate(Resource):
     @api.expect(post_feedback_student_feedback_template)
     def get(self):
-
+        
+        #new_student_feedback = request.json
+        
         templateName = post_feedback_student_feedback_template.parse_args().get("template_Name")
         templateID = post_feedback_student_feedback_template.parse_args().get("template_ID")
         current_date = datetime.now().strftime('%d-%m-%Y')
@@ -343,12 +346,20 @@ class DeleteFeedbackTemplate(Resource):
            return {"code": 404, "message": "Feedback template does not exist" }, 404
           
         # check if feedback template in use
-        runningcourse = RunCourse.query.filter(RunCourse.template_ID == templateID, RunCourse.runcourse_Status == "Ongoing").all()
-        if runningcourse:
-           return {"code": 404, "message": "Failed the feedback template is in use" }, 404
-        allrunningcourrse = RunCourse.query.filter_by(template_ID = templateID).all()
-        for runcourse in allrunningcourrse:
-           runcourse.template_ID = None
+        feedbacks = Feedback.query.filter(Feedback.feedback_Template_ID == templateID).all()
+        if feedbacks:
+          for feedback in feedbacks:
+              runCourseID = feedback.rcourse_ID
+              IstemplateinUse = RunCourse.query.filter(RunCourse.rcourse_ID ==runCourseID, RunCourse.runcourse_Status == "Ongoing").first()
+              if IstemplateinUse:
+                  return {"code": 404, "message": "Failed the feedback template is in use" }, 404
+     
+        # runningcourse = RunCourse.query.filter(RunCourse.template_ID == templateID, RunCourse.runcourse_Status == "Ongoing").all()
+        # if runningcourse:
+        #    return {"code": 404, "message": "Failed the feedback template is in use" }, 404
+        # allrunningcourrse = RunCourse.query.filter_by(template_ID = templateID).all()
+        # for runcourse in allrunningcourrse:
+        #    runcourse.template_ID = None
 
         if feedback_template:
             course_to_change = Course.query.filter_by(template_ID = templateID)
