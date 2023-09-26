@@ -142,8 +142,9 @@ class CreateFeedbackTemplate(Resource):
 
                     for inputOption in inputOptions:
                         textlabel = inputOption.get("option")
+                        print(textlabel)
 
-                        newInputOption = InputOption(None, templateAttributeID, position, textlabel)
+                        newInputOption = InputOption(templateAttributeID, position, textlabel)
                         db.session.add(newInputOption)
 
                         position += 1
