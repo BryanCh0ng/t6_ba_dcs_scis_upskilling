@@ -82,12 +82,15 @@ export default {
     },
     submit() {
       const course_id = this.course.course_ID;
-      const feedback_id = this.course.template_ID
+      const template_id = this.course.template_ID
       const user_id = 1
-      this.templateData['course_id'] = course_id
-      this.templateData['feedback_id'] = feedback_id
-      this.templateData['user_id'] = user_id
-      console.log(this.templateData)
+      const data = {
+        'course_id': course_id,
+        'template_id': template_id,
+        'user_id': user_id,
+        'data': this.templateData
+      }
+      console.log(data)
     },
     updateAnswer(answer) {
       var index = parseInt(answer.key)
