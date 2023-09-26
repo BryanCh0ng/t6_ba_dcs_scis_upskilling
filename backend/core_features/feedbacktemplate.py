@@ -284,41 +284,48 @@ class GetCourseNamesByFeedbackTemplateId(Resource):
         return {"code": 404, "message": "Failed" + str(e)}, 404
          
 edit_feedback_template = api.parser()
-@api.route("/edit_feedback_template", methods=["PUT"])
+@api.route("/edit_feedback_template/<int:template_id>", methods=["PUT"])
 class EditFeedbackTemplate(Resource):
     @api.expect(edit_feedback_template)
-    def put(self):
+    def put(self, template_id):
 
         try: 
             #Get the updated data from the request body 
             data = request.json
         
-            template = FeedbackTemplate.query.filter_by(template_Name=data['feedback_template_name']).first()
-            template_ID = template.template_ID
+            template = FeedbackTemplate.query.filter_by(template_ID=template_id).first()
 
             if template:
+                # if template exists, update template name and delete all attributes and options
+                setattr(template, 'template_Name', data['feedback_template_name'])
+
+                attributes = TemplateAttribute.query.filter_by(template_ID=template_id).all()
+                for attribute in attributes:
+                    InputOption.query.filter_by(template_Attribute_ID=attribute.template_Attribute_ID).delete()
+                    db.session.delete(attribute)
+
                 # Update the fields based on data
                 for editAttribute in data['data']:
-                    attribute = TemplateAttribute.query.filter_by(template_ID=template_ID).filter_by(question=editAttribute['question']).first()
-                    if attribute:
-                        setattr(attribute, 'input_Type', editAttribute['selectedInputType'])
-                        if editAttribute['inputOptions']:
-                            InputOption.query.filter_by(template_Attribute_ID=attribute.template_Attribute_ID).delete()
-                            position = 1
-                            for editOption in editAttribute['inputOptions']: 
-                                new_option = InputOption(template_Attribute_ID=attribute.template_Attribute_ID, position=position, textlabel=editOption['option'])
-                                position += 1
-                                db.session.add(new_option)
-                    else:
-                        new_attribute = TemplateAttribute(question=editAttribute['question'], input_Type=editAttribute['selectedInputType'], template_ID=template_ID)
-                        db.session.add(new_attribute)
-                        if editAttribute['inputOptions']:
-                            template_Attribute_ID = TemplateAttribute.query.filter_by(template_ID=template_ID).filter_by(question=editAttribute['question']).first().template_Attribute_ID
-                            position = 1
-                            for editOption in editAttribute['inputOptions']: 
-                                new_option = InputOption(template_Attribute_ID=template_Attribute_ID, position=position, textlabel=editOption['option'])
-                                position += 1
-                                db.session.add(new_option)
+                    # attribute = TemplateAttribute.query.filter_by(template_ID=template_id).filter_by(question=editAttribute['question']).first()
+                    # if attribute:
+                    #     setattr(attribute, 'input_Type', editAttribute['selectedInputType'])
+                    #     if editAttribute['inputOptions']:
+                    #         InputOption.query.filter_by(template_Attribute_ID=attribute.template_Attribute_ID).delete()
+                    #         position = 1
+                    #         for editOption in editAttribute['inputOptions']: 
+                    #             new_option = InputOption(template_Attribute_ID=attribute.template_Attribute_ID, position=position, textlabel=editOption['option'])
+                    #             position += 1
+                    #             db.session.add(new_option)
+                    # else:
+                    new_attribute = TemplateAttribute(question=editAttribute['question'], input_Type=editAttribute['selectedInputType'], template_ID=template_id)
+                    db.session.add(new_attribute)
+                    if editAttribute['inputOptions']:
+                        template_Attribute_ID = TemplateAttribute.query.filter_by(template_ID=template_id).filter_by(question=editAttribute['question']).first().template_Attribute_ID
+                        position = 1
+                        for editOption in editAttribute['inputOptions']: 
+                            new_option = InputOption(template_Attribute_ID=template_Attribute_ID, position=position, textlabel=editOption['option'])
+                            position += 1
+                            db.session.add(new_option)
 
                 #Commit the changes to the database 
                 db.session.commit()
