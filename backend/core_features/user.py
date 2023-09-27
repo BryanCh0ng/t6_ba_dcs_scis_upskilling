@@ -241,7 +241,15 @@ class GetUserName(Resource):
     def get(self):
         user_ID = session.get('user_ID')
         if user_ID:
-            return User.query.filter_by(user_ID=user_ID).first().user_Name
+            user = User.query.filter_by(user_ID=user_ID).first()
+            if user:
+                user_name = user.user_Name
+                # Split the user's name by space and get the first part
+                user_name_parts = user_name.split()
+                first_name = user_name_parts[0] if user_name_parts else ''
+                return first_name
+            else:
+                return 'User not found'
         else:
             return 'Session not set'
 
