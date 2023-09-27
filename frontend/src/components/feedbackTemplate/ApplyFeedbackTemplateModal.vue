@@ -64,7 +64,8 @@
     },
     async fetchData() {
       try {
-        console.log('load')
+        this.not_included_courses = [];
+        this.included_course = [];
         console.log(this.feedback_template)
         if(this.feedback_template.template_ID) {
           const response = await FeedbackTemplateService.getCourseNamesByFeedbackTemplateId(this.feedback_template.template_ID)
@@ -72,8 +73,6 @@
           if(response.code == 200) {
             this.not_included_courses = response.course_name_no_template;
             this.included_courses = response.course_names_using;
-            console.log(this.not_included_courses)
-            console.log(this.included_courses)
           } else {
             this.error = true;
             this.errorMessage = response.message
@@ -109,8 +108,6 @@
   },
   watch: {
     modalOpen(newVal) {
-      console.log(newVal)
-      console.log('modal open')
       this.fetchData(); 
     },
   },
