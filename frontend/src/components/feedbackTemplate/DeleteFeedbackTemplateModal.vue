@@ -96,7 +96,7 @@
     }
   },
   watch: {
-    deleteModalOpen(newVal) {
+    deleteModalOpen() {
       this.fetchData(); 
     },
   },

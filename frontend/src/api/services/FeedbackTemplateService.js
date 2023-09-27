@@ -63,15 +63,15 @@ class FeedbackTemplateService extends BaseApiService {
         }
     }
 
-    async editFeedbackTemplate(data) {
+    async editFeedbackTemplate(template_id,data) {
         try {
-            let response = await axiosClient.put("/feedbacktemplate/edit_feedback_template", data)
+            let response = await axiosClient.put(`/feedbacktemplate/edit_feedback_template/${template_id}`, data)
             console.log(response)
             return response.data
         } catch (error) {
             return this.handleError(error)
         }
-    }
+    }  
 
     async deleteFeedbackTemplate(templateId) {
         try { 
@@ -83,6 +83,16 @@ class FeedbackTemplateService extends BaseApiService {
         }
     }
 
+    async applyFeedbackTemplateToCourses(data) {
+        try {
+            let response = await axiosClient.post("/feedbacktemplate/apply_feedback_template_to_courses", data)
+            console.log(response)
+            return response.data
+        } catch (error) {
+            return this.handleError(error)
+        }
+    }  
+    
 }
 
 export default new FeedbackTemplateService();

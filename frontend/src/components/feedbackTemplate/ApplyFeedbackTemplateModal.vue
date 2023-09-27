@@ -5,7 +5,7 @@
       </div>
       <div class="modal-body pt-1"> 
         <div class="modal-title pt-3">
-          <h3 class="text-center">Assign {{ feedback_template.template_Name }} To Course(s)</h3>
+          <h3 class="text-center">Apply {{ feedback_template.template_Name }} To Course(s)</h3>
         </div>
         <div v-if="!error">
           <div class="row mt-5">
@@ -32,6 +32,9 @@
             <button type="button" class="mt-4 btn btn-success float-right w-100 apply" @click="apply()">Apply</button>
             <button type="button" class="mt-4 btn btn-secondary float-right w-100" data-bs-dismiss="modal" aria-label="Close" @click="closeModal">Cancel</button>
           </div>
+          <div>
+            <p class="text-success text-center pt-5">{{ successMsge }}</p>
+          </div>
         </div>
         <div v-else>
           <p>{{ errorMessage }}</p>
@@ -52,9 +55,10 @@
   data() {
     return {
       not_included_courses: [],
-      included_course: [],
+      included_courses: [],
       error: false,
       errorMessage: '',
+      successMsge: ''
     }
   },
   methods: {
@@ -65,8 +69,10 @@
     async fetchData() {
       try {
         this.not_included_courses = [];
-        this.included_course = [];
-        console.log(this.feedback_template)
+        this.included_courses = [];
+        this.error = false;
+        this.errorMessage  = '';
+        this.successMsge = '';
         if(this.feedback_template.template_ID) {
           const response = await FeedbackTemplateService.getCourseNamesByFeedbackTemplateId(this.feedback_template.template_ID)
           console.log(response)
@@ -97,17 +103,37 @@
       }
       this.not_included_courses.push(course)
     },
-    apply(){
+    async apply(){
+      this.error = false; 
+      this.errorMessage = '';
+      this.successMsge = ''
       const data = {
         not_included_courses: this.not_included_courses,
-        included_courses: this.included_course,
+        included_courses: this.included_courses,
         template_ID: this.feedback_template.template_ID
       }
       console.log(data)
-    }
+      try {
+        const response = await FeedbackTemplateService.applyFeedbackTemplateToCourses(data)
+        console.log(response)
+        if (response.code == 200) {
+          this.error = false
+          this.successMsge = response.message
+        } else {
+          this.error = true
+          this.errorMessage = response.message
+          this.successMsge = ''
+        }
+      } catch (error) {
+        console.log(error)
+        this.error = true;
+        this.successMsge = ''
+        this.errorMessage = error.toString()
+      }
+    } 
   },
   watch: {
-    modalOpen(newVal) {
+    modalOpen() {
       this.fetchData(); 
     },
   },
