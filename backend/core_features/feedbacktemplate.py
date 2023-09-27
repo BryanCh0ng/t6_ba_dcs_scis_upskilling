@@ -3,7 +3,6 @@ from flask_restx import Namespace, Resource, fields
 from datetime import datetime, date, time
 from allClasses import *
 from sqlalchemy import asc
-from sqlalchemy.orm import aliased
 import json
 
 api = Namespace('feedbacktemplate', description='Feedback template related operations')
@@ -243,36 +242,32 @@ class GetCourseNamesByFeedbackTemplateId(Resource):
       try:
         templateID = get_course_names_by_feedback_template_id.parse_args().get("template_id")
         print(templateID)
-        query = (
-          db.session.query(FeedbackTemplate, Course)
-          .join(Course, FeedbackTemplate.template_ID == Course.template_ID)
-          .filter(FeedbackTemplate.template_ID == templateID)
-          .distinct()
+        courses_using_template = (
+          db.session.query(Course)
+          .filter(Course.template_ID == templateID)
+          .all()
         )
 
-        no_template_query =(
-          db.session.query(FeedbackTemplate, Course)
-          .join(Course, FeedbackTemplate.template_ID == Course.template_ID)
-          .filter(FeedbackTemplate.template_ID == None)
-          .distinct()
+        courses_no_template =(
+          db.session.query(Course)
+          .filter(Course.template_ID == None)
+          .all()
         )
 
-        courses_using_template = query.all()
-        courses_no_template = no_template_query.all()
         db.session.close()
 
         course_names_using = []
         course_name_no_template = []
 
         if courses_using_template:
-          for _, course in courses_using_template:
+          for course in courses_using_template:
             course_names_using.append({
               'course_ID': course.course_ID,
               'course_Name': course.course_Name
             })
     
         if courses_no_template:
-          for _, course in courses_no_template:
+          for course in courses_no_template:
             course_name_no_template.append({
               'course_ID': course.course_ID,
               'course_Name': course.course_Name
@@ -330,13 +325,13 @@ class EditFeedbackTemplate(Resource):
                 #Commit the changes to the database 
                 db.session.commit()
 
-                return json.loads(json.dumps(template.json(), default=str)), 200
+                return {"code": 200, "message": "Feedback Template successfully edited"}, 200
 
-            return json.loads(json.dumps({"message": "There is no such feedback template"})), 404
+            return {"code": 404, "message": "There is no such feedback template"}, 404
 
         except Exception as e:
             print("Error:", str(e))
-            return "Failed" + str(e), 500  
+            return {"code": 500, "message": "Failed " + str(e) }, 500
 
 delete_feedback_template = api.parser()
 delete_feedback_template.add_argument("template_ID", help="Feedback Template ID")
@@ -425,3 +420,40 @@ class GetFeedbackTemplateRecords(Resource):
           return {"code": 200, "feedback": eachfeedback_json}, 200
 
         return {"code": 404, "message" : "feedback does not exist for this rcourse"},404
+
+
+@api.route("/apply_feedback_template_to_courses", methods=["POST"])
+@api.doc(description="Apply Feedback Template to Courses")
+class ApplyFeedbackTemplateToCourses(Resource):
+    def post(self):
+        req = request.json
+        templateID = req.get("template_ID")
+        included_courses = req.get("included_courses")
+        not_included_courses = req.get("not_included_courses")
+
+        def update_course_template(course_list, template_id):
+            for course in course_list:
+                print(course)
+                course_record = Course.query.filter(Course.course_ID == course.get("course_ID")).first()
+                print(course_record)
+                if course_record:
+                    course_record.template_ID = template_id
+                else:
+                    return False
+            return True
+
+        try:
+            success1 = update_course_template(included_courses, templateID)
+            success2 = update_course_template(not_included_courses, None)
+
+            if success1 and success2:
+                db.session.commit()
+                return {"code": 200, "message": "Successfully apply feedback template to course(s)"}, 200
+            else:
+                db.session.rollback()
+                return {"code": 404, "message": "Course(s) not found, unable to apply feedback template to course(s)"}, 404
+
+        except Exception as e:
+            db.session.rollback()
+            return {"code": 500, "message": "Failed " + str(e)}, 500
+

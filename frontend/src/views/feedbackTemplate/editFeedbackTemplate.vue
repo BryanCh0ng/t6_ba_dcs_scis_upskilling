@@ -173,7 +173,7 @@ export default {
         }
         try {
           console.log(data)
-          const response = await FeedbackTemplateService.editFeedbackTemplate(data)
+          const response = await FeedbackTemplateService.editFeedbackTemplate(this.$route.params.id,data)
           if (response.code == 200) {
             this.title = "Feedback Template Edit Success"
             this.message =  response.message

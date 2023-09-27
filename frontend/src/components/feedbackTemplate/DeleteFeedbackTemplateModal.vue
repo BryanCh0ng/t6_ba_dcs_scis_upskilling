@@ -19,8 +19,8 @@
             </ul>
           </div>
           <div class="col-6 offset-6 d-flex justify-content-between">
-              <button type="button" class="mt-4 btn delete btn-danger float-right w-100 delete-feedback-template" data-bs-dismiss="modal" aria-label="Close" @click="deleteTemplate">Delete</button>
-              <button type="button" class="mt-4 btn btn-secondary float-right w-100" data-bs-dismiss="modal" aria-label="Close" @click="closeModal">Cancel</button>
+            <button type="button" :disabled="disabled" class="mt-4 btn delete btn-danger float-right w-100"  @click="deleteTemplate">Delete</button>
+            <button type="button" class="mt-4 btn btn-secondary float-right w-100" data-bs-dismiss="modal" aria-label="Close" @click="closeModal">Cancel</button>
           </div>
           
         </div>
@@ -45,27 +45,31 @@
       courses: {},
       error: false,
       errorMessage: '',
-      deleteMsge: ''
+      deleteMsge: '',
+      disabled: false
     }
   },
   methods: {
     closeModal() {
+      const button = document.getElementById("delete-feedback-template");
+      button.disabled = false;
       this.$emit("close-modal");
       this.$emit('model-after-action-close', true);
     },
     async fetchData() {
-      console.log('test')
-      console.log(this.feedback_template)
+      this.deleteMsge = ''
+      this.error = false
+      this.errorMessage = ''
+      this.disabled = false
+      this.courses = {}
       try {
-        if(this.feedback_template.template_ID) {
-          const response = await FeedbackTemplateService.getCoursesByTemplateId(this.feedback_template.template_ID)
-          console.log(response)
-          if(response.code == 200) {
-            this.courses = response.data.courses
-          } else {
-            this.error = true;
-            this.errorMessage = response.message
-          }
+        const response = await FeedbackTemplateService.getCoursesByTemplateId(this.feedback_template.template_ID)
+        console.log(response)
+        if(response.code == 200) {
+          this.courses = response.data.courses
+        } else {
+          this.error = true;
+          this.errorMessage = response.message
         }
       } catch (error) {
         this.error = true;
@@ -78,9 +82,8 @@
         console.log(response)
         if (response.code == 200) {
           this.error = false
-          this.errorMessage = response.message
-          const button = document.getElementById("delete-feedback-template");
-          button.disabled = true;
+          this.deleteMsge = response.message
+          this.disabled = true
         } else {
           this.error = true
           this.errorMessage = response.message
@@ -93,9 +96,7 @@
     }
   },
   watch: {
-    deleteModalOpen(newVal) {
-      console.log(newVal)
-      console.log('modal open')
+    deleteModalOpen() {
       this.fetchData(); 
     },
   },
