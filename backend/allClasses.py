@@ -229,8 +229,7 @@ class TemplateAttribute(db.Model):
     template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'),  nullable=False) 
 
 
-    def __init__(self, template_Attribute_ID, question, input_Type, template_ID ):
-        self.template_Attribute_ID = template_Attribute_ID
+    def __init__(self, question, input_Type, template_ID ):
         self.question = question
         self.input_Type = input_Type
         self.template_ID = template_ID
