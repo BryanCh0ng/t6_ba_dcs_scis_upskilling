@@ -121,7 +121,8 @@ import SearchFilter from "@/components/search/ProposalCourseRelatedSearchFilter.
 import CommonSearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 import courseDate from '@/components/course/courseDate.vue';
-import CommonService from "@/api/services/CommonService.js"
+import CommonService from "@/api/services/CommonService.js";
+import UserService from "@/api/services/UserService.js";
 
 export default {
   components: {
@@ -273,7 +274,13 @@ export default {
     }
   },
   async created() {
-    this.loadData();
+    const user_ID = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_ID);
+    if (role != 'Admin') {
+      this.$router.push({ name: 'studentViewProfile' }); 
+    } else {
+      this.loadData();
+    }
   },
   mounted() {
     const buttonElement = document.createElement('button');

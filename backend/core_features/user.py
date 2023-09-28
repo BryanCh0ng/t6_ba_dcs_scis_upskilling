@@ -232,7 +232,9 @@ class GetRole(Resource):
     def get(self):
         user_ID = session.get('user_ID')
         if user_ID:
-            return User.query.filter_by(user_ID=user_ID).first().user_ID
+            id = User.query.filter_by(user_ID=user_ID).first().user_ID
+            db.session.close()
+            return id
         else:
             return 'Session not set'
 
@@ -258,7 +260,9 @@ class GetRole(Resource):
     def get(self):
         user_ID = session.get('user_ID')
         if user_ID:
-            return User.query.filter_by(user_ID=user_ID).first().role_Name
+            role = User.query.filter_by(user_ID=user_ID).first().role_Name
+            db.session.close()
+            return role
         
         else:
             return 'Session not set'

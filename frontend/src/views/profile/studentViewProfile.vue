@@ -333,37 +333,44 @@ export default {
   },
   async created() {
     this.getUserID();
-    
-    try {
-      const user_ID = await UserService.getUserID()
+    const user_ID = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_ID);
+    if (role == 'Admin') {
+      this.$router.push({ name: 'adminViewCourse' }); 
+    } else if (role == 'Trainer' || role == 'Instructor') {
+      this.$router.push({ name: 'instructorTrainerViewVotingCampaign' }); 
+    } else {
+      try {
+        const user_ID = await UserService.getUserID()
 
-      let registered_response= await CourseService.searchCourseRegistrationInfo(user_ID, null, null, null)
-      console.log(registered_response)
-      this.registered_courses = registered_response.data
-      if (this.registered_courses == undefined || this.registered_courses.length == 0) {
-        this.onInitialEmptyRegistered = true
-      }
+        let registered_response= await CourseService.searchCourseRegistrationInfo(user_ID, null, null, null)
+        console.log(registered_response)
+        this.registered_courses = registered_response.data
+        if (this.registered_courses == undefined || this.registered_courses.length == 0) {
+          this.onInitialEmptyRegistered = true
+        }
 
-      let interested_response= await CourseService.searchCourseVoteInfo(user_ID, null, null, null)
-      this.interested_courses = interested_response.data
-      if (this.interested_courses == undefined || this.interested_courses.length == 0) {
-        this.onInitialEmptyInterested = true
-      }
+        let interested_response= await CourseService.searchCourseVoteInfo(user_ID, null, null, null)
+        this.interested_courses = interested_response.data
+        if (this.interested_courses == undefined || this.interested_courses.length == 0) {
+          this.onInitialEmptyInterested = true
+        }
 
-      let proposed_response = await CourseService.searchProposedInfo(user_ID, null, null, null)
-      this.proposed_courses = proposed_response.data
-      if (this.proposed_courses == undefined || this.proposed_courses.length == 0) {
-        this.onInitialEmptyProposed = true
-      }
+        let proposed_response = await CourseService.searchProposedInfo(user_ID, null, null, null)
+        this.proposed_courses = proposed_response.data
+        if (this.proposed_courses == undefined || this.proposed_courses.length == 0) {
+          this.onInitialEmptyProposed = true
+        }
 
-      let completed_response = await CourseService.searchProposedInfo(user_ID, null, null, null)
-      // console.log(completed_response.data)
-      this.completed_courses = completed_response.data
-      if (this.completed_courses == undefined || this.completed_courses.length == 0) {
-        this.onInitialEmptyCompleted = true
+        let completed_response = await CourseService.searchProposedInfo(user_ID, null, null, null)
+        // console.log(completed_response.data)
+        this.completed_courses = completed_response.data
+        if (this.completed_courses == undefined || this.completed_courses.length == 0) {
+          this.onInitialEmptyCompleted = true
+        }
+      } catch (error) {
+        console.error("Error fetching course details:", error);
       }
-    } catch (error) {
-      console.error("Error fetching course details:", error);
     }
   },
   methods: {

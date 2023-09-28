@@ -217,11 +217,12 @@ export default {
             try {
                 this.createCourseResponse = await CourseService.createCourse(this.submitFormData);
             } catch (error) {
+                console.log(error)
                 console.error('Error creating a new course', error);
 
                 this.title = "Course Creation Failed";
 
-                throw new Error("Course Creation was unsuccessful");
+                throw new Error(error.response.data.message);
             }
         },
         async fetchUserID() {
@@ -256,7 +257,7 @@ export default {
 
                 this.title = "Course Update Failed";
 
-                throw new Error("Course Update was unsuccessful");
+                throw new Error(error.response.data.message);
             }
         },
         async onReset() {
@@ -314,6 +315,8 @@ export default {
                     this.submitFormData["coursecat_ID"] = this.formData.courseCategories.find(i => i.coursecat_Name === this.formData.selectedCategory).coursecat_ID;
 
                     this.submitFormData["course_Status"] = "Active";
+
+                    this.submitFormData["user_ID"] = await UserService.getUserID()
                     
                     if(this.view === "createCourse") {
 

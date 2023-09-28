@@ -15,8 +15,14 @@ export default {
     components: {
         CourseForm
     },
-    created() {
-        document.title = "Edit Course";
+    async created() {
+        const user_ID = await UserService.getUserID();
+        const role = await UserService.getUserRole(user_ID);
+        if (role != 'Admin') {
+            this.$router.push({ name: 'proposeCourse' }); 
+        } else {
+            document.title = "Edit Course";
+        }
     },
 };
 </script>

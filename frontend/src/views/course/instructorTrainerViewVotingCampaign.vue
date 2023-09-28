@@ -51,7 +51,8 @@ import courseNameDesc from '@/components/course/courseNameDesc.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/ProposalCourseRelatedSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
-import CommonService from "@/api/services/CommonService.js"
+import CommonService from "@/api/services/CommonService.js";
+import UserService from "@/api/services/UserService.js";
 
 export default {
   components: {
@@ -137,8 +138,16 @@ export default {
         }
     }
   },
-  created() {
-   this.loadData();
+  async created() {
+    const user_ID = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_ID);
+    if (role == 'Student') {
+      this.$router.push({ name: 'studentViewProfile' }); 
+    } else if (role == 'Admin') {
+      this.$router.push({ name: 'adminViewVoteCourse' }); 
+    } else {
+      this.loadData();
+    }
   }
   }
 </script>

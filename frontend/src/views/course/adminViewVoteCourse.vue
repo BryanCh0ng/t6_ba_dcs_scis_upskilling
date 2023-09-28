@@ -129,12 +129,11 @@ import courseAction from '../../components/course/courseAction.vue';
 import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
-// import courseDateTime from '@/components/course/courseDateTime.vue';
 import courseDate from '@/components/course/courseDate.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import ProposalCourseRelatedSearchFilter from "@/components/search/ProposalCourseRelatedSearchFilter.vue";
-// import UserService from "@/api/services/UserService.js";
+import UserService from "@/api/services/UserService.js";
 import CourseService from "@/api/services/CourseService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
 import CommonService from "@/api/services/CommonService.js"
@@ -294,14 +293,20 @@ export default {
     }
   },
   async created() {
-    try {
-      let response = await CourseService.searchAllVotingCoursesAdmin(null, null, null)
-      this.vote_courses = response.data
+    const user_ID = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_ID);
+    if (role != 'Admin') {
+      this.$router.push({ name: 'studentViewProfile' }); 
+    } else {
+        try {
+        let response = await CourseService.searchAllVotingCoursesAdmin(null, null, null)
+        this.vote_courses = response.data
 
-      let course = await CourseService.searchAllNotOfferedVotingCoursesAdmin(null, null)
-      this.notoffered_courses = course.data
-    } catch (error) {
-      console.error("Error fetching course details:", error);
+        let course = await CourseService.searchAllNotOfferedVotingCoursesAdmin(null, null)
+        this.notoffered_courses = course.data
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+      }
     }
   },
   mounted() {
