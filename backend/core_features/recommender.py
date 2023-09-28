@@ -63,8 +63,7 @@ class RecommenderUserRegistration(Resource):
         user_similarity = cosine_similarity(pivot_df)
         user_similarity_df = pd.DataFrame(user_similarity, index=pivot_df.index, columns=pivot_df.index)
 
-        # user_ID = session.get('user_ID')
-        user_ID = 1
+        user_ID = session.get('user_ID')
 
         reg_courses = Registration.query.filter(
             Registration.user_ID == user_ID,
@@ -169,13 +168,12 @@ class RecommenderCourseRegistration(Resource):
             if not course_list_req:
                 return jsonify({"code": 200, "data": {"course_list": []}})
             
-            
             last_three_reg = request.json['params']['course_list_req'][-3:]
             
             rcourse_id_list = [course['rcourse_ID'] for course in last_three_reg]
 
-        #    user_ID = session.get('user_ID')
-            user_ID = 1
+            user_ID = session.get('user_ID')
+            # user_ID = 1
 
             # Fetch user registration data
             regList = Registration.query.all()
@@ -411,12 +409,13 @@ class ImprovedRecommenderCourseInterest(Resource):
         try:
             # [courseid1, courseid2, courseid3]
             course_list_req = request.json['params']['course_list_req']
+        
             if not course_list_req:
                 return jsonify({"code": 200, "data": {"course_list": []}})
             
             last_three_voted = request.json['params']['course_list_req'][-3:] # based on the last 3 interested courses
             vcourse_id_list = [course['course_ID'] for course in last_three_voted]
-
+            
             # Fetch all users and their course interests
             interest_list = self.get_interest_data()
 
@@ -428,7 +427,7 @@ class ImprovedRecommenderCourseInterest(Resource):
 
             # Recommend courses based on similarity
             recommended_courses = self.recommend_courses(vcourse_id_list, course_similarity_df, course_list_req)
-
+            
             return jsonify({"code": 200, "data": {"course_list": recommended_courses[:10]}})
         except Exception as e:
             return jsonify({"code": 404, "message": "Course does not exist"})
@@ -472,7 +471,7 @@ class ImprovedRecommenderCourseInterest(Resource):
         df = pd.DataFrame(interest_list)
         df["registered"] = 1
         pivot_df = df.pivot(index="course_ID", columns="user_ID", values="registered").fillna(0).astype(int)
-
+        
         return pivot_df
 
     # content-based similarity - course desc
@@ -491,7 +490,7 @@ class ImprovedRecommenderCourseInterest(Resource):
             # Compute cosine similarity based on TF-IDF vectors
             course_similarity = cosine_similarity(tfidf_matrix, tfidf_matrix)
             course_similarity_df = pd.DataFrame(course_similarity, index=pivot_df.index, columns=pivot_df.index)
-
+            
             return course_similarity_df
         except Exception as e:
             raise e
@@ -499,9 +498,10 @@ class ImprovedRecommenderCourseInterest(Resource):
     def recommend_courses(self, vcourse_id_list, course_similarity_df, course_list_req):
         try:
             course_dict = {}
+            
             for course in vcourse_id_list:
-                similar_courses = course_similarity_df[course].sort_values(ascending=False)[1:]
                 
+                similar_courses = course_similarity_df[course].sort_values(ascending=False)[1:]
                 for similar_course, score in similar_courses.items():
                     vcourse = VoteCourse.query.filter(VoteCourse.course_ID == similar_course).first()
                     course_ids = [course['course_ID'] for course in course_list_req]
@@ -510,8 +510,9 @@ class ImprovedRecommenderCourseInterest(Resource):
                             course_dict[similar_course] = 1
                         else:
                             course_dict[similar_course] += 1
-
+            
             sorted_dict = dict(sorted(course_dict.items(), key=lambda item: item[1], reverse=True))
+                
             course_list = []
 
             for recommended_course_id in sorted_dict:
@@ -524,12 +525,14 @@ class ImprovedRecommenderCourseInterest(Resource):
                 datapoint["coursecat_Name"] = coursecat.coursecat_Name
                 for field in vcourse.keys():
                     datapoint[field] = vcourse[field]
-                    
+                        
                 course_list.append(datapoint)
+                    
 
             db.session.close()
-
+                
             return course_list
+            
         except KeyError:
             return jsonify({"code": 404, "message": "Course does not exist"})
 

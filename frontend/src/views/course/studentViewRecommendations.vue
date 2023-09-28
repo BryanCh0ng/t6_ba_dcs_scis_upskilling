@@ -99,8 +99,8 @@
             <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentPageRegCourseForYou" v-if="reg_courses_for_you.length/itemsPerPage > 0" :totalItems="reg_courses_for_you.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseForYou" class="justify-content-center pagination-container"/>        
-
+        <vue-awesome-paginate v-model="localCurrentPageRegCourseForYou" v-if="reg_courses_for_you.length/itemsPerPage > 0" :totalItems="reg_courses_for_you.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseForYou" class="justify-content-center pagination-container"/>
+        
         <div class="pt-5 container col-12 table-responsive" v-if="showRegisterOthers">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
           <div v-if="reg_courses_others && reg_courses_others.length > 0"> 
@@ -150,7 +150,7 @@
 
 
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'express_interest' }">
-         <div class="pt-5 container col-12 table-responsive" v-if="shouldShowTopInterestPicks">
+        <div class="pt-5 container col-12 table-responsive" v-if="shouldShowTopInterestPicks">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Top Picks</h1>
           <div v-if="top_interest_picks && top_interest_picks.length > 0"> 
             <table class="table bg-white">
@@ -179,7 +179,7 @@
           </div>
         </div>
         <vue-awesome-paginate v-model="localCurrentPageTopPickInterest" v-if="top_interest_picks.length/itemsPerPage > 0 && shouldShowTopInterestPicks" :totalItems="top_interest_picks.length" :items-per-page="itemsPerPage" @page-change="handlePageTopInterestCourses" class="justify-content-center pagination-container"/>
-        
+          
         <div class="pt-5 container col-12 table-responsive" v-if="showInterestJustForYou">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
           <div v-if="interest_courses && interest_courses.length > 0"> 
@@ -209,7 +209,8 @@
           </div>
         </div>
         <vue-awesome-paginate v-model="localCurrentInterestCourses" v-if="interest_courses.length/itemsPerPage > 0" :totalItems="interest_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageTopInterestCourses" class="justify-content-center pagination-container"/>
-          
+
+        
           <div class="pt-5 container col-12 table-responsive" v-if="showInterestOthers">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
           <div v-if="interest_others && interest_others.length > 0"> 
@@ -461,7 +462,6 @@ export default {
             this.showInterestOthers = false
           }
         }
-        
       }
 
       let top_register_pick = await Recommender.getTopPicksForRegistration(this.user_ID)
