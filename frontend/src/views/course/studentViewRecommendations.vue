@@ -10,51 +10,6 @@
     </ul>
     <div class="tab-content ">
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'for_registration' }">
-        <div class="pt-5 container col-12 table-responsive" v-if="showRegisterJustForYou">
-          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
-          <div v-if="reg_courses_for_you && reg_courses_for_you.length > 0"> 
-            <table class="table bg-white">
-              <thead>
-                <tr class="text-nowrap">
-                  <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'register_you')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
-                  <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'register_you')">Course Start Date <sort-icon :sortColumn="sortColumn === 'start_date'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
-                  <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'register_you')">Course End Date <sort-icon :sortColumn="sortColumn === 'end_date'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
-                  <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'register_you')">Closing Date <sort-icon :sortColumn="sortColumn === 'closing_date'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
-                  <th scope="col">Course Details</th>
-                  <th scope="col">Action(s)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(reg_course, key) in displayedRegCourseForYou" :key="key">
-                  <td class="name">
-                    <course-name-desc :name="reg_course.course_Name" :category="reg_course.coursecat_Name" :description="reg_course.course_Desc"></course-name-desc>
-                  </td>
-                  <td class="start_date">
-                    <course-date-time :date="reg_course.run_Startdate" :time="reg_course.run_Starttime"></course-date-time>
-                  </td>
-                  <td class="end_date">
-                    <course-date-time :date="reg_course.run_Enddate" :time="reg_course.run_Endtime"></course-date-time>
-                  </td>
-                  <td class="closing_date">
-                    <course-date-time :date="reg_course.reg_Enddate" :time="reg_course.reg_Endtime"></course-date-time>
-                  </td>
-                  <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(reg_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action @action-and-message-updated="handleActionData" :status="reg_course.course_Status" :course="reg_course"></course-action></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div v-else-if="reg_courses_for_you=[]" class="text-center pt-2 pb-5">
-            <p>Currently, there are no recommendations for you.</p>
-            <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
-          </div>
-        </div>
-        <vue-awesome-paginate v-model="localCurrentPageRegCourseForYou" v-if="reg_courses_for_you.length/itemsPerPage > 0" :totalItems="reg_courses_for_you.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseForYou" class="justify-content-center pagination-container"/>
-        
         <div class="pt-5 container col-12 table-responsive" v-if="shouldShowTopRegisterPicks">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Top Picks</h1>
             <div v-if="top_register_picks && top_register_picks.length > 0"> 
@@ -101,7 +56,50 @@
         </div>
         <vue-awesome-paginate v-model="localCurrentPageTopPickRegister" v-if="top_register_picks.length/itemsPerPage > 0 && shouldShowTopRegisterPicks" :totalItems="top_register_picks.length" :items-per-page="itemsPerPage" @page-change="handlePageTopRegisterCourses" class="justify-content-center pagination-container"/>
       
-          
+        <div class="pt-5 container col-12 table-responsive" v-if="showRegisterJustForYou">
+          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
+          <div v-if="reg_courses_for_you && reg_courses_for_you.length > 0"> 
+            <table class="table bg-white">
+              <thead>
+                <tr class="text-nowrap">
+                  <th scope="col">
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'register_you')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                  <th scope="col">
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'register_you')">Course Start Date <sort-icon :sortColumn="sortColumn === 'start_date'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
+                  <th scope="col">
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'register_you')">Course End Date <sort-icon :sortColumn="sortColumn === 'end_date'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
+                  <th scope="col">
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'register_you')">Closing Date <sort-icon :sortColumn="sortColumn === 'closing_date'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
+                  <th scope="col">Course Details</th>
+                  <th scope="col">Action(s)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(reg_course, key) in displayedRegCourseForYou" :key="key">
+                  <td class="name">
+                    <course-name-desc :name="reg_course.course_Name" :category="reg_course.coursecat_Name" :description="reg_course.course_Desc"></course-name-desc>
+                  </td>
+                  <td class="start_date">
+                    <course-date-time :date="reg_course.run_Startdate" :time="reg_course.run_Starttime"></course-date-time>
+                  </td>
+                  <td class="end_date">
+                    <course-date-time :date="reg_course.run_Enddate" :time="reg_course.run_Endtime"></course-date-time>
+                  </td>
+                  <td class="closing_date">
+                    <course-date-time :date="reg_course.reg_Enddate" :time="reg_course.reg_Endtime"></course-date-time>
+                  </td>
+                  <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(reg_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
+                  <td><course-action @action-and-message-updated="handleActionData" :status="reg_course.course_Status" :course="reg_course"></course-action></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div v-else-if="reg_courses_for_you=[]" class="text-center pt-2 pb-5">
+            <p>Currently, there are no recommendations for you.</p>
+            <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
+          </div>
+        </div>
+        <vue-awesome-paginate v-model="localCurrentPageRegCourseForYou" v-if="reg_courses_for_you.length/itemsPerPage > 0" :totalItems="reg_courses_for_you.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseForYou" class="justify-content-center pagination-container"/>        
 
         <div class="pt-5 container col-12 table-responsive" v-if="showRegisterOthers">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
@@ -152,6 +150,36 @@
 
 
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'express_interest' }">
+         <div class="pt-5 container col-12 table-responsive" v-if="shouldShowTopInterestPicks">
+          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Top Picks</h1>
+          <div v-if="top_interest_picks && top_interest_picks.length > 0"> 
+            <table class="table bg-white">
+              <thead>
+                <tr class="text-nowrap">
+                  <th scope="col">
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'interest_tops')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'name'" :sortDirection="sortDirection"/></a></th>
+                  <th scope="col">Course Details</th>
+                  <th scope="col">Action(s)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(interest_course, key) in displayedTopPicksInterest" :key="key">
+                  <td class="name">
+                      <course-name-desc :name="interest_course.course_Name" :category="interest_course.coursecat_Name" :description="interest_course.course_Desc"></course-name-desc>
+                  </td>
+                  <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(interest_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
+                  <td><course-action @action-and-message-updated="handleActionData" status="Vote" :course="interest_course"></course-action></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div v-else-if="top_interest_picks=[]" class="text-center pt-2 pb-5">
+            <p>Currently, there are no recommendations for you.</p>
+            <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
+          </div>
+        </div>
+        <vue-awesome-paginate v-model="localCurrentPageTopPickInterest" v-if="top_interest_picks.length/itemsPerPage > 0 && shouldShowTopInterestPicks" :totalItems="top_interest_picks.length" :items-per-page="itemsPerPage" @page-change="handlePageTopInterestCourses" class="justify-content-center pagination-container"/>
+        
         <div class="pt-5 container col-12 table-responsive" v-if="showInterestJustForYou">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
           <div v-if="interest_courses && interest_courses.length > 0"> 
@@ -181,36 +209,6 @@
           </div>
         </div>
         <vue-awesome-paginate v-model="localCurrentInterestCourses" v-if="interest_courses.length/itemsPerPage > 0" :totalItems="interest_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageTopInterestCourses" class="justify-content-center pagination-container"/>
-
-        <div class="pt-5 container col-12 table-responsive" v-if="shouldShowTopInterestPicks">
-          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Top Picks</h1>
-          <div v-if="top_interest_picks && top_interest_picks.length > 0"> 
-            <table class="table bg-white">
-              <thead>
-                <tr class="text-nowrap">
-                  <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'interest_tops')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'name'" :sortDirection="sortDirection"/></a></th>
-                  <th scope="col">Course Details</th>
-                  <th scope="col">Action(s)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(interest_course, key) in displayedTopPicksInterest" :key="key">
-                  <td class="name">
-                      <course-name-desc :name="interest_course.course_Name" :category="interest_course.coursecat_Name" :description="interest_course.course_Desc"></course-name-desc>
-                  </td>
-                  <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(interest_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action @action-and-message-updated="handleActionData" status="Vote" :course="interest_course"></course-action></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div v-else-if="top_interest_picks=[]" class="text-center pt-2 pb-5">
-            <p>Currently, there are no recommendations for you.</p>
-            <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
-          </div>
-        </div>
-        <vue-awesome-paginate v-model="localCurrentPageTopPickInterest" v-if="top_interest_picks.length/itemsPerPage > 0 && shouldShowTopInterestPicks" :totalItems="top_interest_picks.length" :items-per-page="itemsPerPage" @page-change="handlePageTopInterestCourses" class="justify-content-center pagination-container"/>
           
           <div class="pt-5 container col-12 table-responsive" v-if="showInterestOthers">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>

@@ -567,8 +567,8 @@ class GetCompletedCourses(Resource):
             UserInstructor.user_Email.label("instructor_email"),
             exists().where(and_(
                 Feedback.submitted_By == user_id,
-                Feedback.course_ID == Course.course_ID,  # Specify course filter
-                Feedback.feedback_Template_ID == RunCourse.template_ID  # Add this filter
+                Feedback.rcourse_ID == RunCourse.rcourse_ID,
+                Feedback.feedback_Template_ID == Course.template_ID
             )).label("feedback_submitted")
         ).select_from(RunCourse).join(Course, RunCourse.course_ID == Course.course_ID) \
             .join(Registration, RunCourse.rcourse_ID == Registration.rcourse_ID) \

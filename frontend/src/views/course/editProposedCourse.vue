@@ -235,8 +235,6 @@ export default {
           } else {
             approve_result = { code: 200 };
           }
-          
-          // console.log(approve_result);
               
           if (approve_result.code == 200) {
             this.showSuccessModal = true;
@@ -254,11 +252,9 @@ export default {
         if (this.action == 'approve')
           this.$router.push({ name: 'adminViewProposedCourse'});
         else {
-          this.userRole = await UserService.getUserRole();
-          
-          if (this.userRole === 'Student' ) {
+          if (this.user_role === 'Student' ) {
             this.$router.push({ name: 'studentViewProfile'});
-          } else if (this.userRole === 'Instructor' || this.userRole === 'Trainer') {
+          } else if (this.user_role === 'Instructor' || this.user_role === 'Trainer') {
             this.$router.push({ name: 'instructorTrainerViewProfile'});
           }
         }
