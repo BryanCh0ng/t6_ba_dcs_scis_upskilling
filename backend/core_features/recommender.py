@@ -9,7 +9,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 import re
 from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 import logging

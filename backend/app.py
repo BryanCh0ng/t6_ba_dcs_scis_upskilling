@@ -48,7 +48,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+mysqlconnector://{db_username}:{
 app.config["CORS_ALLOW_CREDENTIALS"] = True
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['SECRET_KEY'] = 'ashSDFSDFbiuoqewiort123!@*U&!&*(@^)'
-# app.config['SQLALCHEMY_POOL_SIZE'] = 2
+app.config['SQLALCHEMY_POOL_SIZE'] = 30
 # app.config['SQLALCHEMY_MAX_OVERFLOW'] = 0
 
 db = SQLAlchemy(app)

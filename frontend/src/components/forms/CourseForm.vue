@@ -330,6 +330,7 @@ export default {
 
                     } else if (this.view === "proposeCourse") {
                         this.submitFormData["course_Status"] = "Inactive";
+                        this.submitFormData["template_ID"] = null;
 
                         await this.createCourse();
                         
