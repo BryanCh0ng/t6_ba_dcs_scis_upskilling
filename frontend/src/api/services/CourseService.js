@@ -372,16 +372,6 @@ class CourseService extends BaseApiService {
         }
     }
 
-    async sortRecords(sort_column, sort_direction, records) {
-        try {
-
-            let response = await axiosClient.post("/course/sort_records", {sort_column: sort_column, sort_direction: sort_direction, records: records});
-            return response.data;
-        } catch (error) {
-            return this.handleError(error);
-        }
-    }
-
     async createCourse(newCourseData) {
         try {
           let response = await axiosClient.post('/course/create_course', newCourseData);

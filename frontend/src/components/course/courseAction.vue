@@ -82,12 +82,13 @@ export default {
     async voteAction() {
       try {
         let response;
-        // let user_ID = this.get_user_id();
+        let user_ID = await UserService.getUserID();
+        console.log(user_ID)
         if (this.status == 'Vote') {
           console.log(this.course.vote_ID)
-          response = await CourseService.voteCourse(this.course.vote_ID, 1);
+          response = await CourseService.voteCourse(this.course.vote_ID, user_ID);
         } else if (this.status == 'say-pass') {
-          response = await CourseService.unvoteCourse(this.course.vote_ID, 1);
+          response = await CourseService.unvoteCourse(this.course.vote_ID, user_ID);
         } else if (this.status == 'unoffered-vote') {
           response = await CourseService.unofferedVoteCourse(this.course.course_ID);
         } else if (this.status == 'Close') {
@@ -103,7 +104,8 @@ export default {
     async proposalAction() {
       try {
         let response;
-        // let user_ID = this.get_user_id();
+        let user_ID = await UserService.getUserID();
+        console.log(user_ID)
         if (this.status == 'remove-proposal') {
           response = await ProposedCourseService.removeProposedCourse(this.course.pcourse_ID);
         } 
@@ -114,16 +116,16 @@ export default {
         this.$emit('action-and-message-updated', {message: this.message, course: this.course});
       }
     },
-    async get_user_id() {
-      try {
-        const user_ID = await UserService.getUserID()
-        this.user_ID = user_ID
+    // async get_user_id() {
+    //   try {
+    //     const user_ID = await UserService.getUserID()
+    //     this.user_ID = user_ID
 
-      } catch (error) {
-        this.message = error.message
-        this.user_ID = null;
-      }
-    },
+    //   } catch (error) {
+    //     this.message = error.message
+    //     this.user_ID = null;
+    //   }
+    // },
     async registerCourse() {
       console.log(this.course)
       let response = await RunCourseService.changeRegistrationStatus({ "rcourse_ID": this.course.rcourse_ID })

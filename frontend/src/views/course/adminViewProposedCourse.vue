@@ -27,7 +27,7 @@
                   <th scope="col">
                     <a href="" class="text-decoration-none text-dark" @click.prevent="sort('submitted_by', 'pending')">Owner <sort-icon :sortColumn="sortColumn === 'submitted_by'" :sortDirection="getSortDirection('submitted_by')"/></a></th>
                   <th scope="col">Course Details</th>
-                  <th scope="col">Action(s)</th>
+                  <th scope="col" colspan="2">Action(s)</th>
                 </tr>
               </thead>
               <tbody>
@@ -121,6 +121,8 @@ import SearchFilter from "@/components/search/ProposalCourseRelatedSearchFilter.
 import CommonSearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 import courseDate from '@/components/course/courseDate.vue';
+import CommonService from "@/api/services/CommonService.js";
+import UserService from "@/api/services/UserService.js";
 
 export default {
   components: {
@@ -229,13 +231,13 @@ export default {
     },
     async sortCourse(action) {
       if (action == 'pending') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.pending_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.pending_courses)
          if (sort_response.code == 200) {
           this.pending_courses = sort_response.data
          }
       }
       if (action == 'proposed') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
          if (sort_response.code == 200) {
           this.proposed_courses = sort_response.data
          }
@@ -272,7 +274,13 @@ export default {
     }
   },
   async created() {
-    this.loadData();
+    const user_ID = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_ID);
+    if (role != 'Admin') {
+      this.$router.push({ name: 'studentViewProfile' }); 
+    } else {
+      this.loadData();
+    }
   },
   mounted() {
     const buttonElement = document.createElement('button');

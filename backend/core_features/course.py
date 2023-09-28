@@ -1,4 +1,5 @@
 from flask import request, jsonify, session
+from core_features import common
 from flask_restx import Namespace, Resource, fields, reqparse
 from allClasses import *
 import json
@@ -91,22 +92,25 @@ class DeleteCourse(Resource):
     @api.expect(delete_course)
     def delete(self):    
         try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to delete course"}, 404 
+
             courseID = delete_course.parse_args().get("course_id")
-            
-            course = Course.query.filter_by(course_ID=courseID).first()            
+            course = Course.query.filter_by(course_ID=courseID).first()
+        
             if(course):
                     try:
                         db.session.delete(course)              
-                        db.session.commit()                 
+                        db.session.commit()
+                        db.session.close()                 
                         return json.loads(json.dumps({"message":"Course successfully deleted"})), 200
                     except Exception as e:
                         return "Foreign key dependencies exist, cannot delete. " + str(e), 408
 
             return json.loads(json.dumps({"Message": "There is no such course"}, default=str)), 404
-
-
-
         except Exception as e:
+            db.session.rollback()
             return "Failed. " + str(e), 500
         
 delete_runcourse = api.parser()
@@ -117,6 +121,10 @@ class DeleteCourse(Resource):
     @api.expect(delete_runcourse)
     def delete(self):    
         try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to delete run course"}, 404 
+
             rcourse_ID = delete_runcourse.parse_args().get("rcourse_ID")
             # app.logger.debug(rcourse_ID)
 
@@ -124,16 +132,16 @@ class DeleteCourse(Resource):
             if(runCourse):
                     try:
                         db.session.delete(runCourse)              
-                        db.session.commit()                 
+                        db.session.commit()
+                        db.session.close()                 
                         return json.loads(json.dumps({"message":"Run Course has successfully deleted"})), 200
                     except Exception as e:
                         return "Foreign key dependencies exist, cannot delete. " + str(e), 408
 
             return json.loads(json.dumps({"Message": "There is no such run course"}, default=str)), 404
 
-
-
         except Exception as e:
+            db.session.rollback()
             return "Failed. " + str(e), 500
 
 
@@ -163,10 +171,10 @@ class GetCourse(Resource):
 @api.doc(description="Create course")
 class CreateCourse(Resource):
     def post(self):
-        try: 
+        try:
             # Get the data for creating a new course from the request body
             new_course_data = request.json
-            new_course_name = new_course_data.get("course_Name")
+            new_course_name = new_course_data.get("course_Name") 
 
             # Check if the course name already exists in the database
             existing_course = Course.query.filter_by(course_Name=new_course_name).first()
@@ -188,6 +196,7 @@ class CreateCourse(Resource):
             return json.loads(json.dumps(new_course.json(), default=str)), 201
 
         except Exception as e:
+            db.session.rollback()
             print("Error:", str(e))
             return "Failed to create a new course: " + str(e), 500
 
@@ -198,11 +207,14 @@ class EditCourse(Resource):
     def put(self, course_id):
 
         try: 
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to edit course"}, 404 
+
             #Get the updated data from the request body 
             updated_data = request.json
         
             course = Course.query.filter_by(course_ID=course_id).first()
-
             if course:
                 # Update the fields based on updated_data
                 for field, value in updated_data.items():
@@ -217,7 +229,7 @@ class EditCourse(Resource):
             return json.loads(json.dumps({"message": "There is no such course"})), 404
 
         except Exception as e:
-            print("Error:", str(e))
+            db.session.rollback()
             return "Failed" + str(e), 500
 
 # Student - Courses Available for Registration (Ongoing) with Filters
@@ -278,14 +290,14 @@ class GetUnregisteredActiveCourses(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[2].run_Startdate),
-                    'run_Enddate': format_date_time(result[2].run_Enddate),
-                    'run_Starttime': format_date_time(result[2].run_Starttime),
-                    'run_Endtime': format_date_time(result[2].run_Endtime),
-                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                    'run_Startdate': common.format_date_time(result[2].run_Startdate),
+                    'run_Enddate': common.format_date_time(result[2].run_Enddate),
+                    'run_Starttime': common.format_date_time(result[2].run_Starttime),
+                    'run_Endtime': common.format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': common.format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -578,6 +590,7 @@ class GetCompletedCourses(Resource):
             .filter(UserStudent.user_ID == user_id) \
             .filter(RunCourse.run_Enddate <= current_datetime)
 
+
         if course_name:
             query = query.filter(Course.course_Name.contains(course_name))
         if course_category_id:
@@ -590,14 +603,14 @@ class GetCompletedCourses(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[1].run_Startdate),
-                    'run_Enddate': format_date_time(result[1].run_Enddate),
-                    'run_Starttime': format_date_time(result[1].run_Starttime),
-                    'run_Endtime': format_date_time(result[1].run_Endtime),
-                    'reg_Startdate': format_date_time(result[1].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[1].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[1].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[1].reg_Endtime),
+                    'run_Startdate': common.format_date_time(result[1].run_Startdate),
+                    'run_Enddate': common.format_date_time(result[1].run_Enddate),
+                    'run_Starttime': common.format_date_time(result[1].run_Starttime),
+                    'run_Endtime': common.format_date_time(result[1].run_Endtime),
+                    'reg_Startdate': common.format_date_time(result[1].reg_Startdate),
+                    'reg_Enddate': common.format_date_time(result[1].reg_Enddate),
+                    'reg_Starttime': common.format_date_time(result[1].reg_Starttime),
+                    'reg_Endtime': common.format_date_time(result[1].reg_Endtime),
                 }
 
                 modified_run_course = {**result[1].json(), **run_course_attrs}
@@ -617,8 +630,6 @@ class GetCompletedCourses(Resource):
         return jsonify({"code": 404, "message": "No completed courses found"})
 
 
-
-    
 
 # Instructor/Trainer - Voting Campaign
 retrieve_voting_campaign_courses_filter_search = api.parser()
@@ -672,7 +683,8 @@ class GetVotingCampaignCourses(Resource):
             return jsonify({"code": 200, "data": result_data})
         
         return jsonify({"code": 404, "message": "No matching courses found"})
-        
+
+
 # Instructor/Trainer - Assigned Course
 retrieve_instructor_courses_filter_search = api.parser()
 retrieve_instructor_courses_filter_search.add_argument("instructor_id", help="Enter instructor ID")
@@ -728,14 +740,14 @@ class GetInstructorCourses(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[2].run_Startdate),
-                    'run_Enddate': format_date_time(result[2].run_Enddate),
-                    'run_Starttime': format_date_time(result[2].run_Starttime),
-                    'run_Endtime': format_date_time(result[2].run_Endtime),
-                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                    'run_Startdate': common.format_date_time(result[2].run_Startdate),
+                    'run_Enddate': common.format_date_time(result[2].run_Enddate),
+                    'run_Starttime': common.format_date_time(result[2].run_Starttime),
+                    'run_Endtime': common.format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': common.format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -855,14 +867,14 @@ class GetInstructorTaughtCourses(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[2].run_Startdate),
-                    'run_Enddate': format_date_time(result[2].run_Enddate),
-                    'run_Starttime': format_date_time(result[2].run_Starttime),
-                    'run_Endtime': format_date_time(result[2].run_Endtime),
-                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                    'run_Startdate': common.format_date_time(result[2].run_Startdate),
+                    'run_Enddate': common.format_date_time(result[2].run_Enddate),
+                    'run_Starttime': common.format_date_time(result[2].run_Starttime),
+                    'run_Endtime': common.format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': common.format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
                 }
                 modified_run_course = {**result[2].json(), **run_course_attrs}
 
@@ -1135,14 +1147,14 @@ class GetAllCoursesWithRegistrationCount(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[2].run_Startdate),
-                    'run_Enddate': format_date_time(result[2].run_Enddate),
-                    'run_Starttime': format_date_time(result[2].run_Starttime),
-                    'run_Endtime': format_date_time(result[2].run_Endtime),
-                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                    'run_Startdate': common.format_date_time(result[2].run_Startdate),
+                    'run_Enddate': common.format_date_time(result[2].run_Enddate),
+                    'run_Starttime': common.format_date_time(result[2].run_Starttime),
+                    'run_Endtime': common.format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': common.format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -1197,6 +1209,7 @@ class GetAllInstructorsAndTrainers(Resource):
             query = query.filter(User.role_Name == role_name)
         
         results = query.all()
+        db.session.close()
 
         if results:
             result_data = []
@@ -1271,6 +1284,10 @@ class DeactivateCourse(Resource):
     @api.expect(deactivate_course)
     def post(self):
         try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to deactivate course"}, 404 
+
             args = deactivate_course.parse_args()
             course_id = args.get("course_id")
 
@@ -1280,7 +1297,8 @@ class DeactivateCourse(Resource):
             # Query the database for the RunCourse with the specified course_id
             run_course = RunCourse.query.filter_by(course_ID=course_id).first()
             course = Course.query.filter_by(course_ID=course_id).first()
-            
+            db.session.close()
+
             if run_course:
                 if course.course_Status == 'Active':
                     if run_course.runcourse_Status == 'Closed':
@@ -1299,21 +1317,27 @@ class DeactivateCourse(Resource):
                             # No ongoing run courses, update the course and registration status
                             course.course_Status = 'Inactive'
                             db.session.commit()
+                            db.session.close()
                             return jsonify({"code": 200, "message": "Course has been canceled or deactivated"})
                         else:
+                            db.session.close()
                             return jsonify({"code": 400, "message": "Cannot deactivate. There are ongoing classes."})
                     elif run_course.runcourse_Status == 'Ongoing':
                         # Update only the course status
                         course.course_Status = 'Inactive'
                         run_course.runcourse_Status = 'Closed'
                         db.session.commit()
+                        db.session.close()
+
                         return jsonify({"code": 200, "message": "Course has been canceled or deactivated"})
                 else:
+                    db.session.close()
                     return jsonify({"code": 400, "message": "Course is not active, cannot be canceled"})
             else:
                 return jsonify({"code": 404, "message": "Course not found"})
 
         except Exception as e:
+            db.session.rollback()
             return jsonify({"code": 500, "message": "Failed: " + str(e)})
 
 # Retire button in the adminViewRunCourse 
@@ -1326,12 +1350,21 @@ class RetireCourse(Resource):
     @api.expect(retire_course)
     def post(self):
         try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to retire course"}, 404 
+
             args = retire_course.parse_args()
             courseID = args.get("course_id")
             
             course = Course.query.filter_by(course_ID=courseID).first()
             runCourses = RunCourse.query.filter_by(course_ID=courseID).all()
+<<<<<<< HEAD
             # app.logger.debug(runCourses)
+=======
+            app.logger.debug(runCourses)
+            db.session.close()
+>>>>>>> b802f81 (add auth for contact us;)
 
             if course:
                 # Check if the course is inactive
@@ -1341,6 +1374,7 @@ class RetireCourse(Resource):
                         # Activate the course and commit the changes
                         course.course_Status = 'Retired'
                         db.session.commit()
+                        db.session.close()
                         return jsonify({"code": 200, "message": "Course has been retired"})
                     else:
                         return jsonify({"code": 400, "message": "Course cannot be retired"})
@@ -1350,6 +1384,7 @@ class RetireCourse(Resource):
                 return jsonify({"code": 404, "message": "There is no such run course"})
 
         except Exception as e:
+            db.session.rollback()
             return jsonify({"message": "Failed. " + str(e)}), 500
 
 
@@ -1362,11 +1397,16 @@ class ActivateCourse(Resource):
     @api.expect(activate_course)
     def post(self):
         try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to activate course"}, 404 
+
             args = activate_course.parse_args()
             courseID = args.get("course_id")
             
             course = Course.query.filter_by(course_ID=courseID).first()
             runCourses = RunCourse.query.filter_by(course_ID=courseID).all()
+            db.session.close()
             
             if course:
                 # Check if the course is inactive
@@ -1376,6 +1416,7 @@ class ActivateCourse(Resource):
                         # Activate the course and commit the changes
                         course.course_Status = 'Active'
                         db.session.commit()
+                        db.session.close()
                         return jsonify({"code": 200, "message": "Course has been activated"})
                     else:
                         return jsonify({"code": 400, "message": "Course cannot be activated because not all run courses are closed"})
@@ -1385,36 +1426,8 @@ class ActivateCourse(Resource):
                 return jsonify({"code": 404, "message": "There is no such run course"})
 
         except Exception as e:
+            db.session.rollback()
             return jsonify({"code": 500, "message": "Failed. " + str(e)})
-
-sort_records = api.parser()
-sort_records.add_argument("sort_column", help="Enter sort column")
-sort_records.add_argument("sort_direction", help="Enter sort direction")
-sort_records.add_argument("records", help="Enter records")
-@api.route("/sort_records", methods=["POST"])
-@api.doc(description="Sort Records")
-class sortRecords(Resource):
-    @api.expect(sort_records)
-    def post(self):
-      args = sort_records.parse_args()
-      sort_column = args.get("sort_column", "")
-      sort_direction = args.get("sort_direction", "")
-      records = request.json.get("records", [])
-
-      records_with_values = [record for record in records if record.get(sort_column) is not None]
-      records_with_none_values = [record for record in records if record.get(sort_column) is None]
-
-      if sort_column != "":
-          sorted_data = sorted(records_with_values, key=lambda x: x[sort_column], reverse=(sort_direction == "desc"))
-      else:
-          sorted_data = records
-
-      sorted_data = records_with_none_values + sorted_data
-
-      return jsonify({"code": 200, "data": sorted_data, "sort": sort_column, "direction": sort_direction})
-
-
-
 
 
 add_interest = api.parser()
@@ -1429,6 +1442,7 @@ class AddInterest(Resource):
             args = add_interest.parse_args()
             voteID = args.get("vote_ID")
             userID = args.get("user_ID")
+
             interestList = Interest.query.filter(Interest.interest_ID.contains("")).all()
             finalInterest = interestList[-1]
             interestID = finalInterest.interest_ID
@@ -1442,9 +1456,11 @@ class AddInterest(Resource):
             Proposedcourse.voteCount = votecount + 1
             db.session.add(newInterest)
             db.session.commit()
+            db.session.close()
 
             return json.loads(json.dumps({"message":"Express Interest Successfully! Please refer to your profile to find out the status of the course."}, default=str)), 200
         except Exception as e:
+            db.session.rollback()
             return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
 
 
@@ -1454,24 +1470,28 @@ delete_interest.add_argument("vote_ID", help="Vote ID")
 delete_interest.add_argument("user_ID", help="User ID")
 @api.route('/delete_interest')
 @api.doc(description="Delete Interest for Course")
-class DemoveInterest(Resource):
+class DeleteInterest(Resource):
     @api.expect(delete_interest)
     def post(self):
-        try:
+        try: 
             args = delete_interest.parse_args()
             voteID = args.get("vote_ID")
             userID = args.get("user_ID")
+            interest_record = Interest.query.filter_by(vote_ID=voteID, user_ID=userID).first()
+            if userID != str(interest_record.user_ID):
+                return json.loads(json.dumps({"message": "User id is different"})), 404
+
             course = VoteCourse.query.filter_by(vote_ID = voteID).first()
             courseID = course.course_ID
             Proposedcourse = ProposedCourse.query.filter_by(course_ID=courseID).first()
             votecount = Interest.query.filter_by(vote_ID = voteID).count()
             Proposedcourse.voteCount = votecount - 1
-            db.session.delete(Interest.query.filter_by(vote_ID=voteID, user_ID=userID).first())                                 
+            db.session.delete(interest_record)                                 
             db.session.commit()
-
+            db.session.close()
             return json.loads(json.dumps({"message":"Unvote Interest Successfully! Please refer to View Course page to find out more courses."}, default=str)), 200
-            
         except Exception as e:
+            db.session.rollback()
             return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
 
 # Soft delete vote - Update status to Not Offered
@@ -1484,6 +1504,10 @@ class UpdateVoteStatus(Resource):
     @api.expect(update_vote_status_parser)
     def put(self):
         try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to reject proposed course"}, 404 
+
             args = update_vote_status_parser.parse_args()
             course_ID = args.get("course_ID")
 
@@ -1496,10 +1520,12 @@ class UpdateVoteStatus(Resource):
             # Update the vote_Status to 'Not Offered'.
             vote_course.vote_Status = 'Not Offered'
             db.session.commit()
+            db.session.close()
 
             return json.loads(json.dumps({"message":"You have delete the course successfully. Please refer to 'Deleted Course' Tab."}, default=str)), 200
 
         except Exception as e:
+            db.session.rollback()
             return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
         
 # Close Voting
@@ -1512,6 +1538,10 @@ class CloseVoteCourse(Resource):
     @api.expect(close_vote_course_parser)
     def put(self):
         try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to close vote course"}, 404 
+
             args = close_vote_course_parser.parse_args()
             course_ID = args.get("course_ID")
 
@@ -1522,10 +1552,12 @@ class CloseVoteCourse(Resource):
 
             vote_course.vote_Status = 'Closed'
             db.session.commit()
+            db.session.close()
 
             return json.loads(json.dumps({"message":"You have closed the course. The course is not available for voting now."}, default=str)), 200
 
         except Exception as e:
+            db.session.rollback()
             return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
 
 
@@ -1542,10 +1574,11 @@ class AdminUpdateRunCourse(Resource):
     @api.expect(admin_update_course)
     def put(self, course_id):
         try:
-            # app.logger.debug(course_id)
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to create course"}, 404 
 
             data = request.get_json()
-            # app.logger.debug(data)
             course_name = data.get('course_Name')
             course_desc = data.get('course_Desc')
             coursecat_ID = data.get('coursecat_ID')
@@ -1560,18 +1593,13 @@ class AdminUpdateRunCourse(Resource):
             course.coursecat_ID = coursecat_ID
 
             db.session.commit()
+            db.session.close()
 
             return jsonify({"message": "course updated successfully", "code": 200})
 
         except Exception as e:
+            db.session.rollback()
             return jsonify({"message": f"Failed to update course: {str(e)}", "code": 500})
 
 
 
-def format_date_time(value):
-    if isinstance(value, (date, datetime)):
-        return value.strftime('%Y-%m-%d')
-    elif isinstance(value, time):
-        return value.strftime('%H:%M:%S')
-    else:
-        return None

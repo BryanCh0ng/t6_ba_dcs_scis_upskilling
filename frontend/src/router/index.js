@@ -1,14 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import UserService from "@/api/services/UserService";
 
 const routes = [
-    {
-        path: '/',
-        name: 'Home',
-        component: () => import('../components/common/HelloWorld.vue'),
-        meta: {
-            title: 'Home',
-        },
-    },
+  {
+      path: '/',
+      name: 'Home',
+      component: () => import('../components/common/HelloWorld.vue'),
+      meta: {
+          title: 'Home',
+      },
+  },
   {
       path: '/contactUs',
       name: 'ContactUs',
@@ -64,6 +65,7 @@ const routes = [
     component: () => import('../views/ContactUs.vue'),
     meta: {
       title: 'Contact Us',
+      requiresAuth: true
     },
   },
   {
@@ -72,6 +74,7 @@ const routes = [
     component: () => import('../views/course/adminViewRunCourse.vue'),
     meta: {
       title: 'adminViewRunCourse',
+      requiresAuth: true
     },
   },
   {
@@ -80,6 +83,7 @@ const routes = [
     component: () => import('../views/course/adminViewProposedCourse.vue'),
     meta: {
         title: 'Admin View Proposed Course',
+        requiresAuth: true
     },
   },
   {
@@ -88,6 +92,7 @@ const routes = [
     component: () => import('../views/course/adminViewVoteCourse.vue'),
     meta: {
         title: 'Admin View Vote Course',
+        requiresAuth: true
     },
   },
   {
@@ -96,14 +101,16 @@ const routes = [
     component: () => import('../views/course/adminViewInstructorsTrainers.vue'),
     meta: {
         title: 'Admin View Instructors Trainers',
+        requiresAuth: true
     },
   },
   {
     path: '/studentViewCourse',
     name: 'studentViewCourse',
-    component: () => import('../views/course/studentViewCourse.vue'),
+    component: () => import('../views/course/studentViewCourse.vue'), 
     meta: {
         title: 'Student View Course',
+        requiresAuth: true
     },
   },
   {
@@ -112,6 +119,7 @@ const routes = [
     component: () => import('../views/course/studentViewRecommendations.vue'),
     meta: {
         title: 'Student View Recommendations',
+        requiresAuth: true
     },
   },
   {
@@ -120,6 +128,7 @@ const routes = [
     component: () => import('../views/course/ProposeCourse.vue'),
     meta: {
         title: 'Propose Course',
+        requiresAuth: true
     },
   },
   {
@@ -128,6 +137,7 @@ const routes = [
     component: () => import('../views/course/CreateCourse.vue'),
     meta: {
         title: 'Create Course',
+        requiresAuth: true
     },
   }, 
   {
@@ -136,6 +146,7 @@ const routes = [
     component: () => import('../views/course/EditCourse.vue'),
     meta: {
         title: 'Edit Course',
+        requiresAuth: true
     },
   },
   {
@@ -144,6 +155,7 @@ const routes = [
     component: () => import('../views/course/CreateRunCourse.vue'),
     meta: {
         title: 'Create Run Course',
+        requiresAuth: true
     },
   },
   {
@@ -152,6 +164,7 @@ const routes = [
     component: () => import('../views/course/EditRunCourse.vue'),
     meta: {
         title: 'Edit Run Course',
+        requiresAuth: true
     },
   },
   {
@@ -160,6 +173,7 @@ const routes = [
     component: () => import('../views/course/editProposedCourse.vue'),
     meta: {
         title: 'Edit Proposed Course',
+        requiresAuth: true
     },
   },    
   {
@@ -168,6 +182,7 @@ const routes = [
     component: () => import('../views/profile/studentViewProfile.vue'),
     meta: {
         title: 'Student View Profile',
+        requiresAuth: true
     },
   },
   {
@@ -176,7 +191,7 @@ const routes = [
     component: () => import('../views/profile/instructorTrainerViewProfile.vue'),
     meta: {
         title: 'Instructor Trainer View Profile',
-   
+        requiresAuth: true
     }
   },
   {
@@ -185,7 +200,7 @@ const routes = [
     component: () => import('../views/course/instructorTrainerViewVotingCampaign.vue'),
     meta: {
         title: 'Instructor Trainer View Voting Campaign',
-   
+        requiresAuth: true
     }
   },
   {
@@ -194,7 +209,7 @@ const routes = [
     component: () => import('../views/course/adminViewCourse.vue'),
     meta: {
         title: 'Admin View Course',
-   
+        requiresAuth: true
     }
   }
   
@@ -323,13 +338,34 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, _from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    sessionStorage.getItem("role") ? next() : next({ path: '/', });
+// router.beforeEach((to, _from, next) => {
+//   if (to.matched.some(record => record.meta.requiresAuth)) {
+//     sessionStorage.getItem("role") ? next() : next({ path: '/', });
 
-  } else if (to.matched.some(record => record.meta.isAuth)) {
-    sessionStorage.getItem("role") ? next({ path: '/student' }) : next();
+//   } else if (to.matched.some(record => record.meta.isAuth)) {
+//     sessionStorage.getItem("role") ? next({ path: '/student' }) : next();
 
+//   } else {
+//     next();
+//   }
+// });
+
+router.beforeEach(async (to, from, next) => {
+  const requiresAuth = to.meta.requiresAuth;
+
+  if (requiresAuth) {
+    try {
+      const user_ID = await UserService.getUserID();
+      console.log(user_ID)
+      if (typeof user_ID === 'number' && user_ID > 0) {
+        next();
+      } else {
+        next('/login');
+      }
+    } catch (error) {
+      console.error(error);
+      next(error); 
+    }
   } else {
     next();
   }

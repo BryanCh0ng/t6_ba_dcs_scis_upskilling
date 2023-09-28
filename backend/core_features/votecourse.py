@@ -2,6 +2,7 @@ from flask import request, jsonify, session
 from flask_restx import Namespace, Resource, fields
 from allClasses import *
 import json
+from core_features import common
 from sqlalchemy.orm import aliased
 from sqlalchemy import func, and_, exists
 from datetime import datetime
@@ -18,6 +19,9 @@ class PromoteToCourse(Resource):
   @api.expect(promote_to_course)
   def post(self):
     try:
+      user_role = common.getUserRole()
+      if (user_role) != 'Admin':
+          return {"message": "Unathorized Access, Failed to promote to course"}, 404 
       args = promote_to_course.parse_args()
       course_id = args.get("course_id")
       vote_course = VoteCourse.query.filter_by(course_ID = course_id).first()

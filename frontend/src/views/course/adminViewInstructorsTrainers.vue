@@ -53,6 +53,8 @@ import sortIcon from '@/components/common/sort-icon.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/InstructorRelatedSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
+import CommonService from "@/api/services/CommonService.js";
+import UserService from "@/api/services/UserService.js";
 
 export default {
   components: {
@@ -108,7 +110,7 @@ export default {
       }
     },
     async sortCourse() {
-      let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.instructors_trainers)
+      let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.instructors_trainers)
         if (sort_response.code == 200) {
           this.instructors_trainers = sort_response.data
         }
@@ -122,11 +124,17 @@ export default {
     }
   },
   async created() {
-    try {
-      let response = await CourseService.getAllInstructorsAndTrainers(null, null, null)
-      this.instructors_trainers = response.data
-    } catch (error) {
-      console.error("Error fetching course details:", error);
+    const user_ID = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_ID);
+    if (role != 'Admin') {
+      this.$router.push({ name: 'studentViewProfile' }); 
+    } else {
+      try {
+        let response = await CourseService.getAllInstructorsAndTrainers(null, null, null)
+        this.instructors_trainers = response.data
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+      }
     }
   }
   }
