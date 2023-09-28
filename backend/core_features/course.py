@@ -1200,6 +1200,52 @@ class GetAllInstructorsAndTrainers(Resource):
         
         results = query.all()
 
+        def get_instructor_average_ratings(instructor_ID):
+            keywords = ['rate', 'instructor']  # Define keywords to identify relevant questions
+        
+            total_ratings = []
+            total_questions = 0
+
+            # To retrieve relevant questions and calculate average rating
+            relevant_questions = db.session.query(FeedbackTemplate, TemplateAttribute) \
+                .join(TemplateAttribute, FeedbackTemplate.template_ID == TemplateAttribute.template_ID) \
+                .join(Feedback, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID) \
+                .join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID) \
+                .filter(TemplateAttribute.input_Type == 'Likert Scale') \
+                .filter(func.lower(TemplateAttribute.question).contains(keywords[0])) \
+                .filter(func.lower(TemplateAttribute.question).contains(keywords[1]))
+
+            if instructor_ID:  # Filter by instructor ID if provided
+                relevant_questions = relevant_questions.filter(RunCourse.instructor_ID == instructor_ID)
+
+            relevant_questions = relevant_questions.all()
+
+            for feedback_template, template_attribute in relevant_questions:
+                question_id = template_attribute.template_Attribute_ID
+                feedback_entries = db.session.query(Feedback) \
+                    .filter(Feedback.template_Attribute_ID == question_id)
+
+                if instructor_ID:
+                    feedback_entries = feedback_entries.join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID) \
+                        .filter(RunCourse.instructor_ID == instructor_ID)  # Filter by instructor ID if provided
+
+                feedback_entries = feedback_entries.all()
+
+                if feedback_entries:
+                    for entry in feedback_entries:
+                        total_ratings.append(int(entry.answer))  # assuming 'answer' contains the Likert Scale value as an integer
+                        total_questions += 1
+
+            # Calculate the instructor-specific average rating
+            if total_ratings and total_questions > 0:
+                instructor_average_rating = round(sum(total_ratings) / total_questions, 2)
+            else:
+                instructor_average_rating = 0
+
+            db.session.close()
+
+            return instructor_average_rating
+
         if results:
             result_data = []
             for result in results:
@@ -1208,9 +1254,10 @@ class GetAllInstructorsAndTrainers(Resource):
                     "user_Name": result[1],
                     "user_Email": result[2],
                     "organisation_Name": result[3],
-                    "role_Name": result[4]
+                    "role_Name": result[4],
+                    "average_rating": get_instructor_average_ratings(result[0])
                 }
-
+                
                 result_data.append(instructor_trainer_info)
 
             return jsonify({"code": 200, "data": result_data})
