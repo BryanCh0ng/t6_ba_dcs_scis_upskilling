@@ -1,6 +1,6 @@
 <template>
     <div id="runcourseform">
-        <div class="container-fluid mt-5">
+        <div class="container mt-5">
             <h2 v-if="create" class="text-center">Create Run Course</h2>
 
             <h2 v-else class="text-center">Edit Run Course</h2>
