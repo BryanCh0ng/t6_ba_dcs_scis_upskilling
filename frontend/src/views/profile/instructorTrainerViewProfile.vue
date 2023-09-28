@@ -229,6 +229,7 @@ import StudentSearchFilter from "@/components/search/StudentCourseSearchFilter.v
 import CourseService from "@/api/services/CourseService.js";
 import UserService from "@/api/services/UserService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
+import CommonService from "@/api/services/CommonService.js"
 
 export default {
   components: {
@@ -399,14 +400,14 @@ export default {
     },
     async sortCourse(action) {
         if (action == 'assigned') {
-          let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.assigned_courses)
+          let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.assigned_courses)
           if (sort_response.code == 200) {
             this.assigned_courses = sort_response.data
           }
         }
 
         if (action == 'proposed') {
-          let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
+          let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
          
           if (sort_response.code == 200) {
             this.proposed_courses = sort_response.data
@@ -414,7 +415,7 @@ export default {
         }
 
         if (action == 'conducted') {
-          let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.conducted_courses)
+          let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.conducted_courses)
           
           if (sort_response.code == 200) {
             this.conducted_courses = sort_response.data

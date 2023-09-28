@@ -71,6 +71,7 @@
   import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
   import CourseService from "@/api/services/CourseService.js";
   import modalAfterAction from '@/components/course/modalAfterAction.vue';
+  import CommonService from "@/api/services/CommonService.js"
   
   export default {
     components: {
@@ -171,7 +172,7 @@
         }
       },
       async sortCourse() {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.courses)
           if (sort_response.code == 200) {
             this.courses = sort_response.data
           }

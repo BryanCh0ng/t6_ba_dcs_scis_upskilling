@@ -137,6 +137,7 @@ import ProposalCourseRelatedSearchFilter from "@/components/search/ProposalCours
 // import UserService from "@/api/services/UserService.js";
 import CourseService from "@/api/services/CourseService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
+import CommonService from "@/api/services/CommonService.js"
 
 export default {
   components: {
@@ -259,13 +260,13 @@ export default {
     },
     async sortCourse(action) {
       if (action == "allvote") {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.vote_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.vote_courses)
         if (sort_response.code == 200) {
           this.vote_courses = sort_response.data
         }
       }
      if (action == "deleted") {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.notoffered_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.notoffered_courses)
         if (sort_response.code == 200) {
           this.notoffered_courses = sort_response.data
         }

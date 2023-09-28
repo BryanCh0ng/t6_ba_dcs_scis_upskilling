@@ -121,6 +121,7 @@ import SearchFilter from "@/components/search/ProposalCourseRelatedSearchFilter.
 import CommonSearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 import courseDate from '@/components/course/courseDate.vue';
+import CommonService from "@/api/services/CommonService.js"
 
 export default {
   components: {
@@ -229,13 +230,13 @@ export default {
     },
     async sortCourse(action) {
       if (action == 'pending') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.pending_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.pending_courses)
          if (sort_response.code == 200) {
           this.pending_courses = sort_response.data
          }
       }
       if (action == 'proposed') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
          if (sort_response.code == 200) {
           this.proposed_courses = sort_response.data
          }

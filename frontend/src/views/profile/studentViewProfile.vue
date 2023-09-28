@@ -284,6 +284,7 @@ import CourseService from "@/api/services/CourseService.js";
 import UserService from "@/api/services/UserService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
 import modalRejectedReason from '@/components/course/modalRejectedReason.vue';
+import CommonService from '@/api/services/CommonService';
 
 export default {
   components: {
@@ -555,25 +556,25 @@ export default {
     },
     async sortCourse(action) {
       if (action == 'registered') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.registered_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.registered_courses)
          if (sort_response.code == 200) {
           this.registered_courses = sort_response.data
          }
       }
       else if (action == 'interested') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.interested_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.interested_courses)
          if (sort_response.code == 200) {
           this.interested_courses = sort_response.data
          }
       }
       else if (action == 'proposed') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
          if (sort_response.code == 200) {
           this.proposed_courses = sort_response.data
          }
       }
       else if (action == 'completed') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.completed_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.completed_courses)
          if (sort_response.code == 200) {
           this.completed_courses = sort_response.data
          }

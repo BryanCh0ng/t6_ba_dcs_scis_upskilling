@@ -53,6 +53,7 @@ import sortIcon from '@/components/common/sort-icon.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/InstructorRelatedSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
+import CommonService from "@/api/services/CommonService.js"
 
 export default {
   components: {
@@ -108,7 +109,7 @@ export default {
       }
     },
     async sortCourse() {
-      let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.instructors_trainers)
+      let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.instructors_trainers)
         if (sort_response.code == 200) {
           this.instructors_trainers = sort_response.data
         }
