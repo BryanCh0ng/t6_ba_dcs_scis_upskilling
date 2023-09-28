@@ -329,6 +329,9 @@ export default {
   border-radius: 5px;
   padding: 5px 10px;
   position: relative;
+  white-space: nowrap;
+  width:auto;
+  min-width: 150px; 
   /* padding-left: 90px; */
 }
 .loginbtn {
