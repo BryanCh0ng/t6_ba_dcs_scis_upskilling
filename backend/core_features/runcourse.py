@@ -102,11 +102,13 @@ class ChangeRegistrationStatus(Resource):
                     message = 'Run Course registration Closed'
 
                 db.session.commit()
+                db.session.close()
                 return json.loads(json.dumps({"message": message, "code": 200}, default=str))
 
             return json.loads(json.dumps({"message": "There is no such runcourse", "code": 404}, default=str))
 
         except Exception as e:
+            db.session.rollback()
             return "Failed" + str(e), 500
 
 get_runcourse_by_id = api.parser()
@@ -155,7 +157,7 @@ class EditRunCourse(Resource):
             return json.loads(json.dumps({"message": "There is no such runcourse"})), 404
 
         except Exception as e:
-            print("Error:", str(e))
+            db.session.rollback()
             return "Failed" + str(e), 500
 
 @api.route("/create_runcourse/<int:course_id>", methods=["POST"])
@@ -188,5 +190,5 @@ class CreateRunCourse(Resource):
             return json.loads(json.dumps(new_run_course.json(), default=str)), 201
 
         except Exception as e:
-            print("Error:", str(e))
+            db.session.rollback()
             return "Failed to create a new course: " + str(e), 500

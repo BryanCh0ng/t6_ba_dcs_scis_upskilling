@@ -27,7 +27,7 @@
                   <th scope="col">
                     <a href="" class="text-decoration-none text-dark" @click.prevent="sort('submitted_by', 'pending')">Owner <sort-icon :sortColumn="sortColumn === 'submitted_by'" :sortDirection="getSortDirection('submitted_by')"/></a></th>
                   <th scope="col">Course Details</th>
-                  <th scope="col">Action(s)</th>
+                  <th scope="col" colspan="2">Action(s)</th>
                 </tr>
               </thead>
               <tbody>

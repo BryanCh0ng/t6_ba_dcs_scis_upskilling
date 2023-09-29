@@ -102,16 +102,15 @@ class DeleteCourse(Resource):
             if(course):
                     try:
                         db.session.delete(course)              
-                        db.session.commit()                 
+                        db.session.commit()
+                        db.session.close()                 
                         return json.loads(json.dumps({"message":"Course successfully deleted"})), 200
                     except Exception as e:
                         return "Foreign key dependencies exist, cannot delete. " + str(e), 408
 
             return json.loads(json.dumps({"Message": "There is no such course"}, default=str)), 404
-
-
-
         except Exception as e:
+            db.session.rollback()
             return "Failed. " + str(e), 500
         
 delete_runcourse = api.parser()
@@ -133,16 +132,16 @@ class DeleteCourse(Resource):
             if(runCourse):
                     try:
                         db.session.delete(runCourse)              
-                        db.session.commit()                 
+                        db.session.commit()
+                        db.session.close()                 
                         return json.loads(json.dumps({"message":"Run Course has successfully deleted"})), 200
                     except Exception as e:
                         return "Foreign key dependencies exist, cannot delete. " + str(e), 408
 
             return json.loads(json.dumps({"Message": "There is no such run course"}, default=str)), 404
 
-
-
         except Exception as e:
+            db.session.rollback()
             return "Failed. " + str(e), 500
 
 
@@ -173,10 +172,6 @@ class GetCourse(Resource):
 class CreateCourse(Resource):
     def post(self):
         try:
-            user_role = common.getUserRole()
-            if (user_role) != 'Admin':
-                return {"message": "Unathorized Access, Failed to create course"}, 404
-
             # Get the data for creating a new course from the request body
             new_course_data = request.json
             new_course_name = new_course_data.get("course_Name") 
@@ -201,6 +196,7 @@ class CreateCourse(Resource):
             return json.loads(json.dumps(new_course.json(), default=str)), 201
 
         except Exception as e:
+            db.session.rollback()
             print("Error:", str(e))
             return "Failed to create a new course: " + str(e), 500
 
@@ -233,7 +229,7 @@ class EditCourse(Resource):
             return json.loads(json.dumps({"message": "There is no such course"})), 404
 
         except Exception as e:
-            print("Error:", str(e))
+            db.session.rollback()
             return "Failed" + str(e), 500
 
 # Student - Courses Available for Registration (Ongoing) with Filters
@@ -585,7 +581,8 @@ class GetCompletedCourses(Resource):
             UserInstructor.user_Email.label("instructor_email"),
             exists().where(and_(
                 Feedback.submitted_By == user_id,
-                Feedback.rcourse_ID == Course.rcourse_ID,  # Specify course filter
+                Feedback.rcourse_ID == RunCourse.rcourse_ID,  # Specify course filter
+                RunCourse.course_ID == Course.course_ID,
                 Feedback.feedback_Template_ID == RunCourse.template_ID  # Add this filter
             )).label("feedback_submitted")
         ).select_from(RunCourse).join(Course, RunCourse.course_ID == Course.course_ID) \
@@ -1214,6 +1211,7 @@ class GetAllInstructorsAndTrainers(Resource):
             query = query.filter(User.role_Name == role_name)
         
         results = query.all()
+        db.session.close()
 
         if results:
             result_data = []
@@ -1301,7 +1299,8 @@ class DeactivateCourse(Resource):
             # Query the database for the RunCourse with the specified course_id
             run_course = RunCourse.query.filter_by(course_ID=course_id).first()
             course = Course.query.filter_by(course_ID=course_id).first()
-            
+            db.session.close()
+
             if run_course:
                 if course.course_Status == 'Active':
                     if run_course.runcourse_Status == 'Closed':
@@ -1320,21 +1319,27 @@ class DeactivateCourse(Resource):
                             # No ongoing run courses, update the course and registration status
                             course.course_Status = 'Inactive'
                             db.session.commit()
+                            db.session.close()
                             return jsonify({"code": 200, "message": "Course has been canceled or deactivated"})
                         else:
+                            db.session.close()
                             return jsonify({"code": 400, "message": "Cannot deactivate. There are ongoing classes."})
                     elif run_course.runcourse_Status == 'Ongoing':
                         # Update only the course status
                         course.course_Status = 'Inactive'
                         run_course.runcourse_Status = 'Closed'
                         db.session.commit()
+                        db.session.close()
+
                         return jsonify({"code": 200, "message": "Course has been canceled or deactivated"})
                 else:
+                    db.session.close()
                     return jsonify({"code": 400, "message": "Course is not active, cannot be canceled"})
             else:
                 return jsonify({"code": 404, "message": "Course not found"})
 
         except Exception as e:
+            db.session.rollback()
             return jsonify({"code": 500, "message": "Failed: " + str(e)})
 
 # Retire button in the adminViewRunCourse 
@@ -1357,6 +1362,7 @@ class RetireCourse(Resource):
             course = Course.query.filter_by(course_ID=courseID).first()
             runCourses = RunCourse.query.filter_by(course_ID=courseID).all()
             app.logger.debug(runCourses)
+            db.session.close()
 
             if course:
                 # Check if the course is inactive
@@ -1366,6 +1372,7 @@ class RetireCourse(Resource):
                         # Activate the course and commit the changes
                         course.course_Status = 'Retired'
                         db.session.commit()
+                        db.session.close()
                         return jsonify({"code": 200, "message": "Course has been retired"})
                     else:
                         return jsonify({"code": 400, "message": "Course cannot be retired"})
@@ -1375,6 +1382,7 @@ class RetireCourse(Resource):
                 return jsonify({"code": 404, "message": "There is no such run course"})
 
         except Exception as e:
+            db.session.rollback()
             return jsonify({"message": "Failed. " + str(e)}), 500
 
 
@@ -1396,6 +1404,7 @@ class ActivateCourse(Resource):
             
             course = Course.query.filter_by(course_ID=courseID).first()
             runCourses = RunCourse.query.filter_by(course_ID=courseID).all()
+            db.session.close()
             
             if course:
                 # Check if the course is inactive
@@ -1405,6 +1414,7 @@ class ActivateCourse(Resource):
                         # Activate the course and commit the changes
                         course.course_Status = 'Active'
                         db.session.commit()
+                        db.session.close()
                         return jsonify({"code": 200, "message": "Course has been activated"})
                     else:
                         return jsonify({"code": 400, "message": "Course cannot be activated because not all run courses are closed"})
@@ -1414,6 +1424,7 @@ class ActivateCourse(Resource):
                 return jsonify({"code": 404, "message": "There is no such run course"})
 
         except Exception as e:
+            db.session.rollback()
             return jsonify({"code": 500, "message": "Failed. " + str(e)})
 
 
@@ -1429,9 +1440,6 @@ class AddInterest(Resource):
             args = add_interest.parse_args()
             voteID = args.get("vote_ID")
             userID = args.get("user_ID")
-            session_user_ID = common.getUserID()
-            if userID != session_user_ID:
-                return json.loads(json.dumps({"message": "User id and session user is different"})), 404
 
             interestList = Interest.query.filter(Interest.interest_ID.contains("")).all()
             finalInterest = interestList[-1]
@@ -1446,9 +1454,11 @@ class AddInterest(Resource):
             Proposedcourse.voteCount = votecount + 1
             db.session.add(newInterest)
             db.session.commit()
+            db.session.close()
 
             return json.loads(json.dumps({"message":"Express Interest Successfully! Please refer to your profile to find out the status of the course."}, default=str)), 200
         except Exception as e:
+            db.session.rollback()
             return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
 
 
@@ -1458,29 +1468,28 @@ delete_interest.add_argument("vote_ID", help="Vote ID")
 delete_interest.add_argument("user_ID", help="User ID")
 @api.route('/delete_interest')
 @api.doc(description="Delete Interest for Course")
-class DemoveInterest(Resource):
+class DeleteInterest(Resource):
     @api.expect(delete_interest)
     def post(self):
-        try:
-            
+        try: 
             args = delete_interest.parse_args()
             voteID = args.get("vote_ID")
             userID = args.get("user_ID")
-            session_user_ID = common.getUserID()
-            if userID != session_user_ID:
-                return json.loads(json.dumps({"message": "User id and session user is different"})), 404
+            interest_record = Interest.query.filter_by(vote_ID=voteID, user_ID=userID).first()
+            if userID != str(interest_record.user_ID):
+                return json.loads(json.dumps({"message": "User id is different"})), 404
 
             course = VoteCourse.query.filter_by(vote_ID = voteID).first()
             courseID = course.course_ID
             Proposedcourse = ProposedCourse.query.filter_by(course_ID=courseID).first()
             votecount = Interest.query.filter_by(vote_ID = voteID).count()
             Proposedcourse.voteCount = votecount - 1
-            db.session.delete(Interest.query.filter_by(vote_ID=voteID, user_ID=userID).first())                                 
+            db.session.delete(interest_record)                                 
             db.session.commit()
-
+            db.session.close()
             return json.loads(json.dumps({"message":"Unvote Interest Successfully! Please refer to View Course page to find out more courses."}, default=str)), 200
-            
         except Exception as e:
+            db.session.rollback()
             return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
 
 # Soft delete vote - Update status to Not Offered
@@ -1509,10 +1518,12 @@ class UpdateVoteStatus(Resource):
             # Update the vote_Status to 'Not Offered'.
             vote_course.vote_Status = 'Not Offered'
             db.session.commit()
+            db.session.close()
 
             return json.loads(json.dumps({"message":"You have delete the course successfully. Please refer to 'Deleted Course' Tab."}, default=str)), 200
 
         except Exception as e:
+            db.session.rollback()
             return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
         
 # Close Voting
@@ -1539,10 +1550,12 @@ class CloseVoteCourse(Resource):
 
             vote_course.vote_Status = 'Closed'
             db.session.commit()
+            db.session.close()
 
             return json.loads(json.dumps({"message":"You have closed the course. The course is not available for voting now."}, default=str)), 200
 
         except Exception as e:
+            db.session.rollback()
             return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
 
 
@@ -1578,10 +1591,12 @@ class AdminUpdateRunCourse(Resource):
             course.coursecat_ID = coursecat_ID
 
             db.session.commit()
+            db.session.close()
 
             return jsonify({"message": "course updated successfully", "code": 200})
 
         except Exception as e:
+            db.session.rollback()
             return jsonify({"message": f"Failed to update course: {str(e)}", "code": 500})
 
 

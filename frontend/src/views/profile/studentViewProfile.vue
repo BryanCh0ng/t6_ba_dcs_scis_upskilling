@@ -65,6 +65,9 @@
                   <td v-if="(registered_course.reg_Status === 'Enrolled' || registered_course.reg_Status === 'Pending') && isClosingDateValid(registered_course.reg_Enddate)">
                       <course-action status="registered_drop" @action-and-message-updated="handleActionData" :course="registered_course"></course-action>
                   </td>
+                  <td v-else-if="(registered_course.reg_Status === 'Dropped') && isClosingDateValid(registered_course.reg_Enddate)">
+                      <course-action @action-and-message-updated="handleActionData" :status="registered_course.course_Status" :course="registered_course"></course-action>
+                  </td>
                 </tr>
               </tbody>
 

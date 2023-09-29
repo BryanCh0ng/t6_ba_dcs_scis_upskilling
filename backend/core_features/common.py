@@ -51,7 +51,12 @@ def getUserRole(user_ID=None):
         user_ID = getUserID()
 
     if user_ID:
-        return User.query.filter_by(user_ID=user_ID).first().role_Name
+        user = db.session.query(User).filter_by(user_ID=user_ID).first()
+        db.session.close()
+        if user:
+            return user.role_Name
+        else:
+            return None
     else:
         return None
     
@@ -63,4 +68,5 @@ def getUserID():
         db.session.close()
         return id
     else:
+        db.session.close()
         return 'Session not set'
