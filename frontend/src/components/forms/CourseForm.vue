@@ -1,6 +1,6 @@
 <template>
     <div id="courseform">
-        <div class="container mt-5">
+        <div class="container">
 
             <h2 v-if="view === 'createCourse'" class="text-center">Create Course For Registration</h2>
             <h2 v-else-if="view === 'proposeCourse'" class="text-center">Propose a Course</h2>
