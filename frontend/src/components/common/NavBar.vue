@@ -112,7 +112,7 @@ export default {
       } else {
         // Add the default links for users who are not logged in
         links.push(
-          { path: "/viewcourses", label: "View Courses" },
+          { path: "/adminViewcourse", label: "View Courses" },
           { path: "/proposeCourse", label: "Propose Course" },
           { path: "/ContactUs", label: "Contact Us" }
         );
