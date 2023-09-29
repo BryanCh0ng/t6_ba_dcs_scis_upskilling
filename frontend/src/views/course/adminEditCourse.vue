@@ -4,13 +4,12 @@
   
 <script>
 import CourseForm from "@/components/forms/CourseForm.vue";
-import UserService from "@/api/services/UserService.js";
 
 export default {
-    name: "CreateCourse",
+    name: "EditCourse",
     data() {
         return {
-            view: "createCourse"
+            view: "editCourse"
         };
     },
     components: {
@@ -22,7 +21,7 @@ export default {
         if (role != 'Admin') {
             this.$router.push({ name: 'proposeCourse' }); 
         } else {
-            document.title = "Create Course For Registration";
+            document.title = "Edit Course";
         }
     },
 };

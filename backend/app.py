@@ -14,6 +14,7 @@ from core_features.contactus import api as contactus
 from core_features.registration import api as registration
 from core_features.votecourse import api as votecourse
 from core_features.feedbacktemplate import api as feedbacktemplate
+from core_features.common import api as common
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
 
@@ -35,6 +36,7 @@ api.add_namespace(contactus)
 api.add_namespace(registration)
 api.add_namespace(votecourse)
 api.add_namespace(feedbacktemplate)
+api.add_namespace(common)
 
 CORS(app, supports_credentials=True)
 # ==================== CONNECTING TO DATABASE ====================#
@@ -46,6 +48,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+mysqlconnector://{db_username}:{
 app.config["CORS_ALLOW_CREDENTIALS"] = True
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['SECRET_KEY'] = 'ashSDFSDFbiuoqewiort123!@*U&!&*(@^)'
+app.config['SQLALCHEMY_POOL_SIZE'] = 30
 # app.config['SQLALCHEMY_POOL_SIZE'] = 2
 # app.config['SQLALCHEMY_MAX_OVERFLOW'] = 0
 

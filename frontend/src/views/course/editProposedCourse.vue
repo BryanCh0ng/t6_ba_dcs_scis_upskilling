@@ -124,13 +124,20 @@ export default {
     SuccessModal
   },
 
-  created() {
+  async created() {
     this.getUserID();
+    const action = this.$route.params.action;
+    this.action = action
+    if (this.action == 'approve') {
+      const user_ID = await UserService.getUserID();
+      const role = await UserService.getUserRole(user_ID);
+      if (role != 'Admin') {
+        this.$router.push({ name: 'studentViewProfile' }); 
+      } 
+    }
     this.get_user_role();
     this.fetchCategoryDropdownOptions();
     this.fetchProposedCourseDetails();
-    const action = this.$route.params.action;
-    this.action = action
   },
 
   methods: {

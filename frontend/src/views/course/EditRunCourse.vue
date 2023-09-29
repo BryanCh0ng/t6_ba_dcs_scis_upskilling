@@ -4,6 +4,7 @@
   
 <script>
 import RunCourseForm from "@/components/forms/RunCourseForm.vue";
+import UserService from "@/api/services/UserService.js";
 
 export default {
     name: "EditRunCourse",
@@ -16,9 +17,15 @@ export default {
     components: {
         RunCourseForm
     },
-    created() {
-        document.title = "Edit Run Course";
-        this.runcourseId = this.$route.params.id;
+    async created() {
+        const user_ID = await UserService.getUserID();
+        const role = await UserService.getUserRole(user_ID);
+        if (role != 'Admin') {
+            this.$router.push({ name: 'proposeCourse' }); 
+        } else {
+            document.title = "Edit Run Course";
+            this.runcourseId = this.$route.params.id;
+        }
     },
 };
 </script>

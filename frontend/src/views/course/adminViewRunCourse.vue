@@ -81,6 +81,8 @@ import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
+import CommonService from "@/api/services/CommonService.js";
+import UserService from "@/api/services/UserService.js";
 
 export default {
   components: {
@@ -180,7 +182,7 @@ export default {
       }
     },
     async sortCourse() {
-      let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.courses)
+      let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.courses)
         if (sort_response.code == 200) {
           this.courses = sort_response.data
         }
@@ -192,8 +194,14 @@ export default {
       this.$router.push({ name: 'createRunCourse', params: {id: courseID}});
     }
   },
-  created() {
-   this.loadData();
+  async created() {
+    const user_ID = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_ID);
+    if (role != 'Admin') {
+      this.$router.push({ name: 'studentViewProfile' }); 
+    } else {
+      this.loadData();
+    }
   },
   mounted() {
     const buttonElement = document.createElement('button');

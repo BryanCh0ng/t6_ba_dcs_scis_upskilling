@@ -82,11 +82,11 @@ export default {
     async voteAction() {
       try {
         let response;
-        // let user_ID = this.get_user_id();
+        let user_ID = this.get_user_id();
         if (this.status == 'Vote') {
-          response = await CourseService.voteCourse(this.course.vote_ID, 1);
+          response = await CourseService.voteCourse(this.course.vote_ID, user_ID);
         } else if (this.status == 'say-pass') {
-          response = await CourseService.unvoteCourse(this.course.vote_ID, 1);
+          response = await CourseService.unvoteCourse(this.course.vote_ID, user_ID);
         } else if (this.status == 'unoffered-vote') {
           response = await CourseService.unofferedVoteCourse(this.course.course_ID);
         } else if (this.status == 'Close') {
@@ -102,7 +102,8 @@ export default {
     async proposalAction() {
       try {
         let response;
-        // let user_ID = this.get_user_id();
+        let user_ID = this.get_user_id();
+        console.log(user_ID)
         if (this.status == 'remove-proposal') {
           response = await ProposedCourseService.removeProposedCourse(this.course.pcourse_ID);
         } 

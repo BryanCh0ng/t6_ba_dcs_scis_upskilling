@@ -1,4 +1,5 @@
 from flask import request, jsonify, session
+from core_features import common
 from flask_restx import Namespace, Resource, fields, reqparse
 from allClasses import *
 import json
@@ -167,6 +168,12 @@ class CreateCourse(Resource):
             # Get the data for creating a new course from the request body
             new_course_data = request.json
             new_course_name = new_course_data.get("course_Name")
+            user_ID = new_course_data.get("user_ID")
+            user_role = common.getUserRole(user_ID)
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to create course"}, 404 
+
+            del new_course_data['user_ID']
 
             # Check if the course name already exists in the database
             existing_course = Course.query.filter_by(course_Name=new_course_name).first()
@@ -202,6 +209,13 @@ class EditCourse(Resource):
             updated_data = request.json
         
             course = Course.query.filter_by(course_ID=course_id).first()
+
+            user_ID = updated_data.get("user_ID")
+            user_role = common.getUserRole(user_ID)
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to create course"}, 404 
+
+            del updated_data['user_ID']
 
             if course:
                 # Update the fields based on updated_data
@@ -278,14 +292,14 @@ class GetUnregisteredActiveCourses(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[2].run_Startdate),
-                    'run_Enddate': format_date_time(result[2].run_Enddate),
-                    'run_Starttime': format_date_time(result[2].run_Starttime),
-                    'run_Endtime': format_date_time(result[2].run_Endtime),
-                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                    'run_Startdate': common.format_date_time(result[2].run_Startdate),
+                    'run_Enddate': common.format_date_time(result[2].run_Enddate),
+                    'run_Starttime': common.format_date_time(result[2].run_Starttime),
+                    'run_Endtime': common.format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': common.format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -569,7 +583,7 @@ class GetCompletedCourses(Resource):
             UserInstructor.user_Email.label("instructor_email"),
             exists().where(and_(
                 Feedback.submitted_By == user_id,
-                Feedback.course_ID == Course.course_ID,  # Specify course filter
+                Feedback.rcourse_ID == Course.rcourse_ID,  # Specify course filter
                 Feedback.feedback_Template_ID == RunCourse.template_ID  # Add this filter
             )).label("feedback_submitted")
         ).select_from(RunCourse).join(Course, RunCourse.course_ID == Course.course_ID) \
@@ -592,14 +606,14 @@ class GetCompletedCourses(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[1].run_Startdate),
-                    'run_Enddate': format_date_time(result[1].run_Enddate),
-                    'run_Starttime': format_date_time(result[1].run_Starttime),
-                    'run_Endtime': format_date_time(result[1].run_Endtime),
-                    'reg_Startdate': format_date_time(result[1].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[1].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[1].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[1].reg_Endtime),
+                    'run_Startdate': common.format_date_time(result[1].run_Startdate),
+                    'run_Enddate': common.format_date_time(result[1].run_Enddate),
+                    'run_Starttime': common.format_date_time(result[1].run_Starttime),
+                    'run_Endtime': common.format_date_time(result[1].run_Endtime),
+                    'reg_Startdate': common.format_date_time(result[1].reg_Startdate),
+                    'reg_Enddate': common.format_date_time(result[1].reg_Enddate),
+                    'reg_Starttime': common.format_date_time(result[1].reg_Starttime),
+                    'reg_Endtime': common.format_date_time(result[1].reg_Endtime),
                 }
 
                 modified_run_course = {**result[1].json(), **run_course_attrs}
@@ -730,14 +744,14 @@ class GetInstructorCourses(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[2].run_Startdate),
-                    'run_Enddate': format_date_time(result[2].run_Enddate),
-                    'run_Starttime': format_date_time(result[2].run_Starttime),
-                    'run_Endtime': format_date_time(result[2].run_Endtime),
-                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                    'run_Startdate': common.format_date_time(result[2].run_Startdate),
+                    'run_Enddate': common.format_date_time(result[2].run_Enddate),
+                    'run_Starttime': common.format_date_time(result[2].run_Starttime),
+                    'run_Endtime': common.format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': common.format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -857,14 +871,14 @@ class GetInstructorTaughtCourses(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[2].run_Startdate),
-                    'run_Enddate': format_date_time(result[2].run_Enddate),
-                    'run_Starttime': format_date_time(result[2].run_Starttime),
-                    'run_Endtime': format_date_time(result[2].run_Endtime),
-                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                    'run_Startdate': common.format_date_time(result[2].run_Startdate),
+                    'run_Enddate': common.format_date_time(result[2].run_Enddate),
+                    'run_Starttime': common.format_date_time(result[2].run_Starttime),
+                    'run_Endtime': common.format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': common.format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
                 }
                 modified_run_course = {**result[2].json(), **run_course_attrs}
 
@@ -1137,14 +1151,14 @@ class GetAllCoursesWithRegistrationCount(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[2].run_Startdate),
-                    'run_Enddate': format_date_time(result[2].run_Enddate),
-                    'run_Starttime': format_date_time(result[2].run_Starttime),
-                    'run_Endtime': format_date_time(result[2].run_Endtime),
-                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                    'run_Startdate': common.format_date_time(result[2].run_Startdate),
+                    'run_Enddate': common.format_date_time(result[2].run_Enddate),
+                    'run_Starttime': common.format_date_time(result[2].run_Starttime),
+                    'run_Endtime': common.format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': common.format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -1389,35 +1403,6 @@ class ActivateCourse(Resource):
         except Exception as e:
             return jsonify({"code": 500, "message": "Failed. " + str(e)})
 
-sort_records = api.parser()
-sort_records.add_argument("sort_column", help="Enter sort column")
-sort_records.add_argument("sort_direction", help="Enter sort direction")
-sort_records.add_argument("records", help="Enter records")
-@api.route("/sort_records", methods=["POST"])
-@api.doc(description="Sort Records")
-class sortRecords(Resource):
-    @api.expect(sort_records)
-    def post(self):
-      args = sort_records.parse_args()
-      sort_column = args.get("sort_column", "")
-      sort_direction = args.get("sort_direction", "")
-      records = request.json.get("records", [])
-
-      records_with_values = [record for record in records if record.get(sort_column) is not None]
-      records_with_none_values = [record for record in records if record.get(sort_column) is None]
-
-      if sort_column != "":
-          sorted_data = sorted(records_with_values, key=lambda x: x[sort_column], reverse=(sort_direction == "desc"))
-      else:
-          sorted_data = records
-
-      sorted_data = records_with_none_values + sorted_data
-
-      return jsonify({"code": 200, "data": sorted_data, "sort": sort_column, "direction": sort_direction})
-
-
-
-
 
 add_interest = api.parser()
 add_interest.add_argument("vote_ID", help="Vote ID")
@@ -1570,10 +1555,3 @@ class AdminUpdateRunCourse(Resource):
 
 
 
-def format_date_time(value):
-    if isinstance(value, (date, datetime)):
-        return value.strftime('%Y-%m-%d')
-    elif isinstance(value, time):
-        return value.strftime('%H:%M:%S')
-    else:
-        return None
