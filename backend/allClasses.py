@@ -86,35 +86,7 @@ class CourseCategory(db.Model):
             result[column] = getattr(self, column)
         return result
         
-################## Feedback Template Class Creation ##################
-class FeedbackTemplate(db.Model):
-    __tablename__ = 'feedbacktemplate'
 
-    template_ID = db.Column(db.Integer, nullable=False, primary_key=True)
-    template_Name = db.Column(db.String(255), nullable=False)
-    # created_on = db.Column(db.DateTime, default=datetime.now ,  nullable=False)
-    created_On = db.Column(db.Date,  nullable=False)
-
-
-
-    def __init__(self, template_ID, template_Name, created_On ):
-        self.template_ID = template_ID
-        self.template_Name = template_Name
-        self.created_On = created_On
-
-
-
-    def json(self):
-        columns = self.__mapper__.column_attrs.keys()
-        result = {}
-        for column in columns:
-            column_value = getattr(self, column)
-            if isinstance(column_value, date):
-                result[column] = column_value.strftime("%Y-%m-%d")
-            else:
-                result[column] = column_value
-        return result
-    
 
 ################## Course Class Creation ##################
 class Course(db.Model):
@@ -220,6 +192,35 @@ class Interest(db.Model):
             result[column] = getattr(self, column)
         return result
     
+################## Feedback Template Class Creation ##################
+class FeedbackTemplate(db.Model):
+    __tablename__ = 'feedbacktemplate'
+
+    template_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    template_Name = db.Column(db.String(255), nullable=False)
+    # created_on = db.Column(db.DateTime, default=datetime.now ,  nullable=False)
+    created_On = db.Column(db.Date,  nullable=False)
+
+
+
+    def __init__(self, template_ID, template_Name, created_On ):
+        self.template_ID = template_ID
+        self.template_Name = template_Name
+        self.created_On = created_On
+
+
+
+    def json(self):
+        columns = self.__mapper__.column_attrs.keys()
+        result = {}
+        for column in columns:
+            column_value = getattr(self, column)
+            if isinstance(column_value, date):
+                result[column] = column_value.strftime("%Y-%m-%d")
+            else:
+                result[column] = column_value
+        return result
+    
 ##################  Template Attribute Class Creation ##################
 class TemplateAttribute(db.Model):
     __tablename__ = 'templateattribute'
@@ -282,8 +283,6 @@ class Feedback(db.Model):
     template_Attribute_ID = db.Column(db.Integer ,db.ForeignKey('templateattribute.template_Attribute_ID'), nullable=False) 
     answer = db.Column(db.String(255), nullable=False) 
     rcourse_ID = db.Column(db.Integer, db.ForeignKey('runcourse.rcourse_ID'), nullable=False) 
-
-
 
     def __init__(self, feedback_ID, feedback_Template_ID, submitted_By, template_Attribute_ID, answer, rcourse_ID):
         self.feedback_ID = feedback_ID
