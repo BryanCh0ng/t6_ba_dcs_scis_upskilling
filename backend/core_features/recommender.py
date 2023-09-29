@@ -17,14 +17,9 @@ app.logger.setLevel(logging.DEBUG)
 api = Namespace('recommender', description='Recommender')
 
 def preprocess_text(text):
-    # Remove special characters and convert to lowercase
     text = re.sub(r'[^a-zA-Z0-9\s]', '', text).lower()
-    # Tokenize the text
     tokens = word_tokenize(text)
     return ' '.join(tokens)
-
-# data = pd.read_csv(r'C:\Users\yakry\Desktop\RawData2021.csv')
-# data.columns = ["Name", "Quantum Leap", "FISCOS BCOS Blockchain", "Python Programming for Data Analysis", "Cybersecurity - Introduction to SSL Certificates"]
 
 recommender_user_similarity = api.parser()
 recommender_user_similarity.add_argument("user_ID", help="Enter user ID")
@@ -36,7 +31,6 @@ class RecommenderUserRegistration(Resource):
         arg = recommender_user_similarity.parse_args().get("user_ID")
         target_user_id = int(arg) if arg else ""
         
-        #userid as rows and courseid as columns
         regList = Registration.query.all()
         
         reg_list = []
@@ -172,13 +166,11 @@ class RecommenderCourseRegistration(Resource):
             rcourse_id_list = [course['rcourse_ID'] for course in last_three_reg]
 
             user_ID = session.get('user_ID')
-            # user_ID = 1
 
             # Fetch user registration data
             regList = Registration.query.all()
             reg_list = []
             
-            # Create a list of registered courses for each user
             for reg in regList:
                 rcourse_id = reg.rcourse_ID
                 userid = reg.user_ID

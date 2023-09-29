@@ -429,7 +429,6 @@ export default {
         this.showRegisterJustForYou = false
       }
 
-      
       let course_list_req = await Recommender.getUserRegisteredCourses(this.user_ID)
       if (course_list_req.message === "No matching course registration information found") {
         this.showRegisterOthers= false
