@@ -800,6 +800,7 @@ export default {
                         this.submitFormData["runcourse_Status"] = "Closed";
                     }
 
+                    //console.log(this.submitFormData["runcourse_Status"])
 
                     this.submitFormData["course_Size"] = parseInt(this.formData.courseSize);
 
