@@ -117,6 +117,7 @@ import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/StudentCourseSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
+import UserService from "@/api/services/UserService.js";
 
 export default {
   components: {
@@ -143,7 +144,8 @@ export default {
       receivedMessage: '',
       actionCourse: {},
       search_course_name: null,
-      search_course_category: null
+      search_course_category: null,
+      user_ID: 1,
     }
   },
   computed: {
@@ -159,6 +161,16 @@ export default {
     }
   },
   methods: {
+    async get_user_id() {
+      try {
+        const user_ID = await UserService.getUserID()
+        this.user_ID = user_ID
+
+      } catch (error) {
+        this.message = error.message
+        this.user_ID = null;
+      }
+    },
     openModal(course) {
       this.selectedCourse = course;
       this.showModal = true;
@@ -220,10 +232,10 @@ export default {
     },
     async loadData() {
       try {
-        let run_response = await CourseService.searchUnregisteredActiveInfo(1, this.search_course_name, this.search_course_category)
+        let run_response = await CourseService.searchUnregisteredActiveInfo(this.user_ID, this.search_course_name, this.search_course_category)
         this.run_courses = run_response.data
         
-        let vote_response = await CourseService.searchUnvotedActiveInfo(1, this.search_course_name, this.search_course_category)
+        let vote_response = await CourseService.searchUnvotedActiveInfo(this.user_ID, this.search_course_name, this.search_course_category)
         this.vote_courses = vote_response.data
       } catch (error) {
         console.error("Error fetching course details:", error);
