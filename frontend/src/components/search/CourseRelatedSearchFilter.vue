@@ -26,11 +26,11 @@
 </template>
 
 <script>
-// import { axiosClient } from "../api/axiosClient";
 import InputField from "../InputField.vue";
 import DropdownField from "../DropdownField.vue";
 // import CourseService from "@/api/services/CourseService.js"
 import CourseCategoryService from "@/api/services/CourseCategoryService.js"
+import UserService from "@/api/services/UserService.js"
 
 export default({
     name: "SearchFilter",
@@ -74,8 +74,7 @@ export default({
         },
         async searchFilter() {
             try {
-                const user_ID = 3;
-                // const user_ID = this.getUserIDFromSession()
+                const user_ID = await UserService.getUserID();
                 const course_Name = this.courseName;
                 const coursecat_ID = this.category;
 

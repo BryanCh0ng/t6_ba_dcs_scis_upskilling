@@ -95,15 +95,6 @@ const routes = [
     },
   },
   {
-    path: '/adminViewInstructorsTrainers',
-    name: 'adminViewInstructorsTrainers',
-    component: () => import('../views/course/adminViewInstructorsTrainers.vue'),
-    meta: {
-        title: 'Admin View Instructors Trainers',
-        requiresAuth: true
-    },
-  },
-  {
     path: '/studentViewCourse',
     name: 'studentViewCourse',
     component: () => import('../views/course/studentViewCourse.vue'),
@@ -208,6 +199,15 @@ const routes = [
     component: () => import('../views/course/adminViewCourse.vue'),
     meta: {
         title: 'Admin View Course',
+        requiresAuth: true
+    }
+  },
+  {
+    path: '/adminViewManagement',
+    name: 'adminViewManagement',
+    component: () => import('../views/usermanagement/adminViewManagement.vue'),
+    meta: {
+        title: 'Admin View Management',
         requiresAuth: true
     }
   }

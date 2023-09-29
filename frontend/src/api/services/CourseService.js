@@ -303,23 +303,6 @@ class CourseService extends BaseApiService {
         }
     }
 
-    // Admin - All Instructors
-    async getAllInstructorsAndTrainers(user_Name, role_Name, organization_Name) {
-        try {
-            let instructorsAndTrainers = await axiosClient.get("/course/get_all_instructors_and_trainers", {
-                params: {
-                    instructor_name: user_Name,
-                    role_name: role_Name,
-                    organization_name: organization_Name
-                }
-            });
-            return instructorsAndTrainers.data;
-        } catch (error) {
-            return this.handleError(error);
-        }
-    }
-
-
     // Admin - All Courses
     async searchAllCourseAdmin(course_Name, coursecat_ID, course_Status) {
         try {

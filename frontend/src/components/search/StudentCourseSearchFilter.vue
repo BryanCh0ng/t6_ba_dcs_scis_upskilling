@@ -30,6 +30,7 @@
 import DropdownField from "../DropdownField.vue";
 import InputField from "../InputField.vue";
 import CourseCategoryService from "@/api/services/CourseCategoryService.js"
+import UserService from "@/api/services/UserService.js"
 
 export default({
     name: "SearchFilter",
@@ -68,9 +69,7 @@ export default({
         },
         async searchFilter() {
             try {
-                // Assign values to variables
-                const user_ID = 1;
-                // const user_ID = this.getUserIDFromSession()
+                const user_ID = await UserService.getUserID()
                 const course_Name = this.courseName;
                 const coursecat_ID = this.category;
 
