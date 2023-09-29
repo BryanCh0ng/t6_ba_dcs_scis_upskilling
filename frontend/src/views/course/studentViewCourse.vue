@@ -118,7 +118,6 @@ import SearchFilter from "@/components/search/StudentCourseSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 import UserService from "@/api/services/UserService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
-import UserService from "@/api/services/UserService.js";
 import CommonService from "@/api/services/CommonService.js"
 
 export default {
@@ -148,7 +147,6 @@ export default {
       actionCourse: {},
       search_course_name: null,
       search_course_category: null,
-      user_ID: 1,
     }
   },
   computed: {

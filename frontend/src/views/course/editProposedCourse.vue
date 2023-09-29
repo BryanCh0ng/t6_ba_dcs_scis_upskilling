@@ -230,8 +230,8 @@ export default {
       try {
         if (this.action == 'approve') {
         const result = await CourseService.adminUpdateCourse(courseId, formData);
+        let approve_result;
         if (result.success) {
-          let approve_result;
             const course = await ProposedCourseService.getProposedCourseByCourseId(courseId);
             const acceptPromise = ProposedCourseService.approveProposedCourse({ "pcourseID": course['data'].pcourse_ID });
             approve_result = await acceptPromise;

@@ -1359,12 +1359,8 @@ class RetireCourse(Resource):
             
             course = Course.query.filter_by(course_ID=courseID).first()
             runCourses = RunCourse.query.filter_by(course_ID=courseID).all()
-<<<<<<< HEAD
             # app.logger.debug(runCourses)
-=======
-            app.logger.debug(runCourses)
             db.session.close()
->>>>>>> b802f81 (add auth for contact us;)
 
             if course:
                 # Check if the course is inactive
