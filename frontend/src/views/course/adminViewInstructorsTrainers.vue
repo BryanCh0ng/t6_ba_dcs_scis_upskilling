@@ -12,12 +12,17 @@
           <thead>
             <tr class="text-nowrap">
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('user_Name')">Name <sort-icon :sortColumn="sortColumn === 'user_Name'" :sortDirection="getSortDirection('user_Name')"/></a></th>
+                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('user_Name')">Name <sort-icon :sortColumn="sortColumn === 'user_Name'" :sortDirection="getSortDirection('user_Name')"/></a>
+              </th>
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('role_Name')">Role <sort-icon :sortColumn="sortColumn === 'role_Name'" :sortDirection="getSortDirection('role_Name')"/></a></th>
+                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('role_Name')">Role <sort-icon :sortColumn="sortColumn === 'role_Name'" :sortDirection="getSortDirection('role_Name')"/></a>
+              </th>
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('organisation_Name')">Organization <sort-icon :sortColumn="sortColumn === 'organisation_Name'" :sortDirection="getSortDirection('organisation_Name')"/></a></th>
-              <th>Ratings</th>
+                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('organisation_Name')">Organization <sort-icon :sortColumn="sortColumn === 'organisation_Name'" :sortDirection="getSortDirection('organisation_Name')"/></a>
+              </th>
+              <th scope="col">
+                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('average_rating')">Ratings <sort-icon :sortColumn="sortColumn === 'average_rating'" :sortDirection="getSortDirection('average_rating')"/></a>
+              </th>
               <th scope="col">Feedback Analysis</th>
             </tr>
           </thead>
@@ -33,7 +38,7 @@
                 {{ instructor_trainer.organisation_Name }}
               </td>
               <td class="ratings">
-                {{ instructor_trainer.ratings }}
+                {{ instructor_trainer.average_rating }} / 5
               </td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
             </tr>
@@ -102,7 +107,11 @@ export default {
         this.sortColumn = column;
         this.sortDirection = 'asc';
       }
-      this.sortCourse()
+      if (column === "average_rating") {
+        this.sortRatings();
+      } else {
+        this.sortCourse()
+      }
     },
     getSortDirection(column) {
       if (this.sortColumn === column) {
@@ -114,6 +123,18 @@ export default {
         if (sort_response.code == 200) {
           this.instructors_trainers = sort_response.data
         }
+    },
+    async sortRatings() {
+      this.instructors_trainers.sort((a, b) => {
+        const valueA = parseFloat(a.average_rating);
+        const valueB = parseFloat(b.average_rating);
+
+        if (this.sortDirection === 'dsc') {
+          return valueB - valueA;
+        } else {
+          return valueB - valueA;
+        }
+      });
     }
   },
   computed: {
