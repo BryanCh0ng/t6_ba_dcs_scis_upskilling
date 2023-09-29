@@ -202,7 +202,8 @@
 
                 <div v-else class="row">
                     <div class="col-md-6 form-group">
-                        <button type="button" @click="goToAdminViewRunCourse" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                        <button type="button" @click="goToAdminViewRunCourse"
+                            class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
                             Cancel
                         </button>
                     </div>
@@ -524,7 +525,7 @@ export default {
         handleModalClosed(value) {
             this.showAlert = value;
 
-            if(!this.showAlert) {
+            if (!this.showAlert) {
                 this.$router.push('/adminViewRunCourse');
             }
         },
@@ -726,7 +727,7 @@ export default {
         //Converting Object to String (For Date variable)
         formatDateToYYYYMMDD(dateObj) {
             const parsedYear = dateObj.getFullYear();
-            const parsedMonth = dateObj.getMonth()+1;
+            const parsedMonth = dateObj.getMonth() + 1;
             const parsedDay = dateObj.getDate();
             return `${parsedYear}-${parsedMonth}-${parsedDay}`;
         },
@@ -768,30 +769,37 @@ export default {
 
                     const today = new Date();
 
-                    today.setHours(0, 0, 0, 0); // Set today's time to midnight
-
                     const todayDay = today.getDate();
                     const todayMonth = today.getMonth() + 1;
                     const todayYear = today.getFullYear();
+
+                    const currentHours = today.getHours();
+                    const currentMinutes = today.getMinutes();
 
                     const openingDay = this.formData.openingDate.getDate();
                     const openingMonth = this.formData.openingDate.getMonth() + 1;
                     const openingYear = this.formData.openingDate.getFullYear();
 
-                    const closingDay = this.formData.closingDate.getDate();
-                    const closingMonth = this.formData.closingDate.getMonth() + 1;
-                    const closingYear = this.formData.closingDate.getFullYear();
+                    const selectedHours = this.formData.openingTime.hours;
+                    const selectedMinutes = this.formData.openingTime.minutes;
 
-                    if (todayYear >= openingYear && todayYear <= closingYear &&
-                        todayMonth >= openingMonth && todayMonth <= closingMonth &&
-                        todayDay >= openingDay && todayDay <= closingDay) {
-
-                        //console.log("Today's date is in between the range");
-
-                        this.submitFormData["runcourse_Status"] = "Ongoing";
+                    if (todayYear === openingYear && todayMonth === openingMonth && todayDay === openingDay) {
+                        if (
+                            currentHours > selectedHours ||
+                            (currentHours === selectedHours && currentMinutes > selectedMinutes) ||
+                            (currentHours === selectedHours && currentMinutes === selectedMinutes)
+                        )   {
+                                // Today's date is within the range, and the selected time is before the current time.
+                                this.submitFormData["runcourse_Status"] = "Ongoing";
+                            } else {
+                            // Today's date is within the range, but the selected time is after the current time.
+                            this.submitFormData["runcourse_Status"] = "Closed";
+                        }
                     } else {
+                        // Today's date is outside the range.
                         this.submitFormData["runcourse_Status"] = "Closed";
                     }
+
 
                     this.submitFormData["course_Size"] = parseInt(this.formData.courseSize);
 

@@ -56,7 +56,7 @@
 
                 <div v-else class="row">
                     <div class="col-md-6 form-group">
-                        <button type="button" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                        <button type="button" @click="goToAdminViewCourse" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
                             Cancel
                         </button>
                     </div>
@@ -373,6 +373,9 @@ export default {
                 console.log('Form has validation errors');
 
             }
+        },
+        goToAdminViewCourse(){
+            this.$router.push("/adminViewCourse");
         }
     },
     computed: {
