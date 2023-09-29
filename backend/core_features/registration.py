@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
+from core_features import common
 from allClasses import *
 import json
 
@@ -55,6 +56,9 @@ class CreateNewRegistration(Resource):
         data = request.get_json()
         rcourse_ID = data.get("rcourse_ID")
         user_ID = data.get("user_ID")
+        session_user_ID = common.getUserID()
+        if session_user_ID != user_ID:
+            return {"message": "Unathorized Access, No rights to create new registration"}, 404 
 
         # Check if a registration with the given rcourse_ID and user_ID exists
         existing_registration = Registration.query.filter_by(rcourse_ID=rcourse_ID, user_ID=user_ID).first()
@@ -116,6 +120,9 @@ class UpdateRegistration(Resource):
             )
         
         try:
+            if data["user_ID"] != registration.user_ID:
+                return {"message": "Unathorized Access, No rights to update registration"}, 404 
+
             for key, value in data.items():
                 setattr(registration, key, value)
 
@@ -142,6 +149,10 @@ class GetRegistrationByUserID(Resource):
     def get(self):
         arg = get_registration_by_userid.parse_args().get("user_ID")
         user_ID = arg if arg else ""
+        session_user_ID = common.getUserID()
+        if user_ID != session_user_ID:
+          return {"message": "Unathorized Access, No rights to view registrations"}, 404
+ 
         regList = Registration.query.filter(Registration.user_ID == user_ID).all()
         db.session.close()
 
@@ -182,6 +193,9 @@ class dropRegisteredCourse(Resource):
             if registration is None:
                 return {"message": "Registration record not found for the specified course and user"}, 404
 
+            if user_ID != registration.user_ID:
+                return {"message": "Unathorized Access, No rights to update registration"}, 404 
+    
             registration.reg_Status = 'Dropped'
             db.session.commit()
 

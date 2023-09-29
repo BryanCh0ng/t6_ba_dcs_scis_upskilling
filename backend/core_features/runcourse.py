@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 from allClasses import *
+from core_features import common
 import json
 
 api = Namespace('runcourse', description='Run Course related operations')
@@ -79,6 +80,11 @@ change_registration_status_model = api.model("change_registration_status_model",
 class ChangeRegistrationStatus(Resource):
     @api.expect(change_registration_status_model)
     def post(self):
+
+        user_role = common.getUserRole()
+        if (user_role) != 'Admin':
+          return {"message": "Unathorized Access, Failed to change registration status for run course"}, 404
+
         data = request.get_json()
 
         try:
@@ -126,6 +132,10 @@ class EditRunCourse(Resource):
     def put(self, runcourse_id):
 
         try: 
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to edit run course"}, 404
+    
             #Get the updated data from the request body 
             updated_data = request.json
         
@@ -153,6 +163,9 @@ class EditRunCourse(Resource):
 class CreateRunCourse(Resource):
     def post(self, course_id):
         try: 
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to create run course"}, 404
             
             # Get the data for creating a new run course from the request body
             new_run_course_data = request.json

@@ -92,9 +92,13 @@ class DeleteCourse(Resource):
     @api.expect(delete_course)
     def delete(self):    
         try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to delete course"}, 404 
+
             courseID = delete_course.parse_args().get("course_id")
-            
-            course = Course.query.filter_by(course_ID=courseID).first()            
+            course = Course.query.filter_by(course_ID=courseID).first()
+        
             if(course):
                     try:
                         db.session.delete(course)              
@@ -118,6 +122,10 @@ class DeleteCourse(Resource):
     @api.expect(delete_runcourse)
     def delete(self):    
         try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to delete run course"}, 404 
+
             rcourse_ID = delete_runcourse.parse_args().get("rcourse_ID")
             # app.logger.debug(rcourse_ID)
 
@@ -164,16 +172,14 @@ class GetCourse(Resource):
 @api.doc(description="Create course")
 class CreateCourse(Resource):
     def post(self):
-        try: 
+        try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to create course"}, 404
+
             # Get the data for creating a new course from the request body
             new_course_data = request.json
-            new_course_name = new_course_data.get("course_Name")
-            user_ID = new_course_data.get("user_ID")
-            user_role = common.getUserRole(user_ID)
-            if (user_role) != 'Admin':
-                return {"message": "Unathorized Access, Failed to create course"}, 404 
-
-            del new_course_data['user_ID']
+            new_course_name = new_course_data.get("course_Name") 
 
             # Check if the course name already exists in the database
             existing_course = Course.query.filter_by(course_Name=new_course_name).first()
@@ -205,18 +211,14 @@ class EditCourse(Resource):
     def put(self, course_id):
 
         try: 
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to edit course"}, 404 
+
             #Get the updated data from the request body 
             updated_data = request.json
         
             course = Course.query.filter_by(course_ID=course_id).first()
-
-            user_ID = updated_data.get("user_ID")
-            user_role = common.getUserRole(user_ID)
-            if (user_role) != 'Admin':
-                return {"message": "Unathorized Access, Failed to create course"}, 404 
-
-            del updated_data['user_ID']
-
             if course:
                 # Update the fields based on updated_data
                 for field, value in updated_data.items():
@@ -634,8 +636,6 @@ class GetCompletedCourses(Resource):
 
 
 
-    
-
 # Instructor/Trainer - Voting Campaign
 retrieve_voting_campaign_courses_filter_search = api.parser()
 retrieve_voting_campaign_courses_filter_search.add_argument("course_name", help="Enter course name")
@@ -688,7 +688,8 @@ class GetVotingCampaignCourses(Resource):
             return jsonify({"code": 200, "data": result_data})
         
         return jsonify({"code": 404, "message": "No matching courses found"})
-        
+
+
 # Instructor/Trainer - Assigned Course
 retrieve_instructor_courses_filter_search = api.parser()
 retrieve_instructor_courses_filter_search.add_argument("instructor_id", help="Enter instructor ID")
@@ -1287,6 +1288,10 @@ class DeactivateCourse(Resource):
     @api.expect(deactivate_course)
     def post(self):
         try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to deactivate course"}, 404 
+
             args = deactivate_course.parse_args()
             course_id = args.get("course_id")
 
@@ -1342,6 +1347,10 @@ class RetireCourse(Resource):
     @api.expect(retire_course)
     def post(self):
         try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to retire course"}, 404 
+
             args = retire_course.parse_args()
             courseID = args.get("course_id")
             
@@ -1378,6 +1387,10 @@ class ActivateCourse(Resource):
     @api.expect(activate_course)
     def post(self):
         try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to activate course"}, 404 
+
             args = activate_course.parse_args()
             courseID = args.get("course_id")
             
@@ -1416,6 +1429,10 @@ class AddInterest(Resource):
             args = add_interest.parse_args()
             voteID = args.get("vote_ID")
             userID = args.get("user_ID")
+            session_user_ID = common.getUserID()
+            if userID != session_user_ID:
+                return json.loads(json.dumps({"message": "User id and session user is different"})), 404
+
             interestList = Interest.query.filter(Interest.interest_ID.contains("")).all()
             finalInterest = interestList[-1]
             interestID = finalInterest.interest_ID
@@ -1445,9 +1462,14 @@ class DemoveInterest(Resource):
     @api.expect(delete_interest)
     def post(self):
         try:
+            
             args = delete_interest.parse_args()
             voteID = args.get("vote_ID")
             userID = args.get("user_ID")
+            session_user_ID = common.getUserID()
+            if userID != session_user_ID:
+                return json.loads(json.dumps({"message": "User id and session user is different"})), 404
+
             course = VoteCourse.query.filter_by(vote_ID = voteID).first()
             courseID = course.course_ID
             Proposedcourse = ProposedCourse.query.filter_by(course_ID=courseID).first()
@@ -1471,6 +1493,10 @@ class UpdateVoteStatus(Resource):
     @api.expect(update_vote_status_parser)
     def put(self):
         try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to reject proposed course"}, 404 
+
             args = update_vote_status_parser.parse_args()
             course_ID = args.get("course_ID")
 
@@ -1499,6 +1525,10 @@ class CloseVoteCourse(Resource):
     @api.expect(close_vote_course_parser)
     def put(self):
         try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to close vote course"}, 404 
+
             args = close_vote_course_parser.parse_args()
             course_ID = args.get("course_ID")
 
@@ -1529,10 +1559,11 @@ class AdminUpdateRunCourse(Resource):
     @api.expect(admin_update_course)
     def put(self, course_id):
         try:
-            # app.logger.debug(course_id)
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to create course"}, 404 
 
             data = request.get_json()
-            # app.logger.debug(data)
             course_name = data.get('course_Name')
             course_desc = data.get('course_Desc')
             coursecat_ID = data.get('coursecat_ID')

@@ -1,5 +1,9 @@
 <template>
-    <CourseForm :view="view" :courseId="courseId"></CourseForm>
+ <div>
+    <template v-if="role === 'Admin'">
+      <CourseForm :view="view" :courseId="courseId"></CourseForm>
+    </template>
+  </div> 
 </template>
   
 <script>
@@ -11,7 +15,8 @@ export default {
     data() {
         return {
             view: "editCourse",
-            courseId: null
+            courseId: null,
+            role: null,
         };
     },
     components: {
@@ -19,8 +24,8 @@ export default {
     },
     async created() {
         const user_ID = await UserService.getUserID();
-        const role = await UserService.getUserRole(user_ID);
-        if (role != 'Admin') {
+        this.role = await UserService.getUserRole(user_ID);
+        if (this.role != 'Admin') {
             this.$router.push({ name: 'proposeCourse' }); 
         } else {
             document.title = "Edit Course";
