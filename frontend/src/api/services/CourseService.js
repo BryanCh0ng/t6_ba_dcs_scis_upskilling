@@ -441,6 +441,22 @@ class CourseService extends BaseApiService {
           return { success: false, message: 'An error occurred while updating the proposed course' };
         }
     }
+
+    async adminGetUserCourses(user_ID, course_Name, coursecat_ID) {
+        try {
+            const endpoint = `/course/user_courses/${user_ID}`;
+            const params = {
+              course_name: course_Name,
+              coursecat_id: coursecat_ID
+            };
+            const response = await axiosClient.get(endpoint, { params });
+            return response.data;
+
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
 }
 
 export default new CourseService();

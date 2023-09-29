@@ -210,6 +210,15 @@ const routes = [
         title: 'Admin View Management',
         requiresAuth: true
     }
+  },
+  {
+    path: '/adminViewStudentEnrolledCourse/:user_ID',
+    name: 'adminViewStudentEnrolledCourse',
+    component: () => import('../views/course/adminViewStudentEnrolledCourse.vue'),
+    meta: {
+        title: 'Admin View Student Enrolled Course',
+        requiresAuth: true
+    }
   }
   
 

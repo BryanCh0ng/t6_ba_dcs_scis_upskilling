@@ -98,7 +98,6 @@ class GetAllAdmin(Resource):
         except Exception as e:
             return jsonify({"code": 500, "message": "Error occurred while fetching student users.", "error": str(e)})
         
-        
 
 # All Instructors
 retrieve_instructors_trainers = api.parser()
@@ -203,3 +202,22 @@ class GetAllInstructorsAndTrainers(Resource):
             return jsonify({"code": 200, "data": result_data})
 
         return jsonify({"code": 404, "message": "No instructors or trainers found"})
+
+# Student Name
+retrieve_student_name = api.parser()
+retrieve_student_name.add_argument("user_id", help="Enter user id")
+
+@api.route("/get_student_name")
+@api.doc(description="Get student name")
+class GetStudentName(Resource):
+    @api.expect(retrieve_student_name)
+    def get(self):
+        args = retrieve_student_name.parse_args()
+        user_id = args.get("user_id", "")
+
+        user = User.query.filter_by(user_ID = user_id).first()
+
+        user_name =  user.user_Name
+        
+
+        return jsonify({"code": 200, "data": user_name})

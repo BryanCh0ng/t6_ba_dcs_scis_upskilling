@@ -76,6 +76,7 @@
                 </th>
                 <th scope="col">Email</th>
                 <th scope="col">Blacklisted</th>
+                <th scope="col">View Course Taken</th>
                 <th scope="col">Action(s)</th>
               </tr>
             </thead>
@@ -91,8 +92,14 @@
                   <span v-if="user.is_blacklisted === true">Blacklisted</span>
                   <span v-else>Not Blacklisted</span>
                 </td>
+                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewCourses(user.user_ID)">View Course Taken</a></td>
                 <!-- need to include:  status=""  -->
-                <td><course-action @action-and-message-updated="handleActionData" :course="user"></course-action></td>
+                <!-- <td v-if="user.is_blacklisted === true">
+                  <course-action @action-and-message-updated="handleActionData" :course="user"></course-action>
+                </td>
+                <td v-if="user.is_blacklisted === false">
+                  <course-action @action-and-message-updated="handleActionData" :course="user"></course-action>
+                </td> -->
               </tr> 
             </tbody>
           </table>
@@ -112,7 +119,7 @@
             @search-complete="handleSearchComplete" />
 
         <div class="container col-12 table-responsive">
-            <h5 class="pb-3">All Instructors/Trainers Database</h5>
+            <h5 class="pb-3">All Instructor/Trainer Database</h5>
             <div v-if="instructors_trainers && instructors_trainers.length > 0">
                 <table class="table bg-white">
                 <thead>
@@ -299,11 +306,9 @@ export default {
     },
     sort(column, action) {
       if (this.sortColumn === column) {
-        // Toggle the sort direction between 'asc' and 'desc'
         this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
       } else {
         this.sortColumn = column;
-        // Set the sort direction to 'desc' when sorting by 'average rating'
         this.sortDirection = column === 'average_rating' ? 'desc' : 'asc';
       }
       this.sortCourse(action);
@@ -336,6 +341,9 @@ export default {
     },
     goToAddAdmin() {
       this.$router.push({name: 'addAdmin'})
+    },
+    viewCourses(user_ID) {
+      this.$router.push({ name: 'adminViewStudentEnrolledCourse', params: { user_ID } });
     }
   },
   computed: {

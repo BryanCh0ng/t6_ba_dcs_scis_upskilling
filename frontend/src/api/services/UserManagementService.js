@@ -46,6 +46,20 @@ class ManagementService extends BaseApiService {
             return this.handleError(error);
         }
     }
+
+    // Student Name
+    async getStudentName(user_id) {
+        try {
+            let student_name = await axiosClient.get("/management/get_student_name", {
+                params: {
+                    user_id: user_id,
+                }
+            });
+            return student_name.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
 }
 
 export default new ManagementService();
