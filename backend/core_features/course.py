@@ -328,7 +328,7 @@ class GetUnvotedOngoingCourses(Resource):
         ).select_from(Course).join(VoteCourse, Course.course_ID == VoteCourse.course_ID).join(
             CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
         ).filter(
-            ~VoteCourse.vote_ID.in_(voted_course_ids),
+            ~VoteCourse.vote_ID.in_(select([voted_course_ids])),
             VoteCourse.vote_Status == "ongoing"
         )
 

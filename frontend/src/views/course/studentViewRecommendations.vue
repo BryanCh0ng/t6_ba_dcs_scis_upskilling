@@ -266,7 +266,6 @@ import modalAfterAction from '@/components/course/modalAfterAction.vue';
 import courseNameDesc from '@/components/course/courseNameDesc.vue';
 import courseDateTime from '@/components/course/courseDateTime.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
-// import {convertDate, convertTime} from '@/scripts/common/convertDateTime.js'
 import Recommender from "@/api/services/recommenderService.js";
 import UserService from "@/api/services/UserService.js";
 import CourseService from "@/api/services/CourseService.js";
@@ -415,6 +414,12 @@ export default {
       this.$emit('page-change', newPage);
     },
     async loadData() {
+      let top_register_pick = await Recommender.getTopPicksForRegistration(this.user_ID)
+      this.top_register_picks = top_register_pick.data
+
+      let top_interest_pick = await Recommender.getTopPicksForVoting(this.user_ID)
+      this.top_interest_picks = top_interest_pick.data
+
       let user_register = await Recommender.getUserSimilarityRegistration(this.user_ID)
       if (user_register.length === 0) {
         this.showRegisterJustForYou = false
@@ -463,12 +468,6 @@ export default {
           }
         }
       }
-
-      let top_register_pick = await Recommender.getTopPicksForRegistration(this.user_ID)
-      this.top_register_picks = top_register_pick.data
-
-      let top_interest_pick = await Recommender.getTopPicksForVoting(this.user_ID)
-      this.top_interest_picks = top_interest_pick.data
 
     }
   },
