@@ -107,17 +107,13 @@ export default {
     const { user_ID } = this.$route.params;
     this.user_ID = user_ID
 
+    let response = await ManagementService.getStudentName(this.user_ID);
+    this.student_Name = response.data
+
     const registeredCourses = await CourseService.adminGetUserCourses(this.user_ID, null, null);
     this.registered_courses = registeredCourses.data;
-    console.log(this.registered_courses)
-    this.student_Name = this.registered_courses[0].user_Name;
 
-    if (this.registered_courses.length == 0) {
-      let response = await ManagementService.getStudentName(
-        this.user_ID,
-      );
-      this.student_Name = response.data
-    }
+    
     
   },
   methods: {
