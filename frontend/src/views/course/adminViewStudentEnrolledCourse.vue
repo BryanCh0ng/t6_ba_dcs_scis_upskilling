@@ -65,7 +65,6 @@
 </template>
 
 <script>
-// import courseAction from '../../components/course/courseAction.vue';
 import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
@@ -73,7 +72,6 @@ import courseDateTime from '@/components/course/courseDateTime.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/ProposalCourseRelatedSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
-import modalAfterAction from '@/components/course/modalAfterAction.vue';
 import CommonService from '@/api/services/CommonService';
 import ManagementService from "@/api/services/UserManagementService.js";
 
@@ -85,7 +83,6 @@ export default {
     courseNameDesc,
     SearchFilter,
     courseDateTime,
-    modalAfterAction,
   },
   data() {
     return {
@@ -113,8 +110,6 @@ export default {
     const registeredCourses = await CourseService.adminGetUserCourses(this.user_ID, null, null);
     this.registered_courses = registeredCourses.data;
 
-    
-    
   },
   methods: {
     openModal(course) {
@@ -181,8 +176,7 @@ export default {
     isClosingDateValid(closingDate) {
         const regClosingDate = new Date(closingDate);
         return this.currentDate < regClosingDate;
-    },
-    
+    }
   },
   computed: {
     displayedRegisteredCourses() {

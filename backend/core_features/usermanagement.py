@@ -128,98 +128,101 @@ retrieve_instructors_trainers.add_argument("organization_name", help="Enter orga
 class GetAllInstructorsAndTrainers(Resource):
     @api.expect(retrieve_instructors_trainers)
     def get(self):
-        args = retrieve_instructors_trainers.parse_args()
-        instructor_name = args.get("instructor_name", "")
-        role_name = args.get("role_name")
-        organization_name = args.get("organization_name", "")
+        try:
+            args = retrieve_instructors_trainers.parse_args()
+            instructor_name = args.get("instructor_name", "")
+            role_name = args.get("role_name")
+            organization_name = args.get("organization_name", "")
 
-        query = db.session.query(
-            User.user_ID,
-            User.user_Name,
-            User.user_Email,
-            db.func.ifnull(ExternalUser.organisation_Name, "SMU").label("organisation_Name"),
-            User.role_Name,
-        ).select_from(User).outerjoin(ExternalUser, User.user_ID == ExternalUser.user_ID)
+            query = db.session.query(
+                User.user_ID,
+                User.user_Name,
+                User.user_Email,
+                db.func.ifnull(ExternalUser.organisation_Name, "SMU").label("organisation_Name"),
+                User.role_Name,
+            ).select_from(User).outerjoin(ExternalUser, User.user_ID == ExternalUser.user_ID)
 
-        # Add filtering for "Instructor" or "Trainer" roles
-        query = query.filter(User.role_Name.in_(["Instructor", "Trainer"]))
+            # Add filtering for "Instructor" or "Trainer" roles
+            query = query.filter(User.role_Name.in_(["Instructor", "Trainer"]))
 
-        if organization_name == "SMU":
-            query = query.filter(ExternalUser.organisation_Name.is_(None))
-        elif organization_name:
-            query = query.filter(ExternalUser.organisation_Name.like(f"%{organization_name}%"))
-            
-        if instructor_name:
-            query = query.filter(User.user_Name.contains(instructor_name))
-        
-        if role_name:
-            query = query.filter(User.role_Name == role_name)
-        
-        results = query.all()
-
-        def get_instructor_average_ratings(instructor_ID):
-            keywords = ['rate', 'instructor']  # Define keywords to identify relevant questions
-        
-            total_ratings = []
-            total_questions = 0
-
-            # To retrieve relevant questions and calculate average rating
-            relevant_questions = db.session.query(FeedbackTemplate, TemplateAttribute) \
-                .join(TemplateAttribute, FeedbackTemplate.template_ID == TemplateAttribute.template_ID) \
-                .join(Feedback, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID) \
-                .join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID) \
-                .filter(TemplateAttribute.input_Type == 'Likert Scale') \
-                .filter(func.lower(TemplateAttribute.question).contains(keywords[0])) \
-                .filter(func.lower(TemplateAttribute.question).contains(keywords[1]))
-
-            if instructor_ID:  # Filter by instructor ID if provided
-                relevant_questions = relevant_questions.filter(RunCourse.instructor_ID == instructor_ID)
-
-            relevant_questions = relevant_questions.all()
-
-            for feedback_template, template_attribute in relevant_questions:
-                question_id = template_attribute.template_Attribute_ID
-                feedback_entries = db.session.query(Feedback) \
-                    .filter(Feedback.template_Attribute_ID == question_id)
-
-                if instructor_ID:
-                    feedback_entries = feedback_entries.join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID) \
-                        .filter(RunCourse.instructor_ID == instructor_ID)  # Filter by instructor ID if provided
-
-                feedback_entries = feedback_entries.all()
-
-                if feedback_entries:
-                    for entry in feedback_entries:
-                        total_ratings.append(int(entry.answer))  # assuming 'answer' contains the Likert Scale value as an integer
-                        total_questions += 1
-
-            # Calculate the instructor-specific average rating
-            if total_ratings and total_questions > 0:
-                instructor_average_rating = round(sum(total_ratings) / total_questions, 2)
-            else:
-                instructor_average_rating = 0
-
-            db.session.close()
-
-            return instructor_average_rating
-
-        if results:
-            result_data = []
-            for result in results:
-                instructor_trainer_info = {
-                    "user_ID": result[0],
-                    "user_Name": result[1],
-                    "user_Email": result[2],
-                    "organisation_Name": result[3],
-                    "role_Name": result[4],
-                    "average_rating": get_instructor_average_ratings(result[0])
-                }
+            if organization_name == "SMU":
+                query = query.filter(ExternalUser.organisation_Name.is_(None))
+            elif organization_name:
+                query = query.filter(ExternalUser.organisation_Name.like(f"%{organization_name}%"))
                 
-                result_data.append(instructor_trainer_info)
+            if instructor_name:
+                query = query.filter(User.user_Name.contains(instructor_name))
+            
+            if role_name:
+                query = query.filter(User.role_Name == role_name)
+            
+            results = query.all()
 
-            return jsonify({"code": 200, "data": result_data})
+            def get_instructor_average_ratings(instructor_ID):
+                keywords = ['rate', 'instructor']  # Define keywords to identify relevant questions
+            
+                total_ratings = []
+                total_questions = 0
 
-        return jsonify({"code": 404, "message": "No instructors or trainers found"})
+                # To retrieve relevant questions and calculate average rating
+                relevant_questions = db.session.query(FeedbackTemplate, TemplateAttribute) \
+                    .join(TemplateAttribute, FeedbackTemplate.template_ID == TemplateAttribute.template_ID) \
+                    .join(Feedback, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID) \
+                    .join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID) \
+                    .filter(TemplateAttribute.input_Type == 'Likert Scale') \
+                    .filter(func.lower(TemplateAttribute.question).contains(keywords[0])) \
+                    .filter(func.lower(TemplateAttribute.question).contains(keywords[1]))
+
+                if instructor_ID:  # Filter by instructor ID if provided
+                    relevant_questions = relevant_questions.filter(RunCourse.instructor_ID == instructor_ID)
+
+                relevant_questions = relevant_questions.all()
+
+                for feedback_template, template_attribute in relevant_questions:
+                    question_id = template_attribute.template_Attribute_ID
+                    feedback_entries = db.session.query(Feedback) \
+                        .filter(Feedback.template_Attribute_ID == question_id)
+
+                    if instructor_ID:
+                        feedback_entries = feedback_entries.join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID) \
+                            .filter(RunCourse.instructor_ID == instructor_ID)  # Filter by instructor ID if provided
+
+                    feedback_entries = feedback_entries.all()
+
+                    if feedback_entries:
+                        for entry in feedback_entries:
+                            total_ratings.append(int(entry.answer))  # assuming 'answer' contains the Likert Scale value as an integer
+                            total_questions += 1
+
+                # Calculate the instructor-specific average rating
+                if total_ratings and total_questions > 0:
+                    instructor_average_rating = round(sum(total_ratings) / total_questions, 2)
+                else:
+                    instructor_average_rating = 0
+
+                db.session.close()
+
+                return instructor_average_rating
+
+            if results:
+                result_data = []
+                for result in results:
+                    instructor_trainer_info = {
+                        "user_ID": result[0],
+                        "user_Name": result[1],
+                        "user_Email": result[2],
+                        "organisation_Name": result[3],
+                        "role_Name": result[4],
+                        "average_rating": get_instructor_average_ratings(result[0])
+                    }
+                    
+                    result_data.append(instructor_trainer_info)
+
+                return jsonify({"code": 200, "data": result_data})
+
+            return jsonify({"code": 404, "message": "No instructors or trainers found"})
+        except Exception as e:
+            return "Failed. " + str(e), 500
 
 # Student Name
 retrieve_student_name = api.parser()
@@ -250,33 +253,36 @@ retrieve_blacklist_student_id.add_argument("user_ids", type=int, action="append"
 class BlacklistStudent(Resource):
     @api.expect(retrieve_blacklist_student_id)
     def post(self):
-        args = retrieve_blacklist_student_id.parse_args()
-        user_ids = args["user_ids"]
+        try:
+            args = retrieve_blacklist_student_id.parse_args()
+            user_ids = args["user_ids"]
 
-        # Check if all the users with the given IDs exist
-        users = User.query.filter(User.user_ID.in_(user_ids)).all()
-        existing_user_ids = [user.user_ID for user in users]
-        missing_user_ids = set(user_ids) - set(existing_user_ids)
+            # Check if all the users with the given IDs exist
+            users = User.query.filter(User.user_ID.in_(user_ids)).all()
+            existing_user_ids = [user.user_ID for user in users]
+            missing_user_ids = set(user_ids) - set(existing_user_ids)
 
-        if missing_user_ids:
-            return jsonify({'code': 404, 'message': f'Users are not found'})
+            if missing_user_ids:
+                return jsonify({'code': 404, 'message': f'Users are not found'})
 
-        # Check if any of the users are already blacklisted
-        blacklisted_users = Blacklist.query.filter(Blacklist.user_ID.in_(user_ids)).all()
-        blacklisted_user_ids = [entry.user_ID for entry in blacklisted_users]
+            # Check if any of the users are already blacklisted
+            blacklisted_users = Blacklist.query.filter(Blacklist.user_ID.in_(user_ids)).all()
+            blacklisted_user_ids = [entry.user_ID for entry in blacklisted_users]
 
-        if blacklisted_user_ids:
-            return jsonify({'code': 400, 'message': f'there are users who are already blacklisted'})
+            if blacklisted_user_ids:
+                return jsonify({'code': 400, 'message': f'There are users who are already blacklisted'})
 
-        # Create new blacklist entries for each user
-        for user_id in user_ids:
-            blacklist_entry = Blacklist(user_ID=user_id)
-            db.session.add(blacklist_entry)
+            # Create new blacklist entries for each user
+            for user_id in user_ids:
+                blacklist_entry = Blacklist(user_ID=user_id)
+                db.session.add(blacklist_entry)
 
-        db.session.commit()
-        db.session.close()
+            db.session.commit()
+            db.session.close()
 
-        return jsonify({'code': 200, 'message': 'Users successfully blacklisted'})
+            return jsonify({'code': 200, 'message': 'Users successfully blacklisted'})
+        except Exception as e:
+            return "Failed. " + str(e), 500
 
 retrieve_blacklist_remove = api.parser()
 retrieve_blacklist_remove.add_argument("user_ids", type=int, action="append", required=True, help="Enter user IDs as a list")
@@ -286,24 +292,27 @@ retrieve_blacklist_remove.add_argument("user_ids", type=int, action="append", re
 class RemoveFromBlacklist(Resource):
     @api.expect(retrieve_blacklist_student_id)
     def post(self):
-        args = retrieve_blacklist_student_id.parse_args()
-        user_ids = args["user_ids"]
+        try:
+            args = retrieve_blacklist_student_id.parse_args()
+            user_ids = args["user_ids"]
 
-        # Check if any of the users are blacklisted
-        blacklisted_users = Blacklist.query.filter(Blacklist.user_ID.in_(user_ids)).all()
-        blacklisted_user_ids = [entry.user_ID for entry in blacklisted_users]
+            # Check if any of the users are blacklisted
+            blacklisted_users = Blacklist.query.filter(Blacklist.user_ID.in_(user_ids)).all()
+            blacklisted_user_ids = [entry.user_ID for entry in blacklisted_users]
 
-        if not blacklisted_user_ids:
-            return jsonify({'code': 400, 'message': f'Users are not blacklisted'})
+            if not blacklisted_user_ids:
+                return jsonify({'code': 400, 'message': f'Users are not blacklisted'})
 
-        # Remove blacklisted entries for each user
-        for user_id in user_ids:
-            Blacklist.query.filter_by(user_ID=user_id).delete()
+            # Remove blacklisted entries for each user
+            for user_id in user_ids:
+                Blacklist.query.filter_by(user_ID=user_id).delete()
 
-        db.session.commit()
-        db.session.close()
+            db.session.commit()
+            db.session.close()
 
-        return jsonify({'code': 200, 'message': 'Users successfully removed from blacklist'})
+            return jsonify({'code': 200, 'message': 'Users successfully removed from blacklist'})
+        except Exception as e:
+            return "Failed. " + str(e), 500
     
 # Remove Admin - Update Role Name to "Instructor"
 remove_admin_id = api.parser()

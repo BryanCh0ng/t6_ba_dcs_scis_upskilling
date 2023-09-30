@@ -70,8 +70,8 @@
 
       <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Student Database</h5>
-          <button v-show="showBlacklistButton" class="btn btn-primary me-3 font-weight-bold text-nowrap" @click="blacklist">Blacklist Student</button>
-          <button v-show="showRemoveButton" class="btn btn-primary font-weight-bold text-nowrap" @click="removeFromBlacklist">Remove from Blacklist</button>
+          <button v-show="showBlacklistButton" class="btn btn-danger me-3 font-weight-bold text-nowrap" @click="blacklist">Blacklist Student</button>
+          <button v-show="showRemoveButton" class="btn btn-danger font-weight-bold text-nowrap" @click="removeFromBlacklist">Remove from Blacklist</button>
       </div>
 
       <div class="container col-12 table-responsive">
@@ -447,4 +447,8 @@ export default {
 <style>
   @import '../../assets/css/course.css';
   @import '../../assets/css/paginate.css';
+
+  .user_checkbox input[type="checkbox"] {
+    transform: scale(1.2);
+  }
 </style>
