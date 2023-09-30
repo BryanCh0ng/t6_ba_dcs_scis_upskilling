@@ -230,16 +230,18 @@ export default {
       try {
         if (this.action == 'approve') {
         const result = await CourseService.adminUpdateCourse(courseId, formData);
+        let approve_result;
         if (result.success) {
-          let approve_result;
             const course = await ProposedCourseService.getProposedCourseByCourseId(courseId);
             const acceptPromise = ProposedCourseService.approveProposedCourse({ "pcourseID": course['data'].pcourse_ID });
             approve_result = await acceptPromise;
+          } else {
+            approve_result = { code: 200 };
+          }
           if (approve_result.code == 200) {
             this.showSuccessModal = true;
           } else {
             this.errorMessage = approve_result.message;
-          }
           }
         } else {
           const result = await ProposedCourseService.updateProposedCourse(courseId, formData);
@@ -259,11 +261,9 @@ export default {
         if (this.action == 'approve')
           this.$router.push({ name: 'adminViewProposedCourse'});
         else {
-          this.userRole = await UserService.getUserRole();
-          
-          if (this.userRole === 'Student' ) {
+          if (this.user_role === 'Student' ) {
             this.$router.push({ name: 'studentViewProfile'});
-          } else if (this.userRole === 'Instructor' || this.userRole === 'Trainer') {
+          } else if (this.user_role === 'Instructor' || this.user_role === 'Trainer') {
             this.$router.push({ name: 'instructorTrainerViewProfile'});
           }
         }

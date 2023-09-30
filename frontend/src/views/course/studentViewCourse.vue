@@ -146,7 +146,7 @@ export default {
       receivedMessage: '',
       actionCourse: {},
       search_course_name: null,
-      search_course_category: null
+      search_course_category: null,
     }
   },
   computed: {
@@ -162,6 +162,16 @@ export default {
     }
   },
   methods: {
+    async get_user_id() {
+      try {
+        const user_ID = await UserService.getUserID()
+        this.user_ID = user_ID
+
+      } catch (error) {
+        this.message = error.message
+        this.user_ID = null;
+      }
+    },
     openModal(course) {
       this.selectedCourse = course;
       this.showModal = true;

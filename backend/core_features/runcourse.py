@@ -172,7 +172,7 @@ class CreateRunCourse(Resource):
             # Get the data for creating a new run course from the request body
             new_run_course_data = request.json
 
-            print(new_run_course_data)
+            #print(new_run_course_data)
 
             # Create a new run course object with the data
             new_run_course = RunCourse(**new_run_course_data)

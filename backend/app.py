@@ -14,6 +14,7 @@ from core_features.contactus import api as contactus
 from core_features.registration import api as registration
 from core_features.votecourse import api as votecourse
 from core_features.feedbacktemplate import api as feedbacktemplate
+from core_features.recommender import api as recommender
 from core_features.common import api as common
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
@@ -36,6 +37,7 @@ api.add_namespace(contactus)
 api.add_namespace(registration)
 api.add_namespace(votecourse)
 api.add_namespace(feedbacktemplate)
+api.add_namespace(recommender)
 api.add_namespace(common)
 
 CORS(app, supports_credentials=True)

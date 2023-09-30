@@ -1,6 +1,6 @@
 <template>
     <div id="courseform">
-        <div class="container-fluid mt-5">
+        <div class="container">
 
             <h2 v-if="view === 'createCourse'" class="text-center">Create Course For Registration</h2>
             <h2 v-else-if="view === 'proposeCourse'" class="text-center">Propose a Course</h2>
@@ -30,7 +30,10 @@
                 <div class="form-group mb-4">
                     <textarea v-model="formData.courseDescription"
                         :class="{ 'form-control': true, 'border-0': !v$?.formData.courseDescription?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseDescription?.$error }"
-                        placeholder="Course Description" style="height: 200px" required></textarea>
+                        placeholder="Course Description" style="height: 200px" @input="limitCourseDescription" required></textarea>
+                    <div class="text-muted mt-2">
+                        Character Count: {{ courseDescLength }}/800
+                    </div>
                     <div v-if="v$?.formData.courseDescription?.$error" class="text-danger">
                         <span v-for="error in v$?.formData.courseDescription?.$errors" :key="error.$uid">{{ error.$message
                         }}</span>
@@ -53,7 +56,7 @@
 
                 <div v-else class="row">
                     <div class="col-md-6 form-group">
-                        <button type="button" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                        <button type="button" @click="goToAdminViewCourse" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
                             Cancel
                         </button>
                     </div>
@@ -75,7 +78,7 @@ import DropdownField from "./DropdownField.vue";
 import CourseCategoryService from "@/api/services/CourseCategoryService.js";
 import DefaultModal from "../DefaultModal.vue";
 import { useVuelidate } from "@vuelidate/core";
-import { required, helpers } from "@vuelidate/validators";
+import { required, helpers, maxLength } from "@vuelidate/validators";
 import CourseService from "@/api/services/CourseService";
 import UserService from "@/api/services/UserService";
 import proposedCourseService from "@/api/services/proposedCourseService";
@@ -128,7 +131,7 @@ export default {
             formData: {
                 courseName: { required: helpers.withMessage('Please provide a valid course Name', required) },
                 selectedCategory: { required: helpers.withMessage('Please select a valid course category', required) },
-                courseDescription: { required: helpers.withMessage('Please provide a valid course description', required) }
+                courseDescription: { required: helpers.withMessage('Please provide a valid course description', required), maxLength: maxLength(800) }
             }
         }
     },
@@ -213,6 +216,11 @@ export default {
                 this.title = "Course Data Retrieval Error";
 
                 throw new Error("There is a problem retrieving the data for this course");
+            }
+        },
+        limitCourseDescription() {
+            if (this.formData.courseDescription.length > 800) {
+                this.formData.courseDescription = this.formData.courseDescription.substring(0, 800); // Limit the description to 800 characters
             }
         },
         async createCourse() {
@@ -303,7 +311,6 @@ export default {
             this.message = `${action} was successful`;
             this.buttonType = "success";
             this.showAlert = !this.showAlert;
-
         },
         async onSubmit() {
             this.v$.$touch();
@@ -330,6 +337,7 @@ export default {
 
                     } else if (this.view === "proposeCourse") {
                         this.submitFormData["course_Status"] = "Inactive";
+                        this.submitFormData["template_ID"] = null;
 
                         await this.createCourse();
                         
@@ -371,6 +379,14 @@ export default {
                 console.log('Form has validation errors');
 
             }
+        },
+        goToAdminViewCourse(){
+            this.$router.push("/adminViewCourse");
+        }
+    },
+    computed: {
+        courseDescLength() {
+            return this.formData.courseDescription.length;
         }
     }
 }

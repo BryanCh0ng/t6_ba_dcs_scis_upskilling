@@ -1,5 +1,5 @@
 <template>
-  <div class="content">
+  <div class="content mb-5">
     <nav class="navbar navbar-expand-xl">
       <div class="container-fluid">
         <a class="navbar-brand no-underline" href="#">
@@ -88,7 +88,7 @@ export default {
       if (this.user_ID) {
         if (this.user_role === "Student") {
           links.push(
-            { path: "/recommendations", label: "Recommendations" },
+            { path: "/studentViewRecommendations", label: "Recommendations" },
             { path: "/studentViewCourse", label: "View Courses" },
             { path: "/proposeCourse", label: "Propose Course" }
           );
@@ -102,8 +102,10 @@ export default {
           );
         } else if (this.user_role === "Admin") {
           links.push(
-            { path: "/adminViewProposedCourse", label: "All Proposal" },
-            { path: "/votingCampaign", label: "Voting Campaign" },
+            { path: "/adminViewcourse", label: "Course DB" },
+            { path: "/adminViewRunCourse", label: "Run Course DB" },
+            { path: "/adminViewVoteCourse", label: "Voting Campaign DB" },
+            { path: "/adminViewProposedCourse", label: "Proposed Course DB" },
             { path: "/createCourse", label: "Create Course" }
           );
         }
@@ -112,7 +114,7 @@ export default {
       } else {
         // Add the default links for users who are not logged in
         links.push(
-          { path: "/viewcourses", label: "View Courses" },
+          { path: "/adminViewcourse", label: "View Courses" },
           { path: "/proposeCourse", label: "Propose Course" },
           { path: "/ContactUs", label: "Contact Us" }
         );
@@ -133,12 +135,7 @@ export default {
         );
       } else if (this.user_role === "Admin") {
         items.push(
-          { path: "/profile", label: "Profile" },
-          { path: "/adminViewRunCourse", label: "All Run Course DB" },
-          { path: "/adminViewVoteCourse", label: "All Vote Course DB" },
-          { path: "/allAvailRegCourse", label: "All Available Registration Course" },
-          { path: "/adminViewInstructorsTrainers", label: "All Instructors DB" },
-          { path: "/blacklist", label: "Blacklist" },
+          { path: "/adminViewManagement", label: "Admin Management" },
           { path: "/feedbackTemplate", label: "Feedback Template" },
           { path: "/dashboard", label: "Dashboard" }
         );
@@ -371,7 +368,7 @@ export default {
 }
 
 .dropdown-content li {
-  padding: 8px 14px;
+  padding: 4px 14px;
   cursor: pointer;
 }
 
