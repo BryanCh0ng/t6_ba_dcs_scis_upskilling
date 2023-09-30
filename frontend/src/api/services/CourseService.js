@@ -323,7 +323,6 @@ class CourseService extends BaseApiService {
     // Admin - All Courses
     async searchAllCourseAdmin(course_Name, coursecat_ID, course_Status) {
         try {
-
             let response = await axiosClient.get("/course/get_all_courses", {
                 params: {
                     course_name: course_Name,
@@ -356,7 +355,7 @@ class CourseService extends BaseApiService {
             let retireRunCourse = await axiosClient.post("/course/retire_course", { course_id: course_ID });
             return retireRunCourse.data
         } catch (error) {
-            console.log("Cannot retire the course");
+            // console.log("Cannot retire the course");
             return this.handleError(error);
         }
     }
@@ -367,7 +366,6 @@ class CourseService extends BaseApiService {
             let activateRunCourse = await axiosClient.post("/course/activate_course", { course_id: course_ID });
             return activateRunCourse.data
         } catch (error) {
-            console.log("Cannot retire the course");
             return this.handleError(error);
         }
     }

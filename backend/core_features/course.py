@@ -1333,8 +1333,12 @@ class DeactivateCourse(Resource):
                 else:
                     db.session.close()
                     return jsonify({"code": 400, "message": "Course is not active, cannot be canceled"})
-            else:
-                return jsonify({"code": 404, "message": "Course not found"})
+            
+            if course.course_Status == "Active":
+                course.course_Status = 'Inactive'
+                db.session.commit()
+                db.session.close()
+                return jsonify({"code": 200, "message": "Course has been deactivated"})
 
         except Exception as e:
             db.session.rollback()
@@ -1359,8 +1363,6 @@ class RetireCourse(Resource):
             
             course = Course.query.filter_by(course_ID=courseID).first()
             runCourses = RunCourse.query.filter_by(course_ID=courseID).all()
-            # app.logger.debug(runCourses)
-            db.session.close()
 
             if course:
                 # Check if the course is inactive
@@ -1399,10 +1401,10 @@ class ActivateCourse(Resource):
 
             args = activate_course.parse_args()
             courseID = args.get("course_id")
+            print(courseID)
             
             course = Course.query.filter_by(course_ID=courseID).first()
             runCourses = RunCourse.query.filter_by(course_ID=courseID).all()
-            db.session.close()
             
             if course:
                 # Check if the course is inactive

@@ -97,7 +97,7 @@ export default {
           this.user_role === "Trainer"
         ) {
           links.push(
-            { path: "/votingCampaign", label: "Voting Campaign" },
+            { path: "/instructorTrainerViewVotingCampaign", label: "Voting Campaign" },
             { path: "/proposeCourse", label: "Propose Course" }
           );
         } else if (this.user_role === "Admin") {
