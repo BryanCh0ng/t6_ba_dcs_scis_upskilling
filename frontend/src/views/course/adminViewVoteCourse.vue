@@ -162,7 +162,7 @@ export default {
         localCurrentPage: 1,
         localCurrentPageNotOffered: 1,
         activeTab: 'allvote',
-        statusOptions: ["Ongoing", "Offered", "Closed"],
+        statusOptions: ["Open for voting", "Offered for students to register", "Voting closed for students"],
         actionCourse: {},
         vote_status: {
           "Ongoing": "Open for voting",
@@ -202,24 +202,33 @@ export default {
       this.loadData();
     },
     async handleSearchComplete(searchResults) {
-      console.log("searchResults", searchResults);
-      this.vote_courses = searchResults; // Always update the courses array
+      // console.log("searchResults", searchResults);
+      this.vote_courses = searchResults; 
     },
     async handleSearchCompleteNotOffered(searchResults) {
-      console.log("searchResults", searchResults);
-      this.notoffered_courses = searchResults; // Always update the courses array
+      // console.log("searchResults", searchResults);
+      this.notoffered_courses = searchResults; 
     },
     async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, vote_status) {
       this.search_course_name = course_Name
       this.search_course_category = coursecat_ID
       this.vote_status = vote_status
+
+      if (vote_status == "Open for voting") {
+        vote_status = "Ongoing"
+      } else if (vote_status == "Offered for students to register") {
+        vote_status = "Offered"
+      } else if (vote_status == "Voting closed for students") {
+        vote_status = "Closed"
+      }
+
       try {
         let response = await CourseService.searchAllVotingCoursesAdmin(
           course_Name,
           coursecat_ID,
           vote_status
         );
-        console.log(response.data)
+        
         this.vote_courses = response.data;
         return this.vote_courses;
       } catch (error) {
@@ -235,7 +244,7 @@ export default {
           course_Name,
           coursecat_ID,
         );
-        console.log(response.data)
+        // console.log(response.data)
         this.notoffered_courses = response.data;
         return this.notoffered_courses;
       } catch (error) {
