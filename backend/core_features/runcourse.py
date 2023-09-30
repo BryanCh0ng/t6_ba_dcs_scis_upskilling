@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 from allClasses import *
+from core_features import common
 import json
 
 api = Namespace('runcourse', description='Run Course related operations')
@@ -79,6 +80,11 @@ change_registration_status_model = api.model("change_registration_status_model",
 class ChangeRegistrationStatus(Resource):
     @api.expect(change_registration_status_model)
     def post(self):
+
+        user_role = common.getUserRole()
+        if (user_role) != 'Admin':
+          return {"message": "Unathorized Access, Failed to change registration status for run course"}, 404
+
         data = request.get_json()
 
         try:
@@ -96,11 +102,13 @@ class ChangeRegistrationStatus(Resource):
                     message = 'Run Course registration Closed'
 
                 db.session.commit()
+                db.session.close()
                 return json.loads(json.dumps({"message": message, "code": 200}, default=str))
 
             return json.loads(json.dumps({"message": "There is no such runcourse", "code": 404}, default=str))
 
         except Exception as e:
+            db.session.rollback()
             return "Failed" + str(e), 500
 
 get_runcourse_by_id = api.parser()
@@ -126,6 +134,10 @@ class EditRunCourse(Resource):
     def put(self, runcourse_id):
 
         try: 
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to edit run course"}, 404
+    
             #Get the updated data from the request body 
             updated_data = request.json
         
@@ -145,7 +157,7 @@ class EditRunCourse(Resource):
             return json.loads(json.dumps({"message": "There is no such runcourse"})), 404
 
         except Exception as e:
-            print("Error:", str(e))
+            db.session.rollback()
             return "Failed" + str(e), 500
 
 @api.route("/create_runcourse/<int:course_id>", methods=["POST"])
@@ -153,11 +165,14 @@ class EditRunCourse(Resource):
 class CreateRunCourse(Resource):
     def post(self, course_id):
         try: 
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to create run course"}, 404
             
             # Get the data for creating a new run course from the request body
             new_run_course_data = request.json
 
-            print(new_run_course_data)
+            #print(new_run_course_data)
 
             # Create a new run course object with the data
             new_run_course = RunCourse(**new_run_course_data)
@@ -175,5 +190,5 @@ class CreateRunCourse(Resource):
             return json.loads(json.dumps(new_run_course.json(), default=str)), 201
 
         except Exception as e:
-            print("Error:", str(e))
+            db.session.rollback()
             return "Failed to create a new course: " + str(e), 500

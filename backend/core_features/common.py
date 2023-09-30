@@ -46,8 +46,27 @@ def format_date_time(value):
         return None
     
     
-def getUserRole(user_ID):
+def getUserRole(user_ID=None):
+    if user_ID is None:
+        user_ID = getUserID()
+
     if user_ID:
-        return User.query.filter_by(user_ID=user_ID).first().role_Name
+        user = db.session.query(User).filter_by(user_ID=user_ID).first()
+        db.session.close()
+        if user:
+            return user.role_Name
+        else:
+            return None
     else:
         return None
+    
+def getUserID():
+    user_ID = session.get('user_ID')
+    print(user_ID)
+    if user_ID:
+        id = User.query.filter_by(user_ID=user_ID).first().user_ID
+        db.session.close()
+        return id
+    else:
+        db.session.close()
+        return 'Session not set'

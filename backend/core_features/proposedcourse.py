@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
+from core_features import common
 from allClasses import *
 import json
 import logging
@@ -51,7 +52,8 @@ class GetProposedCourse(Resource):
         if proposed_course:
             course = Course.query.get(proposed_course.course_ID)
             course_category = CourseCategory.query.get(course.coursecat_ID)
-            
+            db.session.close()
+
             response_data = {
                 "course_ID": course.course_ID,
                 "course_Name": course.course_Name,
@@ -67,6 +69,8 @@ class GetProposedCourse(Resource):
                     "data": response_data
                 }
             )
+
+        db.session.close()
         return jsonify({"message": "There is no such course", "code": 404})
   
 retrieve_proposed_course_by_status = api.parser()
@@ -115,8 +119,9 @@ class CreateProposedCourse(Resource):
             return json.loads(json.dumps(new_proposed_course.json(), default=str)), 201
 
         except Exception as e:
-            print("Error:", str(e))
-            return "Failed to create a new course: " + str(e), 500
+          db.session.rollback()
+          return "Failed to create a new course: " + str(e), 500
+
 # Edit/Update Proposed Course 
 update_proposed_course_model = {
     "course_Name": fields.String(description="Course Name", required=True),
@@ -139,6 +144,11 @@ class UpdateProposedCourse(Resource):
             coursecat_ID = data.get('coursecat_ID')
 
             course = Course.query.get(course_id)
+            user_id = common.getUserID()
+            user_role = common.getUserRole()
+            proposed_course = ProposedCourse.query.filter_by(course_ID = course_id).first()
+            if (user_id) != proposed_course.submitted_By and user_role != "Admin":
+              return jsonify({"message": "Unathorized Access, no rights to edit proposed course", "code": 404}) 
 
             if course is None:
                 return jsonify({"message": "Proposed course not found", "code": 404}), 404
@@ -148,10 +158,12 @@ class UpdateProposedCourse(Resource):
             course.coursecat_ID = coursecat_ID
 
             db.session.commit()
+            db.session.close()
 
             return jsonify({"message": "Proposed course updated successfully", "code": 200})
 
         except Exception as e:
+            db.session.rollback()
             return jsonify({"message": f"Failed to update proposed course: {str(e)}", "code": 500})
         
 
@@ -172,6 +184,9 @@ class RemoveProposedCourse(Resource):
 
             # Find the proposed course by its ID.
             proposed_course = ProposedCourse.query.get(pcourse_id)
+            user_id = common.getUserID()
+            if (user_id) != proposed_course.submitted_By:
+                return {"message": "Unathorized Access, Not owner of this proposed those"}, 404 
 
             if proposed_course is None:
                 return {"message": "Proposed course not found"}, 404
@@ -188,10 +203,12 @@ class RemoveProposedCourse(Resource):
             if course is not None:
               db.session.delete(course)
               db.session.commit()
+              db.session.close()
 
             return {"message": "Proposed course deleted successfully"}
 
         except Exception as e:
+            db.session.rollback()
             return {"message": "Failed to delete proposed course: " + str(e)}, 500
 
 
@@ -205,18 +222,26 @@ class RejectProposedCourse(Resource):
   @api.expect(reject_proposed_course_model)
   def post(self):
     try:
+      user_role = common.getUserRole()
+      user_id = common.getUserID()
+      if (user_role) != 'Admin':
+          return {"message": "Unathorized Access, Failed to reject proposed course"}, 404 
+
       data = request.get_json()
       proposed_course = ProposedCourse.query.filter_by(pcourse_ID = data['pcourseID']).first()
       if proposed_course:
         proposed_course.pcourse_Status = 'Rejected'
         proposed_course.reason = data['reason']
+        proposed_course.action_Done_By = user_id
         db.session.commit()
+        db.session.close()
         return jsonify({"message": "Proposed Course is successfully rejected", "code": 200})
   
       else:
         return jsonify({"message": "Course does not exist", "code": 404})
 
     except Exception as e:
+      db.session.rollback()
       return jsonify({"message": "Failed " + str(e), "code": 500})
     
 
@@ -229,6 +254,10 @@ class ApproveProposedCourse(Resource):
   @api.expect(approve_proposed_course_model)
   def post(self):
     try:
+      user_role = common.getUserRole()
+      if (user_role) != 'Admin':
+          return {"message": "Unathorized Access, Failed to approve proposed course"}, 404 
+
       data = request.get_json()
       proposed_course = ProposedCourse.query.filter_by(pcourse_ID = data['pcourseID']).first()
 
@@ -240,6 +269,7 @@ class ApproveProposedCourse(Resource):
         )
         db.session.add(newVoteCourse)
         db.session.commit()
+        db.session.close()
       
         return jsonify({"message": "Proposed Course is successfully accepted", "code": 200})
   
@@ -247,4 +277,5 @@ class ApproveProposedCourse(Resource):
         return jsonify({"message": "Course does not exist", "code": 404})
 
     except Exception as e:
+        db.session.rollback()
         return jsonify({"message": "Failed " + str(e), "code": 500})

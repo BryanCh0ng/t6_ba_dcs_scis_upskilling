@@ -15,7 +15,7 @@ class FeedbackTemplateService extends BaseApiService {
 
     async getTemplateById(templateId) {
         try {
-            let response = await axiosClient.get("/feedbacktemplate/get_template_by_id", { params: { template_id: templateId } });
+            let response = await axiosClient.get("/feedbacktemplate/get_template_by_id", { template_id: templateId });
             return response.data;
 
         } catch (error) {

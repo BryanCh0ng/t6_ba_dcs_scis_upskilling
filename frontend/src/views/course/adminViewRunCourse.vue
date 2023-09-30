@@ -3,7 +3,8 @@
     <search-filter
       :status-options="statusOptions"
       :search-api="searchAllRunCoursesAdmin" 
-      @search-complete="handleSearchComplete"/>
+      @search-complete="handleSearchComplete"
+      class="pt-4"/>
     <div class="container col-12">
       <h5 class="pb-3">All Run Courses</h5>
       <div v-if="courses && courses.length > 0" class="table-responsive">
@@ -20,7 +21,7 @@
                 <a href="" @click.prevent="sort('runcourse_Status')" class="text-decoration-none text-dark">Run Status <sort-icon :sortColumn="sortColumn === 'runcourse_Status'" :sortDirection="getSortDirection('runcourse_Status')"/></a></th>
               <th scope="col">Feedback Analysis</th>
               <th scope="col">Course Details</th>
-              <th scope="col">Action(s)</th>
+              <th scope="col" colspan="3">Action(s)</th>
             </tr>
           </thead>
           <tbody>

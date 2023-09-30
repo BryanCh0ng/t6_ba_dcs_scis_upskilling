@@ -65,6 +65,7 @@ const routes = [
     component: () => import('../views/ContactUs.vue'),
     meta: {
       title: 'Contact Us',
+      requiresAuth: true
     },
   },
   {
@@ -97,7 +98,7 @@ const routes = [
   {
     path: '/studentViewCourse',
     name: 'studentViewCourse',
-    component: () => import('../views/course/studentViewCourse.vue'),
+    component: () => import('../views/course/studentViewCourse.vue'), 
     meta: {
         title: 'Student View Course',
         requiresAuth: true
@@ -364,6 +365,7 @@ router.beforeEach(async (to, from, next) => {
   if (requiresAuth) {
     try {
       const user_ID = await UserService.getUserID();
+      console.log(user_ID)
       if (typeof user_ID === 'number' && user_ID > 0) {
         next();
       } else {

@@ -61,6 +61,7 @@ export default {
         if (this.status == 'Retire') {
           response = await CourseService.retireRunCourse(this.course.course_ID);
         } else if (this.status == 'Activate') {
+          console.log(this.course.course_ID)
           response = await CourseService.activateRunCourse(this.course.course_ID);
         } else if (this.status == 'Deactivate') {
           response = await CourseService.deactivateRunCourse(this.course.course_ID);
@@ -82,7 +83,8 @@ export default {
     async voteAction() {
       try {
         let response;
-        let user_ID = this.get_user_id();
+        let user_ID = await UserService.getUserID();
+        console.log(user_ID)
         if (this.status == 'Vote') {
           response = await CourseService.voteCourse(this.course.vote_ID, user_ID);
         } else if (this.status == 'say-pass') {
@@ -102,7 +104,7 @@ export default {
     async proposalAction() {
       try {
         let response;
-        let user_ID = this.get_user_id();
+        let user_ID = await UserService.getUserID();
         console.log(user_ID)
         if (this.status == 'remove-proposal') {
           response = await ProposedCourseService.removeProposedCourse(this.course.pcourse_ID);
@@ -114,18 +116,18 @@ export default {
         this.$emit('action-and-message-updated', {message: this.message, course: this.course});
       }
     },
-    async get_user_id() {
-      try {
-        const user_ID = await UserService.getUserID()
-        this.user_ID = user_ID
+    // async get_user_id() {
+    //   try {
+    //     const user_ID = await UserService.getUserID()
+    //     this.user_ID = user_ID
 
-      } catch (error) {
-        this.message = error.message
-        this.user_ID = null;
-      }
-    },
+    //   } catch (error) {
+    //     this.message = error.message
+    //     this.user_ID = null;
+    //   }
+    // },
     async registerCourse() {
-      console.log(this.course)
+      // console.log(this.course)
       let response = await RunCourseService.changeRegistrationStatus({ "rcourse_ID": this.course.rcourse_ID })
       console.log(response)
       this.message = response.message;

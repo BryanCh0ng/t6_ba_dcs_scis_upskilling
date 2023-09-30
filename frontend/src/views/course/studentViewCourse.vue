@@ -146,7 +146,7 @@ export default {
       receivedMessage: '',
       actionCourse: {},
       search_course_name: null,
-      search_course_category: null
+      search_course_category: null,
     }
   },
   computed: {
@@ -162,6 +162,16 @@ export default {
     }
   },
   methods: {
+    async get_user_id() {
+      try {
+        const user_ID = await UserService.getUserID()
+        this.user_ID = user_ID
+
+      } catch (error) {
+        this.message = error.message
+        this.user_ID = null;
+      }
+    },
     openModal(course) {
       this.selectedCourse = course;
       this.showModal = true;
@@ -275,9 +285,20 @@ export default {
   }
   },
   async created() {
-    this.user_ID = await UserService.getUserID()
-    console.log(this.user_ID)
-    this.loadData();
+    const user_ID = await UserService.getUserID();
+    this.user_ID = user_ID
+    const role = await UserService.getUserRole(user_ID);
+    if (role == 'Admin') {
+      this.$router.push({ name: 'adminViewCourse' }); 
+    } else if (role == 'Instructor' || role == 'Trainer') {
+      this.$router.push({ name: 'instructorTrainerViewVotingCampaign' }); 
+    } else {
+      try {
+        this.loadData()
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+      }
+    }
   },
   mounted() {
     const buttonElement = document.createElement('button');

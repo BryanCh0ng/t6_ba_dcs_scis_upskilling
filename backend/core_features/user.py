@@ -41,6 +41,7 @@ class Login(Resource):
         # compare input and database, then display results
         try:
             user = User.query.filter_by(user_Email=email).first()
+            db.session.close()
             if user:
                 if bcrypt.check_password_hash(user.user_Password, password):
                     # store user details in session
@@ -56,6 +57,7 @@ class Login(Resource):
                 return json.loads(json.dumps({"Message": "Email does not exist"}, default=str)), 404
 
         except Exception as e:
+            db.session.rollback()
             return "Failed: " + str(e), 500
         
 # verify_email() -----------------------------------------
@@ -76,13 +78,16 @@ class VerifyEmail(Resource):
         try:
             user = User.query.filter_by(user_Email=email).first()
             if user:
+                db.session.close()
                 return json.loads(json.dumps({"Message": "Email already exists"}, default=str)), 404
             
             else:
                 self.send_email(email)
+                db.session.close()
                 return json.loads(json.dumps({"message":"Verification email sent"})), 200
 
         except Exception as e:
+            db.session.rollback()
             return "Failed: " + str(e), 500
 
     def send_email(self, email):
@@ -150,13 +155,16 @@ class Register(Resource):
                 newExternalUser = ExternalUser(user_ID=getattr(user, 'user_ID'), organisation_Name=data['organizationName'], is_Alumni=bool(int(data['alumni'])))
                 db.session.add(newExternalUser)
                 db.session.commit()
+                db.session.close()
                 return json.loads(json.dumps(newExternalUser.json(), default=str)), 200
             
             else:
                 db.session.commit()
+                db.session.close()
                 return json.loads(json.dumps(newUser.json(), default=str)), 200
         
         except Exception as e:
+            db.session.rollback()
             return "Failed: " + str(e), 500
         
 # forgot_password() --------------------------------------
@@ -177,13 +185,16 @@ class ForgotPassword(Resource):
         try:
             user = User.query.filter_by(user_Email=email).first()
             if not user:
+                db.session.close()
                 return json.loads(json.dumps({"Message": "Email does not exist"}, default=str)), 404
             
             else:
                 self.send_email(email)
+                db.session.close()
                 return json.loads(json.dumps({"message":"Email sent"})), 200
 
         except Exception as e:
+            db.session.rollback()
             return "Failed: " + str(e), 500
 
     def send_email(self, email):
@@ -221,9 +232,11 @@ class ResetPassword(Resource):
                 hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
                 setattr(user, 'user_Password', hashed_password)
                 db.session.commit()
+                db.session.close()
                 return json.loads(json.dumps({"Message": "Password updated"}, default=str)), 200
 
         except Exception as e:
+            db.session.rollback()
             return "Failed: " + str(e), 500
         
 # retrieve user_ID from session
@@ -244,6 +257,7 @@ class GetUserName(Resource):
         user_ID = session.get('user_ID')
         if user_ID:
             user = User.query.filter_by(user_ID=user_ID).first()
+            db.session.close()
             if user:
                 user_name = user.user_Name
                 # Split the user's name by space and get the first part
@@ -253,6 +267,7 @@ class GetUserName(Resource):
             else:
                 return 'User not found'
         else:
+            db.session.close()
             return 'Session not set'
 
 @api.route("/get_role")
@@ -265,6 +280,7 @@ class GetRole(Resource):
             return role
         
         else:
+            db.session.close()
             return 'Session not set'
 
 @api.route("/logout")
