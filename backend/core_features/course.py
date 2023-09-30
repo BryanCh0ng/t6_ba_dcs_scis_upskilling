@@ -1297,8 +1297,7 @@ class DeactivateCourse(Resource):
             # Query the database for the RunCourse with the specified course_id
             run_course = RunCourse.query.filter_by(course_ID=course_id).first()
             course = Course.query.filter_by(course_ID=course_id).first()
-            db.session.close()
-
+            
             if run_course:
                 if course.course_Status == 'Active':
                     if run_course.runcourse_Status == 'Closed':
