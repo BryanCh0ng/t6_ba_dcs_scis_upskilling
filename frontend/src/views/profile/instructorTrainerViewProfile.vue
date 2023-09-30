@@ -491,22 +491,38 @@ export default {
         this.user_ID = await UserService.getUserID()
 
         let assigned_courses = await CourseService.searchInstructorAssignedCourseInfo(this.user_ID, null, null, null)
-        this.assigned_courses = assigned_courses.data
-        if (this.assigned_courses == undefined || this.assigned_courses.length == 0) {
+        if (assigned_courses.code == 200) {
+          this.assigned_courses = assigned_courses.data
+          if (this.assigned_courses == undefined || this.assigned_courses.length == 0) {
+            this.onInitialEmptyAssigned = true
+          }
+        } else {
+          this.assigned_courses = []
           this.onInitialEmptyAssigned = true
         }
 
         let proposed_courses = await CourseService.searchInstructorProposedCourseInfo(this.user_ID, null, null, null)
-        this.proposed_courses = proposed_courses.data
-        if (this.proposed_courses == undefined || this.proposed_courses.length == 0) {
+        if (proposed_courses.code == 200 ) {
+          this.proposed_courses = proposed_courses.data
+          if (this.proposed_courses == undefined || this.proposed_courses.length == 0) {
+            this.onInitialEmptyProposed = true
+          }
+        } else {
+          this.proposed_courses = []
           this.onInitialEmptyProposed = true
         }
 
         let conducted_courses = await CourseService.searchInstructorCompletedCourseInfo(this.user_ID, null, null)
-        this.conducted_courses = conducted_courses.data
-        if (this.conducted_courses == undefined || this.conducted_courses.length == 0) {
+        if (conducted_courses.code == 200) {
+          this.conducted_courses = conducted_courses.data
+          if (this.conducted_courses == undefined || this.conducted_courses.length == 0) {
+            this.onInitialEmptyConducted = true
+          }
+        } else {
+          this.conducted_courses = []
           this.onInitialEmptyConducted = true
         }
+        
       } catch (error) {
         console.error("Error fetching course details:", error);
       }
