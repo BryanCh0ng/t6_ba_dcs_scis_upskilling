@@ -195,27 +195,35 @@ get_courses_by_template_id.add_argument("template_id", help="Enter template id")
 class GetCoursesByTemplateId(Resource):
     @api.expect(get_courses_by_template_id)
     def get(self):
-      templateID = get_courses_by_template_id.parse_args().get("template_id")
-      query = db.session.query(
-          FeedbackTemplate,
-          Course
-      ).select_from(FeedbackTemplate).outerjoin(
-          Course, FeedbackTemplate.template_ID == Course.template_ID
-      ).filter(
-          FeedbackTemplate.template_ID == templateID
-      )
-      query_results = query.all()
-      db.session.close()
-      if query_results:
+      try:
+        templateID = get_courses_by_template_id.parse_args().get("template_id")
+        query = db.session.query(
+            FeedbackTemplate,
+            RunCourse, 
+            Course
+        ).select_from(FeedbackTemplate).outerjoin(
+            RunCourse, FeedbackTemplate.template_ID == RunCourse.template_ID
+        ).join(
+            Course, RunCourse.course_ID == Course.course_ID  
+        ).filter(
+            FeedbackTemplate.template_ID == templateID
+        )
+        query_results = query.all()
+        db.session.close()
         courses = []
-        for _, course in query_results:
-            if course is not None:
+        if query_results:
+          for _, runcourse, course in query_results:
+            if runcourse is not None:
               courses.append({
                 "course_Name": course.course_Name,
-                "course_ID": course.course_ID
+                "run": [{
+                  "run_Name": runcourse.run_Name,
+                  "rcourse_id": runcourse.rcourse_ID
+                }]
               })
         return {"code": 200, "data": {"courses": courses}}, 200
-      return {"code": 404, "message": "Failed to retrieve run courses by template id"}, 404
+      except Exception as e:
+        return {"code": 404, "message": "Failed " + str(e)}, 404
 
 get_all_feedback_template_names = api.parser()
 @api.route("/get_all_feedback_template_names")
@@ -241,36 +249,36 @@ class GetCourseNamesByFeedbackTemplateId(Resource):
     def get(self):
       try:
         templateID = get_course_names_by_feedback_template_id.parse_args().get("template_id")
-        print(templateID)
-        courses_using_template = (
-          db.session.query(Course)
-          .filter(Course.template_ID == templateID)
-          .all()
-        )
 
-        courses_no_template =(
-          db.session.query(Course)
-          .filter(Course.template_ID == None)
-          .all()
-        )
+        courses_using_template = (
+          db.session.query(
+          RunCourse
+        ).filter(RunCourse.template_ID == templateID).all())
+
+        courses_no_template = (
+          db.session.query(
+          RunCourse
+        ).filter(RunCourse.template_ID == None).all())
 
         db.session.close()
 
         course_names_using = []
         course_name_no_template = []
+        print(courses_using_template)
+        print(courses_no_template)
 
         if courses_using_template:
-          for course in courses_using_template:
+          for runcourse in courses_using_template:
             course_names_using.append({
-              'course_ID': course.course_ID,
-              'course_Name': course.course_Name
+              "run_Name": runcourse.run_Name,
+              "rcourse_id": runcourse.rcourse_ID
             })
-    
+
         if courses_no_template:
-          for course in courses_no_template:
+          for runcourse in courses_no_template:
             course_name_no_template.append({
-              'course_ID': course.course_ID,
-              'course_Name': course.course_Name
+              'run_Name': runcourse.run_Name,
+              'rcourse_id': runcourse.rcourse_ID
             })
 
         return {"code": 200, "course_names_using": course_names_using, "course_name_no_template": course_name_no_template}, 200
@@ -364,7 +372,7 @@ class DeleteFeedbackTemplate(Resource):
         #    runcourse.template_ID = None
 
         if feedback_template:
-            course_to_change = Course.query.filter_by(template_ID = templateID)
+            course_to_change = RunCourse.query.filter_by(template_ID = templateID)
             for course in course_to_change:
                course.template_ID = None
           
@@ -434,7 +442,7 @@ class ApplyFeedbackTemplateToCourses(Resource):
         def update_course_template(course_list, template_id):
             for course in course_list:
                 print(course)
-                course_record = Course.query.filter(Course.course_ID == course.get("course_ID")).first()
+                course_record = RunCourse.query.filter(RunCourse.rcourse_ID == course.get("rcourse_id")).first()
                 print(course_record)
                 if course_record:
                     course_record.template_ID = template_id

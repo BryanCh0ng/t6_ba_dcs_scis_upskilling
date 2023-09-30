@@ -15,7 +15,12 @@
           <div class="mt-3">
             <h6 class="font-weight-bold">Course(s):</h6>
             <ul>
-              <li v-for="(course, key) in courses" :key="key">{{ course.course_Name }}</li>
+              <li v-for="(course, key) in courses" :key="key">{{ course.course_Name }}
+                <ul>
+                  <li v-for="(run, runKey) in course.run" :key="runKey">
+                    {{ run.run_Name }}</li>
+                </ul>
+              </li>
             </ul>
           </div>
           <div class="col-6 offset-6 d-flex justify-content-between">
@@ -46,7 +51,8 @@
       error: false,
       errorMessage: '',
       deleteMsge: '',
-      disabled: false
+      disabled: false,
+      expandedCourses: []
     }
   },
   methods: {
