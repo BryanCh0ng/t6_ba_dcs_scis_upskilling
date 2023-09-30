@@ -488,20 +488,6 @@ class CourseService extends BaseApiService {
           return { success: false, message: 'An error occurred while updating the proposed course' };
         }
     }
-
-    async CourseApplyFeedbackTemplate(course_id, template_id) {
-        try {
-            const response = await axiosClient.post("/course/course_apply_feedback_template", {
-                course_id: course_id,
-                template_id: template_id,
-            });
-            console.log(response.data);
-            return response.data;
-            
-        } catch (error) {
-            return this.handleError(error);
-        }
-    }
 }
 
 export default new CourseService();

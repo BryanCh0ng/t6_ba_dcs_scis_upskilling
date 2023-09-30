@@ -5,11 +5,11 @@
       </div>
       <div class="modal-body pt-1"> 
         <div class="modal-title pt-3">
-          <h3 class="text-center">Apply Feedback Template for {{ course.course_Name }} </h3>
+          <h3 class="text-center">Apply Feedback Template for {{ course.run_Name }} </h3>
         </div>
         <div v-if="!error">
           <div class="mt-4 mb-4 container form-group row">
-            <label class="mb-1">Select Feedback Template for {{ course.course_Name }}</label>
+            <label class="mb-1">Select Feedback Template for {{ course.run_Name }}</label>
             <select class="form-control" v-model="selectedOption">
               <option v-for="feedback_template in feedback_templates" :key="feedback_template.template_ID" :value="feedback_template.template_ID">{{ feedback_template.template_Name }}</option>
             </select>
@@ -32,7 +32,7 @@
   
   <script>
   import FeedbackTemplateService from "@/api/services/FeedbackTemplateService"
-  import CourseService from "@/api/services/CourseService"
+  import runCourseService from "@/api/services/runCourseService"
 
   export default {
   props: {
@@ -78,7 +78,8 @@
     async apply(){
       try {
         console.log(this.selectedOption)
-        const response = await CourseService.CourseApplyFeedbackTemplate(this.course.course_ID, this.selectedOption)
+        console.log(this.course.rcourse_ID)
+        const response = await runCourseService.CourseApplyFeedbackTemplate(this.course.rcourse_ID, this.selectedOption)
         console.log(response)
         if (response.code == 200) {
           this.error = false;

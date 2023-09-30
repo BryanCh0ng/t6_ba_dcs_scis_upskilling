@@ -33,7 +33,7 @@
     
 <script>
 import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js";
-import CourseService from "@/api/services/CourseService.js";
+import RunCourseService from "@/api/services/runCourseService.js";
 import TextField from "@/components/feedbackTemplate/TextField.vue";
 import NumberField from "@/components/feedbackTemplate/NumberField.vue";
 import RadioButtonField from "@/components/feedbackTemplate/RadioButtonField.vue";
@@ -61,11 +61,14 @@ export default {
     async loadData() {
       this.answers = new Array(this.templateData.length).fill('');
       const course_id = this.$route.params.id;
-      const course_response = await CourseService.getCourseById(course_id)
+      const course_response = await RunCourseService.getRunCourseById(course_id)
+      console.log(course_response)
       if(course_response.code == 200) {
         this.haveError = false
-        this.course = course_response.data.course[0]
+        this.course = course_response.course
+        console.log(this.course)
         const response = await FeedbackTemplateService.getTemplateById(this.course.template_ID)
+        console.log(response)
         if (response.code == 200) {
           this.haveError = false
           this.templateData = response.data.template.data
@@ -81,11 +84,11 @@ export default {
       }
     },
     submit() {
-      const course_id = this.course.course_ID;
+      const rcourse_id = this.course.rcourse_ID;
       const template_id = this.course.template_ID
       const user_id = 1
       const data = {
-        'course_id': course_id,
+        'rcourse_id': rcourse_id,
         'template_id': template_id,
         'user_id': user_id,
         'data': this.templateData

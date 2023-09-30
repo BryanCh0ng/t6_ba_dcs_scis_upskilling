@@ -1632,35 +1632,6 @@ class AdminUpdateRunCourse(Resource):
             return jsonify({"message": f"Failed to update course: {str(e)}", "code": 500})
 
 
-# Apply Feedback Template to Course
-course_apply_feedback_template = api.parser()
-course_apply_feedback_template.add_argument("course_id", help="Enter course id")
-course_apply_feedback_template.add_argument("template_id", help="Enter template id")
-@api.route("/course_apply_feedback_template")
-@api.doc(description="Apply feedback template to a course")
-class CourseApplyFeedbackTemplate(Resource):
-    @api.expect(course_apply_feedback_template)
-    def post(self):
-        try:
-            args = course_apply_feedback_template.parse_args()
-            courseID = args.get("course_id")
-            templateID = args.get("template_id")
-            
-            course = Course.query.filter_by(course_ID=courseID).first()
-            print(course)
-            print(templateID)
-
-            # check if template id is valid
-            if course is None:
-                return jsonify({"message": "course not found", "code": 404}), 404
-
-            course.template_ID = templateID
-            db.session.commit()
-            return jsonify({"code": 200, "message": "Course assign feedback template success"})
-
-        except Exception as e:
-            return jsonify({"code": 500, "message": "Failed. " + str(e)})
-
 def format_date_time(value):
     if isinstance(value, (date, datetime)):
         return value.strftime('%Y-%m-%d')

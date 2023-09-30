@@ -562,7 +562,8 @@ export default {
         },*/
         async fetchRunCourseByID() {
             try {
-                const runcourseData = await RunCourseService.getRunCourseById(this.runcourseId);
+                const runcourseResponse = await RunCourseService.getRunCourseById(this.runcourseId);
+                const runcourseData = runcourseResponse.course
 
                 this.instructorID = runcourseData.instructor_ID;
 

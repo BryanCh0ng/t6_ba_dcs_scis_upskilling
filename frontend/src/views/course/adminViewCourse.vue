@@ -23,7 +23,6 @@
                 <th scope="col">Feedback Analysis</th>
                 <th scope="col">Course Details</th>
                 <th scope="col">Course Run(s)</th>
-                <th scope="col">Feedback Template</th>
                 <th scope="col">Action(s)</th>
               </tr>
             </thead>
@@ -36,7 +35,6 @@
                 <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewCourseRun(course.course_ID)">View Runs</a></td>
-                <td><a v-if="course.course_Status != 'Retired'" class="text-nowrap text-dark text-decoration-underline apply-feedback-template" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
                 <td v-if="course.course_Status === 'Active'"><course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
                 <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
                 <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action></td>
@@ -62,12 +60,6 @@
         </div>
       </div>
 
-      <div class="modal fade" id="apply_course_feedback_template_modal" tabindex="-1" aria-hidden="true" ref="applyCourseFeedbackTemplateModal">
-        <div class="modal-dialog modal-lg"> 
-          <course-apply-feedback-template-modal :modalOpen="modalOpenFeedbackTemplate" v-if="showFeedbackTemplateModal" @model-after-action-close="modalAfterActionClose" :course="selectedCourse" @close-modal="closeFeedbackTemplateModal" />
-        </div>
-      </div>
-  
     </div>
   
 </template>
@@ -81,7 +73,7 @@
   import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
   import CourseService from "@/api/services/CourseService.js";
   import modalAfterAction from '@/components/course/modalAfterAction.vue';
-  import courseApplyFeedbackTemplateModal from '@/components/course/courseApplyFeedbackTemplateModal.vue'
+
   
   export default {
     components: {
@@ -91,8 +83,7 @@
       VueAwesomePaginate,
       courseNameDesc,
       SearchFilter,
-      modalAfterAction,
-      courseApplyFeedbackTemplateModal
+      modalAfterAction
     },
     data() {
       return {
@@ -108,8 +99,6 @@
         search_status: 'Active',
         search_course_name: null,
         search_course_category: null,
-        modalOpenFeedbackTemplate: false,
-        showFeedbackTemplateModal: false
       }
     },
     computed: {
@@ -204,16 +193,6 @@
       goToViewCourseRun(courseID) {
         this.$router.push({ name: 'adminViewCourseRun', params: {id: courseID}});
       },
-      openFeedbackTemplateModal(course) {
-        this.selectedCourse = course
-        this.modalOpenFeedbackTemplate = !this.modalOpenFeedbackTemplate;
-        this.showFeedbackTemplateModal = true;
-      },
-      closeFeedbackTemplateModal() {
-        this.modalOpenFeedbackTemplate = false;
-        this.showFeedbackTemplateModal = false;
-        this.selectedCourse = null;
-      },
     },
     created() {
      this.loadData();
@@ -226,21 +205,10 @@
       this.$el.appendChild(buttonElement);
       const modalElement = this.$refs.afterActionModal;
       modalElement.addEventListener('hidden.bs.modal', this.modalAfterActionClose);
-      
-      const buttonElement2 = document.createElement('button');
-      buttonElement2.className = 'btn btn-primary d-none invisible-btn';
-      buttonElement2.setAttribute('data-bs-toggle', 'modal');
-      buttonElement2.setAttribute('data-bs-target', '#apply_course_feedback_template_modal'); 
-      this.$el.appendChild(buttonElement2);
-      const modalElement2 = this.$refs.applyCourseFeedbackTemplateModal;
-      modalElement2.addEventListener('hidden.bs.modal', this.modalAfterActionClose);
     },
     beforeUnmount() {
       const modalElement = this.$refs.afterActionModal;
       modalElement.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
-
-      const modalElement2 = this.$refs.applyCourseFeedbackTemplateModal;
-      modalElement2.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
     },
     }
 </script>
