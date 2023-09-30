@@ -21,7 +21,7 @@
 
       <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Admin Database</h5>
-          <button class="btn btn-primary" @click="goToAddAdmin">Add Admin</button>
+          <button class="btn btn-primary font-weight-bold text-nowrap" @click="goToAddAdmin">Add Admin</button>
       </div>
 
       <div class="container col-12">
@@ -45,8 +45,10 @@
                   {{ user.user_Email }}
                 </td>
 
-                <!-- need to include :status=""  -->
-                <td><course-action @action-and-message-updated="handleActionData" :course="user"></course-action></td>
+                <td v-if="user.user_ID !== user_ID">
+                  <button class="btn btn-danger font-weight-bold text-nowrap" @click="removeAdmin(user.user_ID)">Remove</button>
+                </td>
+                <td v-else></td>
               </tr>
             </tbody>
           </table>
@@ -68,8 +70,8 @@
 
       <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Student Database</h5>
-          <button v-show="showBlacklistButton" class="btn btn-danger me-3" @click="blacklist">Blacklist Student</button>
-          <button v-show="showRemoveButton" class="btn btn-success" @click="removeFromBlacklist">Remove from Blacklist</button>
+          <button v-show="showBlacklistButton" class="btn btn-primary me-3 font-weight-bold text-nowrap" @click="blacklist">Blacklist Student</button>
+          <button v-show="showRemoveButton" class="btn btn-primary font-weight-bold text-nowrap" @click="removeFromBlacklist">Remove from Blacklist</button>
       </div>
 
       <div class="container col-12 table-responsive">
@@ -181,7 +183,6 @@
 </template>
 
 <script>
-import courseAction from '@/components/course/courseAction.vue';
 import sortIcon from '@/components/common/sort-icon.vue';
 import modalCourseContent from '@/components/course/modalCourseContent.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
@@ -195,7 +196,6 @@ import DefaultModal from "@/components/DefaultModal.vue";
 
 export default {
   components: {
-    courseAction,
     sortIcon,
     modalCourseContent,
     VueAwesomePaginate,
@@ -230,7 +230,8 @@ export default {
       showModal: false,
       modalMessage: "",
       modalTitle: "",
-      modalVariant: "primary",
+      modalVariant: "secondary",
+      userID: null,
     }
   },
   methods: {
@@ -386,6 +387,13 @@ export default {
       this.modalMessage = response.message
       this.showModal = true;
     },
+    async removeAdmin(user_ID) {
+      this.modalTitle = "Remove Admin"
+      console.log(user_ID)
+      let response = await ManagementService.removeAdmin(user_ID)
+      this.modalMessage = response.message
+      this.showModal = true;
+    },
   },
   computed: {
     displayedAdmin() {
@@ -414,6 +422,7 @@ export default {
   },
   async created() {
     const user_ID = await UserService.getUserID();
+    this.user_ID = user_ID;
     const role = await UserService.getUserRole(user_ID);
     if (role != 'Admin') {
       this.$router.push({ name: 'studentViewProfile' }); 

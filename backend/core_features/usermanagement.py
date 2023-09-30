@@ -30,16 +30,35 @@ class GetAllAdmin(Resource):
 
             if admin_users:
                 admin_users_json = []
+                user_id = session.get('user_ID')
 
+                if user_id:
+
+                    # Find the user with the matching user_ID from the session
+                    user = User.query.filter_by(user_ID=user_id, role_Name='admin').first()
+
+                    if user:
+                        user_data = {
+                            "user_ID": user.user_ID,
+                            "user_Name": user.user_Name,
+                            "user_Email": user.user_Email,
+                            "role_Name": user.role_Name
+                        }
+
+                        admin_users_json.append(user_data)
+
+                # Add other admin users to admin_users_json
                 for user in admin_users:
-                    user_data = {
-                        "user_ID": user.user_ID,
-                        "user_Name": user.user_Name,
-                        "user_Email": user.user_Email,
-                        "role_Name": user.role_Name
-                    }
-                    admin_users_json.append(user_data)
-                
+                    # Check if the user is not the same as the one in the session
+                    if user_id and user.user_ID != user_id:
+                        user_data = {
+                            "user_ID": user.user_ID,
+                            "user_Name": user.user_Name,
+                            "user_Email": user.user_Email,
+                            "role_Name": user.role_Name
+                        }
+                        admin_users_json.append(user_data)
+
                 db.session.close()
 
                 return jsonify({"code": 200, "data": admin_users_json})
@@ -47,7 +66,6 @@ class GetAllAdmin(Resource):
                 return jsonify({"code": 404, "message": "No admin users found."})
         except Exception as e:
             return jsonify({"code": 500, "message": "Error occurred while fetching admin users.", "error": str(e)})
-
 # All Students
 retrieve_student_parser = api.parser()
 retrieve_student_parser.add_argument("student_name", help="Enter student name")
@@ -283,5 +301,39 @@ class RemoveFromBlacklist(Resource):
             Blacklist.query.filter_by(user_ID=user_id).delete()
 
         db.session.commit()
+        db.session.close()
 
         return jsonify({'code': 200, 'message': 'Users successfully removed from blacklist'})
+    
+# Remove Admin - Update Role Name to "Instructor"
+remove_admin_id = api.parser()
+remove_admin_id.add_argument("user_ID", help="Enter user id")
+
+@api.route("/remove_admin")
+@api.doc(description="Remove admin")
+class RemoveAdmin(Resource):
+    @api.expect(remove_admin_id)
+    def post(self):
+        try:
+            current_admin_ID = int(session.get('user_ID'))
+            user_ID = int(remove_admin_id.parse_args().get("user_ID"))
+            print(current_admin_ID,"==",user_ID)
+            
+            if user_ID == current_admin_ID:
+                print("they are equal")
+                return json.loads(json.dumps({"message":"You can't remove yourself"})), 200  # Use 400 Bad Request status
+            else:
+                user = User.query.filter_by(user_ID=user_ID).first()            
+                if(user and user.role_Name == "Admin"):
+                    try:
+                        user.role_Name = "Instructor"         
+                        db.session.commit()    
+                        db.session.close()             
+                        return json.loads(json.dumps({"message":"Admin role removed"})), 200
+                    except Exception as e:
+                        return "Failed to remove admin role. " + str(e), 500
+
+                return json.loads(json.dumps({"message": "There is no such admin user"})), 404
+
+        except Exception as e:
+            return "Failed. " + str(e), 500

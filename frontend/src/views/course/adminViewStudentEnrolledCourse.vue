@@ -17,8 +17,6 @@
                 <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'registered')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
               <th scope="col">
                 <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'registered')">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
-              <th scope="col">
-                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'registered')">Closing Date<sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
               <th scope="col">Course Details</th>
             </tr>
           </thead>
@@ -33,9 +31,6 @@
               </td>
               <td>
                 <course-date-time :date="registered_course.run_Enddate" :time="registered_course.run_Endtime"></course-date-time>
-              </td>
-              <td>
-                <course-date-time :date="registered_course.reg_Enddate" :time="registered_course.reg_Endtime"></course-date-time>
               </td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(registered_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
               
@@ -84,7 +79,6 @@ import ManagementService from "@/api/services/UserManagementService.js";
 
 export default {
   components: {
-    // courseAction,
     sortIcon,
     modalCourseContent,
     VueAwesomePaginate,
@@ -167,17 +161,6 @@ export default {
         throw error;
       }
     },
-    // async loadData() {
-    //   try {
-
-    //     let registered_courses = await CourseService.searchCourseRegistrationInfo(this.user_ID, null, null, null)
-    //     this.registered_courses = registered_courses.data
-        
-    //   } catch (error) {
-    //     console.error("Error fetching course details:", error);
-    //   }
-    // },
-
     sort(column, action) {
       if (this.sortColumn === column) {
         this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -212,19 +195,6 @@ export default {
       return this.registered_courses.slice(startIndex, endIndex);
     },
     
-  },
-  mounted() {
-    const buttonElement = document.createElement('button');
-    buttonElement.className = 'btn btn-primary d-none invisible-btn';
-    buttonElement.setAttribute('data-bs-toggle', 'modal');
-    buttonElement.setAttribute('data-bs-target', '#after_action_modal');
-    this.$el.appendChild(buttonElement);
-    const modalElement = this.$refs.afterActionModal;
-    modalElement.addEventListener('hidden.bs.modal', this.modalAfterActionClose);
-  },
-  beforeUnmount() {
-    const modalElement = this.$refs.afterActionModal;
-    modalElement.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
   }
 }
 </script>

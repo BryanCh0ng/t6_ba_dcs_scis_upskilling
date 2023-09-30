@@ -84,7 +84,17 @@ class ManagementService extends BaseApiService {
             return this.handleError(error);
         }
     }
-    
+
+    async removeAdmin(user_ID) {
+        try {
+            const response = await axiosClient.post("/management/remove_admin", {
+                user_ID: user_ID,
+            });
+            return response.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
 }
 
 export default new ManagementService();

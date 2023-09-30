@@ -91,16 +91,16 @@ export default {
             { path: "/studentViewRecommendations", label: "Recommendations" },
             { path: "/studentViewCourse", label: "View Courses" },
             { path: "/proposeCourse", label: "Propose Course" },
-            { path: "/ContactUs", label: "Contact Us" },
+            { path: "/contactUs", label: "Contact Us" },
           );
         } else if (
           this.user_role === "Instructor" ||
           this.user_role === "Trainer"
         ) {
           links.push(
-            { path: "/votingCampaign", label: "Voting Campaign" },
+            { path: "/instructorTrainerViewVotingCampaign", label: "Voting Campaign" },
             { path: "/proposeCourse", label: "Propose Course" },
-            { path: "/ContactUs", label: "Contact Us" },
+            { path: "/contactUs", label: "Contact Us" },
           );
         } else if (this.user_role === "Admin") {
           links.push(
@@ -116,7 +116,7 @@ export default {
         links.push(
           { path: "/adminViewcourse", label: "View Courses" },
           { path: "/proposeCourse", label: "Propose Course" },
-          { path: "/ContactUs", label: "Contact Us" }
+          { path: "/contactUs", label: "Contact Us" }
         );
       }
 
