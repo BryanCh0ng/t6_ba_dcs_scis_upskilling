@@ -1,6 +1,6 @@
 <template>
   <div class="content mb-5">
-    <nav class="navbar navbar-expand-xl">
+    <nav class="navbar navbar-expand-xxl">
       <div class="container-fluid">
         <a class="navbar-brand no-underline" href="#">
           <img src="../../assets/smulogo.png" title="smu logo" class="navlogo" />
@@ -368,7 +368,7 @@ export default {
 }
 
 .dropdown-content li {
-  padding: 4px 14px;
+  padding: 2px 14px;
   cursor: pointer;
 }
 

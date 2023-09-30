@@ -65,23 +65,34 @@
         :search-api="searchStudentInfo"
         @search-complete="handleSearchStudent"
       />
+
+      <div class="container col-12 d-flex mb-3 w-100">
+          <h5 class="col m-auto">All Student Database</h5>
+          <button v-show="showBlacklistButton" class="btn btn-danger me-3" @click="blacklist">Blacklist Student</button>
+          <button v-show="showRemoveButton" class="btn btn-success" @click="removeFromBlacklist">Remove from Blacklist</button>
+      </div>
+
       <div class="container col-12 table-responsive">
-        <h5 class="pb-3">All Student Database</h5>
         <div v-if="student && student.length > 0">
           <table class="table bg-white">
             <thead>
               <tr class="text-nowrap">
+                <th scope="col">
+                </th>
                 <th scope="col">
                   <a href="" class="text-decoration-none text-dark" @click.prevent="sort('user_Name', 'student')">Name <sort-icon :sortColumn="sortColumn === 'user_Name'" :sortDirection="getSortDirection('user_Name')"/></a>
                 </th>
                 <th scope="col">Email</th>
                 <th scope="col">Blacklisted</th>
                 <th scope="col">View Course Taken</th>
-                <th scope="col">Action(s)</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(user, key) in displayedStudent" :key="key">
+                <td class="user_checkbox">
+                  <!-- Bind checkbox to the selectedUserIDs array -->
+                  <input type="checkbox" v-model="selectedUserIDs" :value="user.user_ID" />
+                </td>
                 <td class="user_name">
                   {{ user.user_Name }}
                 </td>
@@ -93,13 +104,6 @@
                   <span v-else>Not Blacklisted</span>
                 </td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewCourses(user.user_ID)">View Course Taken</a></td>
-                <!-- need to include:  status=""  -->
-                <!-- <td v-if="user.is_blacklisted === true">
-                  <course-action @action-and-message-updated="handleActionData" :course="user"></course-action>
-                </td>
-                <td v-if="user.is_blacklisted === false">
-                  <course-action @action-and-message-updated="handleActionData" :course="user"></course-action>
-                </td> -->
               </tr> 
             </tbody>
           </table>
@@ -171,11 +175,7 @@
       </div>
     </div>
 
-    <div class="modal fade" id="after_action_modal" tabindex="-1" aria-hidden="true" ref="afterActionModal">
-      <div class="modal-dialog modal-lg"> 
-        <modal-after-action :course="actionCourse" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
-      </div>
-    </div>
+    <DefaultModal :visible="showModal" :message="modalMessage" :title="modalTitle" :variant="modalVariant" @modal-closed="handleModalClosed"/>
   </div>
 </div>
 </template>
@@ -189,48 +189,48 @@ import SearchFilter from "@/components/search/InstructorRelatedSearchFilter.vue"
 import StudentSearchFilter from "@/components/search/StudentInfoSearchFilter.vue";
 import NameSearchFilter from "@/components/search/NameSearchFilter.vue";
 import ManagementService from "@/api/services/UserManagementService.js";
-import modalAfterAction from '@/components/course/modalAfterAction.vue';
 import CommonService from "@/api/services/CommonService.js"
 import UserService from "@/api/services/UserService.js";
+import DefaultModal from "@/components/DefaultModal.vue";
 
 export default {
   components: {
     courseAction,
     sortIcon,
     modalCourseContent,
-    // courseNameDesc,
     VueAwesomePaginate,
-    // courseDateTime,
+    DefaultModal,
     SearchFilter,
     StudentSearchFilter,
-    NameSearchFilter,
-    modalAfterAction
+    NameSearchFilter
   },
   data() {
     return {
       // Admin
       admin: [],
       localCurrentPageAdmin: 1,
-
       student: [],
       localCurrentPageStudent: 1,
       blacklistedOption: ['Blacklisted', 'Not Blacklisted'],
       search_name: null,
       search_blacklist: null, 
-
       activeTab: 'admin',
       receivedMessage: '',
       actionCourse: {},
       search_course_name: null,
       search_course_category: null,
-      // Instructor & Trainer
       instructors_trainers: [],
       sortColumn: '',
       sortDirection: 'asc',
       itemsPerPage: 10,
       localCurrentPageInstructorsTrainers: 1,
       statusOptions: ["Instructor", "Trainer"],
-
+      selectAllStudents: false,
+      selectedUserIDs: [],
+      showModal: false,
+      modalMessage: "",
+      modalTitle: "",
+      modalVariant: "primary",
     }
   },
   methods: {
@@ -283,7 +283,6 @@ export default {
           this.search_blacklist
         );
         this.student = response.data;
-        console.log(this.student)
         return this.student;
       } catch (error) {
         console.error("Error fetching info:", error);
@@ -339,12 +338,54 @@ export default {
       }
 
     },
+    async loadData() {
+      try {
+        let admin_response = await ManagementService.getAllAdmin(null)
+        this.admin = admin_response.data
+
+        let student_response = await ManagementService.getAllStudent(null, null)
+        this.student = student_response.data
+
+        let response = await ManagementService.getAllInstructorsAndTrainers(null, null, null)
+        this.instructors_trainers = response.data
+        
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+      }
+    },
     goToAddAdmin() {
       this.$router.push({name: 'addAdmin'})
     },
     viewCourses(user_ID) {
       this.$router.push({ name: 'adminViewStudentEnrolledCourse', params: { user_ID } });
-    }
+    },
+    async handleModalClosed(){
+      this.loadData()
+      this.selectedUserIDs = []
+    },
+    async blacklist() {
+      this.modalTitle = "Blacklist Student"
+
+      if (this.selectedUserIDs.length === 0) {
+        this.modalMessage = "You did not select any student to blacklist."
+        this.showModal = true;
+      }
+
+      let response = await ManagementService.blacklistStudent(this.selectedUserIDs)
+      this.modalMessage = response.message
+      this.showModal = true;
+    },
+    async removeFromBlacklist() {
+      this.modalTitle = "Remove Student from Blacklist"
+      if (this.selectedUserIDs.length === 0) {
+        this.modalMessage = "You did not select any student to remove from blacklist."
+        this.showModal = true;
+      }
+
+      let response = await ManagementService.removeFromBlacklist(this.selectedUserIDs)
+      this.modalMessage = response.message
+      this.showModal = true;
+    },
   },
   computed: {
     displayedAdmin() {
@@ -363,7 +404,13 @@ export default {
       const startIndex = (this.localCurrentPageInstructorsTrainers - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
       return this.instructors_trainers.slice(startIndex, endIndex);
-    }
+    },
+    showBlacklistButton() {
+      return this.search_blacklist === false || this.search_blacklist === null;
+    },
+    showRemoveButton() {
+      return this.search_blacklist === true || this.search_blacklist === null;
+    },
   },
   async created() {
     const user_ID = await UserService.getUserID();
@@ -373,11 +420,9 @@ export default {
     } else {
       try {
         let admin_response = await ManagementService.getAllAdmin(null)
-        console.log(admin_response)
         this.admin = admin_response.data
 
         let student_response = await ManagementService.getAllStudent(null, null)
-        console.log(student_response)
         this.student = student_response.data
 
         let response = await ManagementService.getAllInstructorsAndTrainers(null, null, null)

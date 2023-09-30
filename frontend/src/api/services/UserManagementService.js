@@ -60,6 +60,31 @@ class ManagementService extends BaseApiService {
             return this.handleError(error);
         }
     }
+
+    async blacklistStudent(user_ids) {
+        try {
+            // console.log(user_ids)
+            const response = await axiosClient.post("/management/blacklist", {
+                user_ids: user_ids,
+            });
+            return response.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+    async removeFromBlacklist(user_ids) {
+        try {
+            // console.log(user_ids)
+            const response = await axiosClient.post("/management/remove_from_blacklist", {
+                user_ids: user_ids,
+            });
+            return response.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+    
 }
 
 export default new ManagementService();

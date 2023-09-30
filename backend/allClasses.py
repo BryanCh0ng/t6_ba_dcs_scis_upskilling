@@ -441,18 +441,12 @@ class AttendenceRecord(db.Model):
 class Blacklist(db.Model):
     __tablename__ = 'blacklist'
 
-    blacklist_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    blacklist_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     user_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'),  nullable=False)
     
-
-
-    def __init__(self, blacklist_ID, user_ID ):
-        self.blacklist_ID = blacklist_ID
+    def __init__(self, user_ID ):
         self.user_ID = user_ID
         
-
-
-
     def json(self):
         columns = self.__mapper__.column_attrs.keys()
         result = {}

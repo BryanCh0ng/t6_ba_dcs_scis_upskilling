@@ -221,3 +221,67 @@ class GetStudentName(Resource):
         
 
         return jsonify({"code": 200, "data": user_name})
+
+
+# Blacklist Student
+retrieve_blacklist_student_id = api.parser()
+retrieve_blacklist_student_id.add_argument("user_ids", type=int, action="append", required=True, help="Enter user ids as a list")
+
+@api.route('/blacklist', methods=['POST'])
+@api.doc(description="Blacklist Student")
+class BlacklistStudent(Resource):
+    @api.expect(retrieve_blacklist_student_id)
+    def post(self):
+        args = retrieve_blacklist_student_id.parse_args()
+        user_ids = args["user_ids"]
+
+        # Check if all the users with the given IDs exist
+        users = User.query.filter(User.user_ID.in_(user_ids)).all()
+        existing_user_ids = [user.user_ID for user in users]
+        missing_user_ids = set(user_ids) - set(existing_user_ids)
+
+        if missing_user_ids:
+            return jsonify({'code': 404, 'message': f'Users are not found'})
+
+        # Check if any of the users are already blacklisted
+        blacklisted_users = Blacklist.query.filter(Blacklist.user_ID.in_(user_ids)).all()
+        blacklisted_user_ids = [entry.user_ID for entry in blacklisted_users]
+
+        if blacklisted_user_ids:
+            return jsonify({'code': 400, 'message': f'there are users who are already blacklisted'})
+
+        # Create new blacklist entries for each user
+        for user_id in user_ids:
+            blacklist_entry = Blacklist(user_ID=user_id)
+            db.session.add(blacklist_entry)
+
+        db.session.commit()
+        db.session.close()
+
+        return jsonify({'code': 200, 'message': 'Users successfully blacklisted'})
+
+retrieve_blacklist_remove = api.parser()
+retrieve_blacklist_remove.add_argument("user_ids", type=int, action="append", required=True, help="Enter user IDs as a list")
+
+@api.route('/remove_from_blacklist', methods=['POST'])
+@api.doc(description="Remove Students from Blacklist")
+class RemoveFromBlacklist(Resource):
+    @api.expect(retrieve_blacklist_student_id)
+    def post(self):
+        args = retrieve_blacklist_student_id.parse_args()
+        user_ids = args["user_ids"]
+
+        # Check if any of the users are blacklisted
+        blacklisted_users = Blacklist.query.filter(Blacklist.user_ID.in_(user_ids)).all()
+        blacklisted_user_ids = [entry.user_ID for entry in blacklisted_users]
+
+        if not blacklisted_user_ids:
+            return jsonify({'code': 400, 'message': f'Users are not blacklisted'})
+
+        # Remove blacklisted entries for each user
+        for user_id in user_ids:
+            Blacklist.query.filter_by(user_ID=user_id).delete()
+
+        db.session.commit()
+
+        return jsonify({'code': 200, 'message': 'Users successfully removed from blacklist'})

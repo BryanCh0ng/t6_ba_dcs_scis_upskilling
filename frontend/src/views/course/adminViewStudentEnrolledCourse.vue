@@ -46,7 +46,7 @@
           <div class="modal-dialog modal-lg"><modal-course-content v-if="selectedCourse" :course="selectedCourse" @close-modal="closeModal" /></div>
         </div>
       </div>
-      <div v-els="registered_courses=[]">
+      <div v-else-if="registered_courses=[]">
           <p>No enrolled course</p>
       </div>
 
@@ -115,6 +115,7 @@ export default {
 
     const registeredCourses = await CourseService.adminGetUserCourses(this.user_ID, null, null);
     this.registered_courses = registeredCourses.data;
+    console.log(this.registered_courses)
     this.student_Name = this.registered_courses[0].user_Name;
 
     if (this.registered_courses.length == 0) {
