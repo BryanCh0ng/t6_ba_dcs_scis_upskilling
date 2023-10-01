@@ -92,6 +92,15 @@ class FeedbackTemplateService extends BaseApiService {
             return this.handleError(error)
         }
     }  
+    async postStudentFeedback(data) {
+        try {
+            let response = await axiosClient.post("/feedbacktemplate/post_feedback_student", data)
+            console.log(response)
+            return response.data
+        } catch (error) {
+            return this.handleError(error)
+        }
+    } 
     
 }
 

@@ -83,7 +83,7 @@ export default {
         this.errorMsge = course_response.message
       }
     },
-    submit() {
+    async submit()  {
       const rcourse_id = this.course.rcourse_ID;
       const template_id = this.course.template_ID
       const user_id = 1
@@ -93,7 +93,13 @@ export default {
         'user_id': user_id,
         'data': this.templateData
       }
+      try{
+      const response = await FeedbackTemplateService.postStudentFeedback(data)
+      console.log(response)
       console.log(data)
+      }catch (error) {
+      console.error('Error submitting student feedback:', error);
+    }
     },
     updateAnswer(answer) {
       var index = parseInt(answer.key)

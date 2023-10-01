@@ -160,15 +160,14 @@ class CreateFeedbackTemplate(Resource):
 
 # Not in use, use /post_feedback_student
 post_feedback_student = api.parser()
-
 @api.route("/post_feedback_student" ,methods=["POST", "GET"])
 @api.doc(description="Search if template id exists, if does get template, else create new template")
 class GetTemplate(Resource):
     @api.expect(post_feedback_student)
-    def get(self):
+    def post(self):
         
         new_student_feedback = request.json
-        courseID = new_student_feedback.get("course_id")
+        courseID = new_student_feedback.get("rcourse_id")
         templateID = new_student_feedback.get("template_id")
         userID = new_student_feedback.get("user_id")
         data = new_student_feedback.get("data")
@@ -195,7 +194,7 @@ class GetTemplate(Resource):
                    answer = eachdata.get("answer")
                   #  NewFeedbackTemplate = FeedbackTemplate(None, templateName, currentDate)
                    NewFeedback =Feedback( None, templateID, userID, AttributeID, answer, courseID)
-                   db.add(NewFeedback)
+                   db.session.add(NewFeedback)
                    db.session.commit()
                    
                 return json.loads(json.dumps(NewFeedback.json())), 200
