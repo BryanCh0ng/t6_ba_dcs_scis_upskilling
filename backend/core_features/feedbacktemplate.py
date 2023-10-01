@@ -172,22 +172,21 @@ class GetTemplate(Resource):
         templateID = new_student_feedback.get("template_id")
         userID = new_student_feedback.get("user_id")
         data = new_student_feedback.get("data")
-        registered = Registration.query(Registration.rcourse_ID).filter(Registration.user_ID == userID, Registration.reg_Status == "Enrolled").all()
-        runningcourses = RunCourse.query.filter(RunCourse.course_ID == courseID, RunCourse.runcourse_Status == "ongoing").all()
-        runcourseID = 0
-        for runningcourse in runningcourses:
-           rcourseID = runningcourse.rcourse_ID
-           if rcourseID in registered:
-              runcourseID = rcourseID
+        # registered = Registration.query(Registration.rcourse_ID).filter(Registration.user_ID == userID, Registration.reg_Status == "Enrolled").all()
+        # runningcourses = RunCourse.query.filter(RunCourse.course_ID == courseID, RunCourse.runcourse_Status == "ongoing").all()
+        # runcourseID = 0
+        # for runningcourse in runningcourses:
+        #    rcourseID = runningcourse.rcourse_ID
+        #    if rcourseID in registered:
+        #       runcourseID = rcourseID
               
 
         # templateName = post_feedback_student_feedback_template.parse_args().get("template_Name")
         # templateID = post_feedback_student_feedback_template.parse_args().get("template_ID")
         # current_date = datetime.now().strftime('%d-%m-%Y')
 
-        if runcourseID ==0:
-          return "failed"
-        template = Feedback.query.filter(Feedback.feedback_Template_ID==templateID,Feedback.submitted_By == userID, Feedback.rcourse_ID == runcourseID ).first()
+       
+        template = Feedback.query.filter(Feedback.feedback_Template_ID==templateID,Feedback.submitted_By == userID, Feedback.rcourse_ID == courseID ).first()
 
         if not template:
             try:
