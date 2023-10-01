@@ -208,8 +208,8 @@ const routes = [
     name: 'adminViewManagement',
     component: () => import('../views/usermanagement/adminViewManagement.vue'),
     meta: {
-        title: 'Admin View Management',
-        requiresAuth: true
+        title: 'Admin View Management'
+        //requiresAuth: true
     }
   },
   {
@@ -219,6 +219,22 @@ const routes = [
     meta: {
         title: 'Admin View Student Enrolled Course',
         requiresAuth: true
+    }
+  },
+  {
+    path: '/adminAddAdmin',
+    name: 'adminAddAdmin',
+    component: () => import('../views/usermanagement/adminAddAdmin.vue'),
+    meta: {
+        title: 'Admin Add Admin'
+    }
+  },
+  {
+    path: '/adminChangePassword',
+    name: 'adminChangePassword',
+    component: () => import('../views/usermanagement/adminChangePassword.vue'),
+    meta: {
+        title: 'Admin Change Password'
     }
   }
   

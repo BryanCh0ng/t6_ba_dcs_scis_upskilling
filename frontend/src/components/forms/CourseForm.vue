@@ -129,7 +129,7 @@ export default {
     validations() {
         return {
             formData: {
-                courseName: { required: helpers.withMessage('Please provide a valid course Name', required) },
+                courseName: { required: helpers.withMessage('Please provide a valid course name', required) },
                 selectedCategory: { required: helpers.withMessage('Please select a valid course category', required) },
                 courseDescription: { required: helpers.withMessage('Please provide a valid course description', required), maxLength: maxLength(800) }
             }

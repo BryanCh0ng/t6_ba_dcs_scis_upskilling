@@ -91,6 +91,16 @@ class ManagementService extends BaseApiService {
                 user_ID: user_ID,
             });
             return response.data;
+        } catch (error){
+            return this.handleError(error);
+        }
+    }
+
+    async addAdmin(newAdminData) {
+        try {
+            console.log(newAdminData)
+            let response = await axiosClient.post('/management/add_admin', newAdminData);
+            return response.data;
         } catch (error) {
             return this.handleError(error);
         }

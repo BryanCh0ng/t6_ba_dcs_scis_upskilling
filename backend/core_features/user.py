@@ -92,7 +92,7 @@ class VerifyEmail(Resource):
 
     def send_email(self, email):
         msg = Message('Hello from Flask-Mail',
-                  sender='nic.wong@live.com',
+                  sender='upskilling.engagement@outlook.com',
                   recipients=[email])
         msg.html = "<p>Please click the link to verify your email and finish creating your account <a href='http://localhost:8080/t6_ba_dcs_scis_upskilling/registerform?email="+ email +"'>http://localhost:8080/t6_ba_dcs_scis_upskilling/registerform?email="+ email +"</a>.</p>"
         mail.send(msg)
@@ -199,7 +199,7 @@ class ForgotPassword(Resource):
 
     def send_email(self, email):
         msg = Message('Hello from Flask-Mail',
-                  sender='nic.wong@live.com',
+                  sender='upskilling.engagement@outlook.com',
                   recipients=[email])
         msg.html = "<p>Please click the link to change your password <a href='http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"'>http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"</a>.</p>"
         mail.send(msg)
