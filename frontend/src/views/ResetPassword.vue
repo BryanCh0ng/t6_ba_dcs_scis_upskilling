@@ -138,7 +138,7 @@ export default {
     },
     hideSuccessModal() {
       this.showSuccessModal = false;
-      this.$router.push('/login');
+      this.$router.push('/');
     },
   },
 };
