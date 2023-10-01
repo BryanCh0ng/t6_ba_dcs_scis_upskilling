@@ -428,8 +428,8 @@ CREATE TABLE IF NOT EXISTS `runcourse`(
 
 INSERT INTO runcourse VALUES
 	(1, 'Quantum Leap - Run 1' ,'2023-07-10', '2023-08-07', '12:00:00', '14:00:00', 4, 'face-to-face', 'SCIS SR 2-4', 'Closed', 35, 20, 0, 2, '2023-06-05', '2023-06-10', '10:00:00', '10:00:00', 1, 2), 
-    (2, 'Cybersecurity - Introduction to SSL Certificates - Run 1','run' ,'2023-09-05', '2023-10-05', '09:00:00', '11:00:00', 3, 'face-to-face', 'SCIS SR 3-3', 'Closed', 30, 15, 0, 2, '2023-08-01', '2023-08-06', '10:00:00', '10:00:00', 1, 4),
-    (3, 'SAP Cloud Accelerated Learning Experience (S.C.A.L.E) - Run 1','run' ,'2023-10-15', '2023-11-15', '15:00:00', '17:00:00', 5, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 25, 15, 10, 2, '2023-09-01', '2023-09-06', '10:00:00', '10:00:00', 1, 6),
+    (2, 'Cybersecurity - Introduction to SSL Certificates - Run 1' ,'2023-09-05', '2023-10-05', '09:00:00', '11:00:00', 3, 'face-to-face', 'SCIS SR 3-3', 'Closed', 30, 15, 0, 2, '2023-08-01', '2023-08-06', '10:00:00', '10:00:00', 1, 4),
+    (3, 'SAP Cloud Accelerated Learning Experience (S.C.A.L.E) - Run 1' ,'2023-10-15', '2023-11-15', '15:00:00', '17:00:00', 5, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 25, 15, 10, 2, '2023-09-01', '2023-09-06', '10:00:00', '10:00:00', 1, 6),
     (4, 'Overview of Big Data with Kx - Run 1' ,'2023-11-20', '2023-12-20', '10:00:00', '12:00:00', 46, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 40, 25, 15, 2, '2023-10-05', '2023-10-10', '10:00:00', '10:00:00', 1, 8),
     (5, 'Business Intelligence and Analytic - Run 1' ,'2023-10-10', '2023-11-10', '14:00:00', '16:00:00', 41, 'online', NULL , 'Ongoing', 30, 20, 0, 2, '2023-09-12', '2023-09-17', '10:00:00', '10:00:00', 1, 21),
     (6, 'IT Project Management - Run 1' ,'2023-11-01', '2023-11-20', '15:00:00', '17:00:00', 47, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 20, 15, 10, 2, '2023-10-05', '2023-10-10', '10:00:00', '10:00:00', 1, 23),

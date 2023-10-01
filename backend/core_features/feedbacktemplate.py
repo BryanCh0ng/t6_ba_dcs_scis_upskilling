@@ -159,34 +159,52 @@ class CreateFeedbackTemplate(Resource):
         
 
 # Not in use, use /post_feedback_student
-post_feedback_student_feedback_template = api.parser()
-post_feedback_student_feedback_template.add_argument("template_Name", help="Enter template name")
-post_feedback_student_feedback_template.add_argument("template_ID", help="Enter template id")
-@api.route("/post_feedback_student_feedback_template" ,methods=["POST", "GET"])
+post_feedback_student = api.parser()
+
+@api.route("/post_feedback_student" ,methods=["POST", "GET"])
 @api.doc(description="Search if template id exists, if does get template, else create new template")
 class GetTemplate(Resource):
-    @api.expect(post_feedback_student_feedback_template)
+    @api.expect(post_feedback_student)
     def get(self):
         
-        #new_student_feedback = request.json
-        
-        templateName = post_feedback_student_feedback_template.parse_args().get("template_Name")
-        templateID = post_feedback_student_feedback_template.parse_args().get("template_ID")
-        current_date = datetime.now().strftime('%d-%m-%Y')
+        new_student_feedback = request.json
+        courseID = new_student_feedback.get("course_id")
+        templateID = new_student_feedback.get("template_id")
+        userID = new_student_feedback.get("user_id")
+        data = new_student_feedback.get("data")
+        registered = Registration.query(Registration.rcourse_ID).filter(Registration.user_ID == userID, Registration.reg_Status == "Enrolled").all()
+        runningcourses = RunCourse.query.filter(RunCourse.course_ID == courseID, RunCourse.runcourse_Status == "ongoing").all()
+        runcourseID = 0
+        for runningcourse in runningcourses:
+           rcourseID = runningcourse.rcourse_ID
+           if rcourseID in registered:
+              runcourseID = rcourseID
+              
 
+        # templateName = post_feedback_student_feedback_template.parse_args().get("template_Name")
+        # templateID = post_feedback_student_feedback_template.parse_args().get("template_ID")
+        # current_date = datetime.now().strftime('%d-%m-%Y')
 
-        template = FeedbackTemplate.query.filter_by(template_ID=templateID).first()
+        if runcourseID ==0:
+          return "failed"
+        template = Feedback.query.filter(Feedback.feedback_Template_ID==templateID,Feedback.submitted_By == userID, Feedback.rcourse_ID == runcourseID ).first()
 
         if not template:
-            NewFeedbackTemplate = FeedbackTemplate(templateID, templateName, current_date)
             try:
-                db.session.add(NewFeedbackTemplate)
-                return json.loads(json.dumps(NewFeedbackTemplate.json())), 200
+                for eachdata in data:
+                   AttributeID = eachdata.get("attribute_id")
+                   answer = eachdata.get("answer")
+                  #  NewFeedbackTemplate = FeedbackTemplate(None, templateName, currentDate)
+                   NewFeedback =Feedback( None, templateID, userID, AttributeID, answer, courseID)
+                   db.add(NewFeedback)
+                   db.session.commit()
+                   
+                return json.loads(json.dumps(NewFeedback.json())), 200
            
             except Exception as e:
                 return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
         else:
-            return {"message": "Template ID already exists"}, 409
+            return {"message": "Feedback already exists"}, 409
 
 get_courses_by_template_id = api.parser()
 get_courses_by_template_id.add_argument("template_id", help="Enter template id")
