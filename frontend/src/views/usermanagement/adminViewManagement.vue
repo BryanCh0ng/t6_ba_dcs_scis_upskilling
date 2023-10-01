@@ -355,7 +355,7 @@ export default {
       }
     },
     goToAddAdmin() {
-      this.$router.push({name: 'addAdmin'})
+      this.$router.push({name: 'adminAddAdmin'})
     },
     viewCourses(user_ID) {
       this.$router.push({ name: 'adminViewStudentEnrolledCourse', params: { user_ID } });

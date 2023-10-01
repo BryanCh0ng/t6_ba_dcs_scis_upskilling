@@ -74,6 +74,10 @@ export default {
     methods: {
         async handleModalClosed(value){
             this.showAlert = value;
+
+            if(!this.showAlert) {
+                this.$router.push('/adminViewManagement');
+            }
         },
         async addAdmin() {
             try {
