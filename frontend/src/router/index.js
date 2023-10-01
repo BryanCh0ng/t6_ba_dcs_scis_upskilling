@@ -228,14 +228,6 @@ const routes = [
     meta: {
         title: 'Admin Add Admin'
     }
-  },
-  {
-    path: '/adminChangePassword',
-    name: 'adminChangePassword',
-    component: () => import('../views/usermanagement/adminChangePassword.vue'),
-    meta: {
-        title: 'Admin Change Password'
-    }
   }
   
 
