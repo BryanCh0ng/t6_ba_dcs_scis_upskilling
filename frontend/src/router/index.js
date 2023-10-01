@@ -208,8 +208,8 @@ const routes = [
     name: 'adminViewManagement',
     component: () => import('../views/usermanagement/adminViewManagement.vue'),
     meta: {
-        title: 'Admin View Management'
-        //requiresAuth: true
+        title: 'Admin View Management',
+        requiresAuth: true
     }
   },
   {
