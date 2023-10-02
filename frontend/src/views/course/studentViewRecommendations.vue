@@ -225,7 +225,6 @@
               </thead>
               <tbody>
                 <tr v-for="(interest_other, key) in displayedInterestOthers" :key="key">
-                  {{interest_other}}
                   <td class="name">
                       <course-name-desc :name="interest_other.course_Name" :category="interest_other.coursecat_Name" :description="interest_other.course_Desc"></course-name-desc>
                   </td>
