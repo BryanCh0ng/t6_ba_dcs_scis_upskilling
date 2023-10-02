@@ -102,7 +102,7 @@ export default {
         if (userRole === 'Student') {
           this.router.push('/studentViewCourse')
         } else if (userRole === 'Instructor' || userRole === 'Trainer') {
-          this.router.push('/instructorTrainerViewProfile') // will need to change the route
+          this.router.push('/instructorTrainerViewVotingCampaign') // will need to change the route
         } else if (userRole === 'Admin') {
           this.router.push('/adminViewCourse')
         }
