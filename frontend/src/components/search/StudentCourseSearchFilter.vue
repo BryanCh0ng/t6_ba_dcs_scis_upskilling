@@ -4,7 +4,7 @@
             <form>
                 <div class="row">
                     <div class="col-sm">
-                        <input-field v-model="courseName" type="text" placeholder="Course Name"/>
+                        <input v-model="courseName" type="text" placeholder="Course Name" class="form-control border-0 shadow-sm px-4 field mb-3"/>
                     </div>
                     <div class="col-sm">
                         <dropdown-field
@@ -28,7 +28,6 @@
 <script>
 // import { axiosClient } from "../api/axiosClient";
 import DropdownField from "../DropdownField.vue";
-import InputField from "../InputField.vue";
 import CourseCategoryService from "@/api/services/CourseCategoryService.js"
 import UserService from "@/api/services/UserService.js"
 
@@ -43,7 +42,6 @@ export default({
     },
     components: {
         DropdownField,
-        InputField,
     },
     async mounted() {
         await this.fetchCategoryDropdownOptions(); // Fetch category options using the new service
@@ -62,6 +60,8 @@ export default({
         },
         
         resetFilter() {
+            
+            console.log(this.courseName)
             this.courseName = "";
             this.category = "";
 

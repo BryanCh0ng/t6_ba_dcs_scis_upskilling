@@ -4,7 +4,8 @@
             <form>
                 <div class="row">
                     <div class="col-md">
-                        <input-field v-model="courseName" type="text" placeholder="Course Name"/>
+                        <input v-model="courseName" type="text" placeholder="Course Name" class="form-control border-0 shadow-sm px-4 field mb-3"/>
+
                     </div>
                     <div class="col-md">
                         <dropdown-field
@@ -26,7 +27,6 @@
 </template>
 
 <script>
-import InputField from "../InputField.vue";
 import DropdownField from "../DropdownField.vue";
 // import CourseService from "@/api/services/CourseService.js"
 import CourseCategoryService from "@/api/services/CourseCategoryService.js"
@@ -42,7 +42,6 @@ export default({
         };
     },
     components: {
-        InputField,
         DropdownField,
     },
     async mounted() {

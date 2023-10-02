@@ -4,7 +4,7 @@
             <form class="searchform">
                 <div class="row d-flex justify-content-center">
                     <div class="col-md">
-                        <input-field v-model="name" type="text" placeholder="Name"/>
+                        <input v-model="name" type="text" placeholder="Name" class="form-control border-0 shadow-sm px-4 field mb-3"/>
                     </div>
                     <div class="col-md">
                         <dropdown-field
@@ -26,8 +26,6 @@
 </template>
 
 <script>
-// import { axiosClient } from "../api/axiosClient";
-import InputField from "../InputField.vue";
 import DropdownField from "../DropdownField.vue";
 
 export default({
@@ -45,7 +43,6 @@ export default({
         defaultStatus: String,
     },
     components: {
-        InputField,
         DropdownField
     },
     methods: {

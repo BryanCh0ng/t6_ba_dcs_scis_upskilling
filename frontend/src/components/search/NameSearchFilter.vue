@@ -4,7 +4,7 @@
             <form class="searchform">
                 <div class="row d-flex justify-content-center">
                     <div class="col-md-5">
-                        <input-field v-model="name" type="text" placeholder="Name"/>
+                        <input v-model="name" type="text" placeholder="Name" class="form-control border-0 shadow-sm px-4 field mb-3"/>
                     </div>
                     
                     <div class="col-md-4">
@@ -20,7 +20,6 @@
 </template>
 
 <script>
-import InputField from "../InputField.vue";
 
 export default({
     name: "SearchFilter",
@@ -31,9 +30,6 @@ export default({
     },
     props: {
         searchApi: Function,
-    },
-    components: {
-        InputField,
     },
     methods: {
         resetFilter() {
