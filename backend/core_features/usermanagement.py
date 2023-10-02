@@ -370,8 +370,6 @@ class RemoveAdmin(Resource):
 
         except Exception as e:
             return "Failed. " + str(e), 500
-        return jsonify({'code': 200, 'message': 'Users successfully removed from blacklist'})
-
 
 def generate_random_password(length):
     lowercase = string.ascii_lowercase
@@ -443,7 +441,7 @@ class AddAdmin(Resource):
     
     def send_email_to_admin(self, fullName, email):
         msg = Message("Welcome to Upskilling Engagement System",
-                    sender="upskilling.engagement@outlook.com", recipients=[email])
+                    sender="nic.wong@live.com", recipients=[email])
         #Need to change this when we deployed to AWS 
         reset_password_link = f'http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email={email}'
         """

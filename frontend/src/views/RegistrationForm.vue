@@ -156,18 +156,12 @@ export default {
         return;
       }
 
-      // Check password length
-      if (this.password.length < 8) {
-        this.errorMessage = "Password must be at least 8 characters long.";
-        return;
-      }
-
       // Check password complexity (letters, numbers, special characters)
       const passwordRegex =
-        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
       if (!passwordRegex.test(this.password)) {
         this.errorMessage =
-          "Password must contain at least one letter, one number, and one special character.";
+          "Password must contain at least one uppercase, one lowercase, one number, one special character and at least 8 characters long.";
         return;
       }
 
@@ -189,6 +183,7 @@ export default {
             organizationName: this.organizationName,
             alumni: this.alumni,
         }
+        console.log(userData)
         const response = await UserService.register(userData)
         // const response = await axiosClient.post("/user/register", {
         //   role: this.role,
@@ -199,9 +194,8 @@ export default {
         //   organizationName: this.organizationName,
         //   alumni: this.alumni,
         // });
-
+        console.log(response)
         this.showSuccessModal = true;
-        console.log(response.data);
       } catch (error) {
         this.errorMessage = "Register failed. Please check your credentials.";
         console.log("Register error:", error.request.response);

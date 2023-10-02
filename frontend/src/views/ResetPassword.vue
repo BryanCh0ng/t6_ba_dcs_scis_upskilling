@@ -33,7 +33,7 @@
 
 <script>
 import ImageHalf from "../components/ImageHalf.vue";
-import FormContainer from "../components/CommonFormContainer.vue";
+import FormContainer from "../components/RegistrationPasswordContainer.vue";
 import PasswordField from "../components/PasswordField.vue";
 import ErrorMessage from "../components/ErrorMessage.vue";
 import SuccessModal from "../components/SuccessModal.vue";
@@ -93,15 +93,9 @@ export default {
         return;
       }
 
-      // Check password length
-      if (this.password.length < 8) {
-        this.errorMessage = "Password must be at least 8 characters long.";
-        return;
-      }
-
       // Check password complexity (letters, numbers, special characters)
-      const passwordRegex =
-        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+       const passwordRegex =
+        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
       if (!passwordRegex.test(this.password)) {
         this.errorMessage =
           "Password must contain at least one letter, one number, and one special character.";
