@@ -42,7 +42,7 @@
 
                 <div v-if="view === 'createCourse'  || view  === 'proposeCourse'" class="row">
                     <div class="col-md-6 form-group">
-                        <button type="reset" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                        <button type="reset" class="btn btn-secondary shadow-sm w-100 mt-5 field cancelbtn">
                             Reset
                         </button>
                     </div>
@@ -56,7 +56,7 @@
 
                 <div v-else class="row">
                     <div class="col-md-6 form-group">
-                        <button type="button" @click="goToAdminViewCourse" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                        <button type="button" @click="goToAdminViewCourse" class="btn btn-secondary shadow-sm w-100 mt-5 field cancelbtn">
                             Cancel
                         </button>
                     </div>
@@ -238,6 +238,7 @@ export default {
         async fetchUserID() {
             try {
                 this.userID = await UserService.getUserID();
+
             } catch (error) {
                 console.error("Error fetching user id: ", error);
 
@@ -248,12 +249,9 @@ export default {
         },
         async createProposedCourse() {
             try {
-                let data = this.submitFormData;
-                this.userID = await UserService.getUserID();
-                // console.log(this.userID)
-                data['submitted_By']= this.userID
-                // console.log(data)
-                this.createProposedCourseResponse = await proposedCourseService.createProposedCourse(data);
+                
+                this.createProposedCourseResponse = await proposedCourseService.createProposedCourse(this.submitFormData);
+
             } catch (error) {
                 console.error('Error creating a new proposed course', error);
 
@@ -329,8 +327,6 @@ export default {
                     this.submitFormData["coursecat_ID"] = this.formData.courseCategories.find(i => i.coursecat_Name === this.formData.selectedCategory).coursecat_ID;
 
                     this.submitFormData["course_Status"] = "Active";
-
-                    this.submitFormData["template_ID"] = null;
                     
                     if(this.view === "createCourse") {
 
@@ -340,14 +336,12 @@ export default {
 
                     } else if (this.view === "proposeCourse") {
                         this.submitFormData["course_Status"] = "Inactive";
-                        this.submitFormData["template_ID"] = null;
 
                         await this.createCourse();
                         
                         this.submitFormData = {};
 
-                        //Need to delete this ltr
-                        this.userID = await this.fetchUserID();
+                        await this.fetchUserID();
 
                         //Suppose to use the fetchUserID() to get the user id 
                         this.submitFormData["submitted_By"] = this.userID;

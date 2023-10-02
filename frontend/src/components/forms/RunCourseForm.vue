@@ -89,7 +89,7 @@
                 <div class="row mb-4">
                     <!--Course Size-->
                     <div class="col-md-6 form-group">
-                        <input v-model="formData.courseSize" type="text" placeholder="Course Size" required autofocus
+                        <input v-model="formData.courseSize" @input="restrictToNumbers('courseSize')" type="text" placeholder="Course Size" required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.courseSize?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseSize?.$error }" />
                         <div v-if="v$?.formData.courseSize?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.courseSize?.$errors" :key="error.$uid">{{ error.$message
@@ -98,7 +98,7 @@
                     </div>
                     <!--Minimum Slots-->
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <input v-model="formData.minimumSlots" type="text" placeholder="Minimum Slots" required autofocus
+                        <input v-model="formData.minimumSlots" @input="restrictToNumbers('minimumSlots')" type="text" placeholder="Minimum Slots" required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.minimumSlots?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.minimumSlots?.$error }" />
                         <div v-if="v$?.formData.minimumSlots?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.minimumSlots?.$errors" :key="error.$uid">{{ error.$message
@@ -163,7 +163,7 @@
                 <div class="row mb-4">
                     <!--Course Fee-->
                     <div class="col-md-6 form-group">
-                        <input v-model="formData.courseFee" type="text" placeholder="Course Fee" required autofocus
+                        <input v-model="formData.courseFee" @input="validateMoneyInput" type="text" placeholder="Course Fee" required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.courseFee?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseFee?.$error }" />
                         <div v-if="v$?.formData.courseFee?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.courseFee?.$errors" :key="error.$uid">{{ error.$message
@@ -188,7 +188,7 @@
 
                 <div v-if="create" class="row">
                     <div class="col-md-6 form-group">
-                        <button type="reset" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                        <button type="reset" class="btn btn-secondary shadow-sm w-100 mt-5 field cancelbtn">
                             Reset
                         </button>
                     </div>
@@ -203,7 +203,7 @@
                 <div v-else class="row">
                     <div class="col-md-6 form-group">
                         <button type="button" @click="goToAdminViewRunCourse"
-                            class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                            class="btn btn-secondary shadow-sm w-100 mt-5 field cancelbtn">
                             Cancel
                         </button>
                     </div>
@@ -871,6 +871,19 @@ export default {
             } else {
                 // Form has validation errors
                 console.log('Form has validation errors');
+            }
+        },
+        restrictToNumbers(fieldName) {
+            console.log(fieldName)
+            // Allow only numeric input
+            this.formData[fieldName] = this.formData[fieldName].replace(/[^0-9]/g, '');
+        },
+        validateMoneyInput() {
+            // Regular expression to allow numeric values with optional decimal points
+            const regex = /^\d+(\.\d{1,2})?$/;
+            if (!regex.test(this.formData.courseFee)) {
+                // If input does not match the pattern, set the value to a valid money format
+                this.formData.courseFee = this.formData.courseFee.replace(/[^\d.]/g, '');
             }
         }
     }

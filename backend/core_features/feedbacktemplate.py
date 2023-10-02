@@ -32,7 +32,9 @@ class GetTemplate(Resource):
     @api.expect(get_template_by_id)
     def get(self):
         templateID = get_template_by_id.parse_args().get("template_id")
+     
         template = FeedbackTemplate.query.filter_by(template_ID=templateID).first()
+     
         db.session.close()
         if template:
             return json.loads(json.dumps(template.json())), 200

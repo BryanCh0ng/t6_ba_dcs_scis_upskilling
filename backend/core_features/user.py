@@ -38,6 +38,10 @@ class Login(Resource):
         email = data['email']
         password = data['password']
 
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+        print(hashed_password)
+
         # compare input and database, then display results
         try:
             user = User.query.filter_by(user_Email=email).first()
