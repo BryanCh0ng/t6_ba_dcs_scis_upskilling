@@ -277,31 +277,34 @@ class BlacklistStudent(Resource):
         try:
             args = retrieve_blacklist_student_id.parse_args()
             user_ids = args["user_ids"]
+            if len(user_ids) >0:
 
-            # Check if all the users with the given IDs exist
-            users = User.query.filter(User.user_ID.in_(user_ids)).all()
-            existing_user_ids = [user.user_ID for user in users]
-            missing_user_ids = set(user_ids) - set(existing_user_ids)
+                # Check if all the users with the given IDs exist
+                users = User.query.filter(User.user_ID.in_(user_ids)).all()
+                existing_user_ids = [user.user_ID for user in users]
+                missing_user_ids = set(user_ids) - set(existing_user_ids)
 
-            if missing_user_ids:
-                return jsonify({'code': 404, 'message': f'Users are not found'})
+                if missing_user_ids:
+                    return jsonify({'code': 404, 'message': f'Users are not found'})
 
-            # Check if any of the users are already blacklisted
-            blacklisted_users = Blacklist.query.filter(Blacklist.user_ID.in_(user_ids)).all()
-            blacklisted_user_ids = [entry.user_ID for entry in blacklisted_users]
+                # Check if any of the users are already blacklisted
+                blacklisted_users = Blacklist.query.filter(Blacklist.user_ID.in_(user_ids)).all()
+                blacklisted_user_ids = [entry.user_ID for entry in blacklisted_users]
 
-            if blacklisted_user_ids:
-                return jsonify({'code': 400, 'message': f'There are users who are already blacklisted'})
+                if blacklisted_user_ids:
+                    return jsonify({'code': 400, 'message': f'There are users who are already blacklisted'})
 
-            # Create new blacklist entries for each user
-            for user_id in user_ids:
-                blacklist_entry = Blacklist(user_ID=user_id)
-                db.session.add(blacklist_entry)
+                # Create new blacklist entries for each user
+                for user_id in user_ids:
+                    blacklist_entry = Blacklist(user_ID=user_id)
+                    db.session.add(blacklist_entry)
 
-            db.session.commit()
-            db.session.close()
+                db.session.commit()
+                db.session.close()
 
-            return jsonify({'code': 200, 'message': 'Users successfully blacklisted'})
+                return jsonify({'code': 200, 'message': 'Users successfully blacklisted'})
+            else:
+                return jsonify({'code': 400, 'message': f'You did not select any user to be blacklisted'})
         except Exception as e:
             return "Failed. " + str(e), 500
 
@@ -320,21 +323,25 @@ class RemoveFromBlacklist(Resource):
             args = retrieve_blacklist_student_id.parse_args()
             user_ids = args["user_ids"]
 
-            # Check if any of the users are blacklisted
-            blacklisted_users = Blacklist.query.filter(Blacklist.user_ID.in_(user_ids)).all()
-            blacklisted_user_ids = [entry.user_ID for entry in blacklisted_users]
+            if len(user_ids) >0:
 
-            if not blacklisted_user_ids:
-                return jsonify({'code': 400, 'message': f'Users are not blacklisted'})
+                # Check if any of the users are blacklisted
+                blacklisted_users = Blacklist.query.filter(Blacklist.user_ID.in_(user_ids)).all()
+                blacklisted_user_ids = [entry.user_ID for entry in blacklisted_users]
 
-            # Remove blacklisted entries for each user
-            for user_id in user_ids:
-                Blacklist.query.filter_by(user_ID=user_id).delete()
+                if not blacklisted_user_ids:
+                    return jsonify({'code': 400, 'message': f'Users are not blacklisted'})
 
-            db.session.commit()
-            db.session.close()
+                # Remove blacklisted entries for each user
+                for user_id in user_ids:
+                    Blacklist.query.filter_by(user_ID=user_id).delete()
 
-            return jsonify({'code': 200, 'message': 'Users successfully removed from blacklist'})
+                db.session.commit()
+                db.session.close()
+
+                return jsonify({'code': 200, 'message': 'Users successfully removed from blacklist'})
+            else:
+                return jsonify({'code': 400, 'message': f'You did not select any students to be removed from blacklist'})
         except Exception as e:
             return "Failed. " + str(e), 500
     

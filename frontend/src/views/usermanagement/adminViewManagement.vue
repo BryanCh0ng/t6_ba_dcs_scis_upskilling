@@ -363,29 +363,32 @@ export default {
     async handleModalClosed(){
       this.loadData()
       this.selectedUserIDs = []
+      this.showModal = false
+      this.modalMessage=""
     },
     async blacklist() {
+      
       this.modalTitle = "Blacklist Student"
-
       if (this.selectedUserIDs.length === 0) {
         this.modalMessage = "You did not select any student to blacklist."
         this.showModal = true;
+      } else {
+        let response = await ManagementService.blacklistStudent(this.selectedUserIDs)
+        this.modalMessage = response.message
+        this.showModal = true;
       }
-
-      let response = await ManagementService.blacklistStudent(this.selectedUserIDs)
-      this.modalMessage = response.message
-      this.showModal = true;
     },
     async removeFromBlacklist() {
+      
       this.modalTitle = "Remove Student from Blacklist"
       if (this.selectedUserIDs.length === 0) {
         this.modalMessage = "You did not select any student to remove from blacklist."
         this.showModal = true;
+      } else {
+        let response = await ManagementService.removeFromBlacklist(this.selectedUserIDs)
+        this.modalMessage = response.message
+        this.showModal = true;
       }
-
-      let response = await ManagementService.removeFromBlacklist(this.selectedUserIDs)
-      this.modalMessage = response.message
-      this.showModal = true;
     },
     async removeAdmin(user_ID) {
       this.modalTitle = "Remove Admin"
