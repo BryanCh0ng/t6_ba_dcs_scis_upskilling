@@ -136,29 +136,69 @@ class EditRunCourse(Resource):
         try: 
             user_role = common.getUserRole()
             if (user_role) != 'Admin':
-                return {"message": "Unathorized Access, Failed to edit run course"}, 404
+                return {
+                    "message": "Unathorized Access, Failed to edit run course"
+                }, 404
     
             #Get the updated data from the request body 
             updated_data = request.json
         
             runcourse = RunCourse.query.filter_by(rcourse_ID=runcourse_id).first()
 
-            if runcourse:
-                # Update the fields based on updated_data
-                for field, value in updated_data.items():
-                    #print(f"Updating {field} to {value}")
-                    setattr(runcourse, field, value)
+            if not runcourse:
+                return {
+                    'message': "There is no such runcourse"
+                }, 404
 
-                #Commit the changes to the database 
-                db.session.commit()
+             # Get instructor availability data from the updated data
+            start_date = datetime.strptime(updated_data.get('run_Startdate'), '%Y-%m-%d').date()
+            end_date = datetime.strptime(updated_data.get('run_Enddate'), '%Y-%m-%d').date()
+            start_time = datetime.strptime(updated_data.get('run_Starttime'), '%H:%M:%S').time()
+            end_time = datetime.strptime(updated_data.get('run_Endtime'), '%H:%M:%S').time()
+            instructor_id = updated_data.get('instructor_ID')
 
-                return json.loads(json.dumps(runcourse.json(), default=str)), 200
+            # Query existing run courses for the given instructor
+            runs = RunCourse.query.filter_by(instructor_ID=instructor_id).all()
 
-            return json.loads(json.dumps({"message": "There is no such runcourse"})), 404
+            # Check instructor availability
+            if runs:
+                for run in runs:
+                    if run.run_Startdate <= end_date and run.run_Enddate >= start_date:
+                        if run.run_Endtime >= start_time and run.run_Starttime <= end_time:
+                            return {
+                                'message': 'Instructor is already occupied at the chosen date and time'
+                            }, 400
+
+    
+            # Update the fields based on updated_data
+            for field, value in updated_data.items():
+                #print(f"Updating {field} to {value}")
+                setattr(runcourse, field, value)
+
+            #Commit the changes to the database 
+            db.session.commit()
+
+           # Convert dates and times to formatted strings
+            runcourse.run_Startdate = start_date.strftime('%Y-%m-%d')
+            runcourse.run_Enddate = end_date.strftime('%Y-%m-%d')
+            runcourse.run_Starttime = start_time.strftime('%H:%M:%S')
+            runcourse.run_Endtime = end_time.strftime('%H:%M:%S')
+
+            runcourse.reg_Startdate = runcourse.reg_Startdate.strftime('%Y-%m-%d')
+            runcourse.reg_Enddate = runcourse.reg_Enddate.strftime('%Y-%m-%d')
+            runcourse.reg_Starttime = runcourse.reg_Starttime.strftime('%H:%M:%S')
+            runcourse.reg_Endtime = runcourse.reg_Endtime.strftime('%H:%M:%S')
+
+            return {
+                'message': 'Run course updated successfully',
+                'data': runcourse.json()
+            }, 200
 
         except Exception as e:
             db.session.rollback()
-            return "Failed" + str(e), 500
+            return {
+                "message": "Failed to update run course: " + str(e)
+            }, 500
 
 @api.route("/create_runcourse/<int:course_id>", methods=["POST"])
 @api.doc(description="Create run course")
@@ -167,11 +207,29 @@ class CreateRunCourse(Resource):
         try: 
             user_role = common.getUserRole()
             if (user_role) != 'Admin':
-                return {"message": "Unathorized Access, Failed to create run course"}, 404
-            
+                return {
+                    "message": "Unathorized Access, Failed to create run course"
+                }, 404
+
             # Get the data for creating a new run course from the request body
             new_run_course_data = request.json
 
+            start_date = datetime.strptime(new_run_course_data.get('run_Startdate'), '%Y-%m-%d').date()
+            end_date = datetime.strptime(new_run_course_data.get('run_Enddate'), '%Y-%m-%d').date()
+            start_time = datetime.strptime(new_run_course_data.get('run_Starttime'), '%H:%M:%S').time()
+            end_time = datetime.strptime(new_run_course_data.get('run_Endtime'), '%H:%M:%S').time()
+            instructor_id = new_run_course_data.get('instructor_ID')
+
+            runs = RunCourse.query.filter_by(instructor_ID=instructor_id).all()
+
+            if runs:
+                for run in runs:
+                    if run.run_Startdate <= end_date and run.run_Enddate >= start_date:
+                        if run.run_Endtime >= start_time and run.run_Starttime <= end_time:
+                            return {
+                                'message': 'Instructor is already occupied at the chosen date and time'
+                            }, 400
+                
             #print(new_run_course_data)
 
             # Create a new run course object with the data
@@ -187,8 +245,15 @@ class CreateRunCourse(Resource):
             #print("Data before returning:", new_proposed_course.json())
 
             # Return the newly created course as JSON response
-            return json.loads(json.dumps(new_run_course.json(), default=str)), 201
+            #return json.loads(json.dumps(new_run_course.json(), default=str)), 201
+            return {
+                'message': 'Run course created successfully',
+                'data': new_run_course.json()  # Assuming new_run_course.json() returns the required data as a dictionary
+            }, 201
 
         except Exception as e:
             db.session.rollback()
-            return "Failed to create a new course: " + str(e), 500
+            print(str(e))
+            return {
+                "message": "Failed to create a new run course: " + str(e)
+            }, 500
