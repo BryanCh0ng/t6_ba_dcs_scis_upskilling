@@ -197,12 +197,12 @@ class GetTemplate(Resource):
                    db.session.add(NewFeedback)
                    db.session.commit()
                    
-                return json.loads(json.dumps(NewFeedback.json())), 200
+                return {"code": 200, "message": "Feedback Successfully Submitted"}, 200
            
             except Exception as e:
-                return json.loads(json.dumps({"message": "Failed" + str(e)})), 500
+                return {"code": 500, "message": "Failed" + str(e)}, 500
         else:
-            return {"message": "Feedback already exists"}, 409
+            return {"code": 409, "message": "Feedback already exists"}, 409
 
 get_courses_by_template_id = api.parser()
 get_courses_by_template_id.add_argument("template_id", help="Enter template id")

@@ -7,11 +7,11 @@
         </div>
 
         <div class="form-group row mb-4" v-for="(element, key) in templateData" :key="key">
-          <text-field v-if="element.selectedInputType=='Text Field'"  class="mb-4" :label="element.question" :qnNum="key+1" @input="updateAnswer"></text-field>
-          <number-field v-else-if="element.selectedInputType=='Number Field'"  class="mb-4" :label="element.question" :qnNum="key+1" @input="updateAnswer"></number-field>
-          <radio-button-field v-else-if="element.selectedInputType=='Radio Button'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="key+1" @input="updateAnswer"></radio-button-field>
-          <single-select-field v-else-if="element.selectedInputType=='Single Select'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="key+1"  @input="updateAnswer"></single-select-field>
-          <likert-scale-field v-else-if="element.selectedInputType=='Likert Scale'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="key+1" @input="updateAnswer"></likert-scale-field> 
+          <text-field :disabled="disabled" v-if="element.selectedInputType=='Text Field'"  class="mb-4" :label="element.question" :qnNum="key+1" @input="updateAnswer"></text-field>
+          <number-field :disabled="disabled" v-else-if="element.selectedInputType=='Number Field'"  class="mb-4" :label="element.question" :qnNum="key+1" @input="updateAnswer"></number-field>
+          <radio-button-field :disabled="disabled" v-else-if="element.selectedInputType=='Radio Button'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="key+1" @input="updateAnswer"></radio-button-field>
+          <single-select-field :disabled="disabled" v-else-if="element.selectedInputType=='Single Select'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="key+1"  @input="updateAnswer"></single-select-field>
+          <likert-scale-field :disabled="disabled" v-else-if="element.selectedInputType=='Likert Scale'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="key+1" @input="updateAnswer"></likert-scale-field> 
         </div>
   
         <div class="row">
@@ -28,6 +28,9 @@
         </div>
         <p>{{ errorMsge }}</p>
       </div>
+
+      <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
+
     </div>
   </template>
     
@@ -39,7 +42,7 @@ import NumberField from "@/components/feedbackTemplate/NumberField.vue";
 import RadioButtonField from "@/components/feedbackTemplate/RadioButtonField.vue";
 import SingleSelectField from "@/components/feedbackTemplate/SingleSelectField.vue";
 import LikertScaleField from "@/components/feedbackTemplate/LikertScaleFIeld.vue";
-
+import DefaultModal from "@/components/DefaultModal.vue";
   
 export default {
   components: {
@@ -47,7 +50,8 @@ export default {
     NumberField,
     RadioButtonField,
     SingleSelectField,
-    LikertScaleField
+    LikertScaleField,
+    DefaultModal
   },
   data(){
     return {
@@ -55,32 +59,46 @@ export default {
       templateData: [],
       haveError: false,
       errorMsge: '',
+      title: "",
+      message: "",
+      buttonType: "",
+      showAlert: false,
+      submitError: false,
+      disabled: false
     }
   },
   methods: {
     async loadData() {
-      this.answers = new Array(this.templateData.length).fill('');
-      const course_id = this.$route.params.id;
-      const course_response = await RunCourseService.getRunCourseById(course_id)
-      console.log(course_response)
-      if(course_response.code == 200) {
-        this.haveError = false
-        this.course = course_response.course
-        console.log(this.course)
-        const response = await FeedbackTemplateService.getTemplateById(this.course.template_ID)
-        console.log(response)
-        if (response.code == 200) {
+      try {
+        const course_id = this.$route.params.id;
+        const course_response = await RunCourseService.getRunCourseById(course_id)
+        console.log(course_response)
+        if(course_response.code == 200) {
           this.haveError = false
-          this.templateData = response.data.template.data
-          console.log(this.templateData)
+          this.course = course_response.course
+          const response = await FeedbackTemplateService.getTemplateById(this.course.template_ID)
+          console.log(response)
+          if (response.code == 200) {
+            this.haveError = false
+            this.templateData = response.data.template.data
+            for (let i = 0; i < this.templateData.length; i++) {
+              this.templateData[i]['answer'] = '';
+            }
+          } else {
+            this.disabled = true;
+            this.haveError = true
+            this.errorMsge = course_response.message
+            alert(this.errorMsge)
+          }
         } else {
+          this.disabled = true;
           this.haveError = true
           this.errorMsge = course_response.message
-          alert(this.errorMsge)
         }
-      } else {
+      } catch (error) { 
+        this.disabled = true;
         this.haveError = true
-        this.errorMsge = course_response.message
+        this.errorMsge = error.response.data.message.toString();
       }
     },
     async submit()  {
@@ -93,13 +111,47 @@ export default {
         'user_id': user_id,
         'data': this.templateData
       }
-      try{
-      const response = await FeedbackTemplateService.postStudentFeedback(data)
-      console.log(response)
-      console.log(data)
-      }catch (error) {
-      console.error('Error submitting student feedback:', error);
-    }
+      const isAnyAnswerBlank = this.templateData.some((element) => {
+
+        return !element.answer.trim();
+      });
+      if (!isAnyAnswerBlank) {
+        try{
+          const response = await FeedbackTemplateService.postStudentFeedback(data)
+          console.log(response)
+          if (response.code == 200) {
+            this.submitError = false
+            this.showAlert = true;
+            this.title = "Submit Feedback Success";
+            this.message = response.message;
+            this.buttonType = "success";
+          } else {
+            this.submitError = true
+            this.showAlert = true;
+            this.title = "Submit Feedback Fail";
+            this.message = response.message;
+            this.buttonType = "danger"
+          }
+          } catch (error) {
+            this.submitError = true
+            this.showAlert = true;
+            this.title = "Submit Feedback Fail";
+            this.message = error.response.data.message.toString();
+            this.buttonType = "danger"
+        }
+      } else {
+        this.submitError = true
+        this.showAlert = true;
+        this.title = "Submit Feedback Fail";
+        this.message = "Please answer every question before submitting your feedback."
+        this.buttonType = "danger"
+      }
+    },
+    handleModalClosed(value) {
+        this.showAlert = value;
+        if(!this.showAlert && !this.submitError) {
+            this.$router.push('/studentViewProfile');
+        }
     },
     updateAnswer(answer) {
       var index = parseInt(answer.key)
@@ -108,7 +160,7 @@ export default {
       }
     },
   },
-  created() {
+  async created() {
     this.loadData();
   },
 }
