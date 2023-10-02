@@ -62,7 +62,7 @@
             <div v-else-if="assigned_courses=[] && onInitialEmptyAssigned">
               <div class="pt-5 text-center">
                 <p>You are not assigned to any courses.</p>
-                <router-link :to="{ name: 'instructorTrainerViewProfile' }" class="btn btn-edit">Propose a Course</router-link>
+                <router-link :to="{ name: 'proposeCourse' }" class="btn btn-edit">Propose a Course</router-link>
               </div>
             </div>
             <div v-else-if="assigned_courses=[]">

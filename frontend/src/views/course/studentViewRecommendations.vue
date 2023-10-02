@@ -17,13 +17,13 @@
                 <thead>
                   <tr class="text-nowrap">
                     <th scope="col">
-                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'register_top')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'register_top')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                     <th scope="col">
-                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'register_top')">Course Start Date <sort-icon :sortColumn="sortColumn === 'start_date'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
+                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'register_top')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
                     <th scope="col">
-                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'register_top')">Course End Date <sort-icon :sortColumn="sortColumn === 'end_date'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
+                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'register_top')">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
                     <th scope="col">
-                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'register_top')">Closing Date <sort-icon :sortColumn="sortColumn === 'closing_date'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
+                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'register_top')">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
                     <th scope="col">Course Details</th>
                     <th scope="col">Action(s)</th>
                   </tr>
@@ -63,13 +63,13 @@
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'register_you')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'register_you')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'register_you')">Course Start Date <sort-icon :sortColumn="sortColumn === 'start_date'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'register_you')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'register_you')">Course End Date <sort-icon :sortColumn="sortColumn === 'end_date'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'register_you')">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'register_you')">Closing Date <sort-icon :sortColumn="sortColumn === 'closing_date'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'register_you')">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
                   <th scope="col">Course Details</th>
                   <th scope="col">Action(s)</th>
                 </tr>
@@ -108,13 +108,13 @@
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'register_others')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'register_others')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'register_others')">Course Start Date <sort-icon :sortColumn="sortColumn === 'start_date'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'register_others')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
                   <th scope="col">
-                      <a href="" class="register_otherstext-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'run')">Course End Date <sort-icon :sortColumn="sortColumn === 'end_date'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
+                      <a href="" class="register_otherstext-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'run')">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'register_others')">Closing Date <sort-icon :sortColumn="sortColumn === 'closing_date'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'register_others')">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
                   <th scope="col">Course Details</th>
                   <th scope="col">Action(s)</th>
                 </tr>
@@ -157,7 +157,7 @@
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'interest_tops')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'name'" :sortDirection="sortDirection"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'interest_top')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="sortDirection"/></a></th>
                   <th scope="col">Course Details</th>
                   <th scope="col">Action(s)</th>
                 </tr>
@@ -187,7 +187,7 @@
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'interest_you')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'name'" :sortDirection="sortDirection"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'interest_you')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="sortDirection"/></a></th>
                   <th scope="col">Course Details</th>
                   <th scope="col">Action(s)</th>
                 </tr>
@@ -218,7 +218,7 @@
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'interest_others')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'name'" :sortDirection="sortDirection"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'interest_others')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="sortDirection"/></a></th>
                   <th scope="col">Course Details</th>
                   <th scope="col">Action(s)</th>
                 </tr>
@@ -268,6 +268,7 @@ import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import Recommender from "@/api/services/recommenderService.js";
 import UserService from "@/api/services/UserService.js";
 import CourseService from "@/api/services/CourseService.js";
+import CommonService from "@/api/services/CommonService.js";
 
 export default {
   components: {
@@ -351,38 +352,38 @@ export default {
     },
     async sortCourse(action) {
       if (action == 'register_you') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.reg_courses_for_you)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.reg_courses_for_you)
          if (sort_response.code == 200) {
           this.reg_courses_for_you = sort_response.data
          }
       }
       if (action == 'register_top') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.top_register_picks)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.top_register_picks)
          if (sort_response.code == 200) {
           this.top_register_picks = sort_response.data
          }
       }
       if (action == 'register_others') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.reg_courses_others)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.reg_courses_others)
          if (sort_response.code == 200) {
           this.reg_courses_others = sort_response.data
          }
       }
 
       if (action == 'interest_you') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.interest_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.interest_courses)
          if (sort_response.code == 200) {
           this.interest_courses = sort_response.data
          }
       }
       if (action == 'interest_top') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.top_interest_picks)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.top_interest_picks)
          if (sort_response.code == 200) {
           this.top_interest_picks = sort_response.data
          }
       }
       if (action == 'interest_others') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.interest_others)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.interest_others)
          if (sort_response.code == 200) {
           this.interest_others = sort_response.data
          }
