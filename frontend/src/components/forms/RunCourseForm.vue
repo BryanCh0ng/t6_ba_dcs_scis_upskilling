@@ -526,7 +526,7 @@ export default {
             this.showAlert = value;
 
             if (!this.showAlert) {
-                this.$router.push('/adminViewRunCourse');
+                //this.$router.push('/adminViewRunCourse');
             }
         },
         async fetchCoaches() {
@@ -559,7 +559,7 @@ export default {
         async fetchRunCourseByID() {
             try {
                 const runcourseData = await RunCourseService.getRunCourseById(this.runcourseId);
-                console.log(runcourseData)
+                //console.log(runcourseData)
 
                 this.instructorID = runcourseData.instructor_ID;
 
@@ -616,7 +616,6 @@ export default {
                 } else {
                     this.formData.selectedInstructor = ""; 
                 }
-            
 
             } catch (error) {
                 console.error('Error fetching coach by ID:', error);
@@ -670,7 +669,7 @@ export default {
 
                 this.title = "Run Course Creation Failed";
 
-                throw new Error("Run Course Creation was unsuccessful");
+                throw new Error(error.response.data.message);
 
             }
         },
@@ -683,7 +682,8 @@ export default {
 
                 this.title = "Run Course Update Failed";
 
-                throw new Error("Run Course Update was unsuccessful");
+                //throw new Error("Run Course Update was unsuccessful");
+                throw new Error(error.response.data.message)
 
             }
         },
@@ -861,9 +861,14 @@ export default {
 
                 } catch (error) {
                     //console.error(error)
-                    this.title = "Run Course Update Failed"
-                    const errorMsgParts = error.toString().split(":")
-                    this.message = errorMsgParts[1];
+                    if (!this.create) {
+                        this.title = "Run Course Update Failed"
+                    } else {
+                        this.title = "Run Course Creation Failed"
+                    }
+                    //const errorMsgParts = error.toString().split(":")
+                    //this.message = errorMsgParts[1];
+                    this.message = error
                     this.buttonType = "danger"
                     this.showAlert = !this.showAlert;
                 }
