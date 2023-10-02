@@ -102,7 +102,7 @@
                   {{ user.user_Email }}
                 </td>
                 <td class="is_blacklisted">
-                  <span v-if="user.is_blacklisted === true">Blacklisted</span>
+                  <span v-if="user.is_blacklisted === true" class="text-danger">Blacklisted</span>
                   <span v-else>Not Blacklisted</span>
                 </td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewCourses(user.user_ID)">View Course Taken</a></td>
