@@ -130,14 +130,14 @@ export default {
       } else if (this.user_role === "Instructor" || this.user_role === "Trainer") {
         items.push(
           { path: "/instructorTrainerViewProfile", label: "Profile" },
-          { path: "/blacklist", label: "Blacklist" },
-          { path: "/dashboard", label: "Dashboard" }
+          { label: "Blacklist" }, // rmb to add path
+          {  label: "Dashboard" } // rmb to add path
         );
       } else if (this.user_role === "Admin") {
         items.push(
           { path: "/adminViewManagement", label: "User Management" },
-          { path: "/feedbackTemplate", label: "Feedback Template" },
-          { path: "/dashboard", label: "Dashboard" }
+          { label: "Feedback Template" }, // rmb to add path
+          { label: "Dashboard" } // rmb to add path
         );
       }
 

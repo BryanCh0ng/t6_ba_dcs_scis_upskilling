@@ -182,9 +182,9 @@ export default {
         },
         async fetchCourseByID() {
             try {
-                console.log(this.courseId)
+                // console.log(this.courseId)
                 const courseData = await CourseService.getCourseById(this.courseId);
-                console.log(courseData)
+                // console.log(courseData)
 
                 this.formData.courseName = courseData.data.course[0].course_Name;
                 this.coursecatID = courseData.data.course[0].coursecat_ID;
@@ -225,6 +225,7 @@ export default {
         },
         async createCourse() {
             try {
+                // console.log(this.submitFormData)
                 this.createCourseResponse = await CourseService.createCourse(this.submitFormData);
             } catch (error) {
                 console.error('Error creating a new course', error);
@@ -249,9 +250,9 @@ export default {
             try {
                 let data = this.submitFormData;
                 this.userID = await UserService.getUserID();
-                console.log(this.userID)
+                // console.log(this.userID)
                 data['submitted_By']= this.userID
-                console.log(data)
+                // console.log(data)
                 this.createProposedCourseResponse = await proposedCourseService.createProposedCourse(data);
             } catch (error) {
                 console.error('Error creating a new proposed course', error);
@@ -263,7 +264,7 @@ export default {
         },
         async updateCourse() {
             try {
-                console.log(this.courseId)
+                // console.log(this.courseId)
                 this.updateCourseResponse = await CourseService.editCourse(this.courseId, this.submitFormData);
 
             } catch (error) {
@@ -317,7 +318,7 @@ export default {
 
             if (!this.v$.$invalid) {
 
-                console.log('Form has no validation errors');
+                // console.log('Form has no validation errors');
 
                 try {
 
@@ -328,6 +329,8 @@ export default {
                     this.submitFormData["coursecat_ID"] = this.formData.courseCategories.find(i => i.coursecat_Name === this.formData.selectedCategory).coursecat_ID;
 
                     this.submitFormData["course_Status"] = "Active";
+
+                    this.submitFormData["template_ID"] = null;
                     
                     if(this.view === "createCourse") {
 

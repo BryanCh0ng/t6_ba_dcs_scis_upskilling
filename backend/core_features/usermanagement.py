@@ -362,7 +362,7 @@ class RemoveAdmin(Resource):
                         user.role_Name = "Instructor"         
                         db.session.commit()    
                         db.session.close()             
-                        return json.loads(json.dumps({"message":"Admin role removed"})), 200
+                        return json.loads(json.dumps({"message":"Admin role changed to 'Instructor'"})), 200
                     except Exception as e:
                         return "Failed to remove admin role. " + str(e), 500
 
