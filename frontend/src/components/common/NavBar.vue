@@ -28,13 +28,6 @@
               <a :class="{ active: isActiveLink(link.path) }" class="nav-link" :href="link.path">{{ link.label }}</a>
             </li>
 
-            <!-- Login Button (Visible when not logged in) -->
-            <li class="nav-item" v-if="!user_ID">
-              <button type="button" class="btn loginbtn" @click="redirectToLogin">
-                Login
-              </button>
-            </li>
-
             <!-- User Info and Role-Specific Dropdown (Visible when logged in) -->
             <li class="nav-item" v-if="user_ID">
               <!-- Dropdown for displaying user information and actions -->
@@ -111,14 +104,15 @@ export default {
             { path: "/createCourse", label: "Create Course" }
           );
         }
-      } else {
-        // Add the default links for users who are not logged in
-        links.push(
-          { path: "/adminViewCourse", label: "View Courses" },
-          { path: "/proposeCourse", label: "Propose Course" },
-          { path: "/contactUs", label: "Contact Us" }
-        );
-      }
+      } 
+      // else {
+      //   // Add the default links for users who are not logged in
+      //   links.push(
+      //     { path: "/adminViewCourse", label: "View Courses" },
+      //     { path: "/proposeCourse", label: "Propose Course" },
+      //     { path: "/contactUs", label: "Contact Us" }
+      //   );
+      // }
 
       return links;
     },
@@ -411,6 +405,5 @@ export default {
     display: none;
   }
 }
-
 
 </style>
