@@ -79,7 +79,7 @@ class VerifyEmail(Resource):
             user = User.query.filter_by(user_Email=email).first()
             if user:
                 db.session.close()
-                return json.loads(json.dumps({"Message": "Email already exists"}, default=str)), 404
+                return json.loads(json.dumps({"Message": "You already have an account with us."}, default=str)), 404
             
             else:
                 self.send_email(email)

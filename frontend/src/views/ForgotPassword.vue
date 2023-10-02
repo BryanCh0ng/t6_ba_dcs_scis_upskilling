@@ -19,7 +19,7 @@
                 Request reset link
               </button>
               <p class="text-center mt-2">
-                Back to <router-link to="/login">Sign In</router-link>
+                Back to <router-link to="/">Sign In</router-link>
               </p>
             </form>
         </form-container>
@@ -109,7 +109,7 @@ export default {
     },
     hideSuccessModal() {
       this.showSuccessModal = false;
-      this.$router.push('/login');
+      this.$router.push('/');
     },
 
   },

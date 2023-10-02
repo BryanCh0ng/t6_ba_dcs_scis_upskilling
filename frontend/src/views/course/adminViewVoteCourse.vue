@@ -213,7 +213,7 @@ export default {
     async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, vote_status) {
       this.search_course_name = course_Name
       this.search_course_category = coursecat_ID
-      this.vote_status = vote_status
+      // this.vote_status = vote_status
 
       if (vote_status == "Open for voting") {
         vote_status = "Ongoing"
