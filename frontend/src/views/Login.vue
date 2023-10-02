@@ -104,7 +104,7 @@ export default {
         } else if (userRole === 'Instructor' || userRole === 'Trainer') {
           this.router.push('/instructorTrainerViewProfile') // will need to change the route
         } else if (userRole === 'Admin') {
-          this.router.push('/adminViewRunCourse')
+          this.router.push('/adminViewCourse')
         }
 
       } catch (error) {

@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
+from core_features import common
 from allClasses import *
 import json
 
@@ -55,14 +56,17 @@ class CreateNewRegistration(Resource):
         data = request.get_json()
         rcourse_ID = data.get("rcourse_ID")
         user_ID = data.get("user_ID")
+        session_user_ID = common.getUserID()
+        if session_user_ID != user_ID:
+            return {"message": "Unathorized Access, No rights to create new registration"}, 404 
 
         # Check if a registration with the given rcourse_ID and user_ID exists
         existing_registration = Registration.query.filter_by(rcourse_ID=rcourse_ID, user_ID=user_ID).first()
 
         if existing_registration:
             # If the registration exists, update its reg_Status to "pending"
-            existing_registration.reg_Status = "Pending"
             try:
+                existing_registration.reg_Status = "Pending"
                 db.session.commit()
                 return jsonify(
                     {
@@ -72,11 +76,11 @@ class CreateNewRegistration(Resource):
                     }
                 )
             except Exception as e:
+                db.session.rollback()
                 return "Failed to update registration status: " + str(e), 500
         else:
             # If the registration does not exist, create a new one
             registration = Registration(**data)
-
             try:
                 db.session.add(registration)
                 db.session.commit()
@@ -88,6 +92,7 @@ class CreateNewRegistration(Resource):
                     }
                 )
             except Exception as e:
+                db.session.rollback()
                 return "Failed to create new registration: " + str(e), 500
 
 #update_registration()
@@ -108,6 +113,7 @@ class UpdateRegistration(Resource):
         registration = Registration.query.filter_by(reg_ID=reg_ID).first()
 
         if not registration:
+            db.session.close()
             return jsonify(
                 {
                     "code": 404,
@@ -116,10 +122,14 @@ class UpdateRegistration(Resource):
             )
         
         try:
+            if data["user_ID"] != registration.user_ID:
+                return {"message": "Unathorized Access, No rights to update registration"}, 404 
+
             for key, value in data.items():
                 setattr(registration, key, value)
 
             db.session.commit()
+            db.session.close()
 
             return jsonify(
                 {
@@ -130,6 +140,7 @@ class UpdateRegistration(Resource):
             )
         
         except Exception as e:
+            db.session.rollback()
             return "Failed" + str(e), 500
 
 #get_registration_by_userid()
@@ -142,6 +153,10 @@ class GetRegistrationByUserID(Resource):
     def get(self):
         arg = get_registration_by_userid.parse_args().get("user_ID")
         user_ID = arg if arg else ""
+        session_user_ID = common.getUserID()
+        if user_ID != session_user_ID:
+          return {"message": "Unathorized Access, No rights to view registrations"}, 404
+ 
         regList = Registration.query.filter(Registration.user_ID == user_ID).all()
         db.session.close()
 
@@ -180,12 +195,19 @@ class dropRegisteredCourse(Resource):
             registration = Registration.query.filter_by(rcourse_ID=rcourse_ID, user_ID=user_ID).first()
 
             if registration is None:
+                db.session.close()
                 return {"message": "Registration record not found for the specified course and user"}, 404
 
+            if user_ID != registration.user_ID:
+                db.session.close()
+                return {"message": "Unathorized Access, No rights to update registration"}, 404 
+    
             registration.reg_Status = 'Dropped'
             db.session.commit()
+            db.session.close()
 
             return {"message": "The course has been dropped successfully."}, 200
 
         except Exception as e:
+            db.session.rollback()
             return {"message": "Failed to drop the course: " + str(e)}, 500

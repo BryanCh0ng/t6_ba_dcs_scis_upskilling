@@ -65,6 +65,9 @@
                   <td v-if="(registered_course.reg_Status === 'Enrolled' || registered_course.reg_Status === 'Pending') && isClosingDateValid(registered_course.reg_Enddate)">
                       <course-action status="registered_drop" @action-and-message-updated="handleActionData" :course="registered_course"></course-action>
                   </td>
+                  <td v-else-if="(registered_course.reg_Status === 'Dropped') && isClosingDateValid(registered_course.reg_Enddate)">
+                      <course-action @action-and-message-updated="handleActionData" :status="registered_course.course_Status" :course="registered_course"></course-action>
+                  </td>
                 </tr>
               </tbody>
 
@@ -284,6 +287,7 @@ import CourseService from "@/api/services/CourseService.js";
 import UserService from "@/api/services/UserService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
 import modalRejectedReason from '@/components/course/modalRejectedReason.vue';
+import CommonService from '@/api/services/CommonService';
 
 export default {
   components: {
@@ -318,7 +322,7 @@ export default {
       statusOptionsInterested: ["Offered", "Ongoing", "Closed"],
       statusOptionsProposed: ["Approved", "Rejected", "Pending"],
       currentDate: new Date(),
-      user_ID: 1,
+      user_ID: null,
       onInitialEmptyRegistered: false,
       onInitialEmptyInterested: false,
       onInitialEmptyProposed: false,
@@ -330,8 +334,50 @@ export default {
       receivedRejectedCourseMessage: '',
     }
   },
+  async created() {
+    this.getUserID();
+    const user_id = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_id);
+    if (role == 'Admin') {
+      this.$router.push({ name: 'adminViewCourse' }); 
+    } else if (role == 'Trainer' || role == 'Instructor') {
+      this.$router.push({ name: 'instructorTrainerViewVotingCampaign' }); 
+    } else {
+      try {
+        this.user_ID = user_id
+
+        let registered_response= await CourseService.searchCourseRegistrationInfo(user_id, null, null, null)
+        console.log(registered_response)
+        this.registered_courses = registered_response.data
+        if (this.registered_courses == undefined || this.registered_courses.length == 0) {
+          this.onInitialEmptyRegistered = true
+        }
+
+        let interested_response= await CourseService.searchCourseVoteInfo(user_id, null, null, null)
+        this.interested_courses = interested_response.data
+        if (this.interested_courses == undefined || this.interested_courses.length == 0) {
+          this.onInitialEmptyInterested = true
+        }
+
+        let proposed_response = await CourseService.searchProposedInfo(user_id, null, null, null)
+        this.proposed_courses = proposed_response.data
+        if (this.proposed_courses == undefined || this.proposed_courses.length == 0) {
+          this.onInitialEmptyProposed = true
+        }
+
+        let completed_response = await CourseService.searchProposedInfo(user_id, null, null, null)
+        // console.log(completed_response.data)
+        this.completed_courses = completed_response.data
+        if (this.completed_courses == undefined || this.completed_courses.length == 0) {
+          this.onInitialEmptyCompleted = true
+        }
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+      }
+    }
+  },
   methods: {
-    async get_user_id() {
+    async getUserID() {
       try {
         const user_ID = await UserService.getUserID()
         this.user_ID = user_ID
@@ -402,9 +448,8 @@ export default {
     },
     async searchCourseRegistrationInfo(user_ID, course_Name, coursecat_ID, status) {
       try {
-        // let user_id = await UserService.getUserID()
-        let user_id = 1 
-        user_ID = user_id
+        console.log(this.user_ID)
+        user_ID = this.user_ID
 
         let response = await CourseService.searchCourseRegistrationInfo(
           user_ID,
@@ -423,9 +468,7 @@ export default {
 
     async searchCourseVoteInfo(user_ID, course_Name, coursecat_ID, status) {
       try {
-        // let user_id = await UserService.getUserID()
-        let user_id = 1
-        user_ID = user_id
+        user_ID = this.user_ID
 
         let response = await CourseService.searchCourseVoteInfo(
           user_ID,
@@ -443,9 +486,7 @@ export default {
 
     async searchProposedInfo(user_ID, course_Name, coursecat_ID, status) {
       try {
-        // const user_id = await UserService.getUserID()
-        const user_id = 1
-        user_ID = user_id
+        user_ID = this.user_ID
 
         let response = await CourseService.searchProposedInfo(
           user_ID,
@@ -463,9 +504,7 @@ export default {
 
     async searchCompletedInfo(user_ID, course_Name, coursecat_ID) {
       try {
-        // const user_id = await UserService.getUserID()
-        const user_id = 1
-        user_ID = user_id
+        user_ID = this.user_ID
 
         let response = await CourseService.searchCompletedInfo(
           user_ID,
@@ -482,10 +521,7 @@ export default {
 
     async unvoteCourse(vote_Id) {
       try {
-        // let user_id = await UserService.getUserID()
-        let user_ID = 1
-
-        let response = await CourseService.unvoteCourse(vote_Id, user_ID);
+        let response = await CourseService.unvoteCourse(vote_Id, this.user_ID);
         console.log(response); 
         this.loadData();
       } catch (error) {
@@ -529,25 +565,25 @@ export default {
     },
     async sortCourse(action) {
       if (action == 'registered') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.registered_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.registered_courses)
          if (sort_response.code == 200) {
           this.registered_courses = sort_response.data
          }
       }
       else if (action == 'interested') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.interested_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.interested_courses)
          if (sort_response.code == 200) {
           this.interested_courses = sort_response.data
          }
       }
       else if (action == 'proposed') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
          if (sort_response.code == 200) {
           this.proposed_courses = sort_response.data
          }
       }
       else if (action == 'completed') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.completed_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.completed_courses)
          if (sort_response.code == 200) {
           this.completed_courses = sort_response.data
          }
@@ -581,37 +617,6 @@ export default {
       const startIndex = (this.localCurrentPageCompleted - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
       return this.completed_courses.slice(startIndex, endIndex);
-    }
-  },
-  async created() {
-    try {
-
-      let registered_response= await CourseService.searchCourseRegistrationInfo(this.user_ID, null, null, null)
-      this.registered_courses = registered_response.data
-      if (this.registered_courses == undefined || this.registered_courses.length == 0) {
-        this.onInitialEmptyRegistered = true
-      }
-
-      let interested_response= await CourseService.searchCourseVoteInfo(this.user_ID, null, null, null)
-      this.interested_courses = interested_response.data
-      if (this.interested_courses == undefined || this.interested_courses.length == 0) {
-        this.onInitialEmptyInterested = true
-      }
-
-      let proposed_response = await CourseService.searchProposedInfo(this.user_ID, null, null, null)
-      this.proposed_courses = proposed_response.data
-      if (this.proposed_courses == undefined || this.proposed_courses.length == 0) {
-        this.onInitialEmptyProposed = true
-      }
-
-      let completed_response = await CourseService.searchCompletedInfo(this.user_ID, null, null, null)
-      // console.log(completed_response.data)
-      this.completed_courses = completed_response.data
-      if (this.completed_courses == undefined || this.completed_courses.length == 0) {
-        this.onInitialEmptyCompleted = true
-      }
-    } catch (error) {
-      console.error("Error fetching course details:", error);
     }
   },
   mounted() {

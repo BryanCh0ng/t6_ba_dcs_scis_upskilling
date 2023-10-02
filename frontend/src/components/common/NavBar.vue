@@ -97,12 +97,12 @@ export default {
           this.user_role === "Trainer"
         ) {
           links.push(
-            { path: "/votingCampaign", label: "Voting Campaign" },
+            { path: "/instructorTrainerViewVotingCampaign", label: "Voting Campaign" },
             { path: "/proposeCourse", label: "Propose Course" }
           );
         } else if (this.user_role === "Admin") {
           links.push(
-            { path: "/adminViewcourse", label: "Course DB" },
+            { path: "/adminViewCourse", label: "Course DB" },
             { path: "/adminViewRunCourse", label: "Run Course DB" },
             { path: "/adminViewVoteCourse", label: "Voting Campaign DB" },
             { path: "/adminViewProposedCourse", label: "Proposed Course DB" },
@@ -114,7 +114,7 @@ export default {
       } else {
         // Add the default links for users who are not logged in
         links.push(
-          { path: "/adminViewcourse", label: "View Courses" },
+          { path: "/adminViewCourse", label: "View Courses" },
           { path: "/proposeCourse", label: "Propose Course" },
           { path: "/ContactUs", label: "Contact Us" }
         );
@@ -193,7 +193,7 @@ export default {
       return this.$route.path === linkPath;
     },
     redirectToLogin() {
-      this.router.push('/login')
+      this.router.push('/')
     },
     // need to add in redirect link
     async logout() {
@@ -203,13 +203,13 @@ export default {
         this.user_role = "";
         this.user_ID = null;
         this.user_name = "";
-        this.router.push('/login')
+        this.router.push('/')
       } catch (error) {
         console.error('Error logging out:', error);
     }
 
     // After successfully logging out, navigate to the login page
-    this.router.push('/login');
+    this.router.push('/');
     },
     toggleUserDropdown() {
       // console.log("Toggling user dropdown");

@@ -124,13 +124,20 @@ export default {
     SuccessModal
   },
 
-  created() {
+  async created() {
     this.getUserID();
+    const action = this.$route.params.action;
+    this.action = action
+    if (this.action == 'approve') {
+      const user_ID = await UserService.getUserID();
+      const role = await UserService.getUserRole(user_ID);
+      if (role != 'Admin') {
+        this.$router.push({ name: 'studentViewProfile' }); 
+      } 
+    }
     this.get_user_role();
     this.fetchCategoryDropdownOptions();
     this.fetchProposedCourseDetails();
-    const action = this.$route.params.action;
-    this.action = action
   },
 
   methods: {
@@ -221,27 +228,29 @@ export default {
       };
 
       try {
+        if (this.action == 'approve') {
         const result = await CourseService.adminUpdateCourse(courseId, formData);
+        let approve_result;
         if (result.success) {
-          let approve_result;
-
-          if (this.action == 'approve') {
             const course = await ProposedCourseService.getProposedCourseByCourseId(courseId);
-            // console.log(course);
             const acceptPromise = ProposedCourseService.approveProposedCourse({ "pcourseID": course['data'].pcourse_ID });
             approve_result = await acceptPromise;
-            // console.log(approve_result);
-        
           } else {
             approve_result = { code: 200 };
           }
-              
           if (approve_result.code == 200) {
             this.showSuccessModal = true;
           } else {
             this.errorMessage = approve_result.message;
           }
+        } else {
+          const result = await ProposedCourseService.updateProposedCourse(courseId, formData);
+          if (result.success) {
+            this.showSuccessModal = true;
+          } else {
+            this.errorMessage = result.message;
           }
+        }
         } catch (error) {
             console.error('Error submitting form:', error);
         }

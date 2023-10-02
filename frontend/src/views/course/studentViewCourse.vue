@@ -116,8 +116,9 @@ import courseDateTime from '@/components/course/courseDateTime.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/StudentCourseSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
-import modalAfterAction from '@/components/course/modalAfterAction.vue';
 import UserService from "@/api/services/UserService.js";
+import modalAfterAction from '@/components/course/modalAfterAction.vue';
+import CommonService from "@/api/services/CommonService.js"
 
 export default {
   components: {
@@ -132,6 +133,7 @@ export default {
   },
   data() {
     return {
+      user_ID:null,
       run_courses: [],
       vote_courses: [],
       sortColumn: '',
@@ -145,7 +147,6 @@ export default {
       actionCourse: {},
       search_course_name: null,
       search_course_category: null,
-      user_ID: 1,
     }
   },
   computed: {
@@ -232,6 +233,7 @@ export default {
     },
     async loadData() {
       try {
+        await this.getUserID()
         let run_response = await CourseService.searchUnregisteredActiveInfo(this.user_ID, this.search_course_name, this.search_course_category)
         this.run_courses = run_response.data
         
@@ -259,22 +261,44 @@ export default {
       }
     },
   async sortCourse(action) {
-      if (action == 'run') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.run_courses)
-         if (sort_response.code == 200) {
-          this.run_courses = sort_response.data
-         }
-      }
-      if (action == 'vote') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.vote_courses)
-         if (sort_response.code == 200) {
-          this.vote_courses = sort_response.data
-         }
-      }
+    if (action == 'run') {
+      let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.run_courses)
+        if (sort_response.code == 200) {
+        this.run_courses = sort_response.data
+        }
+    }
+    if (action == 'vote') {
+      let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.vote_courses)
+        if (sort_response.code == 200) {
+        this.vote_courses = sort_response.data
+        }
     }
   },
-  created() {
-    this.loadData();
+  async getUserID() {
+    try {
+      const user_ID = await UserService.getUserID();
+      this.user_ID = user_ID;
+    } catch (error) {
+      console.error('Error fetching user ID:', error);
+      this.user_ID = null;
+    }
+  }
+  },
+  async created() {
+    const user_ID = await UserService.getUserID();
+    this.user_ID = user_ID
+    const role = await UserService.getUserRole(user_ID);
+    if (role == 'Admin') {
+      this.$router.push({ name: 'adminViewCourse' }); 
+    } else if (role == 'Instructor' || role == 'Trainer') {
+      this.$router.push({ name: 'instructorTrainerViewVotingCampaign' }); 
+    } else {
+      try {
+        this.loadData()
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+      }
+    }
   },
   mounted() {
     const buttonElement = document.createElement('button');

@@ -45,12 +45,13 @@
                     <td class="current_interest">
                         {{ vote_course.voteCount }}
                     </td>
-                    <td class="text-nowrap">{{ vote_status[vote_course.vote_Status] }}</td>
+                    <td class="text-nowrap">{{ vote_status && vote_status[vote_course.vote_Status] }}</td>
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(vote_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                    <div v-if="vote_course.vote_Status === 'Ongoing'">
+                    <div v-if="vote_course && vote_course.vote_Status === 'Ongoing'">
                       <td><course-action status="Close" @action-and-message-updated="handleActionData" :course="vote_course"></course-action></td>
                     </div>
-                    <div v-else-if="vote_course.vote_Status === 'Closed'">
+
+                    <div v-else-if="vote_course && vote_course.vote_Status === 'Closed'">
                       <td ><course-action status="promote_to_course" @action-and-message-updated="handleActionData" :course="vote_course"></course-action></td>
                       <td><course-action @action-and-message-updated="handleActionData" status="unoffered-vote" :course="vote_course"></course-action></td>
                     </div>
@@ -129,14 +130,14 @@ import courseAction from '../../components/course/courseAction.vue';
 import sortIcon from '../../components/common/sort-icon.vue';
 import modalCourseContent from '../../components/course/modalCourseContent.vue';
 import courseNameDesc from '../../components/course/courseNameDesc.vue';
-// import courseDateTime from '@/components/course/courseDateTime.vue';
 import courseDate from '@/components/course/courseDate.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import ProposalCourseRelatedSearchFilter from "@/components/search/ProposalCourseRelatedSearchFilter.vue";
-// import UserService from "@/api/services/UserService.js";
+import UserService from "@/api/services/UserService.js";
 import CourseService from "@/api/services/CourseService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
+import CommonService from "@/api/services/CommonService.js"
 
 export default {
   components: {
@@ -162,7 +163,7 @@ export default {
         localCurrentPage: 1,
         localCurrentPageNotOffered: 1,
         activeTab: 'allvote',
-        statusOptions: ["Ongoing", "Offered", "Closed"],
+        statusOptions: ["Open for voting", "Offered for students to register", "Voting closed for students"],
         actionCourse: {},
         vote_status: {
           "Ongoing": "Open for voting",
@@ -202,24 +203,32 @@ export default {
       this.loadData();
     },
     async handleSearchComplete(searchResults) {
-      console.log("searchResults", searchResults);
-      this.vote_courses = searchResults; // Always update the courses array
+      // console.log("searchResults", searchResults);
+      this.vote_courses = searchResults; 
     },
     async handleSearchCompleteNotOffered(searchResults) {
-      console.log("searchResults", searchResults);
-      this.notoffered_courses = searchResults; // Always update the courses array
+      // console.log("searchResults", searchResults);
+      this.notoffered_courses = searchResults; 
     },
     async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, vote_status) {
       this.search_course_name = course_Name
       this.search_course_category = coursecat_ID
-      this.vote_status = vote_status
+      // this.vote_status = vote_status
+
+      if (vote_status == "Open for voting") {
+        vote_status = "Ongoing"
+      } else if (vote_status == "Offered for students to register") {
+        vote_status = "Offered"
+      } else if (vote_status == "Voting closed for students") {
+        vote_status = "Closed"
+      }
+
       try {
         let response = await CourseService.searchAllVotingCoursesAdmin(
           course_Name,
           coursecat_ID,
           vote_status
         );
-        console.log(response.data)
         this.vote_courses = response.data;
         return this.vote_courses;
       } catch (error) {
@@ -235,7 +244,7 @@ export default {
           course_Name,
           coursecat_ID,
         );
-        console.log(response.data)
+        // console.log(response.data)
         this.notoffered_courses = response.data;
         return this.notoffered_courses;
       } catch (error) {
@@ -259,13 +268,13 @@ export default {
     },
     async sortCourse(action) {
       if (action == "allvote") {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.vote_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.vote_courses)
         if (sort_response.code == 200) {
           this.vote_courses = sort_response.data
         }
       }
      if (action == "deleted") {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.notoffered_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.notoffered_courses)
         if (sort_response.code == 200) {
           this.notoffered_courses = sort_response.data
         }
@@ -293,14 +302,20 @@ export default {
     }
   },
   async created() {
-    try {
-      let response = await CourseService.searchAllVotingCoursesAdmin(null, null, null)
-      this.vote_courses = response.data
+    const user_ID = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_ID);
+    if (role != 'Admin') {
+      this.$router.push({ name: 'studentViewProfile' }); 
+    } else {
+        try {
+        let response = await CourseService.searchAllVotingCoursesAdmin(null, null, null)
+        this.vote_courses = response.data
 
-      let course = await CourseService.searchAllNotOfferedVotingCoursesAdmin(null, null)
-      this.notoffered_courses = course.data
-    } catch (error) {
-      console.error("Error fetching course details:", error);
+        let course = await CourseService.searchAllNotOfferedVotingCoursesAdmin(null, null)
+        this.notoffered_courses = course.data
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+      }
     }
   },
   mounted() {

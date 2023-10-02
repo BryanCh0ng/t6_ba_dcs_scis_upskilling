@@ -522,11 +522,20 @@ export default {
       );
     }
   },
-  created() {
-    try {
-      this.loadData()
-    } catch (error) {
-      console.error("Error fetching course details:", error);
+  async created() {
+    const user_ID = await UserService.getUserID();
+    this.user_ID = user_ID
+    const role = await UserService.getUserRole(user_ID);
+    if (role == 'Admin') {
+      this.$router.push({ name: 'adminViewCourse' }); 
+    } else if (role == 'Instructor' || role == 'Trainer') {
+      this.$router.push({ name: 'instructorTrainerViewVotingCampaign' }); 
+    } else {
+      try {
+        this.loadData()
+      } catch (error) {
+        console.error("Error fetching course details:", error);
+      }
     }
   },
   mounted() {

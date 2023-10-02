@@ -182,7 +182,9 @@ export default {
         },
         async fetchCourseByID() {
             try {
+                console.log(this.courseId)
                 const courseData = await CourseService.getCourseById(this.courseId);
+                console.log(courseData)
 
                 this.formData.courseName = courseData.data.course[0].course_Name;
                 this.coursecatID = courseData.data.course[0].coursecat_ID;
@@ -245,7 +247,12 @@ export default {
         },
         async createProposedCourse() {
             try {
-                this.createProposedCourseResponse = await proposedCourseService.createProposedCourse(this.submitFormData);
+                let data = this.submitFormData;
+                this.userID = await UserService.getUserID();
+                console.log(this.userID)
+                data['submitted_By']= this.userID
+                console.log(data)
+                this.createProposedCourseResponse = await proposedCourseService.createProposedCourse(data);
             } catch (error) {
                 console.error('Error creating a new proposed course', error);
 
@@ -336,10 +343,8 @@ export default {
                         
                         this.submitFormData = {};
 
-                        await this.fetchUserID();
-
                         //Need to delete this ltr
-                        this.userID = 1;
+                        this.userID = await this.fetchUserID();
 
                         //Suppose to use the fetchUserID() to get the user id 
                         this.submitFormData["submitted_By"] = this.userID;
