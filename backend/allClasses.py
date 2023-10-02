@@ -97,7 +97,7 @@ class Course(db.Model):
     course_Desc = db.Column(db.String(800), nullable=False)
     coursecat_ID = db.Column(db.Integer, db.ForeignKey('coursecategory.coursecat_ID'), nullable=False)
     course_Status = db.Column(db.String(255), nullable=False)
-    template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'),  nullable=False) 
+    template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'),  nullable=True) 
 
 
     def __init__(self, course_ID, course_Name, course_Desc, coursecat_ID, course_Status, template_ID):
@@ -441,18 +441,12 @@ class AttendenceRecord(db.Model):
 class Blacklist(db.Model):
     __tablename__ = 'blacklist'
 
-    blacklist_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    blacklist_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     user_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'),  nullable=False)
     
-
-
-    def __init__(self, blacklist_ID, user_ID ):
-        self.blacklist_ID = blacklist_ID
+    def __init__(self, user_ID ):
         self.user_ID = user_ID
         
-
-
-
     def json(self):
         columns = self.__mapper__.column_attrs.keys()
         result = {}

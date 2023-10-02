@@ -19,7 +19,6 @@ from core_features.common import api as common
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
 
-
 app = Flask(__name__)
 api = Api(
     app,
@@ -63,8 +62,18 @@ app.config['MAIL_USE_TLS'] = True  # Use TLS for security
 app.config['MAIL_USERNAME'] = 'nic.wong@live.com'
 app.config['MAIL_PASSWORD'] = 'Nic!256980'
 #app.config['MAIL_DEFAULT_SENDER'] = 'noreply@live.com'  # Default sender email
+
+# app.config['MAIL_SERVER'] = 'smtp-mail.outlook.com'  # Your email server
+# app.config['MAIL_PORT'] = 587  # Port for sending emails
+# app.config['MAIL_USE_TLS'] = True  # Use TLS for security
+# app.config['MAIL_USERNAME'] = 'upskilling_engagement@outlook.com'
+# app.config['MAIL_PASSWORD'] = 'Team6ix!'
+
 mail = Mail(app)
 bcrypt = Bcrypt(app)
+
+from core_features.usermanagement import api as usermanagement
+api.add_namespace(usermanagement)
 
 # ==================== TEST FUNCTIONS ====================
 test_parser = api.parser()

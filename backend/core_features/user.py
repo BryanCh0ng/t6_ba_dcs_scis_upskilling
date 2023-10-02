@@ -91,7 +91,7 @@ class VerifyEmail(Resource):
             return "Failed: " + str(e), 500
 
     def send_email(self, email):
-        msg = Message('Hello from Flask-Mail',
+        msg = Message('Welcome to Upskilling Engagement System',
                   sender='nic.wong@live.com',
                   recipients=[email])
         msg.html = "<p>Please click the link to verify your email and finish creating your account <a href='http://localhost:8080/t6_ba_dcs_scis_upskilling/registerform?email="+ email +"'>http://localhost:8080/t6_ba_dcs_scis_upskilling/registerform?email="+ email +"</a>.</p>"
@@ -121,6 +121,7 @@ class Register(Resource):
     def post(self):
         # get inputs
         data = request.get_json()
+        print(data)
         password = data['password']
         repassword = data['confirmpassword']
 
@@ -155,13 +156,13 @@ class Register(Resource):
                 newExternalUser = ExternalUser(user_ID=getattr(user, 'user_ID'), organisation_Name=data['organizationName'], is_Alumni=bool(int(data['alumni'])))
                 db.session.add(newExternalUser)
                 db.session.commit()
-                db.session.close()
                 return json.loads(json.dumps(newExternalUser.json(), default=str)), 200
             
             else:
                 db.session.commit()
-                db.session.close()
                 return json.loads(json.dumps(newUser.json(), default=str)), 200
+
+            db.session.close()
         
         except Exception as e:
             db.session.rollback()
@@ -198,7 +199,7 @@ class ForgotPassword(Resource):
             return "Failed: " + str(e), 500
 
     def send_email(self, email):
-        msg = Message('Hello from Flask-Mail',
+        msg = Message('[Upskilling Engagement System] Reset Password',
                   sender='nic.wong@live.com',
                   recipients=[email])
         msg.html = "<p>Please click the link to change your password <a href='http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"'>http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"</a>.</p>"

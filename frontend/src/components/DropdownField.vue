@@ -39,6 +39,5 @@ export default {
 <style scoped>
 .dropdown-field {
   position: relative;
-  /* display: inline-block; */
 }
 </style>

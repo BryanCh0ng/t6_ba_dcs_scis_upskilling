@@ -1,6 +1,6 @@
 <template>
     <div>
-        <select v-model="selectedValue" :class="{ 'form-select': true, 'border-0': !hasError, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': hasError}">
+        <select v-model="selectedValue" :class="{ 'form-select': true, 'border-0': !hasError, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': hasError}" class="custom-select">
             <option disabled hidden value="">{{ defaultPlaceholder }}</option>
             <slot></slot>
         </select>
@@ -49,3 +49,10 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.custom-select {
+    cursor: pointer !important;
+}; 
+
+</style>

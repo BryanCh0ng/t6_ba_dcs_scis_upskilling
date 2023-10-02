@@ -1,6 +1,6 @@
 <template>
   <div class="content mb-5">
-    <nav class="navbar navbar-expand-xl">
+    <nav class="navbar navbar-expand-xxl">
       <div class="container-fluid">
         <a class="navbar-brand no-underline" href="#">
           <img src="../../assets/smulogo.png" title="smu logo" class="navlogo" />
@@ -90,7 +90,8 @@ export default {
           links.push(
             { path: "/studentViewRecommendations", label: "Recommendations" },
             { path: "/studentViewCourse", label: "View Courses" },
-            { path: "/proposeCourse", label: "Propose Course" }
+            { path: "/proposeCourse", label: "Propose Course" },
+            { path: "/contactUs", label: "Contact Us" },
           );
         } else if (
           this.user_role === "Instructor" ||
@@ -98,7 +99,8 @@ export default {
         ) {
           links.push(
             { path: "/instructorTrainerViewVotingCampaign", label: "Voting Campaign" },
-            { path: "/proposeCourse", label: "Propose Course" }
+            { path: "/proposeCourse", label: "Propose Course" },
+            { path: "/contactUs", label: "Contact Us" },
           );
         } else if (this.user_role === "Admin") {
           links.push(
@@ -109,14 +111,12 @@ export default {
             { path: "/createCourse", label: "Create Course" }
           );
         }
-        // Add the common links for logged-in users
-        links.push({ path: "/ContactUs", label: "Contact Us" });
       } else {
         // Add the default links for users who are not logged in
         links.push(
           { path: "/adminViewCourse", label: "View Courses" },
           { path: "/proposeCourse", label: "Propose Course" },
-          { path: "/ContactUs", label: "Contact Us" }
+          { path: "/contactUs", label: "Contact Us" }
         );
       }
 
@@ -130,14 +130,14 @@ export default {
       } else if (this.user_role === "Instructor" || this.user_role === "Trainer") {
         items.push(
           { path: "/instructorTrainerViewProfile", label: "Profile" },
-          { path: "/blacklist", label: "Blacklist" },
-          { path: "/dashboard", label: "Dashboard" }
+          { label: "Blacklist" }, // rmb to add path
+          {  label: "Dashboard" } // rmb to add path
         );
       } else if (this.user_role === "Admin") {
         items.push(
-          { path: "/adminViewManagement", label: "Admin Management" },
-          { path: "/feedbackTemplate", label: "Feedback Template" },
-          { path: "/dashboard", label: "Dashboard" }
+          { path: "/adminViewManagement", label: "User Management" },
+          { label: "Feedback Template" }, // rmb to add path
+          { label: "Dashboard" } // rmb to add path
         );
       }
 
@@ -368,7 +368,7 @@ export default {
 }
 
 .dropdown-content li {
-  padding: 4px 14px;
+  padding: 2px 14px;
   cursor: pointer;
 }
 

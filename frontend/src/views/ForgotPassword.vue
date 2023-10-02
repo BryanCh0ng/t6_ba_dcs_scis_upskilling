@@ -32,7 +32,7 @@
 
 <script>
 import ImageHalf from "../components/ImageHalf.vue";
-import FormContainer from "../components/CommonFormContainer.vue";
+import FormContainer from "../components/RegistrationPasswordContainer.vue";
 import ErrorMessage from "../components/ErrorMessage.vue";
 import InputField from "../components/InputField.vue";
 import SuccessModal from "../components/SuccessModal.vue";

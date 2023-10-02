@@ -4,7 +4,7 @@ from flask_restx import Namespace, Resource, fields, reqparse
 from allClasses import *
 import json
 from sqlalchemy.orm import aliased
-from sqlalchemy import func, and_, exists, select
+from sqlalchemy import func, and_, exists, not_, select
 from datetime import datetime, date, time
 import logging
 app.logger.setLevel(logging.DEBUG)
@@ -577,6 +577,7 @@ class GetCompletedCourses(Resource):
             CourseCategory.coursecat_Name,
             UserInstructor.user_Name.label("instructor_name"),
             UserInstructor.user_Email.label("instructor_email"),
+            Registration,
             exists().where(and_(
                 Feedback.submitted_By == user_id,
                 Feedback.rcourse_ID == RunCourse.rcourse_ID,
@@ -621,14 +622,14 @@ class GetCompletedCourses(Resource):
                     "coursecat_Name": result[2],
                     "instructor_Name": result[3],
                     "instructor_Email": result[4],
-                    "feedback_submitted": result[5]  # Use the boolean value
+                    **result[5].json(),
+                    "feedback_submitted": result[6]
                 }
                 result_data.append(course_info)
 
             return jsonify({"code": 200, "data": result_data})
 
         return jsonify({"code": 404, "message": "No completed courses found"})
-
 
 
 # Instructor/Trainer - Voting Campaign
@@ -1170,65 +1171,6 @@ class GetAllCoursesWithRegistrationCount(Resource):
 
         return jsonify({"code": 404, "message": "No courses found"})
 
-# Admin - All Instructors
-retrieve_instructors_trainers = api.parser()
-retrieve_instructors_trainers.add_argument("instructor_name", help="Enter instructor name")
-retrieve_instructors_trainers.add_argument("role_name", help="Enter role name")
-retrieve_instructors_trainers.add_argument("organization_name", help="Enter organization")
-
-@api.route("/get_all_instructors_and_trainers")
-@api.doc(description="Get all instructors and trainers with organization names")
-class GetAllInstructorsAndTrainers(Resource):
-    @api.expect(retrieve_instructors_trainers)
-    def get(self):
-        args = retrieve_instructors_trainers.parse_args()
-        instructor_name = args.get("instructor_name", "")
-        role_name = args.get("role_name")
-        organization_name = args.get("organization_name", "")
-
-        query = db.session.query(
-            User.user_ID,
-            User.user_Name,
-            User.user_Email,
-            db.func.ifnull(ExternalUser.organisation_Name, "SMU").label("organisation_Name"),
-            User.role_Name,
-        ).select_from(User).outerjoin(ExternalUser, User.user_ID == ExternalUser.user_ID)
-
-        # Add filtering for "Instructor" or "Trainer" roles
-        query = query.filter(User.role_Name.in_(["Instructor", "Trainer"]))
-
-        if organization_name == "SMU":
-            query = query.filter(ExternalUser.organisation_Name.is_(None))
-        elif organization_name:
-            query = query.filter(ExternalUser.organisation_Name.like(f"%{organization_name}%"))
-            
-        if instructor_name:
-            query = query.filter(User.user_Name.contains(instructor_name))
-        
-        if role_name:
-            query = query.filter(User.role_Name == role_name)
-        
-        results = query.all()
-        db.session.close()
-
-        if results:
-            result_data = []
-            for result in results:
-                instructor_trainer_info = {
-                    "user_ID": result[0],
-                    "user_Name": result[1],
-                    "user_Email": result[2],
-                    "organisation_Name": result[3],
-                    "role_Name": result[4]
-                }
-
-                result_data.append(instructor_trainer_info)
-
-            return jsonify({"code": 200, "data": result_data})
-
-        return jsonify({"code": 404, "message": "No instructors or trainers found"})
-
-
 # Admin - Get All Course
 retrieve_all_courses_admin = api.parser()
 retrieve_all_courses_admin.add_argument("course_name", help="Enter course name")
@@ -1598,5 +1540,73 @@ class AdminUpdateRunCourse(Resource):
             db.session.rollback()
             return jsonify({"message": f"Failed to update course: {str(e)}", "code": 500})
 
+combined_search_parser = api.parser()
+combined_search_parser.add_argument("course_name", help="Enter course name", location="args")
+combined_search_parser.add_argument("coursecat_id", help="Enter course category id", location="args")
 
+@api.route("/user_courses/<int:user_id>")
+class GetUserCourses(Resource):
+    @api.expect(combined_search_parser)
+    def get(self, user_id):
+        try:
+            print(user_id)
+            args = combined_search_parser.parse_args()
+            course_name = args.get("course_name")
+            coursecat_id = args.get("coursecat_id")
 
+            # Base query to retrieve enrolled courses for the user
+            base_query = db.session.query(
+                Course, CourseCategory, RunCourse, Registration, User
+            ).select_from(User).join(
+                Registration,
+                Registration.user_ID == User.user_ID
+            ).join(
+                RunCourse,
+                RunCourse.rcourse_ID == Registration.rcourse_ID
+            ).join(
+                Course,
+                Course.course_ID == RunCourse.course_ID
+            ).join(
+                CourseCategory,
+                CourseCategory.coursecat_ID == Course.coursecat_ID
+            ).filter(
+                User.user_ID == user_id,
+                Registration.reg_Status == "Enrolled"
+            )
+
+            # Apply filters if course_name and coursecat_id are provided
+            if course_name:
+                base_query = base_query.filter(Course.course_Name == course_name)
+            if coursecat_id:
+                base_query = base_query.filter(Course.coursecat_ID == coursecat_id)
+
+            user_courses = base_query.all()
+
+            result_data = []
+            for result in user_courses:
+                run_course_attrs = {
+                    'run_Startdate': common.format_date_time(result[2].run_Startdate),
+                    'run_Enddate': common.format_date_time(result[2].run_Enddate),
+                    'run_Starttime': common.format_date_time(result[2].run_Starttime),
+                    'run_Endtime': common.format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': common.format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
+                }
+
+                modified_run_course = {**result[2].json(), **run_course_attrs}
+
+                course_info = {
+                    **result[0].json(),
+                    "coursecat_Name": result[1].coursecat_Name,
+                    **modified_run_course,
+                    **result[3].json(),
+                    "user_Name": result[4].user_Name
+                }
+                result_data.append(course_info)
+
+            return jsonify({"code": 200, "data": result_data})
+
+        except Exception as e:
+            return jsonify({"code": 500, "message": str(e)})

@@ -336,6 +336,8 @@ export default {
     },
 
     async searchInstructorAssignedCourseInfo(user_ID, course_Name, coursecat_ID, status) {
+      const user_id = await UserService.getUserID();
+      user_ID = user_id
       try {
         let response = await CourseService.searchInstructorAssignedCourseInfo(
           user_ID,
@@ -353,6 +355,8 @@ export default {
     },
 
     async searchInstructorProposedCourseInfo(user_ID, course_Name, coursecat_ID, status) {
+      const user_id = await UserService.getUserID();
+      user_ID = user_id
       try {
         let response = await CourseService.searchInstructorProposedCourseInfo(
           user_ID,
@@ -369,6 +373,8 @@ export default {
     },
 
     async searchInstructorCompletedCourseInfo(user_ID, course_Name, coursecat_ID) {
+      const user_id = await UserService.getUserID();
+      user_ID = user_id
       try {
         let response = await CourseService.searchInstructorCompletedCourseInfo(
           user_ID,
@@ -433,14 +439,16 @@ export default {
 
     async loadData() {
       try {
-          await this.getUserID()
-          let assigned_courses = await CourseService.searchInstructorAssignedCourseInfo(this.user_ID, null, null, null)
+          const user_ID = await UserService.getUserID();
+          console.log(user_ID)
+          
+          let assigned_courses = await CourseService.searchInstructorAssignedCourseInfo(user_ID, null, null, null)
           this.assigned_courses = assigned_courses.data
 
-          let proposed_courses = await CourseService.searchInstructorProposedCourseInfo(this.user_ID, null, null, null)
+          let proposed_courses = await CourseService.searchInstructorProposedCourseInfo(user_ID, null, null, null)
           this.proposed_courses = proposed_courses.data
 
-          let conducted_courses = await CourseService.searchInstructorCompletedCourseInfo(this.user_ID, null, null)
+          let conducted_courses = await CourseService.searchInstructorCompletedCourseInfo(user_ID, null, null)
           this.conducted_courses = conducted_courses.data
         
       } catch (error) {
@@ -500,6 +508,8 @@ export default {
           this.assigned_courses = []
           this.onInitialEmptyAssigned = true
         }
+
+        console.log(this.user_ID)
 
         let proposed_courses = await CourseService.searchInstructorProposedCourseInfo(this.user_ID, null, null, null)
         if (proposed_courses.code == 200 ) {

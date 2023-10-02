@@ -559,6 +559,7 @@ export default {
         async fetchRunCourseByID() {
             try {
                 const runcourseData = await RunCourseService.getRunCourseById(this.runcourseId);
+                console.log(runcourseData)
 
                 this.instructorID = runcourseData.instructor_ID;
 
@@ -608,9 +609,14 @@ export default {
         },
         async fetchCoachByID() {
             try {
-                const coachData = await UserService.getCoachById(this.instructorID);
+                if (this.instructorID) {
+                    const coachData = await UserService.getCoachById(this.instructorID);
 
-                this.formData.selectedInstructor = coachData.user_Name;
+                    this.formData.selectedInstructor = coachData.user_Name; 
+                } else {
+                    this.formData.selectedInstructor = ""; 
+                }
+            
 
             } catch (error) {
                 console.error('Error fetching coach by ID:', error);
@@ -619,10 +625,12 @@ export default {
         },
         async fetchTemplateByID() {
             try {
-                const templateData = await FeedbackTemplateService.getTemplateById(this.templateID);
-
-                this.formData.selectedTemplate = templateData.template_Name;
-
+                if (this.templateID) {
+                    const templateData = await FeedbackTemplateService.getTemplateById(this.templateID);
+                    this.formData.selectedTemplate = templateData.template_Name;
+                } else {
+                    this.formData.selectedTemplate = "";
+                }
             } catch (error) {
                 console.error('Error fetching template by ID:', error);
                 this.errorMsg.push('Error fetching template by ID:', error);

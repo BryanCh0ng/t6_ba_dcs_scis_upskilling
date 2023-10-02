@@ -57,7 +57,8 @@ export default {
     async runCourseAction() {
       try {
         let response;
-        // let user_ID = this.get_user_id();
+        let user_ID = await UserService.getUserID();
+
         if (this.status == 'Retire') {
           response = await CourseService.retireRunCourse(this.course.course_ID);
         } else if (this.status == 'Activate') {
@@ -66,9 +67,9 @@ export default {
         } else if (this.status == 'Deactivate') {
           response = await CourseService.deactivateRunCourse(this.course.course_ID);
         } else  if (this.status == 'Active') {
-          response = await RegistrationService.createNewRegistration(this.course.rcourse_ID, 1, "Pending");
+          response = await RegistrationService.createNewRegistration(this.course.rcourse_ID, user_ID, "Pending");
         } else if (this.status == "registered_drop") {
-          response = await RegistrationService.dropRegisteredCourse(this.course.rcourse_ID, 1);
+          response = await RegistrationService.dropRegisteredCourse(this.course.rcourse_ID, user_ID);
         } else if (this.status == "delete-run-course") {
           response = await CourseService.deleteRunCourse(this.course.rcourse_ID);
           console.log(response.message)

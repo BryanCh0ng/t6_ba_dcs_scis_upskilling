@@ -20,7 +20,7 @@ export default {
   computed: {
     showNavBar() {
       // Specify the routes where you want to show the navbar
-      const routesWithNavBar = ["ContactUs", "viewCourse","adminViewRunCourse", "adminViewVoteCourse", "adminViewProposedCourse","adminVotingCampaign", "adminViewInstructorsTrainers", "studentViewCourse","studentViewProfile", "editProposedCourse", "instructorTrainerViewProfile","proposeCourse", "editCourse", "createCourse", "createRunCourse", "editRunCourse", "instructorTrainerViewVotingCampaign", "adminViewCourse", "studentViewRecommendations"];
+      const routesWithNavBar = ["ContactUs", "viewCourse","adminViewRunCourse", "adminViewVoteCourse", "adminViewProposedCourse","adminVotingCampaign", "adminViewInstructorsTrainers", "studentViewCourse","studentViewProfile", "editProposedCourse", "instructorTrainerViewProfile","proposeCourse", "editCourse", "createCourse", "createRunCourse", "editRunCourse", "instructorTrainerViewVotingCampaign", "adminViewCourse", "studentViewRecommendations", "adminViewManagement", "adminViewStudentEnrolledCourse", "adminAddAdmin"];
       return routesWithNavBar.includes(this.$route.name);
     }
   }
