@@ -246,6 +246,18 @@ class CreateRunCourse(Resource):
 
             # Return the newly created course as JSON response
             #return json.loads(json.dumps(new_run_course.json(), default=str)), 201
+
+            # Convert dates and times to formatted strings
+            new_run_course.run_Startdate = start_date.strftime('%Y-%m-%d')
+            new_run_course.run_Enddate = end_date.strftime('%Y-%m-%d')
+            new_run_course.run_Starttime = start_time.strftime('%H:%M:%S')
+            new_run_course.run_Endtime = end_time.strftime('%H:%M:%S')
+
+            new_run_course.reg_Startdate = new_run_course.reg_Startdate.strftime('%Y-%m-%d')
+            new_run_course.reg_Enddate = new_run_course.reg_Enddate.strftime('%Y-%m-%d')
+            new_run_course.reg_Starttime = new_run_course.reg_Starttime.strftime('%H:%M:%S')
+            new_run_course.reg_Endtime = new_run_course.reg_Endtime.strftime('%H:%M:%S')
+
             return {
                 'message': 'Run course created successfully',
                 'data': new_run_course.json()  # Assuming new_run_course.json() returns the required data as a dictionary

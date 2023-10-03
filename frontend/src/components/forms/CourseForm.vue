@@ -30,7 +30,8 @@
                 <div class="form-group mb-4">
                     <textarea v-model="formData.courseDescription"
                         :class="{ 'form-control': true, 'border-0': !v$?.formData.courseDescription?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseDescription?.$error }"
-                        placeholder="Course Description" style="height: 200px" @input="limitCourseDescription" required></textarea>
+                        placeholder="Course Description" style="height: 200px" @input="limitCourseDescription"
+                        required></textarea>
                     <div class="text-muted mt-2">
                         Character Count: {{ courseDescLength }}/800
                     </div>
@@ -40,7 +41,7 @@
                     </div>
                 </div>
 
-                <div v-if="view === 'createCourse'  || view  === 'proposeCourse'" class="row">
+                <div v-if="view === 'createCourse' || view === 'proposeCourse'" class="row">
                     <div class="col-md-6 form-group">
                         <button type="reset" class="btn btn-secondary shadow-sm w-100 mt-5 field cancelbtn">
                             Reset
@@ -56,7 +57,8 @@
 
                 <div v-else class="row">
                     <div class="col-md-6 form-group">
-                        <button type="button" @click="goToAdminViewCourse" class="btn btn-secondary shadow-sm w-100 mt-5 field cancelbtn">
+                        <button type="button" @click="goToAdminViewCourse"
+                            class="btn btn-secondary shadow-sm w-100 mt-5 field cancelbtn">
                             Cancel
                         </button>
                     </div>
@@ -70,7 +72,8 @@
             </form>
         </div>
         <!-- Success modal -->
-        <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
+        <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType"
+            @modal-closed="handleModalClosed" />
     </div>
 </template>
 <script>
@@ -95,7 +98,7 @@ export default {
         }
     },
     setup() {
-        const v$ = useVuelidate(); 
+        const v$ = useVuelidate();
         return { v$ };
     },
     data() {
@@ -138,8 +141,8 @@ export default {
     async mounted() {
         try {
             await this.fetchCourseCategories();
-            
-            if(this.view === "editCourse"){
+
+            if (this.view === "editCourse") {
                 await this.fetchEditCourseData();
             }
 
@@ -149,24 +152,24 @@ export default {
             this.buttonType = "danger";
             this.showAlert = !this.showAlert;
         }
-        
+
     },
     methods: {
-        async handleModalClosed(value){
+        async handleModalClosed(value) {
             this.showAlert = value;
             this.userRole = await UserService.getUserRole();
 
-            if (!this.showAlert) {
-                if(this.view === "proposeCourse"){
-                    if (this.userRole === 'Student' ) {
-                        this.$router.push({ name: 'studentViewProfile'});
+            if (!this.showAlert && this.buttonType === "success") {
+                if (this.view === "proposeCourse") {
+                    if (this.userRole === 'Student') {
+                        this.$router.push({ name: 'studentViewProfile' });
                     } else if (this.userRole === 'Instructor' || this.userRole === 'Trainer') {
-                        this.$router.push({ name: 'instructorTrainerViewProfile'});
+                        this.$router.push({ name: 'instructorTrainerViewProfile' });
                     }
-                } else{
+                } else {
                     this.$router.push('/adminViewCourse');
                 }
-               
+
             }
         },
         async fetchCourseCategories() {
@@ -249,7 +252,7 @@ export default {
         },
         async createProposedCourse() {
             try {
-                
+
                 this.createProposedCourseResponse = await proposedCourseService.createProposedCourse(this.submitFormData);
 
             } catch (error) {
@@ -285,13 +288,13 @@ export default {
 
             //Modal
             this.title = "",
-            this.message = "",
-            this.buttonType = "",
-            this.showAlert = false
+                this.message = "",
+                this.buttonType = "",
+                this.showAlert = false
 
             try {
                 await this.fetchCourseCategories();
-    
+
             } catch (error) {
                 const errorMsgParts = error.toString().split(":");
                 this.message = errorMsgParts[1];
@@ -327,18 +330,18 @@ export default {
                     this.submitFormData["coursecat_ID"] = this.formData.courseCategories.find(i => i.coursecat_Name === this.formData.selectedCategory).coursecat_ID;
 
                     this.submitFormData["course_Status"] = "Active";
-                    
-                    if(this.view === "createCourse") {
+
+                    if (this.view === "createCourse") {
 
                         await this.createCourse();
-                        
+
                         this.setSuccessAlert("Course Creation");
 
                     } else if (this.view === "proposeCourse") {
                         this.submitFormData["course_Status"] = "Inactive";
 
                         await this.createCourse();
-                        
+
                         this.submitFormData = {};
 
                         await this.fetchUserID();
@@ -361,7 +364,7 @@ export default {
                         await this.updateCourse();
 
                         this.setSuccessAlert("Course Update");
-                    
+
                     }
 
                 } catch (error) {
@@ -377,7 +380,7 @@ export default {
 
             }
         },
-        goToAdminViewCourse(){
+        goToAdminViewCourse() {
             this.$router.push("/adminViewCourse");
         }
     },

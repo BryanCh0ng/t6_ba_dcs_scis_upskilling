@@ -525,8 +525,8 @@ export default {
         handleModalClosed(value) {
             this.showAlert = value;
 
-            if (!this.showAlert) {
-                //this.$router.push('/adminViewRunCourse');
+            if (!this.showAlert && this.buttonType === "success") {
+                this.$router.push('/adminViewRunCourse');
             }
         },
         async fetchCoaches() {

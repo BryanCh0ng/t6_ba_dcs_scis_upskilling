@@ -28,7 +28,7 @@ INSERT INTO user VALUES
 	(2, 'Javier Ang', 'javier.ang@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Admin'),
 	(3, 'Amanda Lee', 'amandalee@gmail.com', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Trainer'),
 	(4, 'Christina Lee', 'christina.lee@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Instructor'),
-	(5, 'Aaron Tan', 'aarontan@gmail.com', 'aaron', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q'),
+	(5, 'Aaron Tan', 'aarontan@gmail.com', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Trainer'),
 	(6, 'Samuel Tan', 'samuel.tan.2020@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
 	(7, 'James Lee', 'james.lee.2020@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
 	(8, 'Sam Lee', 'sam.lee.2019@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
@@ -77,7 +77,7 @@ INSERT INTO user VALUES
 	(51, 'Nathan Tan', 'nathan.tan.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
     (52, 'Sophie Lee', 'sophie.lee.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
     (53, 'Michael Lim', 'michael.lim.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
-    (54, 'Emma Ng', 'emma.ng.2023@smu.edu.sg', 'emma', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q'),
+    (54, 'Emma Ng', 'emma.ng.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
     (55, 'Alexander Koh', 'alexander.koh.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
     (56, 'Sophia Tan', 'sophia.tan.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
     (57, 'Jacob Wong', 'jacob.wong.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student');
