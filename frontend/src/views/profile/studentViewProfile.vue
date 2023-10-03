@@ -365,7 +365,7 @@ export default {
           this.onInitialEmptyProposed = true
         }
 
-        let completed_response = await CourseService.searchProposedInfo(user_id, null, null, null)
+        let completed_response = await CourseService.searchCompletedInfo(user_id, null, null, null)
         // console.log(completed_response.data)
         this.completed_courses = completed_response.data
         if (this.completed_courses == undefined || this.completed_courses.length == 0) {
