@@ -3,6 +3,7 @@ from flask_restx import Namespace, Resource, fields
 from allClasses import *
 from core_features import common
 import json
+from sqlalchemy import distinct
 
 api = Namespace('runcourse', description='Run Course related operations')
 
@@ -158,8 +159,11 @@ class EditRunCourse(Resource):
             instructor_id = updated_data.get('instructor_ID')
 
             # Query existing run courses for the given instructor
-            runs = RunCourse.query.filter_by(instructor_ID=instructor_id).all()
+            #runs = RunCourse.query.filter_by(instructor_ID=instructor_id).all()
 
+            # Query existing run courses for the given instructor excluding the current record being edited
+            runs = RunCourse.query.filter(RunCourse.instructor_ID == instructor_id, RunCourse.rcourse_ID != runcourse_id).all()
+            
             # Check instructor availability
             if runs:
                 for run in runs:
@@ -269,3 +273,17 @@ class CreateRunCourse(Resource):
             return {
                 "message": "Failed to create a new run course: " + str(e)
             }, 500
+
+get_course_formats = api.parser()
+@api.route("/get_course_formats")
+@api.doc(description="Get course formats")
+class GetCourseFormats(Resource):
+    @api.expect(get_course_formats)
+    def get(self):
+        distinct_course_formats = db.session.query(distinct(RunCourse.course_Format)).all()
+        db.session.close()
+
+        if distinct_course_formats:
+            return json.loads(json.dumps(distinct_course_formats, default=str)), 200
+
+        return json.loads(json.dumps({"message": "No course formats found."})), 404

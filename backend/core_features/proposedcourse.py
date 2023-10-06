@@ -116,11 +116,21 @@ class CreateProposedCourse(Resource):
             db.session.commit()
 
             # Return the newly created course as JSON response
-            return json.loads(json.dumps(new_proposed_course.json(), default=str)), 201
+            #return json.loads(json.dumps(new_proposed_course.json(), default=str)), 201
+
+            new_proposed_course.proposed_Date = new_proposed_course.proposed_Date.strftime('%Y-%m-%d')
+
+            return {
+              "message": "Proposed Course created successfully",
+              "data": new_proposed_course.json()
+            }, 201
 
         except Exception as e:
           db.session.rollback()
-          return "Failed to create a new course: " + str(e), 500
+          #return "Failed to create a new course: " + str(e), 500
+          return {
+            "message": "Failed to create a propsed course: " + str(e)
+          }, 500
 
 # Edit/Update Proposed Course 
 update_proposed_course_model = {

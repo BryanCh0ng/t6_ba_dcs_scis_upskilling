@@ -174,13 +174,22 @@ class CreateCourse(Resource):
         try:
             # Get the data for creating a new course from the request body
             new_course_data = request.json
+            print(new_course_data)
             new_course_name = new_course_data.get("course_Name") 
 
+            # Assuming new_course_name is the input course name you want to check against the database
+            input_course_name = new_course_name.strip()
+
+            # Perform a case-insensitive search and remove leading/trailing spaces
+            existing_course = Course.query.filter(func.lower(func.trim(Course.course_Name)) == func.lower(input_course_name)).first()
+
             # Check if the course name already exists in the database
-            existing_course = Course.query.filter_by(course_Name=new_course_name).first()
+            #existing_course = Course.query.filter_by(course_Name=new_course_name).first()
 
             if existing_course:
-                return {"message": "Course name already exists"}, 409  # Conflict
+                return {
+                    "message": "Course name already exists"
+                }, 409  # Conflict
 
             # Create a new course object with the data
             #new_course = Course(None, course_Name=new_course_name, course_Desc=new_course_data.get("course_Desc"), coursecat_ID=new_course_data.get("coursecat_ID"))
@@ -193,12 +202,19 @@ class CreateCourse(Resource):
             db.session.commit()
 
             # Return the newly created course as JSON response
-            return json.loads(json.dumps(new_course.json(), default=str)), 201
+            #return json.loads(json.dumps(new_course.json(), default=str)), 201
+            return {
+                'message': 'Course created successfully',
+                'data': new_course.json()
+            }, 201
 
         except Exception as e:
             db.session.rollback()
-            print("Error:", str(e))
-            return "Failed to create a new course: " + str(e), 500
+            #print("Error:", str(e))
+            #return "Failed to create a new course: " + str(e), 500
+            return {
+                "message": "Failed to create a new course: " + str(e)
+            }, 500
 
 edit_course = api.parser()
 @api.route("/edit_course/<int:course_id>", methods=["PUT"])
@@ -209,13 +225,31 @@ class EditCourse(Resource):
         try: 
             user_role = common.getUserRole()
             if (user_role) != 'Admin':
-                return {"message": "Unathorized Access, Failed to edit course"}, 404 
+                return {
+                    "message": "Unathorized Access, Failed to edit course"
+                }, 404 
 
             #Get the updated data from the request body 
             updated_data = request.json
+            new_course_name = updated_data.get("course_Name") 
         
             course = Course.query.filter_by(course_ID=course_id).first()
+
             if course:
+                # Assuming new_course_name is the input course name you want to check against the database
+                input_course_name = new_course_name.strip()
+
+                # Perform a case-insensitive search and remove leading/trailing spaces
+                existing_course = Course.query.filter(func.lower(func.trim(Course.course_Name)) == func.lower(input_course_name)).first()
+
+                # Check if the course name already exists in the database
+                #existing_course = Course.query.filter_by(course_Name=new_course_name).first()
+
+                if existing_course:
+                    return {
+                        "message": "Course name already exists"
+                    }, 409  # Conflict
+
                 # Update the fields based on updated_data
                 for field, value in updated_data.items():
                     #print(f"Updating {field} to {value}")
@@ -224,13 +258,23 @@ class EditCourse(Resource):
                 #Commit the changes to the database 
                 db.session.commit()
 
-                return json.loads(json.dumps(course.json(), default=str)), 200
+                #return json.loads(json.dumps(course.json(), default=str)), 200
+                return {
+                    "message": "Course updated successfully",
+                    "data": course.json()
+                }, 200
 
-            return json.loads(json.dumps({"message": "There is no such course"})), 404
+            #return json.loads(json.dumps({"message": "There is no such course"})), 404
+            return {
+                "message": "There is no such course"
+            }, 404
 
         except Exception as e:
             db.session.rollback()
-            return "Failed" + str(e), 500
+            #return "Failed" + str(e), 500
+            return {
+                "message": "Failed to create a new course: " + str(e)
+            }, 500
 
 # Student - Courses Available for Registration (Ongoing) with Filters
 retrieve_unregistered_active_courses_filter = api.parser()

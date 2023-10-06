@@ -72,8 +72,7 @@
             </form>
         </div>
         <!-- Success modal -->
-        <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType"
-            @modal-closed="handleModalClosed" />
+        <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
     </div>
 </template>
 <script>
@@ -103,19 +102,16 @@ export default {
     },
     data() {
         return {
-            //Form Fields
             formData: {
                 courseName: "",
                 selectedCategory: "",
                 courseCategories: [],
                 courseDescription: ""
             },
-            //Modal
             title: "",
             message: "",
             buttonType: "",
             showAlert: false,
-            //Suppose to get from the view proposed course page 
             courseID: 0,
             coursecatID: 0,
             createCourseResponse: {},
@@ -155,12 +151,17 @@ export default {
 
     },
     methods: {
+        limitCourseDescription() {
+            if (this.formData.courseDescription.length > 800) {
+                this.formData.courseDescription = this.formData.courseDescription.substring(0, 800); // Limit the description to 800 characters
+            }
+        },
         async handleModalClosed(value) {
             this.showAlert = value;
-            this.userRole = await UserService.getUserRole();
 
             if (!this.showAlert && this.buttonType === "success") {
                 if (this.view === "proposeCourse") {
+                    this.userRole = await UserService.getUserRole();
                     if (this.userRole === 'Student') {
                         this.$router.push({ name: 'studentViewProfile' });
                     } else if (this.userRole === 'Instructor' || this.userRole === 'Trainer') {
@@ -175,6 +176,7 @@ export default {
         async fetchCourseCategories() {
             try {
                 this.formData.courseCategories = await CourseCategoryService.getAllCourseCategory();
+
             } catch (error) {
                 console.error('Error fetching course categories:', error);
 
@@ -185,9 +187,7 @@ export default {
         },
         async fetchCourseByID() {
             try {
-                // console.log(this.courseId)
                 const courseData = await CourseService.getCourseById(this.courseId);
-                // console.log(courseData)
 
                 this.formData.courseName = courseData.data.course[0].course_Name;
                 this.coursecatID = courseData.data.course[0].coursecat_ID;
@@ -215,27 +215,29 @@ export default {
             try {
                 await this.fetchCourseByID();
                 await this.fetchCourseCategoryByID();
+
             } catch (error) {
                 this.title = "Course Data Retrieval Error";
-
                 throw new Error("There is a problem retrieving the data for this course");
-            }
-        },
-        limitCourseDescription() {
-            if (this.formData.courseDescription.length > 800) {
-                this.formData.courseDescription = this.formData.courseDescription.substring(0, 800); // Limit the description to 800 characters
             }
         },
         async createCourse() {
             try {
-                // console.log(this.submitFormData)
                 this.createCourseResponse = await CourseService.createCourse(this.submitFormData);
+                //console.log(typeof(this.createCourseResponse))
+                //console.log(this.createCourseResponse.data.course_ID)
+
             } catch (error) {
                 console.error('Error creating a new course', error);
-
                 this.title = "Course Creation Failed";
+                
+                //throw new Error("Course Creation was unsuccessful");
 
-                throw new Error("Course Creation was unsuccessful");
+                if(error.response.status === 500){
+                    throw new Error("Course Creation was unsuccessful");
+                } else {
+                    throw new Error(error.response.data.message);
+                }
             }
         },
         async fetchUserID() {
@@ -244,9 +246,7 @@ export default {
 
             } catch (error) {
                 console.error("Error fetching user id: ", error);
-
                 this.title = "Propose Course Creation Failed";
-
                 throw new Error("Proposed Course Creation was unsuccessful");
             }
         },
@@ -257,24 +257,28 @@ export default {
 
             } catch (error) {
                 console.error('Error creating a new proposed course', error);
-
                 this.title = "Propose Course Creation Failed";
-
                 throw new Error("Proposed Course Creation was unsuccessful");
             }
         },
         async updateCourse() {
             try {
-                // console.log(this.courseId)
                 this.updateCourseResponse = await CourseService.editCourse(this.courseId, this.submitFormData);
 
             } catch (error) {
                 console.error('Error updating the course:', error);
-
                 this.title = "Course Update Failed";
+                //throw new Error("Course Update was unsuccessful");
 
-                throw new Error("Course Update was unsuccessful");
+                if(error.response.status === 500){
+                    throw new Error("Course Update was unsuccessful");
+                } else {
+                    throw new Error(error.response.data.message);
+                }
             }
+        },
+        goToAdminViewCourse() {
+            this.$router.push("/adminViewCourse");
         },
         async onReset() {
             this.v$.$reset();
@@ -284,13 +288,8 @@ export default {
                 selectedCategory: "",
                 courseCategories: [],
                 courseDescription: ""
-            }
-
-            //Modal
-            this.title = "",
-                this.message = "",
-                this.buttonType = "",
-                this.showAlert = false
+            },
+            this.submitFormData = {}
 
             try {
                 await this.fetchCourseCategories();
@@ -338,6 +337,7 @@ export default {
                         this.setSuccessAlert("Course Creation");
 
                     } else if (this.view === "proposeCourse") {
+
                         this.submitFormData["course_Status"] = "Inactive";
 
                         await this.createCourse();
@@ -346,10 +346,10 @@ export default {
 
                         await this.fetchUserID();
 
-                        //Suppose to use the fetchUserID() to get the user id 
                         this.submitFormData["submitted_By"] = this.userID;
 
-                        this.submitFormData["course_ID"] = this.createCourseResponse["course_ID"];
+                       //this.submitFormData["course_ID"] = this.createCourseResponse["course_ID"];
+                       this.submitFormData["course_ID"] = this.createCourseResponse.data.course_ID;
 
                         const today = new Date();
 
@@ -359,12 +359,10 @@ export default {
 
                         this.setSuccessAlert("Propose Course Creation");
 
-
                     } else {
                         await this.updateCourse();
 
                         this.setSuccessAlert("Course Update");
-
                     }
 
                 } catch (error) {
@@ -373,15 +371,9 @@ export default {
                     this.buttonType = "danger"
                     this.showAlert = !this.showAlert;
                 }
-
             } else {
-
                 console.log('Form has validation errors');
-
             }
-        },
-        goToAdminViewCourse() {
-            this.$router.push("/adminViewCourse");
         }
     },
     computed: {
