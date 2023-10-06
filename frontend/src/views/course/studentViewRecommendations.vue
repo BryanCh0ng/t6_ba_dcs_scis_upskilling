@@ -421,7 +421,7 @@ export default {
       this.top_interest_picks = top_interest_pick.data
 
       let user_register = await Recommender.getUserSimilarityRegistration(this.user_ID)
-      if (user_register.length === 0) {
+      if (user_register.code != 202 || user_register.length === 0) {
         this.showRegisterJustForYou = false
       }
       this.reg_courses_for_you = user_register.data.course_list
@@ -458,7 +458,7 @@ export default {
       } else {
         let course_interest = await Recommender.getCourseSimilarityInterest(interest_list_req.data)
         // console.log(course_interest)
-        if (course_interest.length === 0) {
+        if (course_interest.code != 202 || course_interest.length === 0) {
           this.showInterestOthers = false
         } else {
           this.interest_others = course_interest.data.course_list

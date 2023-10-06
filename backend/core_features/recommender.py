@@ -419,6 +419,7 @@ class ImprovedRecommenderCourseInterest(Resource):
             # Recommend courses based on similarity
             recommended_courses = self.recommend_courses(vcourse_id_list, course_similarity_df, course_list_req)
             
+            
             return jsonify({"code": 200, "data": {"course_list": recommended_courses[:10]}})
         except Exception as e:
             return jsonify({"code": 404, "message": "Course does not exist"})
@@ -697,7 +698,7 @@ class GetCourseRegistrationInfo(Resource):
        
         
         results = query.all()
-        db.session.close()
+        
 
         if results:
             result_data = []
@@ -726,6 +727,7 @@ class GetCourseRegistrationInfo(Resource):
             # app.logger.debug(result_data)
             return jsonify({"code": 200, "data": result_data})
 
+        
         return jsonify({"code": 404, "message": "No matching course registration information found"})
     
 def format_date_time(value):
