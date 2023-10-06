@@ -2,7 +2,7 @@
   margin-left:5px;
 }
 
-.view-course-details, .view-feedback-analysis {
+.view-course-details, .view-feedback-analysis, .view-runs {
   cursor: pointer;
 }
 

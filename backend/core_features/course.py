@@ -1654,3 +1654,68 @@ class GetUserCourses(Resource):
 
         except Exception as e:
             return jsonify({"code": 500, "message": str(e)})
+
+
+retrieve_all_run_course_by_course_id_admin = api.parser()
+retrieve_all_run_course_by_course_id_admin.add_argument("course_name", help="Enter course name")
+retrieve_all_run_course_by_course_id_admin.add_argument("coursecat_id", help="Enter course category id")
+retrieve_all_run_course_by_course_id_admin.add_argument("course_status", help="Enter run course status")
+retrieve_all_run_course_by_course_id_admin.add_argument("course_id", help="Enter course id")
+@api.route("/get_all_run_course_by_course_id")
+@api.doc(description="Get all run course by course id")
+class GetAllCoursesWithRegistrationCount(Resource):
+    @api.expect(retrieve_all_run_course_by_course_id_admin)
+    def get(self):
+        args = retrieve_all_run_course_by_course_id_admin.parse_args()
+        course_name = args.get("course_name", "")
+        course_category_id = args.get("coursecat_id", "")
+        runcourse_status = args.get("course_status", "")
+        course_id = args.get("course_id", "")
+
+        query = db.session.query(
+            Course,
+            CourseCategory.coursecat_Name,
+            RunCourse,
+            func.coalesce(func.count(Registration.reg_ID), 0).label("registration_count")
+        ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).outerjoin(
+            Registration, RunCourse.rcourse_ID == Registration.rcourse_ID
+        ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID).group_by(Course.course_ID, RunCourse.rcourse_ID)
+
+        if course_name:
+            query = query.filter(Course.course_Name.contains(course_name))
+        if course_category_id:
+            query = query.filter(Course.coursecat_ID == course_category_id)
+        if runcourse_status:
+            query = query.filter(RunCourse.runcourse_Status == runcourse_status)
+        if course_id:
+            query = query.filter(RunCourse.course_ID == course_id)
+
+        results = query.all()
+        db.session.close()
+
+        if results:
+            result_data = []
+            for result in results:
+                run_course_attrs = {
+                    'run_Startdate': common.format_date_time(result[2].run_Startdate),
+                    'run_Enddate': common.format_date_time(result[2].run_Enddate),
+                    'run_Starttime': common.format_date_time(result[2].run_Starttime),
+                    'run_Endtime': common.format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': common.format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
+                }
+
+                modified_run_course = {**result[2].json(), **run_course_attrs}
+
+                course_info = {
+                    **result[0].json(),
+                    "coursecat_Name": result[1],
+                    **modified_run_course,
+                    "registration_count": result[3]
+                }
+                result_data.append(course_info)
+            return jsonify({"code": 200, "data": result_data})
+
+        return jsonify({"code": 404, "message": "No courses found"})

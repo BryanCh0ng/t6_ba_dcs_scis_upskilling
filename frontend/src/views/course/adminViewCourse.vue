@@ -22,6 +22,7 @@
                   <a href="" @click.prevent="sort('course_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'course_Status'" :sortDirection="getSortDirection('course_Status')"/></a></th>
                 <th scope="col">Feedback Analysis</th>
                 <th scope="col">Course Details</th>
+                <th scope="col">Course Run(s)</th>
                 <th scope="col">Action(s)</th>
               </tr>
             </thead>
@@ -33,6 +34,7 @@
                 <td>{{ course.course_Status }}</td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
+                <td><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewCourseRun(course.course_ID)">View Runs</a></td>
                 <td v-if="course.course_Status === 'Active'"><course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
                 <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
                 <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action></td>
@@ -186,6 +188,9 @@
       },
       goToCreateCourse() {
         this.$router.push({ name: 'createCourse'});
+      },
+      goToViewCourseRun(courseID) {
+        this.$router.push({ name: 'adminViewCourseRun', params: {id: courseID}});
       }
     },
     async created() {

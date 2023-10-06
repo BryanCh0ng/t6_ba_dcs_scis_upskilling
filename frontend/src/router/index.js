@@ -220,8 +220,15 @@ const routes = [
     meta: {
         title: 'Admin Add Admin'
     }
+  },
+  {
+    path: '/adminViewCourseRun/:id',
+    name: 'adminViewCourseRun',
+    component: () => import('../views/course/adminViewCourseRun.vue'),
+    meta: {
+        title: 'Submit Feedback',
+    },
   }
-
 ]
 
 const router = createRouter({
@@ -240,7 +247,7 @@ router.beforeEach(async (to, from, next) => {
       if (typeof user_ID === 'number' && user_ID > 0) {
         next();
       } else {
-        next('/login');
+        next('/');
       }
     } catch (error) {
       console.error(error);

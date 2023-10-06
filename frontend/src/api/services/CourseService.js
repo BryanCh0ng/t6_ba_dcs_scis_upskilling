@@ -455,6 +455,25 @@ class CourseService extends BaseApiService {
         }
     }
 
+     // Admin - All Run course based on course id
+     async searchAllRunCourseByCourseId(course_Name, coursecat_ID, course_Status, course_id) {
+        try {
+
+            let response = await axiosClient.get("/course/get_all_run_course_by_course_id", {
+                params: {
+                    course_name: course_Name,
+                    coursecat_id: coursecat_ID,
+                    course_status: course_Status,
+                    course_id: course_id
+                }
+            });
+            // console.log(response.data)
+            return response.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
 }
 
 export default new CourseService();
