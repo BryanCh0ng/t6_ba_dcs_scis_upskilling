@@ -84,26 +84,30 @@ class ChangeRegistrationStatus(Resource):
 
         user_role = common.getUserRole()
         if (user_role) != 'Admin':
-          return {"message": "Unathorized Access, Failed to change registration status for run course"}, 404
+            return {
+                "message": "Unathorized Access, Failed to create run course"
+            }, 404
 
         data = request.get_json()
 
         try:
             rcourseID = data["rcourse_ID"]
             rcourse = RunCourse.query.filter_by(rcourse_ID=rcourseID).first()
+            course = Course.query.filter_by(course_ID=rcourse.course_ID).first()
             message = ''            
+
             if(rcourse):
                 if rcourse.runcourse_Status == "Closed":
                     setattr(rcourse, "runcourse_Status", "Ongoing")
-                    setattr(rcourse, "course_Status", "Active")
+                    setattr(course, "course_Status", "Active")
                     message = 'Run Course registration Opened'
                 else:
                     setattr(rcourse, "runcourse_Status", "Closed")
-                    setattr(rcourse, "course_Status", "Inactive")
+                    setattr(course, "course_Status", "Inactive")
                     message = 'Run Course registration Closed'
 
                 db.session.commit()
-                db.session.close()
+
                 return json.loads(json.dumps({"message": message, "code": 200}, default=str))
 
             return json.loads(json.dumps({"message": "There is no such runcourse", "code": 404}, default=str))
@@ -181,6 +185,7 @@ class EditRunCourse(Resource):
 
             #Commit the changes to the database 
             db.session.commit()
+            # db.session.close()
 
            # Convert dates and times to formatted strings
             runcourse.run_Startdate = start_date.strftime('%Y-%m-%d')

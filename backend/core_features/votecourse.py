@@ -31,6 +31,7 @@ class PromoteToCourse(Resource):
         if course:
           course.course_Status = 'Active'
         db.session.commit()
+        db.session.close()
         return jsonify({"message": "Vote Course is successfully promoted to course", "code": 200})
       else:
         return jsonify({"message": "Vote Course does not exist", "code": 404})
@@ -50,6 +51,7 @@ class GetVoteCourse(Resource):
         if vote_course:
             course = Course.query.get(vote_course.course_ID)
             course_category = CourseCategory.query.get(course.coursecat_ID)
+            db.session.close()
             
             response_data = {
                 "course_ID": course.course_ID,

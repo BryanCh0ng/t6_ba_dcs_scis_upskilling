@@ -69,6 +69,8 @@ class CreateNewRegistration(Resource):
             try:
                 existing_registration.reg_Status = "Pending"
                 db.session.commit()
+                db.session.close()
+
                 return jsonify(
                     {
                         "code": 200,
@@ -85,6 +87,8 @@ class CreateNewRegistration(Resource):
             try:
                 db.session.add(registration)
                 db.session.commit()
+                db.session.close()
+
                 return jsonify(
                     {
                         "code": 201,
@@ -196,11 +200,9 @@ class dropRegisteredCourse(Resource):
             registration = Registration.query.filter_by(rcourse_ID=rcourse_ID, user_ID=user_ID).first()
 
             if registration is None:
-                db.session.close()
                 return {"message": "Registration record not found for the specified course and user"}, 404
 
             if user_ID != registration.user_ID:
-                db.session.close()
                 return {"message": "Unathorized Access, No rights to update registration"}, 404 
     
             registration.reg_Status = 'Dropped'
