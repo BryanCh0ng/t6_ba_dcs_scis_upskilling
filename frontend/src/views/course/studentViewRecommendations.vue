@@ -57,7 +57,7 @@
         <vue-awesome-paginate v-model="localCurrentPageTopPickRegister" v-if="top_register_picks.length/itemsPerPage > 0 && shouldShowTopRegisterPicks" :totalItems="top_register_picks.length" :items-per-page="itemsPerPage" @page-change="handlePageTopRegisterCourses" class="justify-content-center pagination-container"/>
       
         <div class="pt-5 container col-12 table-responsive" v-if="showRegisterJustForYou">
-          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
+          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
           <div v-if="reg_courses_for_you && reg_courses_for_you.length > 0"> 
             <table class="table bg-white">
               <thead>
@@ -102,7 +102,7 @@
         <vue-awesome-paginate v-model="localCurrentPageRegCourseForYou" v-if="reg_courses_for_you.length/itemsPerPage > 0" :totalItems="reg_courses_for_you.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseForYou" class="justify-content-center pagination-container"/>
         
         <div class="pt-5 container col-12 table-responsive" v-if="showRegisterOthers">
-          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
+          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
           <div v-if="reg_courses_others && reg_courses_others.length > 0"> 
             <table class="table bg-white">
               <thead>
@@ -181,7 +181,7 @@
         <vue-awesome-paginate v-model="localCurrentPageTopPickInterest" v-if="top_interest_picks.length/itemsPerPage > 0 && shouldShowTopInterestPicks" :totalItems="top_interest_picks.length" :items-per-page="itemsPerPage" @page-change="handlePageTopInterestCourses" class="justify-content-center pagination-container"/>
           
         <div class="pt-5 container col-12 table-responsive" v-if="showInterestJustForYou">
-          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
+          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1> 
           <div v-if="interest_courses && interest_courses.length > 0"> 
             <table class="table bg-white">
               <thead>
@@ -212,7 +212,7 @@
 
         
           <div class="pt-5 container col-12 table-responsive" v-if="showInterestOthers">
-          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
+          <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
           <div v-if="interest_others && interest_others.length > 0"> 
             <table class="table bg-white">
               <thead>
