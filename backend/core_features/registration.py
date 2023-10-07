@@ -69,7 +69,6 @@ class CreateNewRegistration(Resource):
             try:
                 existing_registration.reg_Status = "Pending"
                 db.session.commit()
-                db.session.close()
 
                 return jsonify(
                     {
@@ -87,7 +86,6 @@ class CreateNewRegistration(Resource):
             try:
                 db.session.add(registration)
                 db.session.commit()
-                db.session.close()
 
                 return jsonify(
                     {
