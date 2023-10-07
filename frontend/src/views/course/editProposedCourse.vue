@@ -86,7 +86,7 @@ import { useVuelidate } from "@vuelidate/core";
 import UserService from "@/api/services/UserService.js";
 import CourseCategoryService from "@/api/services/CourseCategoryService.js";
 import ProposedCourseService from "@/api/services/proposedCourseService.js";
-import CourseService from "@/api/services/CourseService.js";
+// import CourseService from "@/api/services/CourseService.js";
 import SuccessModal from "../../components/SuccessModal.vue";
 
 export default {
@@ -229,27 +229,35 @@ export default {
 
       try {
         if (this.action == 'approve') {
-        const result = await CourseService.adminUpdateCourse(courseId, formData);
-        let approve_result;
-        if (result.success) {
-            const course = await ProposedCourseService.getProposedCourseByCourseId(courseId);
-            const acceptPromise = ProposedCourseService.approveProposedCourse({ "pcourseID": course['data'].pcourse_ID });
-            approve_result = await acceptPromise;
-          } else {
-            approve_result = { code: 200 };
+          const result = await ProposedCourseService.updateProposedCourse(courseId, formData);
+          console.log(result)
+          if (result.message == "Proposed course updated successfully") {
+            let approve_result;
+            if (result.success) {
+                const course = await ProposedCourseService.getProposedCourseByCourseId(courseId);
+                const acceptPromise = ProposedCourseService.approveProposedCourse({ "pcourseID": course['data'].pcourse_ID });
+                approve_result = await acceptPromise;
+              } else {
+                approve_result = { code: 200 };
+              }
+              if (approve_result.code == 200) {
+                this.successMessage = approve_result.message
+                this.showSuccessModal = true;
+              } else {
+                this.errorMessage = approve_result.message;
+              }
+          } else if (result.message == "Course Update Unsuccessful. A course with the same name already exists.") {
+            this.errorMessage = "A course with the same name already exists.";
           }
-          if (approve_result.code == 200) {
-            this.successMessage = approve_result.message
-            this.showSuccessModal = true;
-          } else {
-            this.errorMessage = approve_result.message;
-          }
+
+          
         } else {
           const result = await ProposedCourseService.updateProposedCourse(courseId, formData);
-          if (result.success) {
+          console.log(result)
+          if (result.message == "Proposed course updated successfully") {
             this.showSuccessModal = true;
             this.successMessage = result.message
-          } else {
+          } else if (result.message == "Course Update Unsuccessful. A course with the same name already exists."){
             this.errorMessage = result.message;
           }
         }

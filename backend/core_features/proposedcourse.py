@@ -146,10 +146,7 @@ class UpdateProposedCourse(Resource):
     @api.expect(update_proposed_course_model)
     def put(self, course_id):
         try:
-            # app.logger.debug(course_id)
-
             data = request.get_json()
-            # app.logger.debug(data)
             course_name = data.get('course_Name')
             course_desc = data.get('course_Desc')
             coursecat_ID = data.get('coursecat_ID')
@@ -157,20 +154,19 @@ class UpdateProposedCourse(Resource):
             course = Course.query.get(course_id)
             user_id = common.getUserID()
             user_role = common.getUserRole()
-            proposed_course = ProposedCourse.query.filter_by(course_ID = course_id).first()
-            if (user_id) != proposed_course.submitted_By and user_role != "Admin":
-              return jsonify({"message": "Unathorized Access, no rights to edit proposed course", "code": 404}) 
+            proposed_course = ProposedCourse.query.filter_by(course_ID=course_id).first()
+            
+            if user_id != proposed_course.submitted_By and user_role != "Admin":
+                return jsonify({"message": "Unauthorized Access, no rights to edit proposed course", "code": 403})
 
             if course is None:
                 return jsonify({"message": "Proposed course not found", "code": 404}), 404
-            
-            # Perform a case-insensitive search and remove leading/trailing spaces
-            existing_course = Course.query.filter(func.lower(func.trim(Course.course_Name)) == func.lower(course_name)).first()
-            # print(existing_course)
-            
-            if course_name != course.course_Name and existing_course:
-               return jsonify({"message": "Course Update Unsuccessful. A course with the same name already exists.", "code": 200})
 
+            existing_course = Course.query.filter(func.lower(func.trim(Course.course_Name)) == func.lower(course_name)).first()
+
+            if existing_course and course_name != course.course_Name:
+                return jsonify({"message": "Course Update Unsuccessful. A course with the same name already exists.", "code": 405})
+            
             course.course_Name = course_name
             course.course_Desc = course_desc
             course.coursecat_ID = coursecat_ID
@@ -183,6 +179,7 @@ class UpdateProposedCourse(Resource):
         except Exception as e:
             db.session.rollback()
             return jsonify({"message": f"Failed to update proposed course: {str(e)}", "code": 500})
+
         
 
 # Delete Propose Course
