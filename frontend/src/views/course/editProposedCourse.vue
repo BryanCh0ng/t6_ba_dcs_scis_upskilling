@@ -103,7 +103,7 @@ export default {
       course_desc: "",
       errorMessage: "",
       showSuccessModal: false,
-      successMessage: "You have successfully updated the proposed course.",
+      successMessage: "",
       descPlaceholder: "Course Description",
       categoryDropdownOptions: []
     };
@@ -239,6 +239,7 @@ export default {
             approve_result = { code: 200 };
           }
           if (approve_result.code == 200) {
+            this.successMessage = approve_result.message
             this.showSuccessModal = true;
           } else {
             this.errorMessage = approve_result.message;
@@ -247,6 +248,7 @@ export default {
           const result = await ProposedCourseService.updateProposedCourse(courseId, formData);
           if (result.success) {
             this.showSuccessModal = true;
+            this.successMessage = result.message
           } else {
             this.errorMessage = result.message;
           }

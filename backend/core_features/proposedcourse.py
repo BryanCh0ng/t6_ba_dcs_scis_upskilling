@@ -3,6 +3,7 @@ from flask_restx import Namespace, Resource, fields
 from core_features import common
 from allClasses import *
 import json
+from sqlalchemy import func, and_, exists, not_, select
 import logging
 app.logger.setLevel(logging.DEBUG)
 
@@ -162,6 +163,13 @@ class UpdateProposedCourse(Resource):
 
             if course is None:
                 return jsonify({"message": "Proposed course not found", "code": 404}), 404
+            
+            # Perform a case-insensitive search and remove leading/trailing spaces
+            existing_course = Course.query.filter(func.lower(func.trim(Course.course_Name)) == func.lower(course_name)).first()
+            # print(existing_course)
+            
+            if course_name != course.course_Name and existing_course:
+               return jsonify({"message": "Course Update Unsuccessful. A course with the same name already exists.", "code": 200})
 
             course.course_Name = course_name
             course.course_Desc = course_desc
