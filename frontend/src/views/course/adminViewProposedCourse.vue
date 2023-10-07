@@ -276,9 +276,11 @@ export default {
   async created() {
     const user_ID = await UserService.getUserID();
     const role = await UserService.getUserRole(user_ID);
-    if (role != 'Admin') {
-      this.$router.push({ name: 'studentViewProfile' }); 
-    } else {
+    if (role == 'Student') {
+      this.$router.push({ name: 'studentViewCourse' }); 
+    } else if (role == 'Instructor' || role == 'Trainer') {
+        this.$router.push({ name: 'instructorTrainerViewVotingCampaign' });
+    }else {
       this.loadData();
     }
   },

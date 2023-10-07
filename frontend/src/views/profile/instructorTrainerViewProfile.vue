@@ -339,7 +339,7 @@ export default {
       const user_id = await UserService.getUserID();
       user_ID = user_id
       try {
-        let response = await CourseService.searchInstructorAssignedCourseInfo(
+      let response = await CourseService.searchInstructorAssignedCourseInfo(
           user_ID,
           course_Name,
           coursecat_ID,

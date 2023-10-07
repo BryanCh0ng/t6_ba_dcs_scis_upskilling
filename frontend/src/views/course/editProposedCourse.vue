@@ -131,9 +131,11 @@ export default {
     if (this.action == 'approve') {
       const user_ID = await UserService.getUserID();
       const role = await UserService.getUserRole(user_ID);
-      if (role != 'Admin') {
+      if (role == 'Student') {
         this.$router.push({ name: 'studentViewProfile' }); 
-      } 
+      } else if (role == 'Instructor' || role == 'Trainer') {
+        this.$router.push({ name: 'instructorTrainerViewProfile' });
+      }
     }
     this.get_user_role();
     this.fetchCategoryDropdownOptions();

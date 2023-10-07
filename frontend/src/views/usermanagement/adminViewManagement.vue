@@ -427,8 +427,11 @@ export default {
     const user_ID = await UserService.getUserID();
     this.user_ID = user_ID;
     const role = await UserService.getUserRole(user_ID);
-    if (role != 'Admin') {
+    
+    if (role == 'Student') {
       this.$router.push({ name: 'studentViewProfile' }); 
+    } else if (role == 'Instructor' || role == 'Trainer') {
+      this.$router.push({ name: 'instructorTrainerViewProfile' });
     } else {
       try {
         let admin_response = await ManagementService.getAllAdmin(null)

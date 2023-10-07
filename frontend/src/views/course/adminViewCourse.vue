@@ -196,9 +196,11 @@
     async created() {
       const user_ID = await UserService.getUserID();
       const role = await UserService.getUserRole(user_ID);
-      if (role != 'Admin') {
+      if (role == 'Student') {
         this.$router.push({ name: 'studentViewCourse' }); 
-      } else {
+      } else if (role == 'Instructor' || role == 'Trainer') {
+        this.$router.push({ name: 'instructorTrainerViewVotingCampaign' });
+      }else {
         this.loadData();
       }
     },
