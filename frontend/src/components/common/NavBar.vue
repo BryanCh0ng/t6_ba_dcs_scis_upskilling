@@ -1,5 +1,5 @@
 <template>
-  <div class="content mb-5">
+  <div class="content">
     <nav class="navbar navbar-expand-xxl">
       <div class="container-fluid">
         <a class="navbar-brand no-underline" href="#">

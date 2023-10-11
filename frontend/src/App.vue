@@ -3,7 +3,7 @@
     <!-- <img alt="Vue logo" src="./assets/logo.png">
     <HelloWorld msg="Welcome to Your Vue.js App"/> -->
     <nav-bar v-if="showNavBar"/>
-    <div class="content">
+    <div class="core">
       <router-view />
     </div>
   </div>

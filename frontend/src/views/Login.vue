@@ -1,6 +1,6 @@
 <template>
   <div class="full-screen-container" id="login">
-    <div class="content">
+    <div class="onboard">
       <div class="row no-gutter">
         
         <image-half></image-half>
@@ -116,8 +116,8 @@ export default {
 };
 </script>
 
-<style>
-.content {
+<style scoped>
+.onboard {
   padding: 0px;
   font-size: 15px;
 }
