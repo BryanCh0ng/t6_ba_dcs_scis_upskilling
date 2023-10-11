@@ -2,8 +2,8 @@
   <div class="full-screen-container" id="app">
     <!-- <img alt="Vue logo" src="./assets/logo.png">
     <HelloWorld msg="Welcome to Your Vue.js App"/> -->
-    <nav-bar v-if="showNavBar"/>
-    <div class="core">
+    <nav-bar v-if="showNavBar" class="mb-5"/>
+    <div>
       <router-view />
     </div>
   </div>
