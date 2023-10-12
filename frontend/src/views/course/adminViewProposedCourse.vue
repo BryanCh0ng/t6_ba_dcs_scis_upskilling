@@ -87,7 +87,8 @@
                     {{ proposed_course.submitted_by_name }}
                   </td>
                   <td>{{ proposed_course.pcourse_Status }}</td>
-                  <td>{{ proposed_course.reason }}</td>
+                  <td v-if="proposed_course.reason === 'NULL' || proposed_course.reason === null " class="text-center">-</td>
+                  <td v-else-if="proposed_course.reason !== NULL">{{ proposed_course.reason }}</td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                 </tr>
               </tbody>
@@ -256,6 +257,7 @@ export default {
         
         let proposed_response = await CourseService.searchAllApprovedRejectedProposedCoursesAdmin(null, null, null)
         this.proposed_courses = proposed_response.data
+        console.log(this.proposed_courses)
       } catch (error) {
         console.error("Error fetching course details:", error);
       }

@@ -4,6 +4,7 @@ from allClasses import *
 from core_features import common
 import json
 from sqlalchemy import distinct
+from datetime import datetime, timedelta
 
 api = Namespace('runcourse', description='Run Course related operations')
 
@@ -96,10 +97,19 @@ class ChangeRegistrationStatus(Resource):
             course = Course.query.filter_by(course_ID=rcourse.course_ID).first()
             message = ''            
 
+            current_datetime = datetime.now()
+            current_date = current_datetime.strftime('%Y-%m-%d')
+            close_date = (current_datetime + timedelta(days=5)).strftime('%Y-%m-%d')
+            current_time = current_datetime.strftime('%H:%M:%S')
+
             if(rcourse):
                 if rcourse.runcourse_Status == "Closed":
                     setattr(rcourse, "runcourse_Status", "Ongoing")
                     setattr(course, "course_Status", "Active")
+                    setattr(rcourse, "reg_Startdate", current_date)
+                    setattr(rcourse, "reg_Starttime", current_time)
+                    setattr(rcourse, "reg_Enddate", close_date)
+                    setattr(rcourse, "reg_Endtime", "10:00:00")
                     message = 'Run Course registration Opened'
                 else:
                     setattr(rcourse, "runcourse_Status", "Closed")
