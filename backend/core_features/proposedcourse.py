@@ -167,9 +167,16 @@ class UpdateProposedCourse(Resource):
             if existing_course and course_name != course.course_Name:
                 return jsonify({"message": "Course Update Unsuccessful. A course with the same name already exists.", "code": 405})
             
-            course.course_Name = course_name
-            course.course_Desc = course_desc
-            course.coursecat_ID = coursecat_ID
+            
+            result_data = {
+               'course_Name': course_name,
+               'course_Desc': course_desc,
+               'coursecat_ID': coursecat_ID
+            }
+            result = Course.query.filter_by(course_ID=course_id).update(result_data)
+            # course.course_Name = course_name
+            # course.course_Desc = course_desc
+            # course.coursecat_ID = coursecat_ID
 
             db.session.commit()
             db.session.close()
