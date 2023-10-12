@@ -13,10 +13,10 @@
       <div v-if="isRunCourse">
         <div class="pt-4 row">
           <div class="col-6"> 
-            Course Start Date: <br> <strong>{{ convertDate(course.reg_Startdate) }}</strong>
+            Course Start Date: <br> <strong>{{ convertDate(course.run_Startdate) }}</strong>
           </div>
           <div class="col-6">
-            Course Start Time: <br> <strong>{{ convertTime(course.reg_Starttime) }}</strong>
+            Course Start Time: <br> <strong>{{ convertTime(course.run_Starttime) }}</strong>
           </div>
         </div>
         <div class="pt-3 row">
