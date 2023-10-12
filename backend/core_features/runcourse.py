@@ -100,6 +100,12 @@ class ChangeRegistrationStatus(Resource):
             current_datetime = datetime.now()
             current_date = current_datetime.strftime('%Y-%m-%d')
             close_date = (current_datetime + timedelta(days=5)).strftime('%Y-%m-%d')
+
+            rcourse_run_startdate_str = rcourse.run_Startdate.strftime('%Y-%m-%d')
+            # print(rcourse_run_startdate_str)
+            if rcourse_run_startdate_str <= close_date:
+                close_date = (rcourse.run_Startdate - timedelta(days=1)).strftime('%Y-%m-%d')
+            
             current_time = current_datetime.strftime('%H:%M:%S')
 
             if(rcourse):
