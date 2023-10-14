@@ -62,7 +62,7 @@
             <div v-else-if="assigned_courses=[] && onInitialEmptyAssigned">
               <div class="pt-5 text-center">
                 <p>You are not assigned to any courses.</p>
-                <router-link :to="{ name: 'instructorTrainerViewProfile' }" class="btn btn-edit">Propose a Course</router-link>
+                <router-link :to="{ name: 'proposeCourse' }" class="btn btn-edit">Propose a Course</router-link>
               </div>
             </div>
             <div v-else-if="assigned_courses=[]">
@@ -179,7 +179,7 @@
                 </table>
                
             </div>
-            <div v-else-if="conducted_course=[] && onInitialEmptyConducted">
+            <div v-else-if="conducted_courses=[] && onInitialEmptyConducted">
               <div class="pt-5 text-center">
                 <p>You have not yet conducted any courses.</p>
                 <router-link :to="{ name: 'proposeCourse' }" class="btn btn-edit">Propose a Course</router-link>
@@ -227,8 +227,9 @@ import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/CommonSearchFilter.vue";
 import StudentSearchFilter from "@/components/search/StudentCourseSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
-// import UserService from "@/api/services/UserService.js";
+import UserService from "@/api/services/UserService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
+import CommonService from "@/api/services/CommonService.js";
 
 export default {
   components: {
@@ -335,11 +336,10 @@ export default {
     },
 
     async searchInstructorAssignedCourseInfo(user_ID, course_Name, coursecat_ID, status) {
+      const user_id = await UserService.getUserID();
+      user_ID = user_id
       try {
-        // const user_id = await UserService.getUserID()
-        const user_id = 4
-        user_ID = user_id
-        let response = await CourseService.searchInstructorAssignedCourseInfo(
+      let response = await CourseService.searchInstructorAssignedCourseInfo(
           user_ID,
           course_Name,
           coursecat_ID,
@@ -355,10 +355,9 @@ export default {
     },
 
     async searchInstructorProposedCourseInfo(user_ID, course_Name, coursecat_ID, status) {
+      const user_id = await UserService.getUserID();
+      user_ID = user_id
       try {
-        // const user_id = await UserService.getUserID()
-        const user_id = 4
-        user_ID = user_id
         let response = await CourseService.searchInstructorProposedCourseInfo(
           user_ID,
           course_Name,
@@ -374,10 +373,9 @@ export default {
     },
 
     async searchInstructorCompletedCourseInfo(user_ID, course_Name, coursecat_ID) {
+      const user_id = await UserService.getUserID();
+      user_ID = user_id
       try {
-        // const user_id = await UserService.getUserID()
-        const user_id = 4
-        user_ID = user_id
         let response = await CourseService.searchInstructorCompletedCourseInfo(
           user_ID,
           course_Name,
@@ -408,17 +406,14 @@ export default {
     },
     async sortCourse(action) {
         if (action == 'assigned') {
-          let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.assigned_courses)
-          // console.log(this.sortColumn)
-          // console.log(this.sortDirection)
-          // console.log(sort_response)
+          let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.assigned_courses)
           if (sort_response.code == 200) {
             this.assigned_courses = sort_response.data
           }
         }
 
         if (action == 'proposed') {
-          let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
+          let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
          
           if (sort_response.code == 200) {
             this.proposed_courses = sort_response.data
@@ -426,13 +421,12 @@ export default {
         }
 
         if (action == 'conducted') {
-          let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.conducted_courses)
+          let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.conducted_courses)
           
           if (sort_response.code == 200) {
             this.conducted_courses = sort_response.data
           }
         }
-
     },
     isClosingDateValid(closingDate) {
         const regClosingDate = new Date(closingDate);
@@ -445,9 +439,9 @@ export default {
 
     async loadData() {
       try {
-         // let user_ID = await UserService.getUserID()
-          let user_ID = 4
-
+          const user_ID = await UserService.getUserID();
+          console.log(user_ID)
+          
           let assigned_courses = await CourseService.searchInstructorAssignedCourseInfo(user_ID, null, null, null)
           this.assigned_courses = assigned_courses.data
 
@@ -459,6 +453,16 @@ export default {
         
       } catch (error) {
         console.error("Error fetching course details:", error);
+      }
+    },
+
+    async getUserID() {
+      try {
+        const user_ID = await UserService.getUserID();
+        this.user_ID = user_ID;
+      } catch (error) {
+        console.error('Error fetching user ID:', error);
+        this.user_ID = null;
       }
     },
 
@@ -484,30 +488,54 @@ export default {
 
   },
   async created() {
-    try {
-      // let user_ID = await UserService.getUserID()
-      let user_ID = 4
+    const user_ID = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_ID);
+    if (role == 'Student') {
+      this.$router.push({ name: 'studentViewProfile' }); 
+    } else if (role == 'Admin') {
+      this.$router.push({ name: 'AdminViewInstructorsTrainers' }); 
+    } else {
+      try {
+        this.user_ID = await UserService.getUserID()
 
-      let assigned_courses = await CourseService.searchInstructorAssignedCourseInfo(user_ID, null, null, null)
-      this.assigned_courses = assigned_courses.data
-      if (this.assigned_courses == undefined || this.assigned_courses.length == 0) {
-        this.onInitialEmptyAssigned = true
+        let assigned_courses = await CourseService.searchInstructorAssignedCourseInfo(this.user_ID, null, null, null)
+        if (assigned_courses.code == 200) {
+          this.assigned_courses = assigned_courses.data
+          if (this.assigned_courses == undefined || this.assigned_courses.length == 0) {
+            this.onInitialEmptyAssigned = true
+          }
+        } else {
+          this.assigned_courses = []
+          this.onInitialEmptyAssigned = true
+        }
+
+        console.log(this.user_ID)
+
+        let proposed_courses = await CourseService.searchInstructorProposedCourseInfo(this.user_ID, null, null, null)
+        if (proposed_courses.code == 200 ) {
+          this.proposed_courses = proposed_courses.data
+          if (this.proposed_courses == undefined || this.proposed_courses.length == 0) {
+            this.onInitialEmptyProposed = true
+          }
+        } else {
+          this.proposed_courses = []
+          this.onInitialEmptyProposed = true
+        }
+
+        let conducted_courses = await CourseService.searchInstructorCompletedCourseInfo(this.user_ID, null, null)
+        if (conducted_courses.code == 200) {
+          this.conducted_courses = conducted_courses.data
+          if (this.conducted_courses == undefined || this.conducted_courses.length == 0) {
+            this.onInitialEmptyConducted = true
+          }
+        } else {
+          this.conducted_courses = []
+          this.onInitialEmptyConducted = true
+        }
+        
+      } catch (error) {
+        console.error("Error fetching course details:", error);
       }
-
-      let proposed_courses = await CourseService.searchInstructorProposedCourseInfo(user_ID, null, null, null)
-      this.proposed_courses = proposed_courses.data
-      if (this.proposed_courses == undefined || this.proposed_courses.length == 0) {
-        this.onInitialEmptyProposed = true
-      }
-
-      let conducted_courses = await CourseService.searchInstructorCompletedCourseInfo(user_ID, null, null)
-      this.conducted_courses = conducted_courses.data
-      if (this.conducted_courses == undefined || this.conducted_courses.length == 0) {
-        this.onInitialEmptyConducted = true
-      }
-
-    } catch (error) {
-      console.error("Error fetching course details:", error);
     }
   },
   mounted() {

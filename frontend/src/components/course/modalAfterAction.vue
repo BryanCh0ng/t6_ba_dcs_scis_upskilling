@@ -13,7 +13,7 @@
           {{ message }}
       </div>
       <div>
-        <button type="button" class="mt-4 btn btn-secondary" data-bs-dismiss="modal" aria-label="Close" @click="closeModal">Close</button>
+        <button type="button" class="mt-4 btn btn-secondary close-btn float-end" data-bs-dismiss="modal" aria-label="Close" @click="closeModal">Close</button>
       </div>
     </div>
   </div>

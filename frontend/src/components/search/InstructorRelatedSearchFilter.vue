@@ -4,7 +4,7 @@
       <form>
         <div class="row">
           <div class="col-md">
-            <input-field v-model="instructorName" type="text" placeholder="Instructor Name"/>
+            <input v-model="instructorName" type="text" placeholder="Instructor Name" class="form-control border-0 shadow-sm px-4 field mb-3"/>
           </div>
           <div class="col-md">
             <dropdown-field v-model="role" :default-placeholder="'Role'">

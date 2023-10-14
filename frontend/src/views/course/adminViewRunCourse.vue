@@ -3,7 +3,8 @@
     <search-filter
       :status-options="statusOptions"
       :search-api="searchAllRunCoursesAdmin" 
-      @search-complete="handleSearchComplete"/>
+      @search-complete="handleSearchComplete"
+      class="pt-4"/>
     <div class="container col-12">
       <h5 class="pb-3">All Run Courses</h5>
       <div v-if="courses && courses.length > 0" class="table-responsive">
@@ -20,7 +21,7 @@
                 <a href="" @click.prevent="sort('runcourse_Status')" class="text-decoration-none text-dark">Run Status <sort-icon :sortColumn="sortColumn === 'runcourse_Status'" :sortDirection="getSortDirection('runcourse_Status')"/></a></th>
               <th scope="col">Feedback Analysis</th>
               <th scope="col">Course Details</th>
-              <th scope="col">Action(s)</th>
+              <th scope="col" colspan="3">Action(s)</th>
             </tr>
           </thead>
           <tbody>
@@ -37,16 +38,18 @@
               <td>{{ course.runcourse_Status }}</td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-              <td v-if="course.runcourse_Status=='Ongoing'">
-                <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
-              </td>
-              <td v-else-if="course.runcourse_Status=='Closed'">
-                <course-action @action-and-message-updated="handleActionData" status="open_for_registration" :course="course" :courseName="course.courseName" ></course-action>
-              </td>
-              <td><course-action status="Edit" :course="course" @click="goToEditRunCourseWithId(course.rcourse_ID)"></course-action></td>
-              <td v-if="course.runcourse_Status=='Closed'">
-                <course-action @action-and-message-updated="handleActionData" status="delete-run-course" :course="course" :courseName="course.courseName" ></course-action>
-              </td>
+              <div>
+                <td v-if="course.runcourse_Status=='Ongoing'">
+                  <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
+                </td>
+                <td v-else-if="course.runcourse_Status=='Closed' && isCourseStartDateBeforeCurrentDate(course.run_Startdate)">
+                  <course-action @action-and-message-updated="handleActionData" status="open_for_registration" :course="course" :courseName="course.courseName" ></course-action>
+                </td>
+                <td v-if="course"><course-action status="Edit" :course="course" @click="goToEditRunCourseWithId(course.rcourse_ID)"></course-action></td>
+                <td v-if="course.runcourse_Status=='Closed'">
+                  <course-action @action-and-message-updated="handleActionData" status="delete-run-course" :course="course" :courseName="course.courseName" ></course-action>
+                </td>
+              </div>
             </tr>               
           </tbody>
         </table>
@@ -81,6 +84,8 @@ import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
+import CommonService from "@/api/services/CommonService.js";
+import UserService from "@/api/services/UserService.js";
 
 export default {
   components: {
@@ -180,7 +185,7 @@ export default {
       }
     },
     async sortCourse() {
-      let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.courses)
+      let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.courses)
         if (sort_response.code == 200) {
           this.courses = sort_response.data
         }
@@ -190,10 +195,23 @@ export default {
     },
     goToCreateRunCourse(courseID){
       this.$router.push({ name: 'createRunCourse', params: {id: courseID}});
-    }
+    },
+    isCourseStartDateBeforeCurrentDate(courseStartDate) {
+      console.log(courseStartDate)
+      const currentDate = new Date();
+      return new Date(courseStartDate) > currentDate;
+    },
   },
-  created() {
-   this.loadData();
+  async created() {
+    const user_ID = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_ID);
+    if (role == 'Student') {
+      this.$router.push({ name: 'studentViewCourse' }); 
+    } else if (role == 'Instructor' || role == 'Trainer') {
+      this.$router.push({ name: 'instructorTrainerViewVotingCampaign' });
+    }else {
+      this.loadData();
+    }
   },
   mounted() {
     const buttonElement = document.createElement('button');

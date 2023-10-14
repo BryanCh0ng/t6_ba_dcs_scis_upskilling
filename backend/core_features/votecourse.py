@@ -2,6 +2,7 @@ from flask import request, jsonify, session
 from flask_restx import Namespace, Resource, fields
 from allClasses import *
 import json
+from core_features import common
 from sqlalchemy.orm import aliased
 from sqlalchemy import func, and_, exists
 from datetime import datetime
@@ -18,6 +19,9 @@ class PromoteToCourse(Resource):
   @api.expect(promote_to_course)
   def post(self):
     try:
+      user_role = common.getUserRole()
+      if (user_role) != 'Admin':
+          return {"message": "Unathorized Access, Failed to promote to course"}, 404 
       args = promote_to_course.parse_args()
       course_id = args.get("course_id")
       vote_course = VoteCourse.query.filter_by(course_ID = course_id).first()
@@ -27,6 +31,7 @@ class PromoteToCourse(Resource):
         if course:
           course.course_Status = 'Active'
         db.session.commit()
+        db.session.close()
         return jsonify({"message": "Vote Course is successfully promoted to course", "code": 200})
       else:
         return jsonify({"message": "Vote Course does not exist", "code": 404})
@@ -46,6 +51,7 @@ class GetVoteCourse(Resource):
         if vote_course:
             course = Course.query.get(vote_course.course_ID)
             course_category = CourseCategory.query.get(course.coursecat_ID)
+            db.session.close()
             
             response_data = {
                 "course_ID": course.course_ID,

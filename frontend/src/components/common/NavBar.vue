@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <nav class="navbar navbar-expand-xl">
+    <nav class="navbar navbar-expand-xxl">
       <div class="container-fluid">
         <a class="navbar-brand no-underline" href="#">
           <img src="../../assets/smulogo.png" title="smu logo" class="navlogo" />
@@ -26,13 +26,6 @@
             <!-- Navigation Links -->
             <li v-for="link in navigationLinks" :key="link.path" class="nav-item">
               <a :class="{ active: isActiveLink(link.path) }" class="nav-link" :href="link.path">{{ link.label }}</a>
-            </li>
-
-            <!-- Login Button (Visible when not logged in) -->
-            <li class="nav-item" v-if="!user_ID">
-              <button type="button" class="btn loginbtn" @click="redirectToLogin">
-                Login
-              </button>
             </li>
 
             <!-- User Info and Role-Specific Dropdown (Visible when logged in) -->
@@ -88,35 +81,38 @@ export default {
       if (this.user_ID) {
         if (this.user_role === "Student") {
           links.push(
-            { path: "/recommendations", label: "Recommendations" },
+            { path: "/studentViewRecommendations", label: "Recommendations" },
             { path: "/studentViewCourse", label: "View Courses" },
-            { path: "/proposeCourse", label: "Propose Course" }
+            { path: "/proposeCourse", label: "Propose Course" },
+            { path: "/contactUs", label: "Contact Us" },
           );
         } else if (
           this.user_role === "Instructor" ||
           this.user_role === "Trainer"
         ) {
           links.push(
-            { path: "/votingCampaign", label: "Voting Campaign" },
-            { path: "/proposeCourse", label: "Propose Course" }
+            { path: "/instructorTrainerViewVotingCampaign", label: "Voting Campaign" },
+            { path: "/proposeCourse", label: "Propose Course" },
+            { path: "/contactUs", label: "Contact Us" },
           );
         } else if (this.user_role === "Admin") {
           links.push(
-            { path: "/adminViewProposedCourse", label: "All Proposal" },
-            { path: "/votingCampaign", label: "Voting Campaign" },
+            { path: "/adminViewCourse", label: "Course DB" },
+            { path: "/adminViewRunCourse", label: "Run Course DB" },
+            { path: "/adminViewVoteCourse", label: "Voting Campaign DB" },
+            { path: "/adminViewProposedCourse", label: "Proposed Course DB" },
             { path: "/createCourse", label: "Create Course" }
           );
         }
-        // Add the common links for logged-in users
-        links.push({ path: "/ContactUs", label: "Contact Us" });
-      } else {
-        // Add the default links for users who are not logged in
-        links.push(
-          { path: "/viewcourses", label: "View Courses" },
-          { path: "/proposeCourse", label: "Propose Course" },
-          { path: "/ContactUs", label: "Contact Us" }
-        );
-      }
+      } 
+      // else {
+      //   // Add the default links for users who are not logged in
+      //   links.push(
+      //     { path: "/adminViewCourse", label: "View Courses" },
+      //     { path: "/proposeCourse", label: "Propose Course" },
+      //     { path: "/contactUs", label: "Contact Us" }
+      //   );
+      // }
 
       return links;
     },
@@ -128,19 +124,14 @@ export default {
       } else if (this.user_role === "Instructor" || this.user_role === "Trainer") {
         items.push(
           { path: "/instructorTrainerViewProfile", label: "Profile" },
-          { path: "/blacklist", label: "Blacklist" },
-          { path: "/dashboard", label: "Dashboard" }
+          { label: "Blacklist" }, // rmb to add path
+          {  label: "Dashboard" } // rmb to add path
         );
       } else if (this.user_role === "Admin") {
         items.push(
-          { path: "/profile", label: "Profile" },
-          { path: "/adminViewRunCourse", label: "All Run Course DB" },
-          { path: "/adminViewVoteCourse", label: "All Vote Course DB" },
-          { path: "/allAvailRegCourse", label: "All Available Registration Course" },
-          { path: "/adminViewInstructorsTrainers", label: "All Instructors DB" },
-          { path: "/blacklist", label: "Blacklist" },
-          { path: "/feedbackTemplate", label: "Feedback Template" },
-          { path: "/dashboard", label: "Dashboard" }
+          { path: "/adminViewManagement", label: "User Management" },
+          { label: "Feedback Template" }, // rmb to add path
+          { label: "Dashboard" } // rmb to add path
         );
       }
 
@@ -196,7 +187,7 @@ export default {
       return this.$route.path === linkPath;
     },
     redirectToLogin() {
-      this.router.push('/login')
+      this.router.push('/')
     },
     // need to add in redirect link
     async logout() {
@@ -206,13 +197,13 @@ export default {
         this.user_role = "";
         this.user_ID = null;
         this.user_name = "";
-        this.router.push('/login')
+        this.router.push('/')
       } catch (error) {
         console.error('Error logging out:', error);
     }
 
     // After successfully logging out, navigate to the login page
-    this.router.push('/login');
+    this.router.push('/');
     },
     toggleUserDropdown() {
       // console.log("Toggling user dropdown");
@@ -329,6 +320,9 @@ export default {
   border-radius: 5px;
   padding: 5px 10px;
   position: relative;
+  white-space: nowrap;
+  width:auto;
+  min-width: 150px; 
   /* padding-left: 90px; */
 }
 .loginbtn {
@@ -368,7 +362,7 @@ export default {
 }
 
 .dropdown-content li {
-  padding: 8px 14px;
+  padding: 2px 14px;
   cursor: pointer;
 }
 
@@ -411,6 +405,5 @@ export default {
     display: none;
   }
 }
-
 
 </style>

@@ -303,27 +303,9 @@ class CourseService extends BaseApiService {
         }
     }
 
-    // Admin - All Instructors
-    async getAllInstructorsAndTrainers(user_Name, role_Name, organization_Name) {
-        try {
-            let instructorsAndTrainers = await axiosClient.get("/course/get_all_instructors_and_trainers", {
-                params: {
-                    instructor_name: user_Name,
-                    role_name: role_Name,
-                    organization_name: organization_Name
-                }
-            });
-            return instructorsAndTrainers.data;
-        } catch (error) {
-            return this.handleError(error);
-        }
-    }
-
-
     // Admin - All Courses
     async searchAllCourseAdmin(course_Name, coursecat_ID, course_Status) {
         try {
-
             let response = await axiosClient.get("/course/get_all_courses", {
                 params: {
                     course_name: course_Name,
@@ -356,7 +338,7 @@ class CourseService extends BaseApiService {
             let retireRunCourse = await axiosClient.post("/course/retire_course", { course_id: course_ID });
             return retireRunCourse.data
         } catch (error) {
-            console.log("Cannot retire the course");
+            // console.log("Cannot retire the course");
             return this.handleError(error);
         }
     }
@@ -366,17 +348,6 @@ class CourseService extends BaseApiService {
         try {
             let activateRunCourse = await axiosClient.post("/course/activate_course", { course_id: course_ID });
             return activateRunCourse.data
-        } catch (error) {
-            console.log("Cannot retire the course");
-            return this.handleError(error);
-        }
-    }
-
-    async sortRecords(sort_column, sort_direction, records) {
-        try {
-
-            let response = await axiosClient.post("/course/sort_records", {sort_column: sort_column, sort_direction: sort_direction, records: records});
-            return response.data;
         } catch (error) {
             return this.handleError(error);
         }
@@ -468,6 +439,41 @@ class CourseService extends BaseApiService {
           return { success: false, message: 'An error occurred while updating the proposed course' };
         }
     }
+
+    async adminGetUserCourses(user_ID, course_Name, coursecat_ID) {
+        try {
+            const endpoint = `/course/user_courses/${user_ID}`;
+            const params = {
+              course_name: course_Name,
+              coursecat_id: coursecat_ID
+            };
+            const response = await axiosClient.get(endpoint, { params });
+            return response.data;
+
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+     // Admin - All Run course based on course id
+     async searchAllRunCourseByCourseId(course_Name, coursecat_ID, course_Status, course_id) {
+        try {
+
+            let response = await axiosClient.get("/course/get_all_run_course_by_course_id", {
+                params: {
+                    course_name: course_Name,
+                    coursecat_id: coursecat_ID,
+                    course_status: course_Status,
+                    course_id: course_id
+                }
+            });
+            // console.log(response.data)
+            return response.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
 }
 
 export default new CourseService();

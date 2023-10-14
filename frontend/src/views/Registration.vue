@@ -1,6 +1,6 @@
 <template>
   <div class="full-screen-container" id="login">
-    <div class="content">
+    <div class="onboard">
       <div class="row no-gutter">
         
         <image-half></image-half>
@@ -21,7 +21,7 @@
               </button>
 
               <p class="text-center mt-2">
-                Already have an account? <router-link to="/login">Sign In</router-link>
+                Already have an account? <router-link to="/">Sign In</router-link>
               </p>
             </form>
         </form-container>
@@ -89,9 +89,8 @@ export default {
     async sendRegLink() {
       try {
         const response = await UserService.verifyEmail(this.email)
-
         this.showSuccessModal = true;
-        console.log(response.data);
+        console.log(response);
       } catch (error) {
         this.errorMessage = "Sent Registration failed. Please check your credentials.";
         console.log("Sent Registration Link error:", error.message);
@@ -99,14 +98,14 @@ export default {
     },
     hideSuccessModal() {
       this.showSuccessModal = false;
-      this.$router.push('/login');
+      this.$router.push('/');
     },
   },
 };
 </script>
 
 <style>
-.content {
+.onboard {
   padding: 0px;
   font-size: 15px;
 }

@@ -22,7 +22,6 @@ class GetAllMsg(Resource):
         arg = get_all_msg.parse_args().get("msg_ID")
         msg_ID = arg if arg else ""
         msg_List = ContactUs.query.filter(ContactUs.msg_ID.contains(msg_ID)).all()
-        db.session.close()
 
         if len(msg_List):
             return jsonify(
@@ -62,6 +61,7 @@ class CreateNewMsg(Resource):
         try:
             db.session.add(msg)
             db.session.commit()
+ 
             return jsonify(
                 {
                     "code": 201,
@@ -72,4 +72,5 @@ class CreateNewMsg(Resource):
         
         
         except Exception as e:
+            db.session.rollback()
             return "Failed" + str(e), 500

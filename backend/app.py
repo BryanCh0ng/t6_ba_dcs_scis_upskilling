@@ -15,9 +15,10 @@ from core_features.registration import api as registration
 from core_features.votecourse import api as votecourse
 from core_features.feedbacktemplate import api as feedbacktemplate
 from core_features.dashboard import api as dashboard
+from core_features.recommender import api as recommender
+from core_features.common import api as common
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
-
 
 app = Flask(__name__)
 api = Api(
@@ -37,6 +38,8 @@ api.add_namespace(registration)
 api.add_namespace(votecourse)
 api.add_namespace(feedbacktemplate)
 api.add_namespace(dashboard)
+api.add_namespace(recommender)
+api.add_namespace(common)
 
 CORS(app, supports_credentials=True)
 # ==================== CONNECTING TO DATABASE ====================#
@@ -48,6 +51,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = f"mysql+mysqlconnector://{db_username}:{
 app.config["CORS_ALLOW_CREDENTIALS"] = True
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['SECRET_KEY'] = 'ashSDFSDFbiuoqewiort123!@*U&!&*(@^)'
+app.config['SQLALCHEMY_POOL_SIZE'] = 30
 # app.config['SQLALCHEMY_POOL_SIZE'] = 2
 # app.config['SQLALCHEMY_MAX_OVERFLOW'] = 0
 
@@ -60,8 +64,18 @@ app.config['MAIL_USE_TLS'] = True  # Use TLS for security
 app.config['MAIL_USERNAME'] = 'nic.wong@live.com'
 app.config['MAIL_PASSWORD'] = 'Nic!256980'
 #app.config['MAIL_DEFAULT_SENDER'] = 'noreply@live.com'  # Default sender email
+
+# app.config['MAIL_SERVER'] = 'smtp-mail.outlook.com'  # Your email server
+# app.config['MAIL_PORT'] = 587  # Port for sending emails
+# app.config['MAIL_USE_TLS'] = True  # Use TLS for security
+# app.config['MAIL_USERNAME'] = 'upskilling_engagement@outlook.com'
+# app.config['MAIL_PASSWORD'] = 'Team6ix!'
+
 mail = Mail(app)
 bcrypt = Bcrypt(app)
+
+from core_features.usermanagement import api as usermanagement
+api.add_namespace(usermanagement)
 
 # ==================== TEST FUNCTIONS ====================
 test_parser = api.parser()

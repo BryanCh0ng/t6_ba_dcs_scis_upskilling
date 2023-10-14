@@ -1,6 +1,6 @@
 <template>
   <div class="full-screen-container" id="login">
-    <div class="content">
+    <div class="onboard">
       <div class="row no-gutter">
         
         <image-half></image-half>
@@ -19,7 +19,7 @@
                 Request reset link
               </button>
               <p class="text-center mt-2">
-                Back to <router-link to="/login">Sign In</router-link>
+                Back to <router-link to="/">Sign In</router-link>
               </p>
             </form>
         </form-container>
@@ -32,7 +32,7 @@
 
 <script>
 import ImageHalf from "../components/ImageHalf.vue";
-import FormContainer from "../components/CommonFormContainer.vue";
+import FormContainer from "../components/RegistrationPasswordContainer.vue";
 import ErrorMessage from "../components/ErrorMessage.vue";
 import InputField from "../components/InputField.vue";
 import SuccessModal from "../components/SuccessModal.vue";
@@ -109,7 +109,7 @@ export default {
     },
     hideSuccessModal() {
       this.showSuccessModal = false;
-      this.$router.push('/login');
+      this.$router.push('/');
     },
 
   },
@@ -117,10 +117,11 @@ export default {
 </script>
 
 <style>
-.content {
+.onboard {
   padding: 0px;
   font-size: 15px;
 }
+
 
 body {
   overflow:hidden;

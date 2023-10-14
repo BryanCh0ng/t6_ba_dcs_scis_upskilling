@@ -1,6 +1,6 @@
 <template>
     <div id="runcourseform">
-        <div class="container-fluid mt-5">
+        <div class="container mt-5">
             <h2 v-if="create" class="text-center">Create Run Course</h2>
 
             <h2 v-else class="text-center">Edit Run Course</h2>
@@ -89,7 +89,7 @@
                 <div class="row mb-4">
                     <!--Course Size-->
                     <div class="col-md-6 form-group">
-                        <input v-model="formData.courseSize" type="text" placeholder="Course Size" required autofocus
+                        <input v-model="formData.courseSize" @input="restrictToNumbers('courseSize')" type="text" placeholder="Course Size" required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.courseSize?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseSize?.$error }" />
                         <div v-if="v$?.formData.courseSize?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.courseSize?.$errors" :key="error.$uid">{{ error.$message
@@ -98,7 +98,7 @@
                     </div>
                     <!--Minimum Slots-->
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <input v-model="formData.minimumSlots" type="text" placeholder="Minimum Slots" required autofocus
+                        <input v-model="formData.minimumSlots" @input="restrictToNumbers('minimumSlots')" type="text" placeholder="Minimum Slots" required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.minimumSlots?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.minimumSlots?.$error }" />
                         <div v-if="v$?.formData.minimumSlots?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.minimumSlots?.$errors" :key="error.$uid">{{ error.$message
@@ -163,7 +163,7 @@
                 <div class="row mb-4">
                     <!--Course Fee-->
                     <div class="col-md-6 form-group">
-                        <input v-model="formData.courseFee" type="text" placeholder="Course Fee" required autofocus
+                        <input v-model="formData.courseFee" @input="validateMoneyInput" type="text" placeholder="Course Fee" required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.courseFee?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseFee?.$error }" />
                         <div v-if="v$?.formData.courseFee?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.courseFee?.$errors" :key="error.$uid">{{ error.$message
@@ -182,13 +182,9 @@
                     </div>
                 </div>
 
-                <!--<button v-if="status" type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
-            Submit
-          </button>-->
-
                 <div v-if="create" class="row">
                     <div class="col-md-6 form-group">
-                        <button type="reset" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                        <button type="reset" class="btn btn-secondary shadow-sm w-100 mt-5 field cancelbtn">
                             Reset
                         </button>
                     </div>
@@ -202,7 +198,8 @@
 
                 <div v-else class="row">
                     <div class="col-md-6 form-group">
-                        <button type="button" @click="goToAdminViewRunCourse" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                        <button type="button" @click="goToAdminViewRunCourse"
+                            class="btn btn-secondary shadow-sm w-100 mt-5 field cancelbtn">
                             Cancel
                         </button>
                     </div>
@@ -216,13 +213,11 @@
             </form>
         </div>
         <!-- Success modal -->
-        <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType"
-            @modal-closed="handleModalClosed" />
+        <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
     </div>
 </template>
   
 <script>
-//import InputField from "../components/InputField.vue";
 import DropdownField from "./DropdownField.vue";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
@@ -449,10 +444,11 @@ export default {
                 startTime: null,
                 endTime: null,
                 selectedFormat: "",
-                courseFormats: [
-                    { id: 1, name: "Online" },
-                    { id: 2, name: "Face-to-Face" },
-                ],
+                /*courseFormats: [
+                    { id: 0, name: "Online" },
+                    { id: 1, name: "Face-to-Face" },
+                ],*/
+                courseFormats: [],
                 venue: "",
                 courseSize: "",
                 minimumSlots: "",
@@ -481,7 +477,6 @@ export default {
     },
     components: {
         VueDatePicker,
-        //InputField,
         DropdownField,
         DefaultModal
     },
@@ -502,7 +497,7 @@ export default {
                 closingDate: { required: helpers.withMessage('Please select a valid closing date for registration', required), closingDateGreaterThanOpeningDate: closingDateGreaterThanOpeningDateValidatorWithMessage },
                 closingTime: { required: helpers.withMessage('Please select a valid closing time for registration', required) },
                 courseFee: { required: helpers.withMessage('Please provide a valid course fee', required), currency: currencyValidatorWithMessage },
-                selectedTemplate: { requiredL: helpers.withMessage('Please select a valid feedback template', required) }
+                selectedTemplate: { required: helpers.withMessage('Please select a valid feedback template', required) }
             }
         }
     },
@@ -521,20 +516,62 @@ export default {
         }
     },
     methods: {
+        restrictToNumbers(fieldName) {
+            // Allow only numeric input
+            this.formData[fieldName] = this.formData[fieldName].replace(/[^0-9]/g, '');
+        },
+        validateMoneyInput() {
+            // Regular expression to allow numeric values with optional decimal points
+            const regex = /^\d+(\.\d{1,2})?$/;
+            if (!regex.test(this.formData.courseFee)) {
+                // If input does not match the pattern, set the value to a valid money format
+                this.formData.courseFee = this.formData.courseFee.replace(/[^\d.]/g, '');
+            }
+        },
         handleModalClosed(value) {
             this.showAlert = value;
 
-            if(!this.showAlert) {
+            if (!this.showAlert && this.buttonType === "success") {
                 this.$router.push('/adminViewRunCourse');
             }
-        },
+        }, 
         async fetchCoaches() {
             try {
                 this.formData.instructors = await UserService.getAllCoaches();
+
             } catch (error) {
                 console.error('Error fetching instructors:', error);
+                this.errorMsg.push('Error fetching instructors or trainers');
+            }
+        },
+        async fetchCourseFormats() {
+            try {
+                let apiResponse = await RunCourseService.getCourseFormats();
+                
+                // Process the strings and extract the values between single quotes
 
-                this.errorMsg.push('Error fetching instructors:', error);
+                // Variable to keep track of the ID
+                let idCounter = 0; 
+
+                apiResponse.forEach(str => {
+                    // Extract the value between the single quotes
+                    let extractedValue = str.match(/'(.*?)'/)[1];
+                    // Convert the value to the desired format (capitalize first letter)
+                    let formattedValue = extractedValue.charAt(0).toUpperCase() + extractedValue.slice(1).toLowerCase();
+                    // Create an object with id and name properties
+                    let formatObject = {
+                        // Assign the current idCounter value
+                        id: idCounter, 
+                        name: formattedValue
+                    };
+                    // Increment the idCounter for the next element
+                    idCounter++;
+                    // Store the formatted object in the courseFormats array
+                    this.formData.courseFormats.push(formatObject);
+                });
+            } catch (error) {
+                console.error('Error fetching course formats:', error);
+                this.errorMsg.push('Error fetching course formats');
             }
         },
         async fetchFeedbackTemplates() {
@@ -542,12 +579,12 @@ export default {
                 this.formData.feedbackTemplates = await FeedbackTemplateService.getAllTemplates();
             } catch (error) {
                 console.error('Error fetching feedback templates:', error);
-
-                this.errorMsg.push('Error fetching feedback templates:', error);
+                this.errorMsg.push('Error fetching feedback templates');
             }
         },
         async fetchFormFieldsData() {
             await this.fetchCoaches();
+            await this.fetchCourseFormats();
             await this.fetchFeedbackTemplates();
 
             if (this.errorMsg.length > 0) {
@@ -572,9 +609,9 @@ export default {
                 this.formData.endTime = { hours: parseInt(endTimeParts[0]), minutes: parseInt(endTimeParts[1]), seconds: 0 }
 
                 if (runcourseData.course_Format === "face-to-face") {
-                    this.formData.selectedFormat = this.formData.courseFormats[1].name;
-                } else {
                     this.formData.selectedFormat = this.formData.courseFormats[0].name;
+                } else {
+                    this.formData.selectedFormat = this.formData.courseFormats[1].name;
                 }
 
                 this.formData.venue = runcourseData.course_Venue;
@@ -601,30 +638,27 @@ export default {
 
             } catch (error) {
                 console.error('Error fetching run course by ID:', error);
-
                 throw new Error("An error occurred in fetching run course by ID");
             }
         },
         async fetchCoachByID() {
             try {
                 const coachData = await UserService.getCoachById(this.instructorID);
-
-                this.formData.selectedInstructor = coachData.user_Name;
+                this.formData.selectedInstructor = coachData.user_Name; 
 
             } catch (error) {
                 console.error('Error fetching coach by ID:', error);
-                this.errorMsg.push('Error fetching coach by ID:', error);
+                this.errorMsg.push('Error fetching instructor or trainer by ID');
             }
         },
         async fetchTemplateByID() {
             try {
                 const templateData = await FeedbackTemplateService.getTemplateById(this.templateID);
-
                 this.formData.selectedTemplate = templateData.template_Name;
-
+            
             } catch (error) {
                 console.error('Error fetching template by ID:', error);
-                this.errorMsg.push('Error fetching template by ID:', error);
+                this.errorMsg.push('Error fetching template by ID');
             }
         },
         async fetchEditRunCourseData() {
@@ -638,31 +672,27 @@ export default {
                 await this.fetchTemplateByID();
 
                 if (this.errorMsg.length > 0) {
-
-                    this.title = "Course Data Retrieval Error";
-
                     throw new Error("There is a problem retrieving the data for this run course");
                 }
 
             } catch (error) {
-
                 this.title = "Course Data Retrieval Error";
-
                 throw new Error("There is a problem retrieving the data for this run course");
-
             }
         },
         async createRunCourse() {
             try {
                 this.createRunCourseResponse = await RunCourseService.createRunCourse(this.courseId, this.submitFormData);
-
+                console.log(this.createRunCourseResponse);
             } catch (error) {
                 console.error('Error creating a new run course:', error);
-
                 this.title = "Run Course Creation Failed";
 
-                throw new Error("Run Course Creation was unsuccessful");
-
+                if(error.response.status === 500) {
+                    throw new Error("Run Course Creation was unsuccessful")
+                } else {
+                    throw new Error(error.response.data.message);
+                }
             }
         },
         async updateRunCourse() {
@@ -674,7 +704,8 @@ export default {
 
                 this.title = "Run Course Update Failed";
 
-                throw new Error("Run Course Update was unsuccessful");
+                //throw new Error("Run Course Update was unsuccessful");
+                throw new Error(error.response.data.message)
 
             }
         },
@@ -693,10 +724,11 @@ export default {
                 startTime: null,
                 endTime: null,
                 selectedFormat: "",
-                courseFormats: [
-                    { id: 1, name: "Online" },
-                    { id: 2, name: "Face-to-Face" },
-                ],
+                /*courseFormats: [
+                    { id: 0, name: "Online" },
+                    { id: 1, name: "Face-to-Face" },
+                ],*/
+                courseFormats: [],
                 venue: "",
                 courseSize: "",
                 minimumSlots: "",
@@ -707,11 +739,7 @@ export default {
                 courseFee: "",
                 selectedTemplate: "",
                 feedbackTemplates: [],
-            },
-                //Initializing values for success message
-                this.showAlert = false,
-                this.message = "",
-                this.errorMsg = []
+            }
 
             try {
                 await this.fetchFormFieldsData();
@@ -726,7 +754,7 @@ export default {
         //Converting Object to String (For Date variable)
         formatDateToYYYYMMDD(dateObj) {
             const parsedYear = dateObj.getFullYear();
-            const parsedMonth = dateObj.getMonth()+1;
+            const parsedMonth = dateObj.getMonth() + 1;
             const parsedDay = dateObj.getDate();
             return `${parsedYear}-${parsedMonth}-${parsedDay}`;
         },
@@ -736,6 +764,12 @@ export default {
             const minutes = String(timeObject.minutes).padStart(2, '0');
             const seconds = String(timeObject.seconds).padStart(2, '0');
             return `${hours}:${minutes}:${seconds}`;
+        },
+        setSuccessAlert(action) {
+            this.title = `${action} Success`;
+            this.message = `${action} was successful`;
+            this.buttonType = "success";
+            this.showAlert = !this.showAlert;
         },
         async onSubmit() {
             this.v$.$touch();
@@ -768,28 +802,34 @@ export default {
 
                     const today = new Date();
 
-                    today.setHours(0, 0, 0, 0); // Set today's time to midnight
-
                     const todayDay = today.getDate();
                     const todayMonth = today.getMonth() + 1;
                     const todayYear = today.getFullYear();
+
+                    const currentHours = today.getHours();
+                    const currentMinutes = today.getMinutes();
 
                     const openingDay = this.formData.openingDate.getDate();
                     const openingMonth = this.formData.openingDate.getMonth() + 1;
                     const openingYear = this.formData.openingDate.getFullYear();
 
-                    const closingDay = this.formData.closingDate.getDate();
-                    const closingMonth = this.formData.closingDate.getMonth() + 1;
-                    const closingYear = this.formData.closingDate.getFullYear();
+                    const selectedHours = this.formData.openingTime.hours;
+                    const selectedMinutes = this.formData.openingTime.minutes;
 
-                    if (todayYear >= openingYear && todayYear <= closingYear &&
-                        todayMonth >= openingMonth && todayMonth <= closingMonth &&
-                        todayDay >= openingDay && todayDay <= closingDay) {
-
-                        //console.log("Today's date is in between the range");
-
-                        this.submitFormData["runcourse_Status"] = "Ongoing";
+                    if (todayYear === openingYear && todayMonth === openingMonth && todayDay === openingDay) {
+                        if (
+                            currentHours > selectedHours ||
+                            (currentHours === selectedHours && currentMinutes > selectedMinutes) ||
+                            (currentHours === selectedHours && currentMinutes === selectedMinutes)
+                        )   {
+                                // Today's date is within the range, and the selected time is before the current time.
+                                this.submitFormData["runcourse_Status"] = "Ongoing";
+                            } else {
+                            // Today's date is within the range, but the selected time is after the current time.
+                            this.submitFormData["runcourse_Status"] = "Closed";
+                        }
                     } else {
+                        // Today's date is outside the range.
                         this.submitFormData["runcourse_Status"] = "Closed";
                     }
 
@@ -811,7 +851,6 @@ export default {
 
                     this.submitFormData["template_ID"] = this.formData.feedbackTemplates.find(i => i.template_Name === this.formData.selectedTemplate).template_ID;
 
-
                     //For Edit Course (Updating the run course and course)
                     if (!this.create) {
 
@@ -820,10 +859,12 @@ export default {
                         //Update the run course 
                         await this.updateRunCourse();
 
-                        this.title = "Run Course Update Success"
+                        /*this.title = "Run Course Update Success"
                         this.message = "Run Course Update was successful"
                         this.buttonType = "success"
-                        this.showAlert = !this.showAlert;
+                        this.showAlert = !this.showAlert;*/
+
+                        this.setSuccessAlert("Run Course Update")
 
                         //console.log('Form has submitted successfully')
 
@@ -833,20 +874,18 @@ export default {
 
                         await this.createRunCourse();
 
-                        this.title = "Run Course Creation Success"
+                        this.setSuccessAlert("Run Course Creation")
+
+                        /*this.title = "Run Course Creation Success"
                         this.message = "Run Course Creation was successful"
                         this.buttonType = "success"
-                        this.showAlert = !this.showAlert;
-
-                        //create the run course
-
+                        this.showAlert = !this.showAlert;*/
                     }
 
                 } catch (error) {
-                    //console.error(error)
-                    this.title = "Run Course Update Failed"
                     const errorMsgParts = error.toString().split(":")
                     this.message = errorMsgParts[1];
+                    //this.message = error
                     this.buttonType = "danger"
                     this.showAlert = !this.showAlert;
                 }
@@ -858,6 +897,8 @@ export default {
         }
     }
 };
+
+
 </script>
   
 <style lang="scss">

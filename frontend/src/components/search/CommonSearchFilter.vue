@@ -4,7 +4,8 @@
             <form>
                 <div class="row">
                     <div class="col-md">
-                        <input-field v-model="courseName" type="text" placeholder="Course Name"/>
+                        <input v-model="courseName" type="text" placeholder="Course Name" class="form-control border-0 shadow-sm px-4 field mb-3"/>
+
                     </div>
                     <div class="col-md">
                         <dropdown-field
@@ -22,7 +23,7 @@
                     </div>
                     <div class="col-md">
                         <div class="d-flex justify-content-between">
-                            <button @click="resetFilter" class="btn" id="resetbtn" type="button">Clear</button>
+                            <button @click="resetFilter" class="btn" id="resetbtn" type="button">Clear All</button>
                             <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
                         </div>
                     </div>
@@ -35,10 +36,10 @@
 <script>
 // import { axiosClient } from "../api/axiosClient";
 import DropdownField from "../DropdownField.vue";
-import InputField from "../InputField.vue";
+// import InputField from "../InputField.vue";
 // import CourseService from "@/api/services/CourseService.js"
 import CourseCategoryService from "@/api/services/CourseCategoryService.js"
-// import UserService from "@/api/services/UserService.js"
+import UserService from "@/api/services/UserService.js"
 
 export default({
     name: "SearchFilter",
@@ -47,6 +48,7 @@ export default({
             courseName: "",
             category: "",
             status: "",
+            placeholder: "Course Name",
             categoryDropdownOptions: [],
             statusDropdownOptions: [],
         };
@@ -57,7 +59,7 @@ export default({
     },
     components: {
         DropdownField,
-        InputField,
+        // InputField,
     },
     async mounted() {
         // await this.getAllCourses();
@@ -79,17 +81,16 @@ export default({
             }
         },
         resetFilter() {
-            // console.log(this.status);
             this.courseName = "";
             this.category = "";
             this.status = "";
+            this.placeholder="Course Name"
 
             this.searchFilter();
         },
         async searchFilter() {
             try {
-                // const user_ID = await UserService.getUserID()
-                const user_ID = 1
+                const user_ID = await UserService.getUserID()
                 const course_Name = this.courseName;
                 const coursecat_ID = this.category;
                 const status = this.status;

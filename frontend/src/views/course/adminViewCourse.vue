@@ -22,6 +22,7 @@
                   <a href="" @click.prevent="sort('course_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'course_Status'" :sortDirection="getSortDirection('course_Status')"/></a></th>
                 <th scope="col">Feedback Analysis</th>
                 <th scope="col">Course Details</th>
+                <th scope="col">Course Run(s)</th>
                 <th scope="col">Action(s)</th>
               </tr>
             </thead>
@@ -33,11 +34,15 @@
                 <td>{{ course.course_Status }}</td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                <td v-if="course.course_Status === 'Active'"><course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-                <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-                <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action></td>
-                <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course" @click="goToCreateRunCourseWithId(course.course_ID)"></course-action></td>
-                <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Retire" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
+                <td><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewCourseRun(course.course_ID)">View Runs</a></td>
+                <div>
+                  <td v-if="course.course_Status === 'Active'"><course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
+                  <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
+                  <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action></td>
+                  <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course" @click="goToCreateRunCourseWithId(course.course_ID)"></course-action></td>
+                  <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Retire" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
+                </div>
+                
               </tr>               
             </tbody>
           </table>
@@ -71,6 +76,8 @@
   import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
   import CourseService from "@/api/services/CourseService.js";
   import modalAfterAction from '@/components/course/modalAfterAction.vue';
+  import CommonService from "@/api/services/CommonService.js"
+  import UserService from "@/api/services/UserService.js";
   
   export default {
     components: {
@@ -119,7 +126,7 @@
         this.$emit('page-change', newPage);
       },
       async handleSearchComplete(searchResults) {
-        console.log("searchResults", searchResults);
+        // console.log("searchResults", searchResults);
         this.courses = searchResults;
         
       },
@@ -148,7 +155,7 @@
           let response = await CourseService.searchAllCourseAdmin(this.search_course_name, this.search_course_category, this.search_status)
           
           this.courses = response.data
-          console.log(this.courses)
+          // console.log(this.courses)
         } catch (error) {
           console.error("Error fetching course details:", error);
         }
@@ -171,7 +178,7 @@
         }
       },
       async sortCourse() {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.courses)
           if (sort_response.code == 200) {
             this.courses = sort_response.data
           }
@@ -184,10 +191,21 @@
       },
       goToCreateCourse() {
         this.$router.push({ name: 'createCourse'});
+      },
+      goToViewCourseRun(courseID) {
+        this.$router.push({ name: 'adminViewCourseRun', params: {id: courseID}});
       }
     },
-    created() {
-     this.loadData();
+    async created() {
+      const user_ID = await UserService.getUserID();
+      const role = await UserService.getUserRole(user_ID);
+      if (role == 'Student') {
+        this.$router.push({ name: 'studentViewCourse' }); 
+      } else if (role == 'Instructor' || role == 'Trainer') {
+        this.$router.push({ name: 'instructorTrainerViewVotingCampaign' });
+      }else {
+        this.loadData();
+      }
     },
     mounted() {
       const buttonElement = document.createElement('button');

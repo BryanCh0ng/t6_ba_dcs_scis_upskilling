@@ -7,9 +7,10 @@
   /* margin:40px; */
 }
 
-.content {
-  padding: 30px;
+.navbar {
+  padding: 30px !important;
 }
+
 
 body {
   overflow-x: hidden;
