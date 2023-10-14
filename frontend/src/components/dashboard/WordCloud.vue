@@ -28,7 +28,7 @@ export default {
     },
     padding: {
       type: Number,
-      default: 5,
+      default: 10,
     },
   },
   mounted() {
@@ -47,7 +47,7 @@ export default {
 
       const fontSizeScale = d3.scaleLinear()
         .domain([0, d3.max(wordCloudData, (d) => d.size)])
-        .range([10, 40]); // Adjust the maximum font size as needed
+        .range([15, 40]); // Adjust the maximum font size as needed
 
       const wordCloudLayout = cloud()
         .size([this.width, this.height])
