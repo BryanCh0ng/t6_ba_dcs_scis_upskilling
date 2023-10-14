@@ -97,7 +97,6 @@ class Course(db.Model):
     course_Desc = db.Column(db.String(800), nullable=False)
     coursecat_ID = db.Column(db.Integer, db.ForeignKey('coursecategory.coursecat_ID'), nullable=False)
     course_Status = db.Column(db.String(255), nullable=False)
-    template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'),  nullable=False) 
 
     def __init__(self, course_ID, course_Name, course_Desc, coursecat_ID, course_Status):
         self.course_ID = course_ID

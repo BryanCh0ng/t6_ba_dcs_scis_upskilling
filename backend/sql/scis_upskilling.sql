@@ -134,9 +134,7 @@ CREATE TABLE IF NOT EXISTS `course`(
 	course_desc varchar(800) NOT NULL,
 	coursecat_id int NOT NULL,
     course_status varchar(255) NOT NULL, 
-    template_id int,
 	PRIMARY KEY (`course_id`),
-    FOREIGN KEY (template_id) REFERENCES feedbacktemplate(template_id),
 	FOREIGN KEY (coursecat_id) REFERENCES coursecategory(coursecat_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

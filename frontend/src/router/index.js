@@ -202,7 +202,9 @@ const routes = [
     meta: {
         title: 'View Dashboard',
    
-    },
+    }
+  },
+  {
     path: '/adminViewManagement',
     name: 'adminViewManagement',
     component: () => import('../views/usermanagement/adminViewManagement.vue'),
