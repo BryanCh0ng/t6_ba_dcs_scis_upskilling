@@ -1,8 +1,8 @@
 <template>
     <div>
 
-    <div class="container col-12 d-flex mb-3 w-100" v-if="courses && courses.length > 0">
-      <h5 class="col m-auto">All Run Courses for {{ courses[0].course_Name }}</h5>
+    <div class="container col-12 d-flex mb-3 w-100">
+      <h5 class="col m-auto">All Run Courses for '{{ course_Name }}'</h5>
       <button class="btn btn-primary" @click="goToCreateRunCourse(courses[0].course_ID)">Create Run Course</button>
     </div>
 
@@ -113,7 +113,9 @@
         search_course_name: null,
         search_course_category: null,
         modalOpenFeedbackTemplate: false,
-        showFeedbackTemplateModal: false
+        showFeedbackTemplateModal: false,
+        course_Name: '',
+        course_ID: '',
       }
     },
     computed: {
@@ -198,8 +200,13 @@
         return new Date(courseStartDate) > currentDate;
       },
     },
-    created() {
-     this.loadData();
+    async created() {
+      const { id: course_ID } = this.$route.params;
+      this.course_ID = course_ID
+
+      let response = await CourseService.getCourseName(this.course_ID);
+      this.course_Name = response.data
+      this.loadData();
     },
     mounted() {
       const buttonElement = document.createElement('button');

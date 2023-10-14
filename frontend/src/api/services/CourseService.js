@@ -474,6 +474,20 @@ class CourseService extends BaseApiService {
         }
     }
 
+    // Course Name
+    async getCourseName(course_id) {
+        try {
+            let course_name = await axiosClient.get("/course/get_course_name", {
+                params: {
+                    course_id: course_id,
+                }
+            });
+            return course_name.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
 }
 
 export default new CourseService();

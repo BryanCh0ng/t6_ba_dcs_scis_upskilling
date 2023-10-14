@@ -1719,3 +1719,25 @@ class GetAllCoursesWithRegistrationCount(Resource):
             return jsonify({"code": 200, "data": result_data})
 
         return jsonify({"code": 404, "message": "No courses found"})
+
+# Course Name
+retrieve_course_name = api.parser()
+retrieve_course_name.add_argument("course_id", help="Enter course id")
+
+@api.route("/get_course_name")
+@api.doc(description="Get course name")
+class GetStudentName(Resource):
+    @api.expect(retrieve_course_name)
+    def get(self):
+        args = retrieve_course_name.parse_args()
+        course_id = args.get("course_id", "")
+
+        course = Course.query.filter_by(course_ID=course_id).first()
+
+        if course:
+            course_name = course.course_Name
+            print(course_name)
+            return jsonify({"code": 200, "data": course_name})
+        else:
+            print('else')
+            return jsonify({"code": 404, "message": "Course not found"})
