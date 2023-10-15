@@ -23,7 +23,7 @@
     <div class="row">
       <!-- Display Overall Course Sentiment -->
       <div class="col-12 col-md-6 dashboard mb-3 custom-col" v-if="courseSpecific">
-        <WordCloud :wordData="positiveCourseWordData"/> <!-- tryout, need to change -->
+        <DoughnutChart v-if="courseSentimentLabels.length > 0 && courseSentimentPercentages.length > 0" :labelArray="courseSentimentLabels" :dataArray="courseSentimentPercentages" :label="label"/> <!-- tryout, need to change -->
         <p><strong>Overall Course Sentiment</strong></p>
       </div>
       <!-- Display Overall Course Positive WordCloud -->
@@ -41,7 +41,7 @@
 
       <!-- Display Overall Instructor Sentiment -->
       <div class="col-12 col-md-6 dashboard mb-3 custom-col" v-if="instructorSpecific">
-        <WordCloud :wordData="overallInstructorWordData"/>
+        <DoughnutChart v-if="instructorSentimentLabels.length > 0 && instructorSentimentPercentages.length > 0" :labelArray="instructorSentimentLabels" :dataArray="instructorSentimentPercentages" :label="label"/> <!-- tryout, need to change -->
         <p><strong>Overall Instructor Sentiment</strong></p>
       </div>
       <!-- Display Overall Instructor Positive WordCloud -->
@@ -110,10 +110,12 @@
 <script>
 import WordCloud from "@/components/dashboard/WordCloud.vue"; // Adjust the import path based on your project structure
 import DashboardService from '@/api/services/dashboardService';
+import DoughnutChart from "@/components/dashboard/DoughnutChart.vue";
 
 export default {
     components: {
         WordCloud, 
+        DoughnutChart
     },
     data() {
         return {
@@ -132,6 +134,11 @@ export default {
             courseSuggestionsTopics: [],
             instructorDoneWellTopics: [],
             instructorSuggestionsTopics: [],
+            courseSentimentLabels: [],
+            courseSentimentPercentages: [],
+            label: "",
+            instructorSentimentLabels: [],
+            instructorSentimentPercentages: []
         };
     },
     methods: {
@@ -169,11 +176,39 @@ export default {
           console.error('Error fetching courseDoneWellTopics:', error);
         }
       },
+      async fetchCourseFeedbacks() {
+        try {
+          const response = await DashboardService.getCourseFeedbacks();
+          const { sentiment_labels, sentiment_percentages } = response.data;
+
+          // Now you can use sentiment_labels and sentiment_percentages in your component
+          this.courseSentimentLabels = sentiment_labels;
+          this.courseSentimentPercentages = sentiment_percentages;
+          this.label = "Overall Course Sentiment"
+        } catch (error) {
+          console.error("Error fetching course feedbacks: ", error);
+        }
+      },
+      async fetchInstructorFeedbacks() {
+        try {
+          const response = await DashboardService.getInstructorFeedbacks();
+          const { sentiment_labels, sentiment_percentages } = response.data;
+
+          // Now you can use sentiment_labels and sentiment_percentages in your component
+          this.instructorSentimentLabels = sentiment_labels;
+          this.instructorSentimentPercentages = sentiment_percentages;
+          this.label = "Overall Instructor Sentiment"
+        } catch (error) {
+          console.error("Error fetching instructor feedbacks: ", error);
+        }
+      }
     },
     mounted() {
       this.fetchCourseAverageRating();
       this.fetchInstructorAverageRating();
       this.fetchCourseDoneWellTopics();
+      this.fetchCourseFeedbacks();
+      this.fetchInstructorFeedbacks();
     }
 };
 </script>

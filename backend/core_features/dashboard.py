@@ -30,6 +30,9 @@ custom_stop_words = ['the', 'course', 'content', 'instructor', 'professor', 'pro
 stop_words.update(custom_stop_words) # Add custom stop word
 lemmatizer = WordNetLemmatizer() # Set up Lemmatizer
 
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+from collections import Counter
 
 api = Namespace('dashboard', description='Dashboard related operations')
 
@@ -362,3 +365,314 @@ class CourseDoneWellFeedback(Resource):
             return jsonify({"code": 200, "data": response_data, "topic_words_list": topic_words_list_formatted})
 
         return jsonify({"code": 404, "message": "No matching course interest information found"})
+
+
+# Get the sentiment for specific course or all courses
+instructor_average_ratings = api.parser()
+instructor_average_ratings.add_argument("instructor_ID", help="Enter instructor_ID")
+
+@api.route("/instructor_average_ratings")
+@api.doc(description="Instructor specific feedback")
+class InstructorAverageRatings(Resource):
+    @api.expect(instructor_average_ratings)
+    def get(self):
+        args = instructor_average_ratings.parse_args()
+        instructor_ID = args.get("instructor_ID", "")
+
+        keywords = ['rate', 'instructor']  # Define keywords to identify relevant questions
+        try:
+
+            total_ratings = []
+            total_questions = 0
+
+            # To retrieve relevant questions and calculate average rating
+            relevant_questions = db.session.query(FeedbackTemplate, TemplateAttribute) \
+                .join(TemplateAttribute, FeedbackTemplate.template_ID == TemplateAttribute.template_ID) \
+                .join(Feedback, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID) \
+                .join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID) \
+                .filter(TemplateAttribute.input_Type == 'Likert Scale') \
+                .filter(func.lower(TemplateAttribute.question).contains(keywords[0])) \
+                .filter(func.lower(TemplateAttribute.question).contains(keywords[1]))
+
+            if instructor_ID:  # Filter by instructor ID if provided
+                relevant_questions = relevant_questions.filter(RunCourse.instructor_ID == instructor_ID)
+
+            relevant_questions = relevant_questions.all()
+
+            for feedback_template, template_attribute in relevant_questions:
+                question_id = template_attribute.template_Attribute_ID
+                feedback_entries = db.session.query(Feedback) \
+                    .filter(Feedback.template_Attribute_ID == question_id)
+
+                if instructor_ID:
+                    feedback_entries = feedback_entries.join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID) \
+                        .filter(RunCourse.instructor_ID == instructor_ID)  # Filter by instructor ID if provided
+
+                feedback_entries = feedback_entries.all()
+
+                if feedback_entries:
+                    for entry in feedback_entries:
+                        total_ratings.append(int(entry.answer))  # assuming 'answer' contains the Likert Scale value as an integer
+                        total_questions += 1
+
+            # Calculate the instructor-specific average rating
+            if total_ratings and total_questions > 0:
+                instructor_average_rating = round(sum(total_ratings) / total_questions, 2)
+                message = "Instructor ratings calculated successfully."
+            else:
+                instructor_average_rating = 0
+                message = "No ratings for this instructor."
+
+            db.session.close()
+
+            response_data = {
+                "code": 200,
+                "data": {
+                    "instructor_ID": instructor_ID,
+                    "instructor_average_rating": instructor_average_rating
+                },
+                "message": message,
+            }
+
+        except Exception as e:
+            response_data = {
+                "code": 500,
+                "message": str(e)
+            }
+
+        return jsonify(response_data)
+
+def filter_dataframe(df):
+    # Define a list of values to drop
+    values_to_drop = ['NIL', 'nil', 'Nil', '-']
+
+    # Create a boolean mask to select rows to keep (rows not in the values_to_drop list)
+    mask = ~df['Feedback'].isin(values_to_drop)
+
+    # Apply the mask to filter the DataFrame
+    filtered_df = df[mask]
+
+    return filtered_df
+
+def text_preprocess(text):
+
+    # Remove characters that are not letters or whitespace, but retain punctuation, case and hyphen words
+    cleaned_text = re.sub(r'[^a-zA-Z\s.,!?-]', '', text)
+
+    return cleaned_text
+
+def count_words(text):
+    words = text.split()
+    return len(words)
+
+def Sentiment(x):
+    if x>= 0.05:
+        return "Positive"
+    elif x<= -0.05:
+        return "Negative"
+    else:
+        return "Neutral"
+
+course_feedbacks = api.parser()
+#course_feedbacks.add_argument("course_ID", help="Enter course_ID")
+
+@api.route("/course_feedbacks")
+@api.doc(description="Get Course Feedbacks")
+class CourseFeedbacks(Resource):
+    @api.expect(course_feedbacks)
+    def get(self):
+        try: 
+
+            # Parse the course_ID from the request arguments
+            #args = feedback_course_done_well_specific.parse_args()
+            #course_ID = args.get("course_ID", "")
+
+            result = db.session.query(Feedback, TemplateAttribute).join(TemplateAttribute,Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
+
+            # Add filter conditions one by one
+            result = result.filter(func.lower(TemplateAttribute.question).like("%course%"))
+            result = result.filter(TemplateAttribute.input_Type == "Text")
+
+            # Fetch the results
+            filtered_results = result.all()
+            db.session.close()
+            
+            if filtered_results:
+                # Serialize each object within the list dynamically
+                serialized_results = []
+                for feedback, attribute in filtered_results:
+                    serialized_result = {}
+                    for field in feedback.__table__.columns.keys():
+                        serialized_result[field] = getattr(feedback, field)
+                    for field in attribute.__table__.columns.keys():
+                        serialized_result[field] = getattr(attribute, field)
+                    serialized_results.append(serialized_result)
+
+                # Extract all "answer" values into a list
+                answers = [entry["answer"] for entry in serialized_results]
+
+                # Create a DataFrame from the "answer" values
+                df = pd.DataFrame({"Feedback": answers})
+                
+                df.dropna(inplace=True)
+
+                filtered_df = filter_dataframe(df)
+
+                filtered_df['Preprocessed_Feedback'] = filtered_df['Feedback'].apply(text_preprocess)
+
+                # Apply the count_words function to the "text" column
+                filtered_df['Total_Length'] = filtered_df['Preprocessed_Feedback'].apply(count_words)
+
+                analyser = SentimentIntensityAnalyzer()
+
+                filtered_df['Scores'] = filtered_df['Preprocessed_Feedback'].apply(lambda review: analyser.polarity_scores(review))
+
+                filtered_df['Compound']  = filtered_df['Scores'].apply(lambda score_dict: score_dict['compound'])
+
+                filtered_df['Sentiment'] = filtered_df['Compound'].apply(Sentiment)
+
+                data_list = filtered_df.to_dict(orient="records")
+
+                # Calculate sentiment counts
+                sentiment_counts = Counter(filtered_df['Sentiment'])
+
+                # Calculate the total count of all sentiment labels
+                total_count = sum(sentiment_counts.values())
+
+                # Extract labels and counts from the sentiment_counts dictionary
+                labels = list(sentiment_counts.keys())
+                counts = list(sentiment_counts.values())
+                percentages = [round(count / total_count * 100, 1) for count in counts]  # Format to 2 decimal places
+
+                # Output the labels and counts lists
+                #print("Sentiment Labels:", labels)
+                #print("Sentiment Counts:", percentages)
+
+                return jsonify(
+                    {
+                        "code": 200,
+                        #"data": data_list,
+                        "sentiment_labels": labels,
+                        "sentiment_percentages": percentages
+                    }
+                )
+
+
+            return jsonify(
+                {
+                    "code": 400,
+                    "message": "No course feedbacks found"
+                }
+            )
+
+        except Exception as e:
+            print("Error:", str(e))
+            #return "Failed" + str(e), 500
+            return jsonify(
+                {
+                    "code": 500,
+                    "message": "Failed to retreive course feedbacks: " + str(e)
+                }
+            )
+
+instructor_feedbacks = api.parser()
+#instructors_feedbacks.add_argument("course_ID", help="Enter course_ID")
+
+@api.route("/instructor_feedbacks")
+@api.doc(description="Get Instructor Feedbacks")
+class InstructorFeedbacks(Resource):
+    @api.expect(instructor_feedbacks)
+    def get(self):
+        try: 
+
+            # Parse the course_ID from the request arguments
+            #args = feedback_course_done_well_specific.parse_args()
+            #course_ID = args.get("course_ID", "")
+
+            result = db.session.query(Feedback, TemplateAttribute).join(TemplateAttribute,Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
+
+            # Add filter conditions one by one
+            result = result.filter(func.lower(TemplateAttribute.question).like("%instructor%"))
+            result = result.filter(TemplateAttribute.input_Type == "Text")
+
+            # Fetch the results
+            filtered_results = result.all()
+            db.session.close()
+            
+            if filtered_results:
+                # Serialize each object within the list dynamically
+                serialized_results = []
+                for feedback, attribute in filtered_results:
+                    serialized_result = {}
+                    for field in feedback.__table__.columns.keys():
+                        serialized_result[field] = getattr(feedback, field)
+                    for field in attribute.__table__.columns.keys():
+                        serialized_result[field] = getattr(attribute, field)
+                    serialized_results.append(serialized_result)
+
+                # Extract all "answer" values into a list
+                answers = [entry["answer"] for entry in serialized_results]
+
+                # Create a DataFrame from the "answer" values
+                df = pd.DataFrame({"Feedback": answers})
+                
+                df.dropna(inplace=True)
+
+                filtered_df = filter_dataframe(df)
+
+                filtered_df['Preprocessed_Feedback'] = filtered_df['Feedback'].apply(text_preprocess)
+
+                # Apply the count_words function to the "text" column
+                filtered_df['Total_Length'] = filtered_df['Preprocessed_Feedback'].apply(count_words)
+
+                analyser = SentimentIntensityAnalyzer()
+
+                filtered_df['Scores'] = filtered_df['Preprocessed_Feedback'].apply(lambda review: analyser.polarity_scores(review))
+
+                filtered_df['Compound']  = filtered_df['Scores'].apply(lambda score_dict: score_dict['compound'])
+
+                filtered_df['Sentiment'] = filtered_df['Compound'].apply(Sentiment)
+
+                data_list = filtered_df.to_dict(orient="records")
+
+                # Calculate sentiment counts
+                sentiment_counts = Counter(filtered_df['Sentiment'])
+
+                # Calculate the total count of all sentiment labels
+                total_count = sum(sentiment_counts.values())
+
+                # Extract labels and counts from the sentiment_counts dictionary
+                labels = list(sentiment_counts.keys())
+                counts = list(sentiment_counts.values())
+                percentages = [round(count / total_count * 100, 1) for count in counts]  # Format to 2 decimal places
+
+                # Output the labels and counts lists
+                #print("Sentiment Labels:", labels)
+                #print("Sentiment Counts:", percentages)
+
+                return jsonify(
+                    {
+                        "code": 200,
+                        #"data": data_list,
+                        "sentiment_labels": labels,
+                        "sentiment_percentages": percentages
+                    }
+                )
+
+
+            return jsonify(
+                {
+                    "code": 400,
+                    "message": "No instructor feedbacks found"
+                }
+            )
+
+        except Exception as e:
+            print("Error:", str(e))
+            #return "Failed" + str(e), 500
+            return jsonify(
+                {
+                    "code": 500,
+                    "message": "Failed to retreive instructor feedbacks: " + str(e)
+                }
+            )
