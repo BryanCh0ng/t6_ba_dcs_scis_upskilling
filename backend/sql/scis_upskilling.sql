@@ -473,17 +473,17 @@ INSERT INTO templateattribute VALUES
 	(10, 'What are the areas that the instructor did well on?', 'Text', 1),
 	(11, 'What are the areas that the instructor can improve on?', 'Text', 1);
 
-DROP TABLE IF EXISTS `likertscale`;
-CREATE TABLE IF NOT EXISTS `likertscale`(
-	likert_scale_id int NOT NULL AUTO_INCREMENT,
+DROP TABLE IF EXISTS `inputoption`;
+CREATE TABLE IF NOT EXISTS `inputoption`(
+	input_option_id int NOT NULL AUTO_INCREMENT,
 	template_attribute_id int NOT NULL,
 	position int NOT NULL,
 	textlabel varchar(255) NOT NULL,
-	PRIMARY KEY (`likert_scale_id`),
+	PRIMARY KEY (`input_option_id`),
 	FOREIGN KEY (template_attribute_id) REFERENCES templateattribute(template_attribute_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO likertscale VALUES 
+INSERT INTO inputoption VALUES 
 	(1, 1, 1, 'Lowest'), 
 	(2, 1, 2, 'Low'),
 	(3, 1, 3, 'Neutral'),
