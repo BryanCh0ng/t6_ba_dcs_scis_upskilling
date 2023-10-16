@@ -7,6 +7,53 @@
       </div>
       <h4 class="mt-5 mb-3">Edit Feedback Template</h4>
 
+      <div class="form-group row mb-4 pt-4 pb-4 bg-light-grey">
+        <div>
+          <h5>Common Required Questions (will be placed at the end of feedback)</h5>
+        </div>
+        <div class="form-group">
+          <label>1. Question To Ask</label>
+          <input disabled="true" class="form-control" type="text" :placeholder="'How would you rate the course?'" />
+        </div>
+        <div class="form-group mt-2">
+          <label>1. Input Type</label>
+          <input disabled="true" class="form-control" type="text" :placeholder="'Likert Scale'" />
+        </div>
+        <div class="form-group mt-2">
+          <label>1. Likert Scale Option (Sequence from left to right)</label>
+          <ul>
+            <li>
+              <input type="radio" disabled>
+              <label>Very Poor</label>
+            </li>
+            <li>
+              <input type="radio" disabled>
+              <label>Poor</label>
+            </li>
+            <li>
+              <input type="radio" disabled>
+              <label>Neutral</label>
+            </li>
+            <li>
+              <input type="radio" disabled>
+              <label>Good</label>
+            </li>
+            <li>
+              <input type="radio" disabled>
+              <label>Excellent</label>
+            </li>
+          </ul>
+        </div>
+        <div class="form-group">
+          <label>2. Question To Ask</label>
+          <input disabled="true" class="form-control" type="text" :placeholder="'Any Feedbacks for the course?'" />
+        </div>
+        <div class="form-group mt-2">
+          <label>2. Input Type</label>
+          <input disabled="true" class="form-control" type="text" :placeholder="'Text Field'" />
+        </div>
+      </div>
+
       <div v-if="!questionsError">
         <div class="form-group row mb-4">
           <label class="mb-1">Enter Feedback Template Name</label>
@@ -187,7 +234,7 @@ export default {
           }
         } catch (error) {
             this.title = "Feedback Template Edit Failed";
-            this.message = "Feedback Template Edit was unsuccessful"
+            this.message = error.response.data.message.toString();
             this.buttonType = "danger"
             this.showAlert = !this.showAlert;
             throw new Error("Feedback Template Edit was unsuccessful");

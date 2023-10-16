@@ -92,8 +92,6 @@
   import modalAfterAction from '@/components/course/modalAfterAction.vue';
   import courseApplyFeedbackTemplateModal from '@/components/course/courseApplyFeedbackTemplateModal.vue';
   import CommonService from "@/api/services/CommonService.js";
-  import modalAfterAction from '@/components/course/modalAfterAction.vue';
-
   
   export default {
     components: {

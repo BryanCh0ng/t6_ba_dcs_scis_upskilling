@@ -35,22 +35,11 @@
                 <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewCourseRun(course.course_ID)">View Runs</a></td>
-<<<<<<< HEAD
                 <td v-if="course.course_Status === 'Active'"><course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
                 <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
                 <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action></td>
                 <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course" @click="goToCreateRunCourseWithId(course.course_ID)"></course-action></td>
                 <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Retire" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-=======
-                <div>
-                  <td v-if="course.course_Status === 'Active'"><course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-                  <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-                  <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action></td>
-                  <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course" @click="goToCreateRunCourseWithId(course.course_ID)"></course-action></td>
-                  <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Retire" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-                </div>
-                
->>>>>>> master
               </tr>               
             </tbody>
           </table>
@@ -84,12 +73,8 @@
   import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
   import CourseService from "@/api/services/CourseService.js";
   import modalAfterAction from '@/components/course/modalAfterAction.vue';
-<<<<<<< HEAD
-
-=======
-  import CommonService from "@/api/services/CommonService.js"
+  import CommonService from "@/api/services/CommonService.js";
   import UserService from "@/api/services/UserService.js";
->>>>>>> master
   
   export default {
     components: {

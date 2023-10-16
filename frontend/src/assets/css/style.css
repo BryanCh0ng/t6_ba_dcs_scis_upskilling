@@ -109,6 +109,10 @@ body {
   background-color: #007E94 !important;
 }
 
+.bg-light-grey {
+  background-color: lightgray;
+}
+
 .btn-blue-green {
   background-color: #009490 !important;
 }

@@ -6,7 +6,18 @@
           <h4 class="text-grey">{{ this.course.course_Name }}</h4>
         </div>
 
-        <div class="form-group row mb-4" v-for="(element, key) in templateData" :key="key">
+        <div class="form-group row mb-4">
+        <div class="form-group row">
+          <label>1. How would you rate the course?</label>
+          <input class="form-control" type="text" :placeholder="'Likert Scale'" :qnNum="1" @input="updateCommonAnswer" required/>
+        </div>
+        <div class="form-group row">
+          <label>2. Any Feedbacks for the course?</label>
+          <input class="form-control" type="text" :placeholder="'Text Field'" :qnNum="2" @input="updateCommonAnswer" required> 
+        </div>
+      </div>
+
+        <div class="form-group row" v-for="(element, key) in templateData" :key="key+2">
           <text-field :disabled="disabled" v-if="element.selectedInputType=='Text Field'"  class="mb-4" :label="element.question" :qnNum="key+1" @input="updateAnswer"></text-field>
           <number-field :disabled="disabled" v-else-if="element.selectedInputType=='Number Field'"  class="mb-4" :label="element.question" :qnNum="key+1" @input="updateAnswer"></number-field>
           <radio-button-field :disabled="disabled" v-else-if="element.selectedInputType=='Radio Button'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="key+1" @input="updateAnswer"></radio-button-field>
@@ -64,7 +75,8 @@ export default {
       buttonType: "",
       showAlert: false,
       submitError: false,
-      disabled: false
+      disabled: false,
+      common_questions: [],
     }
   },
   methods: {
@@ -94,6 +106,15 @@ export default {
           this.disabled = true;
           this.haveError = true
           this.errorMsge = course_response.message
+        }
+        const common_response = await FeedbackTemplateService.get_feedback_template_common_questions()
+        console.log(common_response)
+        if (common_response.code == 200){
+          this.common_questions = common_response.common_questions
+        } else {
+          this.disabled = true;
+          this.haveError = true
+          this.errorMsge = common_response.common_questions;
         }
       } catch (error) { 
         this.disabled = true;
@@ -155,10 +176,19 @@ export default {
     },
     updateAnswer(answer) {
       var index = parseInt(answer.key)
+      console.log(index)
+      index = index - 2
       if (this.templateData[index]) {
         this.templateData[index]['answer'] = answer.value
       }
     },
+    updateCommonAnswer(answer) {
+      var index = parseInt(answer.key)
+      console.log(index)
+      if (this.common_questions[index]) {
+        this.common_questions[index]['answer'] = answer.value
+      }
+    }
   },
   async created() {
     this.loadData();

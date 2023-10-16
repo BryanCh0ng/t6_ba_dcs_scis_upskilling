@@ -250,14 +250,10 @@ class InputOption(db.Model):
     position = db.Column(db.Integer,  nullable=False)
     textlabel = db.Column(db.String(255), nullable=False) 
 
-
-
     def __init__(self, template_Attribute_ID, position, textlabel ):
         self.template_Attribute_ID = template_Attribute_ID
         self.position = position
         self.textlabel = textlabel
-
-
 
     def json(self):
         columns = self.__mapper__.column_attrs.keys()
@@ -420,8 +416,6 @@ class AttendenceRecord(db.Model):
         self.status = status
         self.reason = reason
         self.attrecord_Status = attrecord_Status
-
-
 
 
     def json(self):

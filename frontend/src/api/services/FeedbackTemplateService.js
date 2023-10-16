@@ -100,7 +100,17 @@ class FeedbackTemplateService extends BaseApiService {
         } catch (error) {
             return this.handleError(error)
         }
-    } 
+    }
+    
+    async getFeedbackTemplateCommonQuestions(){
+        try {
+            let response = await axiosClient.get("/feedbacktemplate/get_feedback_template_common_questions")
+            console.log(response)
+            return response.data
+        } catch (error) {
+            return this.handleError(error)
+        }
+    }
     
 }
 

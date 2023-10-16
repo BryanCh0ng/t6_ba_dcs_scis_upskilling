@@ -61,7 +61,6 @@
   <script>
   import sortIcon from '@/components/common/sort-icon.vue';
   import { VueAwesomePaginate } from 'vue-awesome-paginate';
-  import CourseService from "@/api/services/CourseService.js";
   import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js";
   import {convertDate} from '@/scripts/common/convertDateTime.js'
   import DeleteFeedbackTemplateModal from '@/components/feedbackTemplate/DeleteFeedbackTemplateModal.vue'

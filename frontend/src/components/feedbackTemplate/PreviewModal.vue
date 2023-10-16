@@ -14,6 +14,12 @@
         <single-select-field v-else-if="template.selectedInputType == 'Single Select'" class="mb-4" :options="template.inputOptions" :label="template.question"></single-select-field>
         <likert-scale-field v-else-if="template.selectedInputType == 'Likert Scale'"  class="mb-4" :options="template.inputOptions" :label="template.question"></likert-scale-field>
       </div>
+      <div class="mt-4">
+        <likert-scale-field  :options="[{ option: 'Very Poor' },{ option: 'Poor' },{ option: 'Neutral' },{ option: 'Good' },{ option: 'Excellent' }]" :label="'How would you rate the course?'"></likert-scale-field>
+      </div>
+      <div class="mt-4">
+        <text-field class="mb-4"  :label="'Any Feedbacks for the course?'"></text-field>
+      </div>
     </div> 
   </div>
 </template>

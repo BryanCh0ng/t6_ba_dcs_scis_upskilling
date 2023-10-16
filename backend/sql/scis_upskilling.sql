@@ -514,7 +514,7 @@ CREATE TABLE IF NOT EXISTS `templateattribute`(
 	template_attribute_id int NOT NULL AUTO_INCREMENT,
 	question varchar(255) NOT NULL,
 	input_type varchar(255) NOT NULL,
-	template_id int NOT NULL,
+	template_id int,
 	PRIMARY KEY (`template_attribute_id`),
 	FOREIGN KEY (template_id) REFERENCES feedbacktemplate(template_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -530,7 +530,9 @@ INSERT INTO templateattribute VALUES
 	(8, 'Helpfulness - How would you rate the Instructor?', 'Likert Scale', 1),
 	(9, 'Knowledge - How would you rate the Instructor?', 'Likert Scale', 1),
 	(10, 'What are the areas that the instructor did well on?', 'Text Field', 1),
-	(11, 'What are the areas that the instructor can improve on?', 'Text Field', 1);
+	(11, 'What are the areas that the instructor can improve on?', 'Text Field', 1),
+    (12, 'How would you rate the course?', 'Likert Scale', NULL),
+    (13, 'Any Feedbacks for the course', 'Text Field', NULL);
 
 DROP TABLE IF EXISTS `inputoption`;
 CREATE TABLE IF NOT EXISTS `inputoption`(
@@ -577,7 +579,12 @@ INSERT INTO inputoption VALUES
 	(32, 9, 2, 'Below Average Knowledge'),
 	(33, 9, 3, 'Average Knowledge'),
 	(34, 9, 4, 'Above Average Knowledge'),
-	(35, 9, 5, 'Excellent Knowledge');
+	(35, 9, 5, 'Excellent Knowledge'),
+    (36, 12, 1, 'Very Poor'), 
+	(37, 12, 2, 'Poor'),
+	(38, 12, 3, 'Neutral'),
+	(39, 12, 4, 'Good'),
+	(40, 12, 5, 'Excellent');
 
 DROP TABLE IF EXISTS `runcourse`;
 CREATE TABLE IF NOT EXISTS `runcourse`(

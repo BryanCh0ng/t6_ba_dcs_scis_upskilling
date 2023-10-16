@@ -6,7 +6,55 @@
         <h4 class="text-grey">Customised feedbacks for specific course</h4>
       </div>
       <h4 class="mt-5 mb-3">Create Feedback Template</h4>
-      <div class="form-group row mb-4">
+
+      <div class="form-group row mb-4 pt-4 pb-4 bg-light-grey">
+        <div>
+          <h5>Common Required Questions (will be placed at the end of feedback)</h5>
+        </div>
+        <div class="form-group">
+          <label>1. Question To Ask</label>
+          <input disabled="true" class="form-control" type="text" :placeholder="'How would you rate the course?'" />
+        </div>
+        <div class="form-group mt-2">
+          <label>1. Input Type</label>
+          <input disabled="true" class="form-control" type="text" :placeholder="'Likert Scale'" />
+        </div>
+        <div class="form-group mt-2">
+          <label>1. Likert Scale Option (Sequence from left to right)</label>
+          <ul>
+            <li>
+              <input type="radio" disabled>
+              <label>Very Poor</label>
+            </li>
+            <li>
+              <input type="radio" disabled>
+              <label>Poor</label>
+            </li>
+            <li>
+              <input type="radio" disabled>
+              <label>Neutral</label>
+            </li>
+            <li>
+              <input type="radio" disabled>
+              <label>Good</label>
+            </li>
+            <li>
+              <input type="radio" disabled>
+              <label>Excellent</label>
+            </li>
+          </ul>
+        </div>
+        <div class="form-group">
+          <label>2. Question To Ask</label>
+          <input disabled="true" class="form-control" type="text" :placeholder="'Any Feedbacks for the course?'" />
+        </div>
+        <div class="form-group mt-2">
+          <label>2. Input Type</label>
+          <input disabled="true" class="form-control" type="text" :placeholder="'Text Field'" />
+        </div>
+      </div>
+
+      <div class="form-group row mb-2">
         <label class="mb-1">Enter Feedback Template Name</label>
         <input type="text" v-model="feedback_template_name" class="form-control" placeholder="Feedback Template Name" required>
         <div v-if="v$.feedback_template_name.$error && v$.feedback_template_name.$dirty" class="error-message mt-1 text-danger">Feedback Template Name Field is required.</div>
@@ -167,8 +215,9 @@ export default {
             this.showAlert = !this.showAlert;
           }
         } catch (error) {
+            console.log(error)
             this.title = "Feedback Template Creation Failed";
-            this.message = "Feedback Template Creation was unsuccessful"
+            this.message = error.response.data.message.toString();
             this.buttonType = "danger"
             this.showAlert = !this.showAlert;
             throw new Error("Feedback Template Creation was unsuccessful");
@@ -224,5 +273,9 @@ export default {
 <style scoped>
   .addQn {
     cursor: pointer;
+  }
+
+  li {
+    list-style: none;
   }
 </style>

@@ -319,16 +319,7 @@ const routes = [
         title: 'Submit Feedback',
         requiresAuth: true
     },
-  },
-  {
-    path: '/adminViewInstructorsTrainers',
-    name: 'adminViewInstructorsTrainers',
-    component: () => import('../views/course/adminViewInstructorsTrainers.vue'),
-    meta: {
-        title: 'Admin View Instructors Trainers',
-        requiresAuth: true
-    },
-  },
+  }
 ]
 
 const router = createRouter({

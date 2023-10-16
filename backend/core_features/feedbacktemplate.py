@@ -1,3 +1,4 @@
+from operator import or_
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 from datetime import datetime, date, time
@@ -44,7 +45,10 @@ class GetTemplate(Resource):
         ).outerjoin(
             InputOption, TemplateAttribute.template_Attribute_ID == InputOption.template_Attribute_ID
         ).filter(
-            FeedbackTemplate.template_ID == templateID
+            or_(
+              FeedbackTemplate.template_ID == templateID,
+              FeedbackTemplate.template_ID == None
+            )
         ).order_by(
             asc(InputOption.position)
         )
@@ -222,7 +226,10 @@ class GetCoursesByTemplateId(Resource):
         ).join(
             Course, RunCourse.course_ID == Course.course_ID  
         ).filter(
-            FeedbackTemplate.template_ID == templateID
+           or_(
+              FeedbackTemplate.template_ID == templateID,
+              FeedbackTemplate.template_ID == None
+            )
         )
         query_results = query.all()
         db.session.close()
@@ -481,3 +488,36 @@ class ApplyFeedbackTemplateToCourses(Resource):
             db.session.rollback()
             return {"code": 500, "message": "Failed " + str(e)}, 500
 
+
+get_feedback_template_common_questions = api.parser()
+@api.route('/get_feedback_template_common_questions')
+@api.doc(description= "get feedback template common questions")
+class GetFeedbackTemplateCommonQuestions(Resource):
+    @api.expect(get_feedback_template_common_questions)
+    def get(self):
+      try:
+        query = db.session.query(
+            FeedbackTemplate,
+            TemplateAttribute,
+            InputOption,
+        ).select_from(FeedbackTemplate).outerjoin(
+            TemplateAttribute, FeedbackTemplate.template_ID == TemplateAttribute.template_ID
+        ).outerjoin(
+            InputOption, TemplateAttribute.template_Attribute_ID == InputOption.template_Attribute_ID
+        ).filter(
+            FeedbackTemplate.template_ID == None
+        ).order_by(
+            asc(InputOption.position)
+        )
+        common_questions = query.all()
+        db.session.close()
+
+        print(common_questions)
+        if common_questions:
+           common_questions_json = [each_common_questions.json() for each_common_questions in common_questions]
+           return {"code": 200, "common_questions": common_questions_json}, 200
+
+        return {"code": 404, "message": "Failed to retrieve common questions"}, 404
+
+      except Exception as e:
+        return {"code": 404, "message": "Failed" + str(e)}, 404
