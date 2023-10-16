@@ -134,7 +134,7 @@ class CreateFeedbackTemplate(Resource):
                 finalAttribute = TemplateAttributeList[-1]
                 templateAttributeID = finalAttribute.template_Attribute_ID + 1
 
-                newTemplateAttribute = TemplateAttribute(templateAttributeID, question, inputType, templateID)
+                newTemplateAttribute = TemplateAttribute(template_Attribute_ID=templateAttributeID, question=question, input_Type=inputType, template_ID=templateID)
                 db.session.add(newTemplateAttribute)
 
                 # commit first to fulfil foreign key constraint
@@ -327,6 +327,7 @@ class EditFeedbackTemplate(Resource):
 
                 attributes = TemplateAttribute.query.filter_by(template_ID=template_id).all()
                 for attribute in attributes:
+                    Feedback.query.filter_by(template_Attribute_ID=attribute.template_Attribute_ID).delete()
                     InputOption.query.filter_by(template_Attribute_ID=attribute.template_Attribute_ID).delete()
                     db.session.delete(attribute)
 
