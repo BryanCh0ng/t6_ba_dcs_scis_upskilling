@@ -86,7 +86,7 @@ import { useVuelidate } from "@vuelidate/core";
 import UserService from "@/api/services/UserService.js";
 import CourseCategoryService from "@/api/services/CourseCategoryService.js";
 import ProposedCourseService from "@/api/services/proposedCourseService.js";
-import CourseService from "@/api/services/CourseService.js";
+// import CourseService from "@/api/services/CourseService.js";
 import SuccessModal from "../../components/SuccessModal.vue";
 
 export default {
@@ -103,7 +103,7 @@ export default {
       course_desc: "",
       errorMessage: "",
       showSuccessModal: false,
-      successMessage: "You have successfully updated the proposed course.",
+      successMessage: "",
       descPlaceholder: "Course Description",
       categoryDropdownOptions: []
     };
@@ -124,13 +124,22 @@ export default {
     SuccessModal
   },
 
-  created() {
+  async created() {
     this.getUserID();
+    const action = this.$route.params.action;
+    this.action = action
+    if (this.action == 'approve') {
+      const user_ID = await UserService.getUserID();
+      const role = await UserService.getUserRole(user_ID);
+      if (role == 'Student') {
+        this.$router.push({ name: 'studentViewProfile' }); 
+      } else if (role == 'Instructor' || role == 'Trainer') {
+        this.$router.push({ name: 'instructorTrainerViewProfile' });
+      }
+    }
     this.get_user_role();
     this.fetchCategoryDropdownOptions();
     this.fetchProposedCourseDetails();
-    const action = this.$route.params.action;
-    this.action = action
   },
 
   methods: {
@@ -221,29 +230,39 @@ export default {
       };
 
       try {
-        const result = await CourseService.adminUpdateCourse(courseId, formData);
-        if (result.success) {
-          let approve_result;
+        if (this.action == 'approve') {
+          const result = await ProposedCourseService.updateProposedCourse(courseId, formData);
+          console.log(result)
+          if (result.message == "Proposed course updated successfully") {
+            let approve_result;
+            if (result.success) {
+                const course = await ProposedCourseService.getProposedCourseByCourseId(courseId);
+                const acceptPromise = ProposedCourseService.approveProposedCourse({ "pcourseID": course['data'].pcourse_ID });
+                approve_result = await acceptPromise;
+              } else {
+                approve_result = { code: 200 };
+              }
+              if (approve_result.code == 200) {
+                this.successMessage = approve_result.message
+                this.showSuccessModal = true;
+              } else {
+                this.errorMessage = approve_result.message;
+              }
+          } else if (result.message == "Course Update Unsuccessful. A course with the same name already exists.") {
+            this.errorMessage = "A course with the same name already exists.";
+          }
 
-          if (this.action == 'approve') {
-            const course = await ProposedCourseService.getProposedCourseByCourseId(courseId);
-            // console.log(course);
-            const acceptPromise = ProposedCourseService.approveProposedCourse({ "pcourseID": course['data'].pcourse_ID });
-            approve_result = await acceptPromise;
-            // console.log(approve_result);
-        
-          } else {
-            approve_result = { code: 200 };
-          }
           
-          // console.log(approve_result);
-              
-          if (approve_result.code == 200) {
+        } else {
+          const result = await ProposedCourseService.updateProposedCourse(courseId, formData);
+          console.log(result)
+          if (result.message == "Proposed course updated successfully") {
             this.showSuccessModal = true;
-          } else {
-            this.errorMessage = approve_result.message;
+            this.successMessage = result.message
+          } else if (result.message == "Course Update Unsuccessful. A course with the same name already exists."){
+            this.errorMessage = result.message;
           }
-          }
+        }
         } catch (error) {
             console.error('Error submitting form:', error);
         }
@@ -254,11 +273,9 @@ export default {
         if (this.action == 'approve')
           this.$router.push({ name: 'adminViewProposedCourse'});
         else {
-          this.userRole = await UserService.getUserRole();
-          
-          if (this.userRole === 'Student' ) {
+          if (this.user_role === 'Student' ) {
             this.$router.push({ name: 'studentViewProfile'});
-          } else if (this.userRole === 'Instructor' || this.userRole === 'Trainer') {
+          } else if (this.user_role === 'Instructor' || this.user_role === 'Trainer') {
             this.$router.push({ name: 'instructorTrainerViewProfile'});
           }
         }

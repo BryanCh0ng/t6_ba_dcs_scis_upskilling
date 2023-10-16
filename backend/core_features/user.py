@@ -38,9 +38,14 @@ class Login(Resource):
         email = data['email']
         password = data['password']
 
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+        print(hashed_password)
+
         # compare input and database, then display results
         try:
             user = User.query.filter_by(user_Email=email).first()
+            db.session.close()
             if user:
                 if bcrypt.check_password_hash(user.user_Password, password):
                     # store user details in session
@@ -56,6 +61,7 @@ class Login(Resource):
                 return json.loads(json.dumps({"Message": "Email does not exist"}, default=str)), 404
 
         except Exception as e:
+            db.session.rollback()
             return "Failed: " + str(e), 500
         
 # verify_email() -----------------------------------------
@@ -76,17 +82,20 @@ class VerifyEmail(Resource):
         try:
             user = User.query.filter_by(user_Email=email).first()
             if user:
-                return json.loads(json.dumps({"Message": "Email already exists"}, default=str)), 404
+                db.session.close()
+                return json.loads(json.dumps({"Message": "You already have an account with us."}, default=str)), 404
             
             else:
                 self.send_email(email)
+                db.session.close()
                 return json.loads(json.dumps({"message":"Verification email sent"})), 200
 
         except Exception as e:
+            db.session.rollback()
             return "Failed: " + str(e), 500
 
     def send_email(self, email):
-        msg = Message('Hello from Flask-Mail',
+        msg = Message('Welcome to Upskilling Engagement System',
                   sender='nic.wong@live.com',
                   recipients=[email])
         msg.html = "<p>Please click the link to verify your email and finish creating your account <a href='http://localhost:8080/t6_ba_dcs_scis_upskilling/registerform?email="+ email +"'>http://localhost:8080/t6_ba_dcs_scis_upskilling/registerform?email="+ email +"</a>.</p>"
@@ -116,6 +125,7 @@ class Register(Resource):
     def post(self):
         # get inputs
         data = request.get_json()
+        print(data)
         password = data['password']
         repassword = data['confirmpassword']
 
@@ -155,8 +165,11 @@ class Register(Resource):
             else:
                 db.session.commit()
                 return json.loads(json.dumps(newUser.json(), default=str)), 200
+
+            db.session.close()
         
         except Exception as e:
+            db.session.rollback()
             return "Failed: " + str(e), 500
         
 # forgot_password() --------------------------------------
@@ -177,17 +190,20 @@ class ForgotPassword(Resource):
         try:
             user = User.query.filter_by(user_Email=email).first()
             if not user:
+                db.session.close()
                 return json.loads(json.dumps({"Message": "Email does not exist"}, default=str)), 404
             
             else:
                 self.send_email(email)
+                db.session.close()
                 return json.loads(json.dumps({"message":"Email sent"})), 200
 
         except Exception as e:
+            db.session.rollback()
             return "Failed: " + str(e), 500
 
     def send_email(self, email):
-        msg = Message('Hello from Flask-Mail',
+        msg = Message('[Upskilling Engagement System] Reset Password',
                   sender='nic.wong@live.com',
                   recipients=[email])
         msg.html = "<p>Please click the link to change your password <a href='http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"'>http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"</a>.</p>"
@@ -221,9 +237,11 @@ class ResetPassword(Resource):
                 hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
                 setattr(user, 'user_Password', hashed_password)
                 db.session.commit()
+                db.session.close()
                 return json.loads(json.dumps({"Message": "Password updated"}, default=str)), 200
 
         except Exception as e:
+            db.session.rollback()
             return "Failed: " + str(e), 500
         
 # retrieve user_ID from session
@@ -232,7 +250,9 @@ class GetRole(Resource):
     def get(self):
         user_ID = session.get('user_ID')
         if user_ID:
-            return User.query.filter_by(user_ID=user_ID).first().user_ID
+            id = User.query.filter_by(user_ID=user_ID).first().user_ID
+            db.session.close()
+            return id
         else:
             return 'Session not set'
 
@@ -241,8 +261,18 @@ class GetUserName(Resource):
     def get(self):
         user_ID = session.get('user_ID')
         if user_ID:
-            return User.query.filter_by(user_ID=user_ID).first().user_Name
+            user = User.query.filter_by(user_ID=user_ID).first()
+            db.session.close()
+            if user:
+                user_name = user.user_Name
+                # Split the user's name by space and get the first part
+                user_name_parts = user_name.split()
+                first_name = user_name_parts[0] if user_name_parts else ''
+                return first_name
+            else:
+                return 'User not found'
         else:
+            db.session.close()
             return 'Session not set'
 
 @api.route("/get_role")
@@ -250,9 +280,12 @@ class GetRole(Resource):
     def get(self):
         user_ID = session.get('user_ID')
         if user_ID:
-            return User.query.filter_by(user_ID=user_ID).first().role_Name
+            role = User.query.filter_by(user_ID=user_ID).first().role_Name
+            db.session.close()
+            return role
         
         else:
+            db.session.close()
             return 'Session not set'
 
 @api.route("/logout")

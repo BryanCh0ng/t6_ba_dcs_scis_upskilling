@@ -13,13 +13,13 @@
     <button @click="promote_to_course()" class="btn btn-success promote_to_course text-light font-weight-bold text-nowrap" v-else-if="status == 'promote_to_course'">Promote to course</button>
     <button class="btn btn-primary open_for_voting text-light font-weight-bold text-nowrap" v-else-if="status == 'open_for_voting'">Open for Voting</button>
     <button class="btn btn-danger close text-light font-weight-bold text-nowrap" v-else-if="status == 'proposed_delete'">Delete</button>
-    <button @click="registerCourse()" class="btn btn-success open_for_registration text-light font-weight-bold text-nowrap" v-else-if="status == 'open_for_registration'">Open for Registeration</button>
-    <button @click="registerCourse()" class="btn btn-danger close_registration text-light font-weight-bold text-nowrap w-100" v-else-if="status == 'close_registration'">Close registration</button>  
+    <button @click="registerCourse()" class="btn btn-success open_for_registration text-light font-weight-bold text-nowrap" v-else-if="status == 'open_for_registration'">Open for Registration</button>
+    <button @click="registerCourse()" class="btn btn-danger close_registration text-light font-weight-bold text-nowrap w-100" v-else-if="status == 'close_registration'">Close Registration</button>  
     <button class="btn btn-success create_run text-light font-weight-bold text-nowrap" v-else-if="status == 'create_run'">Create Run</button> 
     <button class="btn btn-success attendance-list text-light font-weight-bold text-nowrap" v-else-if="status == 'attendance'">Attendance List</button>
     <button class="btn btn-success feedback-analysis text-light font-weight-bold text-nowrap" v-else-if="status == 'feedback-analysis'">Feedback Analysis</button>
     <button @click=runCourseAction(course.rcourse_ID) class="btn btn-danger registered_drop text-light font-weight-bold text-nowrap" v-else-if="status == 'registered_drop'">Drop</button>
-    <button @click=voteAction(course.vote_ID) class="btn btn-warning say-pass text-light font-weight-bold text-nowrap" v-else-if="status == 'say-pass'">Say Pass</button>   
+    <button @click=voteAction(course.vote_ID) class="btn btn-danger say-pass text-light font-weight-bold text-nowrap" v-else-if="status == 'say-pass'">Say Pass</button>   
     <button class="btn btn-primary edit-proposal text-light font-weight-bold text-nowrap" v-else-if="status == 'edit-proposal'">Edit</button>   
     <button @click=proposalAction(course.pcourse_ID) class="btn btn-danger remove-proposal text-light font-weight-bold text-nowrap" v-else-if="status == 'remove-proposal'">Remove</button>   
     <button class="btn btn-info provide-feedback text-light font-weight-bold text-nowrap" v-else-if="status == 'provide-feedback'">Provide Feedback</button>  
@@ -57,17 +57,19 @@ export default {
     async runCourseAction() {
       try {
         let response;
-        // let user_ID = this.get_user_id();
+        let user_ID = await UserService.getUserID();
+
         if (this.status == 'Retire') {
           response = await CourseService.retireRunCourse(this.course.course_ID);
         } else if (this.status == 'Activate') {
+          console.log(this.course.course_ID)
           response = await CourseService.activateRunCourse(this.course.course_ID);
         } else if (this.status == 'Deactivate') {
           response = await CourseService.deactivateRunCourse(this.course.course_ID);
         } else  if (this.status == 'Active') {
-          response = await RegistrationService.createNewRegistration(this.course.rcourse_ID, 1, "Pending");
+          response = await RegistrationService.createNewRegistration(this.course.rcourse_ID, user_ID, "Pending");
         } else if (this.status == "registered_drop") {
-          response = await RegistrationService.dropRegisteredCourse(this.course.rcourse_ID, 1);
+          response = await RegistrationService.dropRegisteredCourse(this.course.rcourse_ID, user_ID);
         } else if (this.status == "delete-run-course") {
           response = await CourseService.deleteRunCourse(this.course.rcourse_ID);
           console.log(response.message)
@@ -82,11 +84,12 @@ export default {
     async voteAction() {
       try {
         let response;
-        // let user_ID = this.get_user_id();
+        let user_ID = await UserService.getUserID();
+        console.log(user_ID)
         if (this.status == 'Vote') {
-          response = await CourseService.voteCourse(this.course.vote_ID, 1);
+          response = await CourseService.voteCourse(this.course.vote_ID, user_ID);
         } else if (this.status == 'say-pass') {
-          response = await CourseService.unvoteCourse(this.course.vote_ID, 1);
+          response = await CourseService.unvoteCourse(this.course.vote_ID, user_ID);
         } else if (this.status == 'unoffered-vote') {
           response = await CourseService.unofferedVoteCourse(this.course.course_ID);
         } else if (this.status == 'Close') {
@@ -102,7 +105,8 @@ export default {
     async proposalAction() {
       try {
         let response;
-        // let user_ID = this.get_user_id();
+        let user_ID = await UserService.getUserID();
+        console.log(user_ID)
         if (this.status == 'remove-proposal') {
           response = await ProposedCourseService.removeProposedCourse(this.course.pcourse_ID);
         } 
@@ -113,18 +117,18 @@ export default {
         this.$emit('action-and-message-updated', {message: this.message, course: this.course});
       }
     },
-    async get_user_id() {
-      try {
-        const user_ID = await UserService.getUserID()
-        this.user_ID = user_ID
+    // async get_user_id() {
+    //   try {
+    //     const user_ID = await UserService.getUserID()
+    //     this.user_ID = user_ID
 
-      } catch (error) {
-        this.message = error.message
-        this.user_ID = null;
-      }
-    },
+    //   } catch (error) {
+    //     this.message = error.message
+    //     this.user_ID = null;
+    //   }
+    // },
     async registerCourse() {
-      console.log(this.course)
+      // console.log(this.course)
       let response = await RunCourseService.changeRegistrationStatus({ "rcourse_ID": this.course.rcourse_ID })
       console.log(response)
       this.message = response.message;

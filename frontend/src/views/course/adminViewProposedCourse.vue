@@ -27,7 +27,7 @@
                   <th scope="col">
                     <a href="" class="text-decoration-none text-dark" @click.prevent="sort('submitted_by', 'pending')">Owner <sort-icon :sortColumn="sortColumn === 'submitted_by'" :sortDirection="getSortDirection('submitted_by')"/></a></th>
                   <th scope="col">Course Details</th>
-                  <th scope="col">Action(s)</th>
+                  <th scope="col" colspan="2">Action(s)</th>
                 </tr>
               </thead>
               <tbody>
@@ -87,7 +87,8 @@
                     {{ proposed_course.submitted_by_name }}
                   </td>
                   <td>{{ proposed_course.pcourse_Status }}</td>
-                  <td>{{ proposed_course.reason }}</td>
+                  <td v-if="proposed_course.reason === 'NULL' || proposed_course.reason === null " class="text-center">-</td>
+                  <td v-else-if="proposed_course.reason !== NULL">{{ proposed_course.reason }}</td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                 </tr>
               </tbody>
@@ -121,6 +122,8 @@ import SearchFilter from "@/components/search/ProposalCourseRelatedSearchFilter.
 import CommonSearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 import courseDate from '@/components/course/courseDate.vue';
+import CommonService from "@/api/services/CommonService.js";
+import UserService from "@/api/services/UserService.js";
 
 export default {
   components: {
@@ -229,13 +232,13 @@ export default {
     },
     async sortCourse(action) {
       if (action == 'pending') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.pending_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.pending_courses)
          if (sort_response.code == 200) {
           this.pending_courses = sort_response.data
          }
       }
       if (action == 'proposed') {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.proposed_courses)
          if (sort_response.code == 200) {
           this.proposed_courses = sort_response.data
          }
@@ -254,6 +257,7 @@ export default {
         
         let proposed_response = await CourseService.searchAllApprovedRejectedProposedCoursesAdmin(null, null, null)
         this.proposed_courses = proposed_response.data
+        console.log(this.proposed_courses)
       } catch (error) {
         console.error("Error fetching course details:", error);
       }
@@ -272,7 +276,15 @@ export default {
     }
   },
   async created() {
-    this.loadData();
+    const user_ID = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_ID);
+    if (role == 'Student') {
+      this.$router.push({ name: 'studentViewCourse' }); 
+    } else if (role == 'Instructor' || role == 'Trainer') {
+        this.$router.push({ name: 'instructorTrainerViewVotingCampaign' });
+    }else {
+      this.loadData();
+    }
   },
   mounted() {
     const buttonElement = document.createElement('button');

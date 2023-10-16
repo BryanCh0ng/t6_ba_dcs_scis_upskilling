@@ -2,8 +2,8 @@
   <div class="full-screen-container" id="app">
     <!-- <img alt="Vue logo" src="./assets/logo.png">
     <HelloWorld msg="Welcome to Your Vue.js App"/> -->
-    <nav-bar v-if="showNavBar"/>
-    <div class="content">
+    <nav-bar v-if="showNavBar" class="mb-5"/>
+    <div>
       <router-view />
     </div>
   </div>
@@ -20,7 +20,7 @@ export default {
   computed: {
     showNavBar() {
       // Specify the routes where you want to show the navbar
-      const routesWithNavBar = ["ContactUs", "viewCourse","adminViewRunCourse", "adminViewVoteCourse", "adminViewProposedCourse","adminVotingCampaign", "adminViewInstructorsTrainers", "studentViewCourse","studentViewProfile", "editProposedCourse", "instructorTrainerViewProfile","proposeCourse", "editCourse", "createCourse", "createRunCourse", "editRunCourse", "instructorTrainerViewVotingCampaign", "adminViewCourse", "createFeedbackTemplate", "editFeedbackTemplate" ,"adminViewFeedbackTemplate", "submitFeedback", "adminViewCourseRun"];
+      const routesWithNavBar = ["ContactUs", "viewCourse","adminViewRunCourse", "adminViewVoteCourse", "adminViewProposedCourse","adminVotingCampaign", "adminViewInstructorsTrainers", "studentViewCourse","studentViewProfile", "editProposedCourse", "instructorTrainerViewProfile","proposeCourse", "editCourse", "createCourse", "createRunCourse", "editRunCourse", "instructorTrainerViewVotingCampaign", "adminViewCourse", "studentViewRecommendations", "adminViewManagement", "adminViewStudentEnrolledCourse", "adminAddAdmin", "adminViewCourseRun", "createFeedbackTemplate", "editFeedbackTemplate" ,"adminViewFeedbackTemplate", "submitFeedback"];
       return routesWithNavBar.includes(this.$route.name);
     }
   }

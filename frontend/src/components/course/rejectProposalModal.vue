@@ -25,7 +25,7 @@
       </div>
     </div>
     <div class="modal-footer"> 
-      <button class="btn btn-danger" id="reject-proposed-course-btn" @click="reject">Reject</button>
+      <button class="btn btn-danger" :disabled="disabled" id="reject-proposed-course-btn" @click="reject">Reject</button>
     </div>
   </div>
 </template>
@@ -43,7 +43,8 @@ export default {
       rejectionReason: '',
       showResponse: false,
       responseText: "",
-      isError: false
+      isError: false,
+      disabled: false
     };
   },
   methods: {
@@ -63,7 +64,8 @@ export default {
       this.showResponse = false;
       this.selectedRadio = 'no-reason'
       this.responseText = "";
-      this.isError = false
+      this.isError = false;
+      this.disabled = false;
     },
     async reject_proposed_course() {
       try {
@@ -71,8 +73,7 @@ export default {
         if (response.code == 200) {
           this.responseText = response.message
           this.isError = false
-          const button = document.getElementById("reject-proposed-course-btn");
-          button.disabled = true;
+          this.disabled = true;
         }
         else {
           this.responseText = response.message

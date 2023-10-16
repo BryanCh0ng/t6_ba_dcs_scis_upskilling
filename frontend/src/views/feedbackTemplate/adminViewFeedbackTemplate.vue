@@ -66,6 +66,7 @@
   import {convertDate} from '@/scripts/common/convertDateTime.js'
   import DeleteFeedbackTemplateModal from '@/components/feedbackTemplate/DeleteFeedbackTemplateModal.vue'
   import ApplyFeedbackTemplateModal from '@/components/feedbackTemplate/ApplyFeedbackTemplateModal.vue'
+  import CommonService from "@/api/services/CommonService.js"
   
   export default {
     components: {
@@ -139,7 +140,7 @@
         }
       },
       async sortFeedbackTemplate() {
-        let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.feedback_templates)
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.feedback_templates)
         console.log(sort_response)
           if (sort_response.code == 200) {
             this.feedback_templates = sort_response.data

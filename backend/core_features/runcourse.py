@@ -1,7 +1,10 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
 from allClasses import *
+from core_features import common
 import json
+from sqlalchemy import distinct
+from datetime import datetime, timedelta
 
 api = Namespace('runcourse', description='Run Course related operations')
 
@@ -79,28 +82,54 @@ change_registration_status_model = api.model("change_registration_status_model",
 class ChangeRegistrationStatus(Resource):
     @api.expect(change_registration_status_model)
     def post(self):
+
+        user_role = common.getUserRole()
+        if (user_role) != 'Admin':
+            return {
+                "message": "Unathorized Access, Failed to create run course"
+            }, 404
+
         data = request.get_json()
 
         try:
             rcourseID = data["rcourse_ID"]
             rcourse = RunCourse.query.filter_by(rcourse_ID=rcourseID).first()
+            course = Course.query.filter_by(course_ID=rcourse.course_ID).first()
             message = ''            
+
+            current_datetime = datetime.now()
+            current_date = current_datetime.strftime('%Y-%m-%d')
+            close_date = (current_datetime + timedelta(days=5)).strftime('%Y-%m-%d')
+
+            rcourse_run_startdate_str = rcourse.run_Startdate.strftime('%Y-%m-%d')
+            # print(rcourse_run_startdate_str)
+            if rcourse_run_startdate_str <= close_date:
+                close_date = (rcourse.run_Startdate - timedelta(days=1)).strftime('%Y-%m-%d')
+            
+            current_time = current_datetime.strftime('%H:%M:%S')
+
             if(rcourse):
                 if rcourse.runcourse_Status == "Closed":
                     setattr(rcourse, "runcourse_Status", "Ongoing")
-                    setattr(rcourse, "course_Status", "Active")
+                    setattr(course, "course_Status", "Active")
+                    setattr(rcourse, "reg_Startdate", current_date)
+                    setattr(rcourse, "reg_Starttime", current_time)
+                    setattr(rcourse, "reg_Enddate", close_date)
+                    setattr(rcourse, "reg_Endtime", "10:00:00")
                     message = 'Run Course registration Opened'
                 else:
                     setattr(rcourse, "runcourse_Status", "Closed")
-                    setattr(rcourse, "course_Status", "Inactive")
+                    setattr(course, "course_Status", "Inactive")
                     message = 'Run Course registration Closed'
 
                 db.session.commit()
+
                 return json.loads(json.dumps({"message": message, "code": 200}, default=str))
 
             return json.loads(json.dumps({"message": "There is no such runcourse", "code": 404}, default=str))
 
         except Exception as e:
+            db.session.rollback()
             return "Failed" + str(e), 500
 
 get_runcourse_by_id = api.parser()
@@ -130,38 +159,107 @@ class EditRunCourse(Resource):
     def put(self, runcourse_id):
 
         try: 
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {
+                    "message": "Unathorized Access, Failed to edit run course"
+                }, 404
+    
             #Get the updated data from the request body 
             updated_data = request.json
         
             runcourse = RunCourse.query.filter_by(rcourse_ID=runcourse_id).first()
 
-            if runcourse:
-                # Update the fields based on updated_data
-                for field, value in updated_data.items():
-                    #print(f"Updating {field} to {value}")
-                    setattr(runcourse, field, value)
+            if not runcourse:
+                return {
+                    'message': "There is no such runcourse"
+                }, 404
 
-                #Commit the changes to the database 
-                db.session.commit()
+             # Get instructor availability data from the updated data
+            start_date = datetime.strptime(updated_data.get('run_Startdate'), '%Y-%m-%d').date()
+            end_date = datetime.strptime(updated_data.get('run_Enddate'), '%Y-%m-%d').date()
+            start_time = datetime.strptime(updated_data.get('run_Starttime'), '%H:%M:%S').time()
+            end_time = datetime.strptime(updated_data.get('run_Endtime'), '%H:%M:%S').time()
+            instructor_id = updated_data.get('instructor_ID')
 
-                return json.loads(json.dumps(runcourse.json(), default=str)), 200
+            # Query existing run courses for the given instructor
+            #runs = RunCourse.query.filter_by(instructor_ID=instructor_id).all()
 
-            return json.loads(json.dumps({"message": "There is no such runcourse"})), 404
+            # Query existing run courses for the given instructor excluding the current record being edited
+            runs = RunCourse.query.filter(RunCourse.instructor_ID == instructor_id, RunCourse.rcourse_ID != runcourse_id).all()
+            
+            # Check instructor availability
+            if runs:
+                for run in runs:
+                    if run.run_Startdate <= end_date and run.run_Enddate >= start_date:
+                        if run.run_Endtime >= start_time and run.run_Starttime <= end_time:
+                            return {
+                                'message': 'Instructor is already occupied at the chosen date and time'
+                            }, 400
+
+    
+            # Update the fields based on updated_data
+            for field, value in updated_data.items():
+                #print(f"Updating {field} to {value}")
+                setattr(runcourse, field, value)
+
+            #Commit the changes to the database 
+            db.session.commit()
+            # db.session.close()
+
+           # Convert dates and times to formatted strings
+            runcourse.run_Startdate = start_date.strftime('%Y-%m-%d')
+            runcourse.run_Enddate = end_date.strftime('%Y-%m-%d')
+            runcourse.run_Starttime = start_time.strftime('%H:%M:%S')
+            runcourse.run_Endtime = end_time.strftime('%H:%M:%S')
+
+            runcourse.reg_Startdate = runcourse.reg_Startdate.strftime('%Y-%m-%d')
+            runcourse.reg_Enddate = runcourse.reg_Enddate.strftime('%Y-%m-%d')
+            runcourse.reg_Starttime = runcourse.reg_Starttime.strftime('%H:%M:%S')
+            runcourse.reg_Endtime = runcourse.reg_Endtime.strftime('%H:%M:%S')
+
+            return {
+                'message': 'Run course updated successfully',
+                'data': runcourse.json()
+            }, 200
 
         except Exception as e:
-            print("Error:", str(e))
-            return "Failed" + str(e), 500
+            db.session.rollback()
+            return {
+                "message": "Failed to update run course: " + str(e)
+            }, 500
 
 @api.route("/create_runcourse/<int:course_id>", methods=["POST"])
 @api.doc(description="Create run course")
 class CreateRunCourse(Resource):
     def post(self, course_id):
         try: 
-            
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {
+                    "message": "Unathorized Access, Failed to create run course"
+                }, 404
+
             # Get the data for creating a new run course from the request body
             new_run_course_data = request.json
 
-            print(new_run_course_data)
+            start_date = datetime.strptime(new_run_course_data.get('run_Startdate'), '%Y-%m-%d').date()
+            end_date = datetime.strptime(new_run_course_data.get('run_Enddate'), '%Y-%m-%d').date()
+            start_time = datetime.strptime(new_run_course_data.get('run_Starttime'), '%H:%M:%S').time()
+            end_time = datetime.strptime(new_run_course_data.get('run_Endtime'), '%H:%M:%S').time()
+            instructor_id = new_run_course_data.get('instructor_ID')
+
+            runs = RunCourse.query.filter_by(instructor_ID=instructor_id).all()
+
+            if runs:
+                for run in runs:
+                    if run.run_Startdate <= end_date and run.run_Enddate >= start_date:
+                        if run.run_Endtime >= start_time and run.run_Starttime <= end_time:
+                            return {
+                                'message': 'Instructor is already occupied at the chosen date and time'
+                            }, 400
+                
+            #print(new_run_course_data)
 
             # Create a new run course object with the data
             new_run_course = RunCourse(**new_run_course_data)
@@ -176,7 +274,23 @@ class CreateRunCourse(Resource):
             #print("Data before returning:", new_proposed_course.json())
 
             # Return the newly created course as JSON response
-            return json.loads(json.dumps(new_run_course.json(), default=str)), 201
+            #return json.loads(json.dumps(new_run_course.json(), default=str)), 201
+
+            # Convert dates and times to formatted strings
+            new_run_course.run_Startdate = start_date.strftime('%Y-%m-%d')
+            new_run_course.run_Enddate = end_date.strftime('%Y-%m-%d')
+            new_run_course.run_Starttime = start_time.strftime('%H:%M:%S')
+            new_run_course.run_Endtime = end_time.strftime('%H:%M:%S')
+
+            new_run_course.reg_Startdate = new_run_course.reg_Startdate.strftime('%Y-%m-%d')
+            new_run_course.reg_Enddate = new_run_course.reg_Enddate.strftime('%Y-%m-%d')
+            new_run_course.reg_Starttime = new_run_course.reg_Starttime.strftime('%H:%M:%S')
+            new_run_course.reg_Endtime = new_run_course.reg_Endtime.strftime('%H:%M:%S')
+
+            return {
+                'message': 'Run course created successfully',
+                'data': new_run_course.json()  # Assuming new_run_course.json() returns the required data as a dictionary
+            }, 201
 
         except Exception as e:
             print("Error:", str(e))
@@ -210,3 +324,22 @@ class CourseApplyFeedbackTemplate(Resource):
 
         except Exception as e:
             return jsonify({"code": 500, "message": "Failed. " + str(e)})
+            db.session.rollback()
+            print(str(e))
+            return {
+                "message": "Failed to create a new run course: " + str(e)
+            }, 500
+
+get_course_formats = api.parser()
+@api.route("/get_course_formats")
+@api.doc(description="Get course formats")
+class GetCourseFormats(Resource):
+    @api.expect(get_course_formats)
+    def get(self):
+        distinct_course_formats = db.session.query(distinct(RunCourse.course_Format)).all()
+        db.session.close()
+
+        if distinct_course_formats:
+            return json.loads(json.dumps(distinct_course_formats, default=str)), 200
+
+        return json.loads(json.dumps({"message": "No course formats found."})), 404

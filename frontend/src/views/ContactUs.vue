@@ -1,7 +1,7 @@
 <template>
   <div id="contactus">
     <!-- CONTACT US FORM -->
-    <div class="container mt-5">
+    <div class="container">
       <h2 class="text-center mb-4">Contact Us</h2>
 
       <!-- Error Message -->

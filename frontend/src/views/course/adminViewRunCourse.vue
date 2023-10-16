@@ -3,7 +3,8 @@
     <search-filter
       :status-options="statusOptions"
       :search-api="searchAllRunCoursesAdmin" 
-      @search-complete="handleSearchComplete"/>
+      @search-complete="handleSearchComplete"
+      class="pt-4"/>
     <div class="container col-12">
       <h5 class="pb-3">All Run Courses</h5>
       <div v-if="courses && courses.length > 0" class="table-responsive">
@@ -90,6 +91,8 @@ import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
 import courseApplyFeedbackTemplateModal from '@/components/course/courseApplyFeedbackTemplateModal.vue'
+import CommonService from "@/api/services/CommonService.js";
+import UserService from "@/api/services/UserService.js";
 
 export default {
   components: {
@@ -192,7 +195,7 @@ export default {
       }
     },
     async sortCourse() {
-      let sort_response = await CourseService.sortRecords(this.sortColumn, this.sortDirection, this.courses)
+      let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.courses)
         if (sort_response.code == 200) {
           this.courses = sort_response.data
         }
@@ -213,9 +216,22 @@ export default {
       this.showFeedbackTemplateModal = false;
       this.selectedCourse = null;
     },
+    isCourseStartDateBeforeCurrentDate(courseStartDate) {
+      console.log(courseStartDate)
+      const currentDate = new Date();
+      return new Date(courseStartDate) > currentDate;
+    },
   },
-  created() {
-   this.loadData();
+  async created() {
+    const user_ID = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_ID);
+    if (role == 'Student') {
+      this.$router.push({ name: 'studentViewCourse' }); 
+    } else if (role == 'Instructor' || role == 'Trainer') {
+      this.$router.push({ name: 'instructorTrainerViewVotingCampaign' });
+    }else {
+      this.loadData();
+    }
   },
   mounted() {
     const buttonElement = document.createElement('button');

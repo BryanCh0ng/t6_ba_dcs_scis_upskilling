@@ -146,7 +146,7 @@ export default {
                 this.submitFormData = {};
 
                 //Need to delete this ltr
-                this.user = 1;
+                this.user = await this.fetchUserID();
 
                 this.submitFormData["submitted_By"] = this.user;
 

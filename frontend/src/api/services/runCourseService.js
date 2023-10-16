@@ -30,7 +30,6 @@ class runCourseService extends BaseApiService {
   }
   async createRunCourse(courseId, newRunCourseData) {
     try {
-      console.log(courseId);
       let response = await axiosClient.post(`/runcourse/create_runcourse/${courseId}`, newRunCourseData);
       return response.data;
     } catch (error) {
@@ -68,6 +67,16 @@ class runCourseService extends BaseApiService {
     } catch (error) {
         return this.handleError(error);
     }
+  }
+
+  async getCourseFormats() {
+    try {
+        let response = await axiosClient.get("/runcourse/get_course_formats");
+        return response.data 
+  
+    } catch (error) {
+        return this.handleError(error);
+     }
   }
 }
 

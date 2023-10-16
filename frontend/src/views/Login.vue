@@ -1,6 +1,6 @@
 <template>
   <div class="full-screen-container" id="login">
-    <div class="content">
+    <div class="onboard">
       <div class="row no-gutter">
         
         <image-half></image-half>
@@ -102,9 +102,9 @@ export default {
         if (userRole === 'Student') {
           this.router.push('/studentViewCourse')
         } else if (userRole === 'Instructor' || userRole === 'Trainer') {
-          this.router.push('/instructorTrainerViewProfile') // will need to change the route
+          this.router.push('/instructorTrainerViewVotingCampaign') // will need to change the route
         } else if (userRole === 'Admin') {
-          this.router.push('/adminViewRunCourse')
+          this.router.push('/adminViewCourse')
         }
 
       } catch (error) {
@@ -116,8 +116,8 @@ export default {
 };
 </script>
 
-<style>
-.content {
+<style scoped>
+.onboard {
   padding: 0px;
   font-size: 15px;
 }

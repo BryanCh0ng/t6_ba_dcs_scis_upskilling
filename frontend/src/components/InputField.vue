@@ -34,9 +34,8 @@ export default {
   },
   watch: {
     inputValue(newValue) {
-      // console.log('Input value changed:', newValue);
       this.$emit('update:value', newValue);
     },
-  },
+  },  
 };
 </script>

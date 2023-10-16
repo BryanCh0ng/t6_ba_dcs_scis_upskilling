@@ -225,6 +225,7 @@ import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js";
 import { useVuelidate } from "@vuelidate/core";
 import { required, numeric, helpers } from "@vuelidate/validators";
 import { axiosClient } from "@/api/axiosClient";
+import UserService from "@/api/services/UserService.js";
 //import ErrorMessage from "../components/ErrorMessage.vue";
 
 //Validating the date fields
@@ -542,7 +543,8 @@ export default {
       if (!this.v$.$invalid) {
         // Form is valid, submit or perform further actions
         console.log('Form submitted successfully');
-
+        const user_ID = await UserService.getUserID();
+        console.log(user_ID)
         //Create the course service
         await axiosClient.post("/course/create_course", {
           courseName : this.formData.courseName,
@@ -562,7 +564,8 @@ export default {
           closingDate : this.formData.closingDate,
           closingTime : this.formData.closingTime,
           courseFee : this.formData.courseFee,
-          selectedTemplate : this.formData.selectedTemplate
+          selectedTemplate : this.formData.selectedTemplate,
+          user_ID: user_ID
         }).then(response => {
             console.log(response.data);
           })
