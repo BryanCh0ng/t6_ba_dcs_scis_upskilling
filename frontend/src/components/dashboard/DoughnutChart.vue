@@ -1,6 +1,6 @@
 <template>
     <div id="chart-container">
-        <canvas id="chart" width="350" height="250"></canvas>
+        <canvas :id="'chart-' + chartId" width="350" height="250"></canvas>
     </div>
 </template>
   
@@ -11,17 +11,18 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 export default {
     name: 'DoughnutChart',
     props: {
-        labelArray: {
-            type: Array
+        datasets: {
+            type: Array,
+            required: true
         },
-        dataArray: {
-            type: Array
-        },
-        label: String
+        chartId: {
+            type: Number,
+            required: true
+        }
     },
     mounted() {
         this.$nextTick(() => {
-            const ctx = document.getElementById('chart');
+            const ctx = document.getElementById('chart-' + this.chartId);
             Chart.register(ChartDataLabels);
 
             // Change default options for ALL charts
@@ -32,10 +33,10 @@ export default {
             new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: this.labelArray,
+                    labels: this.datasets.labelArray,
                     datasets: [{
-                        label: this.label,
-                        data: this.dataArray,
+                        label: this.datasets.label,
+                        data: this.datasets.dataArray,
                         backgroundColor: [
                             'rgb(255, 99, 132)',
                             'rgb(54, 162, 235)',
@@ -102,7 +103,5 @@ export default {
     max-width: 100%; /* Ensure the chart doesn't exceed the container's width */
     max-height: 100%; /* Ensure the chart doesn't exceed the container's height */
 }
-
-
 
 </style>

@@ -23,7 +23,8 @@
     <div class="row">
       <!-- Display Overall Course Sentiment -->
       <div class="col-12 col-md-6 dashboard mb-3 custom-col" v-if="courseSpecific">
-        <DoughnutChart v-if="courseSentimentLabels.length > 0 && courseSentimentPercentages.length > 0" :labelArray="courseSentimentLabels" :dataArray="courseSentimentPercentages" :label="label"/> <!-- tryout, need to change -->
+        <!--<DoughnutChart v-if="courseSentimentLabels.length > 0 && courseSentimentPercentages.length > 0" :labelArray="courseSentimentLabels" :dataArray="courseSentimentPercentages" :label="label"/> --><!-- tryout, need to change -->
+        <DoughnutChart v-if="chartData1.labelArray.length > 0 && chartData1.dataArray.length > 0" :datasets="chartData1" :chartId="0" />
         <p><strong>Overall Course Sentiment</strong></p>
       </div>
       <!-- Display Overall Course Positive WordCloud -->
@@ -41,7 +42,8 @@
 
       <!-- Display Overall Instructor Sentiment -->
       <div class="col-12 col-md-6 dashboard mb-3 custom-col" v-if="instructorSpecific">
-        <DoughnutChart v-if="instructorSentimentLabels.length > 0 && instructorSentimentPercentages.length > 0" :labelArray="instructorSentimentLabels" :dataArray="instructorSentimentPercentages" :label="label"/> <!-- tryout, need to change -->
+        <!--<DoughnutChart v-if="instructorSentimentLabels.length > 0 && instructorSentimentPercentages.length > 0" :labelArray="instructorSentimentLabels" :dataArray="instructorSentimentPercentages" :label="label"/> --><!-- tryout, need to change -->
+        <DoughnutChart v-if="chartData2.labelArray.length > 0 && chartData2.dataArray.length > 0" :datasets="chartData2" :chartId="1" />
         <p><strong>Overall Instructor Sentiment</strong></p>
       </div>
       <!-- Display Overall Instructor Positive WordCloud -->
@@ -134,11 +136,21 @@ export default {
             courseSuggestionsTopics: [],
             instructorDoneWellTopics: [],
             instructorSuggestionsTopics: [],
-            courseSentimentLabels: [],
+            /*courseSentimentLabels: [],
             courseSentimentPercentages: [],
             label: "",
             instructorSentimentLabels: [],
-            instructorSentimentPercentages: []
+            instructorSentimentPercentages: []*/
+            chartData1: {
+                labelArray: [],
+                dataArray: [],
+                label: ""
+            },
+            chartData2: {
+              labelArray: [],
+              dataArray: [],
+              label: ""
+            },
         };
     },
     methods: {
@@ -182,9 +194,14 @@ export default {
           const { sentiment_labels, sentiment_percentages } = response.data;
 
           // Now you can use sentiment_labels and sentiment_percentages in your component
-          this.courseSentimentLabels = sentiment_labels;
+          /*this.courseSentimentLabels = sentiment_labels;
           this.courseSentimentPercentages = sentiment_percentages;
-          this.label = "Overall Course Sentiment"
+          this.label = "Overall Course Sentiment"*/
+
+          this.chartData1.labelArray = sentiment_labels;
+          this.chartData1.dataArray = sentiment_percentages;
+          this.chartData1.label = "Overall Course Sentiment";
+          
         } catch (error) {
           console.error("Error fetching course feedbacks: ", error);
         }
@@ -195,9 +212,14 @@ export default {
           const { sentiment_labels, sentiment_percentages } = response.data;
 
           // Now you can use sentiment_labels and sentiment_percentages in your component
-          this.instructorSentimentLabels = sentiment_labels;
+          /*this.instructorSentimentLabels = sentiment_labels;
           this.instructorSentimentPercentages = sentiment_percentages;
-          this.label = "Overall Instructor Sentiment"
+          this.label = "Overall Instructor Sentiment"*/
+          
+          this.chartData2.labelArray = sentiment_labels;
+          this.chartData2.dataArray = sentiment_percentages;
+          this.chartData2.label = "Overall Instructor Sentiment";
+
         } catch (error) {
           console.error("Error fetching instructor feedbacks: ", error);
         }
