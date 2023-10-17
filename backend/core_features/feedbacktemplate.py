@@ -325,31 +325,29 @@ class EditFeedbackTemplate(Resource):
                 # if template exists, update template name and delete all attributes and options
                 setattr(template, 'template_Name', data['feedback_template_name'])
 
-                attributes = TemplateAttribute.query.filter_by(template_ID=template_id).all()
-                for attribute in attributes:
-                    Feedback.query.filter_by(template_Attribute_ID=attribute.template_Attribute_ID).delete()
-                    InputOption.query.filter_by(template_Attribute_ID=attribute.template_Attribute_ID).delete()
-                    db.session.delete(attribute)
+                template_attributes = TemplateAttribute.query.filter_by(template_ID = template_id).all() # get all template attributes linked to the feedback       
+            
+                if template_attributes:
+                    for template_attri in template_attributes:
+                        template_attri_ID = template_attri.template_Attribute_ID
+                        feedback_to_delete = Feedback.query.filter_by(template_Attribute_ID = template_attri_ID).all()
+                        if feedback_to_delete:
+                            for feedback in feedback_to_delete:
+                                db.session.delete(feedback) # delete feedback containing template id and attribute id
+                        template_attributes_options = InputOption.query.filter_by(template_Attribute_ID = template_attri_ID).all() # get all input options linked to template attributes
+                        if template_attributes_options:
+                            for option in template_attributes_options:
+                                db.session.delete(option) #delete template attribute options                      
+                        db.session.delete(template_attri)
 
                 # Update the fields based on data
                 for editAttribute in data['data']:
-                    # attribute = TemplateAttribute.query.filter_by(template_ID=template_id).filter_by(question=editAttribute['question']).first()
-                    # if attribute:
-                    #     setattr(attribute, 'input_Type', editAttribute['selectedInputType'])
-                    #     if editAttribute['inputOptions']:
-                    #         InputOption.query.filter_by(template_Attribute_ID=attribute.template_Attribute_ID).delete()
-                    #         position = 1
-                    #         for editOption in editAttribute['inputOptions']: 
-                    #             new_option = InputOption(template_Attribute_ID=attribute.template_Attribute_ID, position=position, textlabel=editOption['option'])
-                    #             position += 1
-                    #             db.session.add(new_option)
-                    # else:
                     new_attribute = TemplateAttribute(question=editAttribute['question'], input_Type=editAttribute['selectedInputType'], template_ID=template_id)
                     db.session.add(new_attribute)
-                    if editAttribute['inputOptions']:
+                    if 'inputOptions' in editAttribute:
                         template_Attribute_ID = TemplateAttribute.query.filter_by(template_ID=template_id).filter_by(question=editAttribute['question']).first().template_Attribute_ID
                         position = 1
-                        for editOption in editAttribute['inputOptions']: 
+                        for editOption in editAttribute['inputOptions']:
                             new_option = InputOption(template_Attribute_ID=template_Attribute_ID, position=position, textlabel=editOption['option'])
                             position += 1
                             db.session.add(new_option)
