@@ -633,7 +633,8 @@ class GetCompletedCourses(Resource):
             .join(UserStudent, Registration.user_ID == UserStudent.user_ID) \
             .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
             .filter(UserStudent.user_ID == user_id) \
-            .filter(RunCourse.run_Enddate <= current_datetime)
+            .filter(RunCourse.run_Enddate <= current_datetime) \
+            .filter(Registration.reg_Status == "Enrolled")
 
 
         if course_name:
