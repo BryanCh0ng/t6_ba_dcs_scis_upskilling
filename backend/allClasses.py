@@ -267,7 +267,7 @@ class Feedback(db.Model):
     __tablename__ = 'feedback'
 
     feedback_ID = db.Column(db.Integer, nullable=False, primary_key=True)
-    feedback_Template_ID = db.Column(db.Integer,  nullable=False)
+    feedback_Template_ID = db.Column(db.Integer,  nullable=True)
     submitted_By = db.Column(db.Integer,  nullable=False)
     template_Attribute_ID = db.Column(db.Integer ,db.ForeignKey('templateattribute.template_Attribute_ID'), nullable=False) 
     answer = db.Column(db.String(255), nullable=False) 

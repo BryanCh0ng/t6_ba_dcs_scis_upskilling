@@ -635,7 +635,7 @@ INSERT INTO runcourse VALUES
 DROP TABLE IF EXISTS `feedback`;
 CREATE TABLE IF NOT EXISTS `feedback`(
 	feedback_id int NOT NULL AUTO_INCREMENT,
-	feedback_template_id int NOT NULL,
+	feedback_template_id int,
 	submitted_by int NOT NULL,
 	template_attribute_id int NOT NULL,
 	answer varchar(255) NOT NULL,
@@ -1163,7 +1163,11 @@ INSERT INTO registration VALUES
 	(40, 2, 6, 'Pending'),
 	(42, 2, 55, 'Pending'),
 	(43, 1, 25, 'Dropped'),
-	(44, 2, 1, 'Dropped');
+	(44, 2, 1, 'Dropped'),
+    (45, 11, 1, 'Enrolled'),
+    (46, 10, 1, 'Enrolled'),
+    (47, 12, 1, 'Enrolled'),
+    (48, 13, 1, 'Enrolled');
 
 DROP TABLE IF EXISTS `lesson`;
 CREATE TABLE IF NOT EXISTS `lesson`(

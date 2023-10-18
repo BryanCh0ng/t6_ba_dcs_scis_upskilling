@@ -2,7 +2,7 @@
   <div class="form-group row">
     <label v-if="qnNum !== undefined" class="mb-1">{{ qnNum }}. {{ label }}</label>
     <label v-else class="mb-1">{{ label }}</label>
-    <input :disabled="disabled" type="text" :class="id" class="form-control" v-model="userInput" placeholder="Enter Text"> 
+    <input :placeholder="placeholder" :disabled="disabled" type="text" :class="id" class="form-control" v-model="userInput"> 
   </div>
 </template>
   
@@ -15,6 +15,10 @@ export default {
     disabled: {
       type: Boolean,
       default: false,
+    },
+    placeholder: {
+      type: String,
+      default: 'Enter Text',
     },
   },
   data() {

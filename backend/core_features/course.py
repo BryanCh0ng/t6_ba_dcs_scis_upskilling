@@ -633,7 +633,8 @@ class GetCompletedCourses(Resource):
             .join(UserStudent, Registration.user_ID == UserStudent.user_ID) \
             .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
             .filter(UserStudent.user_ID == user_id) \
-            .filter(RunCourse.run_Enddate <= current_datetime)
+            .filter(RunCourse.run_Enddate <= current_datetime) \
+            .filter(Registration.reg_Status == "Enrolled")
 
 
         if course_name:
@@ -1783,3 +1784,56 @@ class GetAllCoursesWithRegistrationCount(Resource):
             return jsonify({"code": 200, "data": result_data})
 
         return jsonify({"code": 404, "message": "No courses found"})
+
+# Student - Check if Course is Completed using user_id and rcourse_id
+is_course_completed = api.parser()
+is_course_completed.add_argument("rcourse_id", help="Enter rcourse id")
+@api.route("/is_course_completed")
+@api.doc(description="Check if Course is Completed using user_id and rcourse_id ")
+class IsCourseCompleted(Resource):
+    @api.expect(is_course_completed)
+    def get(self):
+        try:
+            args = is_course_completed.parse_args()
+            user_id = session.get('user_ID')
+            rcourse_id = args.get("rcourse_id")
+            current_datetime = datetime(2023, 12, 30, 0, 0, 0)
+            print(current_datetime)
+
+            # if student has existing completed course
+            query = db.session.query(
+                RunCourse,
+                Registration
+            ).select_from(RunCourse).join(
+                Registration,
+                Registration.rcourse_ID == RunCourse.rcourse_ID
+            ).filter(
+                RunCourse.rcourse_ID == rcourse_id,
+                RunCourse.run_Enddate <= current_datetime,
+                Registration.user_ID == user_id,
+                Registration.reg_Status == 'Enrolled'
+            )
+
+            results = query.all()
+            db.session.close()
+
+            if results:
+                # if student completed course, check if there is existing feedback response
+                sub_query = db.session.query(
+                    Feedback
+                ).filter(
+                    Feedback.submitted_By == user_id,
+                    Feedback.rcourse_ID == rcourse_id
+                )
+                feedback_result = sub_query.all()
+                print(feedback_result)
+                
+                if feedback_result:
+                    return jsonify({"code": 200, "isCourseCompleted": True, "isFeedbackDone": True })
+                else: 
+                    return jsonify({"code": 200, "isCourseCompleted": True, "isFeedbackDone": False })
+            else:
+                return jsonify({"code": 200, "isCourseCompleted": False, "isFeedbackDone": False})
+
+        except Exception as e:
+            return jsonify({"code": 500, "message": str(e)})

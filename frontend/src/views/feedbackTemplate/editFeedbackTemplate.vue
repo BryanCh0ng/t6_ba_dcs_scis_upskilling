@@ -13,7 +13,7 @@
         </div>
         <div class="form-group">
           <label>1. Question To Ask</label>
-          <input disabled="true" class="form-control" type="text" :placeholder="'How would you rate the course?'" />
+          <textarea disabled="true" class="form-control" type="text" :placeholder="'How would you rate the course?'" />
         </div>
         <div class="form-group mt-2">
           <label>1. Input Type</label>
@@ -126,6 +126,7 @@ import { required } from "@vuelidate/validators";
 import { ref } from "vue";
 import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js";
 import DefaultModal from "@/components/DefaultModal.vue";
+import UserService from "@/api/services/UserService.js";
 
 export default {
   components: {
@@ -237,7 +238,7 @@ export default {
             this.message = error.response.data.message.toString();
             this.buttonType = "danger"
             this.showAlert = !this.showAlert;
-            throw new Error("Feedback Template Edit was unsuccessful");
+            // throw new Error("Feedback Template Edit was unsuccessful");
         }
       }
     },
@@ -280,34 +281,42 @@ export default {
     }
   },
   async created() {
-    const template_id = this.$route.params.id;
-    try {
-      if(template_id) {
-        const response = await FeedbackTemplateService.getTemplateById(template_id);
-        if (response.code == 200) {
-          this.questions = response.data.template
-          this.questionsError = false
-          this.questions.data.forEach((data, index) => {
-            data.id = index + 1;
-            data.originalQnNum = index + 1;
-            data.qnNum = index + 1;
-            data.edit = true
-            data.haveError = false
-          });
-          this.feedback_template_name = this.questions.feedback_template_name;
-        } else {
-          this.questionsError = true
-          this.questionsErrorMessage = "Error fetching template by ID"
+    const user_ID = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_ID);
+    if (role == 'Student') {
+      this.$router.push({ name: 'studentViewCourse' }); 
+    } else if (role == 'Instructor' || role == 'Trainer') {
+      this.$router.push({ name: 'instructorTrainerViewVotingCampaign' });
+    } else {
+      const template_id = this.$route.params.id;
+      try {
+        if(template_id) {
+          const response = await FeedbackTemplateService.getTemplateById(template_id);
+          if (response.code == 200) {
+            this.questions = response.data.template
+            this.questionsError = false
+            this.questions.data.forEach((data, index) => {
+              data.id = index + 1;
+              data.originalQnNum = index + 1;
+              data.qnNum = index + 1;
+              data.edit = true
+              data.haveError = false
+            });
+            this.feedback_template_name = this.questions.feedback_template_name;
+          } else {
+            this.questionsError = true
+            this.questionsErrorMessage = "Error fetching template by ID"
+          }
         }
-      }
-      else {
+        else {
+          this.questionsError = true
+          this.questionsErrorMessage = "feedback template non existent"
+        }
+      } catch (error) {
         this.questionsError = true
-        this.questionsErrorMessage = "feedback template non existent"
+        this.questionsErrorMessage = 'Error fetching template by ID:' + error
+        console.error('Error fetching template by ID:', error);
       }
-    } catch (error) {
-      this.questionsError = true
-      this.questionsErrorMessage = 'Error fetching template by ID:' + error
-      console.error('Error fetching template by ID:', error);
     }
   }
 };

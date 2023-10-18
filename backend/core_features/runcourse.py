@@ -317,17 +317,19 @@ class CourseApplyFeedbackTemplate(Resource):
             if course is None:
                 return jsonify({"message": "run course course not found", "code": 404}), 404
 
+            if datetime.now().date() > course.run_Startdate: #TO CHANGE TO FEEDBACK DATE
+                return jsonify({"message": "run course in ongoing feedback period", "code": 404}), 404
+            elif datetime.now().date() > course.run_Enddate:  #TO CHANGE TO FEEDBACK DATE
+                return jsonify({"message": "run course in past feedback period", "code": 404}), 404
+
             course.template_ID = templateID
             db.session.commit()
             return jsonify({"code": 200, "message": "Run course assign feedback template success"})
 
         except Exception as e:
-            return jsonify({"code": 500, "message": "Failed. " + str(e)})
             db.session.rollback()
             print(str(e))
-            return {
-                "message": "Failed to create a new run course: " + str(e)
-            }, 500
+            return jsonify({"code": 500, "message": "Failed. " + str(e)})
 
 get_course_formats = api.parser()
 @api.route("/get_course_formats")

@@ -577,7 +577,12 @@ export default {
         },
         async fetchFeedbackTemplates() {
             try {
-                this.formData.feedbackTemplates = await FeedbackTemplateService.getAllTemplates();
+                const feedback_template_response = await FeedbackTemplateService.getAllTemplates();
+                if (feedback_template_response.code == 200) {
+                    this.formData.feedbackTemplates =  feedback_template_response.templates
+                } else {
+                    this.errorMsg.push('Error fetching feedback templ ates');
+                }
             } catch (error) {
                 console.error('Error fetching feedback templates:', error);
                 this.errorMsg.push('Error fetching feedback templates');
@@ -657,9 +662,13 @@ export default {
         },
         async fetchTemplateByID() {
             try {
-                const templateData = await FeedbackTemplateService.getTemplateById(this.templateID);
-                this.formData.selectedTemplate = templateData.template_Name;
-            
+                let response = await FeedbackTemplateService.getTemplateById(this.templateID);
+                console.log(response)
+                if(response.code == 200) {
+                    const templateData = response.data.template;
+                    console.log(templateData);
+                    this.formData.selectedTemplate = templateData.feedback_template_name;
+                }
             } catch (error) {
                 console.error('Error fetching template by ID:', error);
                 this.errorMsg.push('Error fetching template by ID');
@@ -924,4 +933,3 @@ export default {
     }
 }
 </style>
-  
