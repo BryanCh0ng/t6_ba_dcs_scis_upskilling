@@ -16,7 +16,7 @@ export default {
     },
     width: {
       type: Number,
-      default: 350,
+      default: 380,
     },
     height: {
       type: Number,
@@ -47,16 +47,18 @@ export default {
 
       const fontSizeScale = d3.scaleLinear()
         .domain([0, d3.max(wordCloudData, (d) => d.size)])
-        .range([15, 40]); // Adjust the maximum font size as needed
+        .range([15, 35]); // Adjust the maximum font size as needed
 
       const wordCloudLayout = cloud()
         .size([this.width, this.height])
         .words(wordCloudData)
         .padding(this.padding)
-        .rotate(() => (Math.random() < 0.5 ? 0 : 90)) // Rotate words either 0 or 90 degrees
+        .rotate(() => (Math.random() < 0.5 ? 0 : 35))
         .font("Impact")
+        .text(function(d) { return d.word; })
         .fontSize((d) => fontSizeScale(d.size))
-        .on("end", draw);
+        .on("end", draw)
+        .random(() => 0.5)
 
       wordCloudLayout.start();
 
@@ -68,13 +70,13 @@ export default {
           .data(words)
           .enter()
           .append("text")
-          .style("font-family", "Impact")
+          .attr('font-family', 'Impact')
           .style("fill", (d, i) => fill(i))
           .attr("text-anchor", "middle")
-          .attr("transform", (d) => `translate(${d.x},${d.y})`)
           .style("fill-opacity", 1)
           .text((d) => d.word)
-          .style("font-size", (d) => d.size * 0.85);
+          .style("font-size", (d) => d.size * 0.85)
+          .call(handleCollision);
 
         cloud
           .exit()
@@ -83,14 +85,15 @@ export default {
           .style("fill-opacity", 1e-6)
           .remove();
       }
+
+      function handleCollision(selection) {
+        selection.each(function() {
+          d3.select(this).attr("transform", (d) => `translate(${d.x},${d.y})`);
+        });
+      }
+
     },
 
   },
 };
 </script>
-
-<style scoped>
-/* Component-specific styles */
-
-/* You can add more styles for your word cloud here */
-</style>

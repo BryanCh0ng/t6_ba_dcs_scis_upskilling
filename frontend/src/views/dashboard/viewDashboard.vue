@@ -108,7 +108,7 @@
 
 
 <script>
-import WordCloud from "@/components/dashboard/WordCloud.vue"; // Adjust the import path based on your project structure
+import WordCloud from "@/components/dashboard/WordCloud.vue";
 import DashboardService from '@/api/services/dashboardService';
 
 export default {
@@ -139,10 +139,10 @@ export default {
       async fetchCourseAverageRating() {
         try {
           const response = await DashboardService.getCourseAverageRatings(null);
-          console.log(response)
+          // console.log(response)
           this.courseAverageRating = response.data.overall_average_rating; 
           this.totalNoOfFeedback = response.data.total_feedback;
-          console.log(this.courseAverageRating)
+          // console.log(this.courseAverageRating)
         } catch (error) {
           console.error('Error fetching courseDoneWellTopics:', error);
         }
@@ -151,22 +151,55 @@ export default {
       async fetchInstructorAverageRating() {
         try {
           const response = await DashboardService.getInstructorAverageRatings(null);
-          console.log(response)
+          // console.log(response)
           this.instructorAverageRating = response.data.instructor_average_rating; 
-          console.log(this.instructorAverageRating)
+          // console.log(this.instructorAverageRating)
         } catch (error) {
           console.error('Error fetching courseDoneWellTopics:', error);
         }
       },
-      // Topic modeling for a particular course
+      // Topic modeling for a particular course (done well)
       async fetchCourseDoneWellTopics() {
         try {
           const response = await DashboardService.getCourseDoneWellFeedback(null);
-          // console.log(response)
+          
           this.courseDoneWellTopics = response.topic_words_list; 
-          // console.log(this.courseDoneWellTopics)
+          
         } catch (error) {
           console.error('Error fetching courseDoneWellTopics:', error);
+        }
+      },
+      // Topic modeling for a particular course (improve)
+      async fetchCourseImproveTopics() {
+        try {
+          const response = await DashboardService.getCourseImproveFeedback(null);
+          
+          this.courseSuggestionsTopics = response.topic_words_list; 
+          
+        } catch (error) {
+          console.error('Error fetching courseSuggestionsTopics:', error);
+        }
+      },
+      // Topic modeling for a particular course (done well)
+      async fetchInstructorDoneWellTopics() {
+        try {
+          const response = await DashboardService.getInstructorDoneWellFeedback(null);
+          console.log(response)
+          this.instructorDoneWellTopics = response.topic_words_list; 
+          
+        } catch (error) {
+          console.error('Error fetching instructorDoneWellTopics:', error);
+        }
+      },
+      // Topic modeling for a particular course (improve)
+      async fetchInstructorImproveTopics() {
+        try {
+          const response = await DashboardService.getInstructorImproveFeedback(null);
+          console.log(response)
+          this.instructorSuggestionsTopics = response.topic_words_list; 
+          
+        } catch (error) {
+          console.error('Error fetching instructorSuggestionsTopics:', error);
         }
       },
     },
@@ -174,6 +207,9 @@ export default {
       this.fetchCourseAverageRating();
       this.fetchInstructorAverageRating();
       this.fetchCourseDoneWellTopics();
+      this.fetchCourseImproveTopics();
+      this.fetchInstructorDoneWellTopics();
+      this.fetchInstructorImproveTopics();
     }
 };
 </script>
