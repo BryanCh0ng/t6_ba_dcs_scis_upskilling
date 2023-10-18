@@ -174,7 +174,7 @@ class CreateCourse(Resource):
         try:
             # Get the data for creating a new course from the request body
             new_course_data = request.json
-            print(new_course_data)
+            #print(new_course_data)
             new_course_name = new_course_data.get("course_Name") 
 
             # Assuming new_course_name is the input course name you want to check against the database

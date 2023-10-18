@@ -72,7 +72,8 @@
             </form>
         </div>
         <!-- Success modal -->
-        <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
+        <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType"
+            @modal-closed="handleModalClosed" />
     </div>
 </template>
 <script>
@@ -230,10 +231,10 @@ export default {
             } catch (error) {
                 console.error('Error creating a new course', error);
                 this.title = "Course Creation Failed";
-                
+
                 //throw new Error("Course Creation was unsuccessful");
 
-                if(error.response.status === 500){
+                if (error.response.status === 500) {
                     throw new Error("Course Creation was unsuccessful");
                 } else {
                     throw new Error(error.response.data.message);
@@ -270,7 +271,7 @@ export default {
                 this.title = "Course Update Failed";
                 //throw new Error("Course Update was unsuccessful");
 
-                if(error.response.status === 500){
+                if (error.response.status === 500) {
                     throw new Error("Course Update was unsuccessful");
                 } else {
                     throw new Error(error.response.data.message);
@@ -289,7 +290,7 @@ export default {
                 courseCategories: [],
                 courseDescription: ""
             },
-            this.submitFormData = {}
+                this.submitFormData = {}
 
             try {
                 await this.fetchCourseCategories();
@@ -348,8 +349,8 @@ export default {
 
                         this.submitFormData["submitted_By"] = this.userID;
 
-                       //this.submitFormData["course_ID"] = this.createCourseResponse["course_ID"];
-                       this.submitFormData["course_ID"] = this.createCourseResponse.data.course_ID;
+                        //this.submitFormData["course_ID"] = this.createCourseResponse["course_ID"];
+                        this.submitFormData["course_ID"] = this.createCourseResponse.data.course_ID;
 
                         const today = new Date();
 

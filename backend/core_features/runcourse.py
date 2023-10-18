@@ -293,8 +293,11 @@ class CreateRunCourse(Resource):
             }, 201
 
         except Exception as e:
-            print("Error:", str(e))
-            return "Failed to create a new course: " + str(e), 500
+            db.session.rollback()
+            #print(str(e))
+            return {
+                "message": "Failed to create a new run course: " + str(e)
+            }, 500
         
 # Apply Feedback Template to Course
 course_apply_feedback_template = api.parser()

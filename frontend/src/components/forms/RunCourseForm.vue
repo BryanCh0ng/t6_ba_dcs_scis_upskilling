@@ -89,7 +89,8 @@
                 <div class="row mb-4">
                     <!--Course Size-->
                     <div class="col-md-6 form-group">
-                        <input v-model="formData.courseSize" @input="restrictToNumbers('courseSize')" type="text" placeholder="Course Size" required autofocus
+                        <input v-model="formData.courseSize" @input="restrictToNumbers('courseSize')" type="text"
+                            placeholder="Course Size" required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.courseSize?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseSize?.$error }" />
                         <div v-if="v$?.formData.courseSize?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.courseSize?.$errors" :key="error.$uid">{{ error.$message
@@ -98,7 +99,8 @@
                     </div>
                     <!--Minimum Slots-->
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <input v-model="formData.minimumSlots" @input="restrictToNumbers('minimumSlots')" type="text" placeholder="Minimum Slots" required autofocus
+                        <input v-model="formData.minimumSlots" @input="restrictToNumbers('minimumSlots')" type="text"
+                            placeholder="Minimum Slots" required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.minimumSlots?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.minimumSlots?.$error }" />
                         <div v-if="v$?.formData.minimumSlots?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.minimumSlots?.$errors" :key="error.$uid">{{ error.$message
@@ -163,7 +165,8 @@
                 <div class="row mb-4">
                     <!--Course Fee-->
                     <div class="col-md-6 form-group">
-                        <input v-model="formData.courseFee" @input="validateMoneyInput" type="text" placeholder="Course Fee" required autofocus
+                        <input v-model="formData.courseFee" @input="validateMoneyInput" type="text" placeholder="Course Fee"
+                            required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.courseFee?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseFee?.$error }" />
                         <div v-if="v$?.formData.courseFee?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.courseFee?.$errors" :key="error.$uid">{{ error.$message
@@ -171,7 +174,7 @@
                         </div>
                     </div>
                     <!--Feedback Template-->
-                    <!--<div class="col-md-6 form-group mt-4 mt-md-0">
+                    <div class="col-md-6 form-group mt-4 mt-md-0">
                         <dropdown-field v-model="formData.selectedTemplate" :default-placeholder="'Feedback Template'"
                             :errors="v$?.formData.selectedTemplate?.$errors[0]?.$message">
                             <option v-for="feedbackTemplate in formData.feedbackTemplates"
@@ -179,7 +182,7 @@
                                 {{ feedbackTemplate.template_Name }}
                             </option>
                         </dropdown-field>
-                    </div>-->
+                    </div>
                 </div>
 
                 <div v-if="create" class="row">
@@ -213,7 +216,8 @@
             </form>
         </div>
         <!-- Success modal -->
-        <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
+        <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType"
+            @modal-closed="handleModalClosed" />
     </div>
 </template>
   
@@ -223,7 +227,7 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import RunCourseService from "@/api/services/runCourseService.js";
 import UserService from "@/api/services/UserService.js";
-//import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js"; 
+import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js"; //need to import
 import { useVuelidate } from "@vuelidate/core";
 import { required, numeric, helpers } from "@vuelidate/validators";
 import DefaultModal from '../DefaultModal.vue';
@@ -457,8 +461,8 @@ export default {
                 closingDate: null,
                 closingTime: null,
                 courseFee: "",
-                //selectedTemplate: "",
-                //feedbackTemplates: [],
+                selectedTemplate: "",
+                feedbackTemplates: [],
             },
             errorMsg: [],
             //Modal 
@@ -468,7 +472,7 @@ export default {
             showAlert: false,
             //Edit Run Course
             instructorID: 0,
-            //templateID: 0,
+            templateID: 0,
             courseID: 0,
             createRunCourseResponse: {},
             editRunCourseResponse: {},
@@ -503,9 +507,7 @@ export default {
     },
     async mounted() {
         try {
-            //await this.fetchFormFieldsData();
-
-            await this.fetchCoaches();
+            await this.fetchFormFieldsData();
 
             if (!this.create) {
                 await this.fetchEditRunCourseData();
@@ -536,7 +538,7 @@ export default {
             if (!this.showAlert && this.buttonType === "success") {
                 this.$router.push('/adminViewRunCourse');
             }
-        }, 
+        },
         async fetchCoaches() {
             try {
                 this.formData.instructors = await UserService.getAllCoaches();
@@ -549,11 +551,11 @@ export default {
         async fetchCourseFormats() {
             try {
                 let apiResponse = await RunCourseService.getCourseFormats();
-                
+
                 // Process the strings and extract the values between single quotes
 
                 // Variable to keep track of the ID
-                let idCounter = 0; 
+                let idCounter = 0;
 
                 apiResponse.forEach(str => {
                     // Extract the value between the single quotes
@@ -563,7 +565,7 @@ export default {
                     // Create an object with id and name properties
                     let formatObject = {
                         // Assign the current idCounter value
-                        id: idCounter, 
+                        id: idCounter,
                         name: formattedValue
                     };
                     // Increment the idCounter for the next element
@@ -576,7 +578,7 @@ export default {
                 this.errorMsg.push('Error fetching course formats');
             }
         },
-        /*async fetchFeedbackTemplates() {
+        async fetchFeedbackTemplates() {
             try {
                 this.formData.feedbackTemplates = await FeedbackTemplateService.getAllTemplates();
             } catch (error) {
@@ -593,11 +595,10 @@ export default {
                 this.title = "Form Data Retrieval Error";
                 throw new Error("There is a problem retrieving the data for the form fields")
             }
-        },*/
+        },
         async fetchRunCourseByID() {
             try {
-                const runcourseResponse = await RunCourseService.getRunCourseById(this.runcourseId);
-                const runcourseData = runcourseResponse.course
+                const runcourseData = await RunCourseService.getRunCourseById(this.runcourseId);
 
                 this.instructorID = runcourseData.instructor_ID;
 
@@ -647,23 +648,23 @@ export default {
         async fetchCoachByID() {
             try {
                 const coachData = await UserService.getCoachById(this.instructorID);
-                this.formData.selectedInstructor = coachData.user_Name; 
+                this.formData.selectedInstructor = coachData.user_Name;
 
             } catch (error) {
                 console.error('Error fetching coach by ID:', error);
                 this.errorMsg.push('Error fetching instructor or trainer by ID');
             }
         },
-        /*async fetchTemplateByID() {
+        async fetchTemplateByID() {
             try {
                 const templateData = await FeedbackTemplateService.getTemplateById(this.templateID);
                 this.formData.selectedTemplate = templateData.template_Name;
-            
+
             } catch (error) {
                 console.error('Error fetching template by ID:', error);
                 this.errorMsg.push('Error fetching template by ID');
             }
-        },*/
+        },
         async fetchEditRunCourseData() {
             try {
                 await this.fetchRunCourseByID();
@@ -672,7 +673,7 @@ export default {
                 await this.fetchCoachByID();
 
                 //need template id from runcourse 
-                //await this.fetchTemplateByID();
+                await this.fetchTemplateByID();
 
                 if (this.errorMsg.length > 0) {
                     throw new Error("There is a problem retrieving the data for this run course");
@@ -691,7 +692,7 @@ export default {
                 console.error('Error creating a new run course:', error);
                 this.title = "Run Course Creation Failed";
 
-                if(error.response.status === 500) {
+                if (error.response.status === 500) {
                     throw new Error("Run Course Creation was unsuccessful")
                 } else {
                     throw new Error(error.response.data.message);
@@ -824,10 +825,10 @@ export default {
                             currentHours > selectedHours ||
                             (currentHours === selectedHours && currentMinutes > selectedMinutes) ||
                             (currentHours === selectedHours && currentMinutes === selectedMinutes)
-                        )   {
-                                // Today's date is within the range, and the selected time is before the current time.
-                                this.submitFormData["runcourse_Status"] = "Ongoing";
-                            } else {
+                        ) {
+                            // Today's date is within the range, and the selected time is before the current time.
+                            this.submitFormData["runcourse_Status"] = "Ongoing";
+                        } else {
                             // Today's date is within the range, but the selected time is after the current time.
                             this.submitFormData["runcourse_Status"] = "Closed";
                         }
@@ -852,7 +853,7 @@ export default {
 
                     this.submitFormData["reg_Endtime"] = this.formatTimeObjectToString(this.formData.closingTime);
 
-                    //this.submitFormData["template_ID"] = this.formData.feedbackTemplates.find(i => i.template_Name === this.formData.selectedTemplate).template_ID;
+                    this.submitFormData["template_ID"] = this.formData.feedbackTemplates.find(i => i.template_Name === this.formData.selectedTemplate).template_ID;
 
                     //For Edit Course (Updating the run course and course)
                     if (!this.create) {
@@ -919,6 +920,5 @@ export default {
         /* Change the placeholder color here */
         color: black;
     }
-}
-</style>
+}</style>
   
