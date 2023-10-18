@@ -144,13 +144,9 @@ class GetRunCourse(Resource):
         db.session.close()
 
         if runcourse:
-            runcourse.run_Starttime = runcourse.run_Starttime.strftime('%H:%M:%S')
-            runcourse.run_Endtime = runcourse.run_Endtime.strftime('%H:%M:%S')
-            runcourse.reg_Starttime = runcourse.reg_Starttime.strftime('%H:%M:%S')
-            runcourse.reg_Endtime = runcourse.reg_Endtime.strftime('%H:%M:%S')
-            return jsonify({"code": 200, "course": runcourse.json()})
+            return json.loads(json.dumps(runcourse.json(), default=str)), 200
 
-        return jsonify({"message": "There is no such runcourse", "code": 404}), 404
+        return json.loads(json.dumps({"message": "There is no such runcourse"})), 404
 
 edit_runcourse = api.parser()
 @api.route("/edit_runcourse/<int:runcourse_id>", methods=["PUT"])
@@ -294,7 +290,7 @@ class CreateRunCourse(Resource):
 
         except Exception as e:
             db.session.rollback()
-            #print(str(e))
+            print(str(e))
             return {
                 "message": "Failed to create a new run course: " + str(e)
             }, 500

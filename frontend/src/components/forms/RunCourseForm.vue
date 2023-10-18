@@ -89,8 +89,7 @@
                 <div class="row mb-4">
                     <!--Course Size-->
                     <div class="col-md-6 form-group">
-                        <input v-model="formData.courseSize" @input="restrictToNumbers('courseSize')" type="text"
-                            placeholder="Course Size" required autofocus
+                        <input v-model="formData.courseSize" @input="restrictToNumbers('courseSize')" type="text" placeholder="Course Size" required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.courseSize?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseSize?.$error }" />
                         <div v-if="v$?.formData.courseSize?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.courseSize?.$errors" :key="error.$uid">{{ error.$message
@@ -99,8 +98,7 @@
                     </div>
                     <!--Minimum Slots-->
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <input v-model="formData.minimumSlots" @input="restrictToNumbers('minimumSlots')" type="text"
-                            placeholder="Minimum Slots" required autofocus
+                        <input v-model="formData.minimumSlots" @input="restrictToNumbers('minimumSlots')" type="text" placeholder="Minimum Slots" required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.minimumSlots?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.minimumSlots?.$error }" />
                         <div v-if="v$?.formData.minimumSlots?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.minimumSlots?.$errors" :key="error.$uid">{{ error.$message
@@ -165,8 +163,7 @@
                 <div class="row mb-4">
                     <!--Course Fee-->
                     <div class="col-md-6 form-group">
-                        <input v-model="formData.courseFee" @input="validateMoneyInput" type="text" placeholder="Course Fee"
-                            required autofocus
+                        <input v-model="formData.courseFee" @input="validateMoneyInput" type="text" placeholder="Course Fee" required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.courseFee?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseFee?.$error }" />
                         <div v-if="v$?.formData.courseFee?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.courseFee?.$errors" :key="error.$uid">{{ error.$message
@@ -216,8 +213,7 @@
             </form>
         </div>
         <!-- Success modal -->
-        <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType"
-            @modal-closed="handleModalClosed" />
+        <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
     </div>
 </template>
   
@@ -440,6 +436,7 @@ export default {
         return {
             //Initializing values for the form fields 
             formData: {
+                runName: "",
                 selectedInstructor: "",
                 instructors: [],
                 datePickerFormat: "dd/MM/yyyy",
@@ -538,7 +535,7 @@ export default {
             if (!this.showAlert && this.buttonType === "success") {
                 this.$router.push('/adminViewRunCourse');
             }
-        },
+        }, 
         async fetchCoaches() {
             try {
                 this.formData.instructors = await UserService.getAllCoaches();
@@ -551,11 +548,11 @@ export default {
         async fetchCourseFormats() {
             try {
                 let apiResponse = await RunCourseService.getCourseFormats();
-
+                
                 // Process the strings and extract the values between single quotes
 
                 // Variable to keep track of the ID
-                let idCounter = 0;
+                let idCounter = 0; 
 
                 apiResponse.forEach(str => {
                     // Extract the value between the single quotes
@@ -565,7 +562,7 @@ export default {
                     // Create an object with id and name properties
                     let formatObject = {
                         // Assign the current idCounter value
-                        id: idCounter,
+                        id: idCounter, 
                         name: formattedValue
                     };
                     // Increment the idCounter for the next element
@@ -599,6 +596,9 @@ export default {
         async fetchRunCourseByID() {
             try {
                 const runcourseData = await RunCourseService.getRunCourseById(this.runcourseId);
+
+                //NEED TO CHANGE
+                this.formData.runName = runcourseData.run_Name;
 
                 this.instructorID = runcourseData.instructor_ID;
 
@@ -648,7 +648,7 @@ export default {
         async fetchCoachByID() {
             try {
                 const coachData = await UserService.getCoachById(this.instructorID);
-                this.formData.selectedInstructor = coachData.user_Name;
+                this.formData.selectedInstructor = coachData.user_Name; 
 
             } catch (error) {
                 console.error('Error fetching coach by ID:', error);
@@ -659,7 +659,7 @@ export default {
             try {
                 const templateData = await FeedbackTemplateService.getTemplateById(this.templateID);
                 this.formData.selectedTemplate = templateData.template_Name;
-
+            
             } catch (error) {
                 console.error('Error fetching template by ID:', error);
                 this.errorMsg.push('Error fetching template by ID');
@@ -680,7 +680,7 @@ export default {
                 }
 
             } catch (error) {
-                this.title = "Course Data Retrieval Error";
+                this.title = "Run Course Data Retrieval Error";
                 throw new Error("There is a problem retrieving the data for this run course");
             }
         },
@@ -692,7 +692,7 @@ export default {
                 console.error('Error creating a new run course:', error);
                 this.title = "Run Course Creation Failed";
 
-                if (error.response.status === 500) {
+                if(error.response.status === 500) {
                     throw new Error("Run Course Creation was unsuccessful")
                 } else {
                     throw new Error(error.response.data.message);
@@ -720,6 +720,7 @@ export default {
             this.v$.$reset();
 
             this.formData = {
+                runName: "",
                 selectedInstructor: "",
                 instructors: [],
                 datePickerFormat: "dd/MM/yyyy",
@@ -784,11 +785,12 @@ export default {
 
                 try {
 
+                    //NEED TO CHANGE
+                    this.submitFormData["run_Name"] = "test";
+
                     this.submitFormData["run_Startdate"] = this.formatDateToYYYYMMDD(this.formData.startDate);
 
-
                     this.submitFormData["run_Enddate"] = this.formatDateToYYYYMMDD(this.formData.endDate);
-
 
                     this.submitFormData["run_Starttime"] = this.formatTimeObjectToString(this.formData.startTime);
 
@@ -825,10 +827,10 @@ export default {
                             currentHours > selectedHours ||
                             (currentHours === selectedHours && currentMinutes > selectedMinutes) ||
                             (currentHours === selectedHours && currentMinutes === selectedMinutes)
-                        ) {
-                            // Today's date is within the range, and the selected time is before the current time.
-                            this.submitFormData["runcourse_Status"] = "Ongoing";
-                        } else {
+                        )   {
+                                // Today's date is within the range, and the selected time is before the current time.
+                                this.submitFormData["runcourse_Status"] = "Ongoing";
+                            } else {
                             // Today's date is within the range, but the selected time is after the current time.
                             this.submitFormData["runcourse_Status"] = "Closed";
                         }
@@ -920,5 +922,6 @@ export default {
         /* Change the placeholder color here */
         color: black;
     }
-}</style>
+}
+</style>
   
