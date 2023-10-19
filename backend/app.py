@@ -61,8 +61,8 @@ db = SQLAlchemy(app)
 app.config['MAIL_SERVER'] = 'smtp-mail.outlook.com'  # Your email server
 app.config['MAIL_PORT'] = 587  # Port for sending emails
 app.config['MAIL_USE_TLS'] = True  # Use TLS for security
-app.config['MAIL_USERNAME'] = 'nic.wong@live.com'
-app.config['MAIL_PASSWORD'] = 'Nic!256980'
+app.config['MAIL_USERNAME'] = 'upskilling.engagement@outlook.com'
+app.config['MAIL_PASSWORD'] = 'Team6ix!2023'
 #app.config['MAIL_DEFAULT_SENDER'] = 'noreply@live.com'  # Default sender email
 
 # app.config['MAIL_SERVER'] = 'smtp-mail.outlook.com'  # Your email server
