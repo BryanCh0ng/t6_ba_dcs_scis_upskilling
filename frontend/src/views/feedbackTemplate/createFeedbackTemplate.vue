@@ -203,6 +203,7 @@ export default {
           data: formData
         }
         try {
+          console.log(data)
           const response = await FeedbackTemplateService.createFeedbackTemplate(data)
           if (response.code == 200) {
             this.title = "Feedback Template Create Success"

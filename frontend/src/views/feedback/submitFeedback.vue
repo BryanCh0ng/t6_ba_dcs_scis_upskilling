@@ -98,7 +98,6 @@ export default {
           this.disabled = true;
           this.haveError = true
           this.errorMsge = response.message
-          alert(this.errorMsge)
         }
         const common_response = await FeedbackTemplateService.getFeedbackTemplateCommonQuestions()
         console.log(common_response)
@@ -135,7 +134,6 @@ export default {
         } else {
           this.haveError = true
           this.errorMsge = response.message
-          alert(this.errorMsge)
         }
       } catch (error) {
         console.log(error) 

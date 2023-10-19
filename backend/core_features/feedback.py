@@ -198,7 +198,9 @@ class GetStudentFeedbackIncludingAnswersAndTemplate(Resource):
           if answer:
             return {"code": 200, "answer": answer.answer}, 200
           else:
-            return {"code": 400, "message": "There was an error retrieving feedback answers"}, 200
+            return {"code": 200, "answer": ''}, 200
+          # else:
+          #   return {"code": 400, "message": "There was an error retrieving feedback answers"}, 400
         except Exception as e :
               print(str(e))
               return {"code": 404, "message": 'answer ' + str(e)}, 404

@@ -12,7 +12,7 @@
           <thead>
             <tr class="text-nowrap">
               <th scope="col">
-                <a href="" @click.prevent="sort('course_Name')" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                <a href="" @click.prevent="sort('run_Name')" class="text-decoration-none text-dark">Run Name / Description <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/></a></th>
               <th scope="col">
                 <a href="" @click.prevent="sort('registration_count')" class="text-decoration-none text-dark">Registration Count <sort-icon :sortColumn="sortColumn === 'registration_count'" :sortDirection="getSortDirection('registration_count')"/></a></th>
               <th scope="col">
@@ -28,7 +28,7 @@
           <tbody>
             <tr v-for="(course, key) in displayedCourses" :key="key">
               <td class="name">
-                <course-name-desc :name="course.course_Name" :category="course.coursecat_Name" :description="course.course_Desc"></course-name-desc>
+                <course-name-desc :name="course.run_Name" :category="course.coursecat_Name" :description="course.course_Desc"></course-name-desc>
               </td>
               <td class="reg_count">
                 {{ course.registration_count }}

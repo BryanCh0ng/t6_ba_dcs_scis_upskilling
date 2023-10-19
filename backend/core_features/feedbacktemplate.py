@@ -119,6 +119,7 @@ class GetTemplate(Resource):
         else:
             return {"code": 400, "message": "There is no such template"}, 404
       except Exception as e :
+            print(str(e))
             return {"code": 404, "message": str(e)}, 404
     
 @api.route("/post_feedback_template", methods=["POST"])

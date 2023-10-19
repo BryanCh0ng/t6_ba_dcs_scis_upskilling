@@ -278,6 +278,12 @@ export default {
     },
     closeModal() {
       this.showModal = false;
+    },
+    async handleModalClosed(value){
+      this.showAlert = value;
+      if (!this.showAlert) {
+        this.$router.push('/adminViewFeedbackTemplate');
+      }
     }
   },
   async created() {

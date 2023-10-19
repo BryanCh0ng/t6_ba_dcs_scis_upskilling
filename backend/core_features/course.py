@@ -1257,14 +1257,14 @@ class GetAllCoursesWithRegistrationCount(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[2].run_Startdate),
-                    'run_Enddate': format_date_time(result[2].run_Enddate),
-                    'run_Starttime': format_date_time(result[2].run_Starttime),
-                    'run_Endtime': format_date_time(result[2].run_Endtime),
-                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                    'run_Startdate': common.format_date_time(result[2].run_Startdate),
+                    'run_Enddate': common.format_date_time(result[2].run_Enddate),
+                    'run_Starttime': common.format_date_time(result[2].run_Starttime),
+                    'run_Endtime': common.format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': common.format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -1451,7 +1451,6 @@ class ActivateCourse(Resource):
 
             args = activate_course.parse_args()
             courseID = args.get("course_id")
-            print(courseID)
             
             course = Course.query.filter_by(course_ID=courseID).first()
             runCourses = RunCourse.query.filter_by(course_ID=courseID).all()
@@ -1797,8 +1796,7 @@ class IsCourseCompleted(Resource):
             args = is_course_completed.parse_args()
             user_id = session.get('user_ID')
             rcourse_id = args.get("rcourse_id")
-            current_datetime = datetime(2023, 12, 30, 0, 0, 0)
-            print(current_datetime)
+            current_datetime = datetime.now()
 
             # if student has existing completed course
             query = db.session.query(
@@ -1826,7 +1824,6 @@ class IsCourseCompleted(Resource):
                     Feedback.rcourse_ID == rcourse_id
                 )
                 feedback_result = sub_query.all()
-                print(feedback_result)
                 
                 if feedback_result:
                     return jsonify({"code": 200, "isCourseCompleted": True, "isFeedbackDone": True })
