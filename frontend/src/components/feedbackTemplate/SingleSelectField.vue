@@ -2,9 +2,9 @@
   <div class="form-group row">
     <label v-if="qnNum !== undefined" class="mb-1">{{ qnNum }}. {{ label }}</label>
     <label v-else class="mb-1">{{ label }}</label>
-    <select class="form-control" v-model="selectedOption" :id="id">
+    <select class="form-control" :value="sOption" v-model="selectedOption" :id="id">
       <option value="" disabled selected>{{ label }}</option>
-      <option v-for="option in options" :key="option.id" :value="option.option">{{ option.option }}</option>
+      <option :disabled="disabled" v-for="option in options" :key="option.id" :value="option.option">{{ option.option }}</option>
     </select>
   </div>
 </template>
@@ -16,7 +16,12 @@
       id: Number,
       options: Array,
       qnNum: Number,
-      value: String
+      value: String,
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+      sOption: String
     },
     data() {
       return {

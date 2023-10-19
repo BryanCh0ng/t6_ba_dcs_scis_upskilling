@@ -13,7 +13,7 @@
         </div>
         <div class="form-group">
           <label>1. Question To Ask</label>
-          <input disabled="true" class="form-control" type="text" :placeholder="'How would you rate the course?'" />
+          <texarea disabled="true" class="form-control" type="text" :placeholder="'How would you rate the course?'" />
         </div>
         <div class="form-group mt-2">
           <label>1. Input Type</label>
@@ -114,6 +114,7 @@ import { required } from "@vuelidate/validators";
 import { ref } from "vue";
 import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js";
 import DefaultModal from "@/components/DefaultModal.vue";
+import UserService from "@/api/services/UserService.js";
 
 export default {
   components: {
@@ -265,7 +266,16 @@ export default {
         this.$router.push('/adminViewFeedbackTemplate');
       }
     },
-  }
+  },
+  async created() {
+    const user_ID = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_ID);
+    if (role == 'Student') {
+      this.$router.push({ name: 'studentViewCourse' }); 
+    } else if (role == 'Instructor' || role == 'Trainer') {
+      this.$router.push({ name: 'instructorTrainerViewVotingCampaign' });
+    }
+  },
 }
 
 </script>

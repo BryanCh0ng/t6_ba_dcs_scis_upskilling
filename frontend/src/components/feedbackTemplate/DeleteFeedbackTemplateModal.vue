@@ -97,7 +97,7 @@
       } catch (error) {
         console.log(error)
         this.error = true;
-        this.errorMessage = error.toString()
+        // this.errorMessage = error.toString()
       }
     }
   },

@@ -4,6 +4,7 @@ from flask_restx import Namespace, Resource, fields
 from datetime import datetime, date, time
 from allClasses import *
 from sqlalchemy import asc
+from core_features import common
 import json
 
 api = Namespace('feedbacktemplate', description='Feedback template related operations')
@@ -12,6 +13,7 @@ api = Namespace('feedbacktemplate', description='Feedback template related opera
 # get_all_templates()
 # get_template_by_id()
 
+
 get_all_templates = api.parser()
 @api.route("/get_all_templates")
 @api.doc(description="Get all feedback templates")
@@ -19,10 +21,27 @@ class GetAllTemplates(Resource):
     @api.expect(get_all_templates)
     def get(self):
       templates = FeedbackTemplate.query.all()
-      db.session.close()
-      
+
       if templates:
+        for template in templates: 
+          template_id = template.template_ID
+          template.existingFeedback = False 
+          existingFeedback = db.session.query(Feedback).filter(Feedback.feedback_Template_ID == template_id).first()
+          if existingFeedback != None:
+             template.existingFeedback = True
+
+          if not template.existingFeedback:
+            courses_using_template = RunCourse.query.filter_by(template_ID = template.template_ID).all()
+            if courses_using_template:
+              for course in courses_using_template:
+                  if datetime.now().date() > course.run_Startdate: #TO CAHNGE TO FEEDBACK START DATE
+                    template.existingFeedback = True
+                  elif datetime.now().date() > course.run_Enddate: #TO CAHNGE TO FEEDBACK START DATE:
+                    template.existingFeedback = True
+          print(template.existingFeedback)
+        db.session.close()
         templates_json = [template.json() for template in templates]
+        templates_json = [{'template_ID': template.template_ID, 'template_Name': template.template_Name, 'created_On': common.format_date_time(template.created_On),'existingFeedback': template.existingFeedback} for template in templates]
         return {"code": 200, "templates": templates_json}, 200
 
       return {"code": 404, "message": "No templates found"}, 404
@@ -68,7 +87,7 @@ class GetTemplate(Resource):
             if template_data['feedback_template_name'] is None:
               template_data['feedback_template_name'] = template.template_Name
               template_data['template_id'] = template.template_ID
-              template_data['created_on'] = format_date_time(template.created_On)
+              template_data['created_on'] = common.format_date_time(template.created_On)
                   
             if input_option is not None:
               if attribute.question in question_dict:
@@ -162,51 +181,6 @@ class CreateFeedbackTemplate(Resource):
         
         
 
-# Not in use, use /post_feedback_student
-post_feedback_student = api.parser()
-@api.route("/post_feedback_student" ,methods=["POST", "GET"])
-@api.doc(description="Search if template id exists, if does get template, else create new template")
-class GetTemplate(Resource):
-    @api.expect(post_feedback_student)
-    def post(self):
-        
-        new_student_feedback = request.json
-        courseID = new_student_feedback.get("rcourse_id")
-        templateID = new_student_feedback.get("template_id")
-        userID = new_student_feedback.get("user_id")
-        data = new_student_feedback.get("data")
-        # registered = Registration.query(Registration.rcourse_ID).filter(Registration.user_ID == userID, Registration.reg_Status == "Enrolled").all()
-        # runningcourses = RunCourse.query.filter(RunCourse.course_ID == courseID, RunCourse.runcourse_Status == "ongoing").all()
-        # runcourseID = 0
-        # for runningcourse in runningcourses:
-        #    rcourseID = runningcourse.rcourse_ID
-        #    if rcourseID in registered:
-        #       runcourseID = rcourseID
-              
-
-        # templateName = post_feedback_student_feedback_template.parse_args().get("template_Name")
-        # templateID = post_feedback_student_feedback_template.parse_args().get("template_ID")
-        # current_date = datetime.now().strftime('%d-%m-%Y')
-
-       
-        template = Feedback.query.filter(Feedback.feedback_Template_ID==templateID,Feedback.submitted_By == userID, Feedback.rcourse_ID == courseID ).first()
-
-        if not template:
-            try:
-                for eachdata in data:
-                   AttributeID = eachdata.get("attribute_id")
-                   answer = eachdata.get("answer")
-                  #  NewFeedbackTemplate = FeedbackTemplate(None, templateName, currentDate)
-                   NewFeedback =Feedback( None, templateID, userID, AttributeID, answer, courseID)
-                   db.session.add(NewFeedback)
-                   db.session.commit()
-                   
-                return {"code": 200, "message": "Feedback Successfully Submitted"}, 200
-           
-            except Exception as e:
-                return {"code": 500, "message": "Failed" + str(e)}, 500
-        else:
-            return {"code": 409, "message": "Feedback already exists"}, 409
 
 get_courses_by_template_id = api.parser()
 get_courses_by_template_id.add_argument("template_id", help="Enter template id")
@@ -287,14 +261,13 @@ class GetCourseNamesByFeedbackTemplateId(Resource):
 
         course_names_using = []
         course_name_no_template = []
-        print(courses_using_template)
-        print(courses_no_template)
 
         if courses_using_template:
           for runcourse in courses_using_template:
             course_names_using.append({
               "run_Name": runcourse.run_Name,
-              "rcourse_id": runcourse.rcourse_ID
+              "rcourse_id": runcourse.rcourse_ID,
+              "feedback_start_date": common.format_date_time(runcourse.run_Startdate) #TO CHANGE TO FEEDBACK START DATE AFTERWARDS
             })
 
         if courses_no_template:
@@ -320,6 +293,23 @@ class EditFeedbackTemplate(Resource):
             data = request.json
         
             template = FeedbackTemplate.query.filter_by(template_ID=template_id).first()
+
+            if template == None:
+              return {"code": 404, "message": "Feedback template does not exist" }, 404
+
+            existingFeedback = db.session.query(Feedback).filter(Feedback.feedback_Template_ID == template_id).first()
+            if existingFeedback != None:
+              return {"code": 404, "message": "There are existing run course feedbacks using this template, unable to edit feedback template" }, 404
+
+            courses_using_template = RunCourse.query.filter_by(template_ID = template_id).all()
+            if courses_using_template:
+              for course in courses_using_template:
+                  print(course.run_Startdate)
+                  print(type(course.run_Startdate))
+                  if datetime.now().date() > course.run_Startdate: #TO CAHNGE TO FEEDBACK START DATE
+                    return {"code": 404, "message": "There are run courses with ongoing feedback period, unable to edit feedback template" }, 404
+                  elif datetime.now().date() > course.run_Enddate: #TO CAHNGE TO FEEDBACK START DATE:
+                    return {"code": 404, "message": "There are run courses with past feedback period, unable to edit feedback template" }, 404
 
             if template:
                 # if template exists, update template name and delete all attributes and options
@@ -376,7 +366,19 @@ class DeleteFeedbackTemplate(Resource):
         feedback_template = FeedbackTemplate.query.filter_by(template_ID = templateID).first() # get first feedback template
         if feedback_template == None:
            return {"code": 404, "message": "Feedback template does not exist" }, 404
-          
+
+        existingFeedback = db.session.query(Feedback).filter(Feedback.feedback_Template_ID == templateID).first()
+        if existingFeedback != None:
+           return {"code": 404, "message": "There are existing run course feedbacks using this template, unable to delete feedback template" }, 404
+
+        courses_using_template = RunCourse.query.filter_by(template_ID = templateID).all()
+        if courses_using_template:
+           for course in courses_using_template:
+              if datetime.now().date() > course.run_Startdate: #TO CAHNGE TO FEEDBACK START DATE
+                 return {"code": 404, "message": "There are run courses with ongoing feedback period, unable to delete feedback template" }, 404
+              elif datetime.now().date() > course.run_Enddate: #TO CAHNGE TO FEEDBACK START DATE:
+                 return {"code": 404, "message": "There are run courses with past feedback period, unable to delete feedback template" }, 404
+
         # check if feedback template in use
         feedbacks = Feedback.query.filter(Feedback.feedback_Template_ID == templateID).all()
         if feedbacks:
@@ -421,14 +423,6 @@ class DeleteFeedbackTemplate(Resource):
       except Exception as e:
         return {"code": 404, "message": "Failed " + str(e)}, 404
 
-
-def format_date_time(value):
-    if isinstance(value, (date, datetime)):
-        return value.strftime('%Y-%m-%d')
-    elif isinstance(value, time):
-        return value.strftime('%H:%M:%S')
-    else:
-        return None
     
 
 get_feedback_template_records = api.parser()
@@ -460,27 +454,44 @@ class ApplyFeedbackTemplateToCourses(Resource):
         templateID = req.get("template_ID")
         included_courses = req.get("included_courses")
         not_included_courses = req.get("not_included_courses")
+        errorCourseRecord = []
 
-        def update_course_template(course_list, template_id):
-            for course in course_list:
-                print(course)
+        print(included_courses)
+        print(not_included_courses)
+        def update_course_template(course_list, template_id, included_course):
+            if included_course:
+              for course in course_list:
+                  course_record = RunCourse.query.filter(RunCourse.rcourse_ID == course.get("rcourse_id")).first()
+                  if course_record:
+                      if course_record.run_Startdate < datetime.now().date(): #TO CHANGE TO FEEDBACK START DATE
+                        course_record.template_ID = template_id
+                      else:
+                        errorCourseRecord.append(course_record.run_Name) 
+                        return False
+                  else:
+                      return False
+              return True
+            else:
+              for course in course_list:
                 course_record = RunCourse.query.filter(RunCourse.rcourse_ID == course.get("rcourse_id")).first()
-                print(course_record)
                 if course_record:
-                    course_record.template_ID = template_id
+                      course_record.template_ID = template_id
                 else:
                     return False
-            return True
-
+              return True
         try:
-            success1 = update_course_template(included_courses, templateID)
-            success2 = update_course_template(not_included_courses, None)
+            success1 = update_course_template(included_courses, templateID, True)
+            success2 = update_course_template(not_included_courses, None, False)
 
             if success1 and success2:
                 db.session.commit()
                 return {"code": 200, "message": "Successfully apply feedback template to course(s)"}, 200
             else:
                 db.session.rollback()
+                if errorCourseRecord:
+                  error_message = "Could not apply feedback template to the following courses: " + ", ".join(errorCourseRecord)
+                  return {"code": 404, "message": error_message}, 404
+
                 return {"code": 404, "message": "Course(s) not found, unable to apply feedback template to course(s)"}, 404
 
         except Exception as e:
@@ -496,15 +507,12 @@ class GetFeedbackTemplateCommonQuestions(Resource):
     def get(self):
       try:
         query = db.session.query(
-            FeedbackTemplate,
             TemplateAttribute,
             InputOption,
-        ).select_from(FeedbackTemplate).outerjoin(
-            TemplateAttribute, FeedbackTemplate.template_ID == TemplateAttribute.template_ID
-        ).outerjoin(
+        ).select_from(TemplateAttribute).outerjoin(
             InputOption, TemplateAttribute.template_Attribute_ID == InputOption.template_Attribute_ID
         ).filter(
-            FeedbackTemplate.template_ID == None
+            TemplateAttribute.template_ID == None
         ).order_by(
             asc(InputOption.position)
         )
@@ -513,8 +521,37 @@ class GetFeedbackTemplateCommonQuestions(Resource):
 
         print(common_questions)
         if common_questions:
-           common_questions_json = [each_common_questions.json() for each_common_questions in common_questions]
-           return {"code": 200, "common_questions": common_questions_json}, 200
+          question_dict = {}
+          if common_questions:
+            for attribute, input_option in common_questions:
+              if input_option is not None:
+                if attribute.question in question_dict:
+                  question_dict[attribute.question]['inputOptions'].append({
+                      'id': input_option.input_Option_ID,
+                      'position': input_option.position,
+                      'option': input_option.textlabel
+                  })
+                else:
+                  question_data = {
+                    'question': attribute.question,
+                    'selectedInputType': attribute.input_Type,
+                    'attribute_id': attribute.template_Attribute_ID,
+                    'inputOptions': [{
+                        'id': input_option.input_Option_ID,
+                        'position': input_option.position,
+                        'option': input_option.textlabel
+                    }],
+                  }
+                  question_dict[attribute.question] = question_data
+              elif attribute is not None:
+                question_data = {
+                  'question': attribute.question,
+                  'selectedInputType': attribute.input_Type,
+                  'attribute_id': attribute.template_Attribute_ID
+                }
+                question_dict[attribute.question] = question_data
+            common_questions_list = list(question_dict.values())
+            return {"code": 200, "common_questions": common_questions_list}, 200
 
         return {"code": 404, "message": "Failed to retrieve common questions"}, 404
 

@@ -492,6 +492,21 @@ class CourseService extends BaseApiService {
         }
     }
 
+    async isCourseCompleted(rcourse_id) {
+        try {
+            const endpoint = `/course/is_course_completed`;
+            const params = {
+              rcourse_id: rcourse_id
+            };
+            const response = await axiosClient.get(endpoint, { params });
+            console.log(response)
+            return response.data;
+
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
 }
 
 export default new CourseService();

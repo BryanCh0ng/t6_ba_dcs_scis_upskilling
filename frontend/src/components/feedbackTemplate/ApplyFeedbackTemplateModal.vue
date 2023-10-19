@@ -11,7 +11,7 @@
           <div class="row mt-5">
             <div class="col-lg-6">
               <table class="table table-responsive">
-                <h4>Available Course Run(s)</h4>
+                <h4>Available Run Course(s)</h4>
                 <tr v-for="(course, key) in not_included_courses" :key="key" class="mt-2">
                   <td class="mt-2"> {{ course.run_Name }} </td>
                   <td class="mt-2"> <button class="btn btn-primary mt-2 bg-primary text-light" @click="selectCourse(course)">Select</button> </td>
@@ -20,10 +20,11 @@
             </div>
             <div class="col-lg-6">
               <table class="table table-responsive">
-                <h4>Course Run(s) Applied</h4>
+                <h4>Run Course(s) Applied</h4>
                 <tr v-for="(included_course, key) in included_courses" :key="key">
                   <td class="mt-2"> {{ included_course.run_Name }} </td>
-                  <td class="mt-2"><button class="btn btn-danger bg-danger text-light mt-2" @click="removeCourse(included_course)">Remove</button> </td>
+                  <td v-if="included_course.feedback_start_date && isBeforeCurrentDate(included_course.feedback_start_date)" class="mt-2"><button class="btn btn-danger bg-danger text-light mt-2" @click="removeCourse(included_course)">Remove</button> </td>
+                  <td v-else><button class="btn btn-danger bg-danger text-light mt-2">Remove</button></td> 
                 </tr>
               </table>
             </div>
@@ -45,12 +46,12 @@
   
   
   <script>
-  import FeedbackTemplateService from "@/api/services/FeedbackTemplateService"
+  import FeedbackTemplateService from "@/api/services/FeedbackTemplateService";
 
   export default {
   props: {
     feedback_template: Object,
-    modalOpen: Boolean
+    modalOpen: Boolean,
   },
   data() {
     return {
@@ -58,7 +59,7 @@
       included_courses: [],
       error: false,
       errorMessage: '',
-      successMsge: ''
+      successMsge: '',
     }
   },
   methods: {
@@ -126,10 +127,15 @@
         }
       } catch (error) {
         console.log(error)
+        console.log(typeof(error.request.response))
         this.error = true;
         this.successMsge = ''
-        this.errorMessage = error.toString()
+        this.errorMessage = JSON.parse(error.request.response).message;
       }
+    },
+    isBeforeCurrentDate(feedbackStartDate) {
+      const currentDate = new Date();
+      return new Date(feedbackStartDate) > currentDate;
     } 
   },
   watch: {

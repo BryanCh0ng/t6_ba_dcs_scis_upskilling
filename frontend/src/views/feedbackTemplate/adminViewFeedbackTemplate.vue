@@ -28,8 +28,10 @@
                 </td>
                 <td class="d-flex">
                   <div><button class="btn btn-info apply_to_course text-light font-weight-bold text-nowrap" @click="openModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#apply_feedback_template_modal">Apply to Course Run(s)</button></div>
-                  <div><button class="m-4 mt-0 mb-0 btn btn-edit edit text-light font-weight-bold text-nowrap" @click="goToEditFeedbackTemplate(feedback_template.template_ID)">Edit</button></div>
-                  <div><button class="btn btn-danger delete text-light font-weight-bold text-nowrap" @click="openDeleteModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#delete_feedback_template_modal">Delete</button></div>
+                  <div v-if="!feedback_template.existingFeedback"><button class="m-4 mt-0 mb-0 btn btn-edit edit text-light font-weight-bold text-nowrap" @click="goToEditFeedbackTemplate(feedback_template.template_ID)">Edit</button></div>
+                  <div v-else><button class="m-4 mt-0 mb-0 btn btn-edit edit text-light font-weight-bold text-nowrap disabled">Edit</button></div>
+                  <div v-if="!feedback_template.existingFeedback"><button class="btn btn-danger delete text-light font-weight-bold text-nowrap" @click="openDeleteModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#delete_feedback_template_modal">Delete</button></div>
+                  <div v-else><button class="btn btn-danger text-light font-weight-bold text-nowrap disabled">Delete</button></div>
                 </td>
               </tr>               
             </tbody>
@@ -62,10 +64,11 @@
   import sortIcon from '@/components/common/sort-icon.vue';
   import { VueAwesomePaginate } from 'vue-awesome-paginate';
   import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js";
-  import {convertDate} from '@/scripts/common/convertDateTime.js'
-  import DeleteFeedbackTemplateModal from '@/components/feedbackTemplate/DeleteFeedbackTemplateModal.vue'
-  import ApplyFeedbackTemplateModal from '@/components/feedbackTemplate/ApplyFeedbackTemplateModal.vue'
-  import CommonService from "@/api/services/CommonService.js"
+  import {convertDate} from '@/scripts/common/convertDateTime.js';
+  import DeleteFeedbackTemplateModal from '@/components/feedbackTemplate/DeleteFeedbackTemplateModal.vue';
+  import ApplyFeedbackTemplateModal from '@/components/feedbackTemplate/ApplyFeedbackTemplateModal.vue';
+  import CommonService from "@/api/services/CommonService.js";
+  import UserService from "@/api/services/UserService.js";
   
   export default {
     components: {
@@ -112,6 +115,7 @@
       async loadData() {
         try {
           let response = await FeedbackTemplateService.getAllTemplates()
+          console.log(response)
           if (response.code == 200) {
             this.feedback_templates = response.templates
           } else {
@@ -173,8 +177,16 @@
         this.$router.push({ name: 'createFeedbackTemplate'});
       }
     },
-    created() {
-     this.loadData();
+    async created() {
+      const user_ID = await UserService.getUserID();
+      const role = await UserService.getUserRole(user_ID);
+      if (role == 'Student') {
+        this.$router.push({ name: 'studentViewCourse' }); 
+      } else if (role == 'Instructor' || role == 'Trainer') {
+        this.$router.push({ name: 'instructorTrainerViewVotingCampaign' });
+      } else {
+        this.loadData();
+      }
     },
     mounted() {
       const buttonElement = document.createElement('button');

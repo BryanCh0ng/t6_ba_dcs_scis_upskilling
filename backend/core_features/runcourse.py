@@ -144,13 +144,9 @@ class GetRunCourse(Resource):
         db.session.close()
 
         if runcourse:
-            runcourse.run_Starttime = runcourse.run_Starttime.strftime('%H:%M:%S')
-            runcourse.run_Endtime = runcourse.run_Endtime.strftime('%H:%M:%S')
-            runcourse.reg_Starttime = runcourse.reg_Starttime.strftime('%H:%M:%S')
-            runcourse.reg_Endtime = runcourse.reg_Endtime.strftime('%H:%M:%S')
-            return jsonify({"code": 200, "course": runcourse.json()})
+            return json.loads(json.dumps(runcourse.json(), default=str)), 200
 
-        return jsonify({"message": "There is no such runcourse", "code": 404}), 404
+        return json.loads(json.dumps({"message": "There is no such runcourse"})), 404
 
 edit_runcourse = api.parser()
 @api.route("/edit_runcourse/<int:runcourse_id>", methods=["PUT"])
@@ -293,8 +289,11 @@ class CreateRunCourse(Resource):
             }, 201
 
         except Exception as e:
-            print("Error:", str(e))
-            return "Failed to create a new course: " + str(e), 500
+            db.session.rollback()
+            print(str(e))
+            return {
+                "message": "Failed to create a new run course: " + str(e)
+            }, 500
         
 # Apply Feedback Template to Course
 course_apply_feedback_template = api.parser()
@@ -318,17 +317,19 @@ class CourseApplyFeedbackTemplate(Resource):
             if course is None:
                 return jsonify({"message": "run course course not found", "code": 404}), 404
 
+            if datetime.now().date() > course.run_Startdate: #TO CHANGE TO FEEDBACK DATE
+                return jsonify({"message": "run course in ongoing feedback period", "code": 404}), 404
+            elif datetime.now().date() > course.run_Enddate:  #TO CHANGE TO FEEDBACK DATE
+                return jsonify({"message": "run course in past feedback period", "code": 404}), 404
+
             course.template_ID = templateID
             db.session.commit()
             return jsonify({"code": 200, "message": "Run course assign feedback template success"})
 
         except Exception as e:
-            return jsonify({"code": 500, "message": "Failed. " + str(e)})
             db.session.rollback()
             print(str(e))
-            return {
-                "message": "Failed to create a new run course: " + str(e)
-            }, 500
+            return jsonify({"code": 500, "message": "Failed. " + str(e)})
 
 get_course_formats = api.parser()
 @api.route("/get_course_formats")

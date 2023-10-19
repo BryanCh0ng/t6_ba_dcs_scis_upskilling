@@ -7,6 +7,8 @@
         type="radio"
         :name="label"
         :value="option.option"
+        :disabled="disabled"
+        :checked="sOption === option.option"
         v-model="selectedOption"
       />{{ option.option }}
       </div>
@@ -20,7 +22,12 @@
       id: Number,
       options: Array,
       qnNum: Number,
-      value: String
+      value: String,
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+      sOption: String
     },
     data() {
     return {

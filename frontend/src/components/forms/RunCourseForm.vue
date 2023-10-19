@@ -171,7 +171,7 @@
                         </div>
                     </div>
                     <!--Feedback Template-->
-                    <!--<div class="col-md-6 form-group mt-4 mt-md-0">
+                    <div class="col-md-6 form-group mt-4 mt-md-0">
                         <dropdown-field v-model="formData.selectedTemplate" :default-placeholder="'Feedback Template'"
                             :errors="v$?.formData.selectedTemplate?.$errors[0]?.$message">
                             <option v-for="feedbackTemplate in formData.feedbackTemplates"
@@ -179,7 +179,7 @@
                                 {{ feedbackTemplate.template_Name }}
                             </option>
                         </dropdown-field>
-                    </div>-->
+                    </div>
                 </div>
 
                 <div v-if="create" class="row">
@@ -223,7 +223,7 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import RunCourseService from "@/api/services/runCourseService.js";
 import UserService from "@/api/services/UserService.js";
-//import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js"; 
+import FeedbackTemplateService from "@/api/services/FeedbackTemplateService.js"; //need to import
 import { useVuelidate } from "@vuelidate/core";
 import { required, numeric, helpers } from "@vuelidate/validators";
 import DefaultModal from '../DefaultModal.vue';
@@ -436,6 +436,7 @@ export default {
         return {
             //Initializing values for the form fields 
             formData: {
+                runName: "",
                 selectedInstructor: "",
                 instructors: [],
                 datePickerFormat: "dd/MM/yyyy",
@@ -457,8 +458,8 @@ export default {
                 closingDate: null,
                 closingTime: null,
                 courseFee: "",
-                //selectedTemplate: "",
-                //feedbackTemplates: [],
+                selectedTemplate: "",
+                feedbackTemplates: [],
             },
             errorMsg: [],
             //Modal 
@@ -468,7 +469,7 @@ export default {
             showAlert: false,
             //Edit Run Course
             instructorID: 0,
-            //templateID: 0,
+            templateID: 0,
             courseID: 0,
             createRunCourseResponse: {},
             editRunCourseResponse: {},
@@ -503,9 +504,7 @@ export default {
     },
     async mounted() {
         try {
-            //await this.fetchFormFieldsData();
-
-            await this.fetchCoaches();
+            await this.fetchFormFieldsData();
 
             if (!this.create) {
                 await this.fetchEditRunCourseData();
@@ -576,9 +575,14 @@ export default {
                 this.errorMsg.push('Error fetching course formats');
             }
         },
-        /*async fetchFeedbackTemplates() {
+        async fetchFeedbackTemplates() {
             try {
-                this.formData.feedbackTemplates = await FeedbackTemplateService.getAllTemplates();
+                const feedback_template_response = await FeedbackTemplateService.getAllTemplates();
+                if (feedback_template_response.code == 200) {
+                    this.formData.feedbackTemplates =  feedback_template_response.templates
+                } else {
+                    this.errorMsg.push('Error fetching feedback templ ates');
+                }
             } catch (error) {
                 console.error('Error fetching feedback templates:', error);
                 this.errorMsg.push('Error fetching feedback templates');
@@ -593,11 +597,13 @@ export default {
                 this.title = "Form Data Retrieval Error";
                 throw new Error("There is a problem retrieving the data for the form fields")
             }
-        },*/
+        },
         async fetchRunCourseByID() {
             try {
-                const runcourseResponse = await RunCourseService.getRunCourseById(this.runcourseId);
-                const runcourseData = runcourseResponse.course
+                const runcourseData = await RunCourseService.getRunCourseById(this.runcourseId);
+
+                //NEED TO CHANGE
+                this.formData.runName = runcourseData.run_Name;
 
                 this.instructorID = runcourseData.instructor_ID;
 
@@ -654,16 +660,20 @@ export default {
                 this.errorMsg.push('Error fetching instructor or trainer by ID');
             }
         },
-        /*async fetchTemplateByID() {
+        async fetchTemplateByID() {
             try {
-                const templateData = await FeedbackTemplateService.getTemplateById(this.templateID);
-                this.formData.selectedTemplate = templateData.template_Name;
-            
+                let response = await FeedbackTemplateService.getTemplateById(this.templateID);
+                console.log(response)
+                if(response.code == 200) {
+                    const templateData = response.data.template;
+                    console.log(templateData);
+                    this.formData.selectedTemplate = templateData.feedback_template_name;
+                }
             } catch (error) {
                 console.error('Error fetching template by ID:', error);
                 this.errorMsg.push('Error fetching template by ID');
             }
-        },*/
+        },
         async fetchEditRunCourseData() {
             try {
                 await this.fetchRunCourseByID();
@@ -672,14 +682,14 @@ export default {
                 await this.fetchCoachByID();
 
                 //need template id from runcourse 
-                //await this.fetchTemplateByID();
+                await this.fetchTemplateByID();
 
                 if (this.errorMsg.length > 0) {
                     throw new Error("There is a problem retrieving the data for this run course");
                 }
 
             } catch (error) {
-                this.title = "Course Data Retrieval Error";
+                this.title = "Run Course Data Retrieval Error";
                 throw new Error("There is a problem retrieving the data for this run course");
             }
         },
@@ -719,6 +729,7 @@ export default {
             this.v$.$reset();
 
             this.formData = {
+                runName: "",
                 selectedInstructor: "",
                 instructors: [],
                 datePickerFormat: "dd/MM/yyyy",
@@ -783,11 +794,12 @@ export default {
 
                 try {
 
+                    //NEED TO CHANGE
+                    this.submitFormData["run_Name"] = "test";
+
                     this.submitFormData["run_Startdate"] = this.formatDateToYYYYMMDD(this.formData.startDate);
 
-
                     this.submitFormData["run_Enddate"] = this.formatDateToYYYYMMDD(this.formData.endDate);
-
 
                     this.submitFormData["run_Starttime"] = this.formatTimeObjectToString(this.formData.startTime);
 
@@ -852,7 +864,7 @@ export default {
 
                     this.submitFormData["reg_Endtime"] = this.formatTimeObjectToString(this.formData.closingTime);
 
-                    //this.submitFormData["template_ID"] = this.formData.feedbackTemplates.find(i => i.template_Name === this.formData.selectedTemplate).template_ID;
+                    this.submitFormData["template_ID"] = this.formData.feedbackTemplates.find(i => i.template_Name === this.formData.selectedTemplate).template_ID;
 
                     //For Edit Course (Updating the run course and course)
                     if (!this.create) {
@@ -921,4 +933,3 @@ export default {
     }
 }
 </style>
-  

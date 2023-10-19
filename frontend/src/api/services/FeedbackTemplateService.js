@@ -2,10 +2,21 @@ import { axiosClient } from "../axiosClient";
 import BaseApiService from "../BaseApiService";
 
 class FeedbackTemplateService extends BaseApiService {
-    async getAllTemplates() {
+    /*async getAllTemplates() {
         try {
             let response = await axiosClient.get("/feedbacktemplate/get_all_templates");
             return response.data;
+
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }*/
+
+    async getAllTemplates() {
+        try {
+            let response = await axiosClient.get("/feedbacktemplate/get_all_templates");
+            
+            return response.data.data.templates;
 
         } catch (error) {
             return this.handleError(error);
@@ -86,15 +97,6 @@ class FeedbackTemplateService extends BaseApiService {
     async applyFeedbackTemplateToCourses(data) {
         try {
             let response = await axiosClient.post("/feedbacktemplate/apply_feedback_template_to_courses", data)
-            console.log(response)
-            return response.data
-        } catch (error) {
-            return this.handleError(error)
-        }
-    }  
-    async postStudentFeedback(data) {
-        try {
-            let response = await axiosClient.post("/feedbacktemplate/post_feedback_student", data)
             console.log(response)
             return response.data
         } catch (error) {
