@@ -303,6 +303,43 @@ class CourseService extends BaseApiService {
         }
     }
 
+    // Admin - All Run course based on course id
+    async searchAllRunCourseByCourseId(course_Name, coursecat_ID, course_Status, course_id) {
+        try {
+
+            let response = await axiosClient.get("/course/get_all_run_course_by_course_id", {
+                params: {
+                    course_name: course_Name,
+                    coursecat_id: coursecat_ID,
+                    course_status: course_Status,
+                    course_id: course_id
+                }
+            });
+            // console.log(response.data)
+            return response.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+
+    // Admin - All Instructors
+    async getAllInstructorsAndTrainers(user_Name, role_Name, organization_Name) {
+        try {
+            let instructorsAndTrainers = await axiosClient.get("/course/get_all_instructors_and_trainers", {
+                params: {
+                    instructor_name: user_Name,
+                    role_name: role_Name,
+                    organization_name: organization_Name
+                }
+            });
+            return instructorsAndTrainers.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+
     // Admin - All Courses
     async searchAllCourseAdmin(course_Name, coursecat_ID, course_Status) {
         try {
@@ -455,20 +492,16 @@ class CourseService extends BaseApiService {
         }
     }
 
-     // Admin - All Run course based on course id
-     async searchAllRunCourseByCourseId(course_Name, coursecat_ID, course_Status, course_id) {
+    async isCourseCompleted(rcourse_id) {
         try {
-
-            let response = await axiosClient.get("/course/get_all_run_course_by_course_id", {
-                params: {
-                    course_name: course_Name,
-                    coursecat_id: coursecat_ID,
-                    course_status: course_Status,
-                    course_id: course_id
-                }
-            });
-            // console.log(response.data)
+            const endpoint = `/course/is_course_completed`;
+            const params = {
+              rcourse_id: rcourse_id
+            };
+            const response = await axiosClient.get(endpoint, { params });
+            console.log(response)
             return response.data;
+
         } catch (error) {
             return this.handleError(error);
         }

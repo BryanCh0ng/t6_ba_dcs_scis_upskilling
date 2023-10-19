@@ -577,7 +577,13 @@ export default {
         },
         async fetchFeedbackTemplates() {
             try {
-                this.formData.feedbackTemplates = await FeedbackTemplateService.getAllTemplates();
+                const feedback_template_response = await FeedbackTemplateService.getAllTemplates();
+                console.log(feedback_template_response)
+                if (feedback_template_response.code == 200) {
+                    this.formData.feedbackTemplates =  feedback_template_response.templates
+                } else {
+                    this.errorMsg.push('Error fetching feedback templ ates');
+                }
             } catch (error) {
                 console.error('Error fetching feedback templates:', error);
                 this.errorMsg.push('Error fetching feedback templates');
@@ -657,9 +663,14 @@ export default {
         },
         async fetchTemplateByID() {
             try {
-                const templateData = await FeedbackTemplateService.getTemplateById(this.templateID);
-                this.formData.selectedTemplate = templateData.template_Name;
-            
+                console.log(this.templateID)
+                let response = await FeedbackTemplateService.getTemplateById(this.templateID);
+                console.log(response)
+                if(response.code == 200) {
+                    const templateData = response.data.template;
+                    console.log(templateData);
+                    this.formData.selectedTemplate = templateData.feedback_template_name;
+                }
             } catch (error) {
                 console.error('Error fetching template by ID:', error);
                 this.errorMsg.push('Error fetching template by ID');
@@ -680,7 +691,7 @@ export default {
                 }
 
             } catch (error) {
-                this.title = "Course Data Retrieval Error";
+                this.title = "Run Course Data Retrieval Error";
                 throw new Error("There is a problem retrieving the data for this run course");
             }
         },
@@ -790,9 +801,9 @@ export default {
 
                     this.submitFormData["run_Startdate"] = this.formatDateToYYYYMMDD(this.formData.startDate);
 
+                    this.submitFormData["run_Startdate"] = this.formatDateToYYYYMMDD(this.formData.startDate);
 
                     this.submitFormData["run_Enddate"] = this.formatDateToYYYYMMDD(this.formData.endDate);
-
 
                     this.submitFormData["run_Starttime"] = this.formatTimeObjectToString(this.formData.startTime);
 
@@ -858,8 +869,9 @@ export default {
                     this.submitFormData["reg_Endtime"] = this.formatTimeObjectToString(this.formData.closingTime);
 
                     this.submitFormData["template_ID"] = this.formData.feedbackTemplates.find(i => i.template_Name === this.formData.selectedTemplate).template_ID;
+                    console.log(this.submitFormData["template_ID"])
 
-                    //For Edit Course (Updating the run course and course)
+                    //For Edit Course (Updating the run course and course)  
                     if (!this.create) {
 
                         this.submitFormData["course_ID"] = this.courseID;
@@ -926,4 +938,3 @@ export default {
     }
 }
 </style>
-  

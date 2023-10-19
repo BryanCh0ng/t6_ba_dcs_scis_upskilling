@@ -225,10 +225,10 @@
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(completed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                   <div v-if="completed_course.feedback_submitted == true">
-                    <td><course-action status="view-feedback" :id="completed_course.course_ID"></course-action></td>
+                    <td><course-action status="view-feedback" @click="feedback(completed_course.course_ID)" :id="completed_course.course_ID"></course-action></td>
                   </div>
                   <div v-else>
-                    <td><course-action status="provide-feedback" :id="completed_course.course_ID"></course-action></td>
+                    <td><course-action status="provide-feedback" @click="feedback(completed_course.course_ID)" :id="completed_course.course_ID"></course-action></td>
                   </div>
                 </tr>
               </tbody>
@@ -595,6 +595,9 @@ export default {
     },
     editCourse(courseId) {
       this.$router.push({ name: 'editProposedCourse', params: { courseId } });
+    },
+    completed_course(courseId) {
+      this.$router.push({ name: 'submitFeedback', params: {courseId}})
     }
   },
   computed: {

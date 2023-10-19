@@ -520,16 +520,19 @@ INSERT INTO templateattribute VALUES
 	(1, 'Content - How would you rate the course content and course structure?', 'Likert Scale', 1),
 	(2, 'Duration - How would you rate the course content and course structure?', 'Likert Scale', 1),
 	(3, 'Relevancy - How would you rate the course content and course structure?', 'Likert Scale', 1),
-	(4, 'What elements of the course most contributed to your learning?', 'Text', 1),
-	(5, 'What suggestions do you have to improve the course?', 'Text', 1), 
-	(6, 'Clarity - How would you rate the Instructor?', 'Likert Scale', 1),
-	(7, 'Pace - How would you rate the Instructor?', 'Likert Scale', 1),
-	(8, 'Helpfulness - How would you rate the Instructor?', 'Likert Scale', 1),
-	(9, 'Knowledge - How would you rate the Instructor?', 'Likert Scale', 1),
-	(10, "What are the strengths of the instructor's teaching?", 'Text', 1),
-	(11, "What suggestions do you have to improve the instructor's teaching?", 'Text', 1),
-    (12, 'How would you rate the course?', 'Likert Scale', NULL),
-    (13, 'Any Feedbacks for the course', 'Text Field', NULL);
+	(4, 'What are the areas of the course can we can improve?', 'Text Field', 1), 
+	(5, 'What elements of the course most contributed to your learning?', 'Text Field', 1),
+	(6, 'What suggestions do you have to improve the course?', 'Text Field', 1), 
+	(7, 'Clarity - How would you rate the Instructor?', 'Likert Scale', 1),
+	(8, 'Pace - How would you rate the Instructor?', 'Likert Scale', 1),
+	(9, 'Helpfulness - How would you rate the Instructor?', 'Likert Scale', 1),
+	(10, 'Knowledge - How would you rate the Instructor?', 'Likert Scale', 1),
+	(11, 'What are the areas that the instructor did well on?', 'Text Field', 1),
+	(12, 'What are the areas that the instructor can improve on?', 'Text Field', 1),
+	(13, "What are the strengths of the instructor's teaching?", 'Text', 1),
+	(14, "What suggestions do you have to improve the instructor's teaching?", 'Text', 1),
+    (15, 'How would you rate the course?', 'Likert Scale', NULL),
+    (16, 'Any Feedbacks for the course', 'Text Field', NULL);
 
 DROP TABLE IF EXISTS `inputoption`;
 CREATE TABLE IF NOT EXISTS `inputoption`(
@@ -587,7 +590,7 @@ DROP TABLE IF EXISTS `runcourse`;
 CREATE TABLE IF NOT EXISTS `runcourse`(
 	rcourse_id int NOT NULL AUTO_INCREMENT,
     run_name varchar(255),
-	run_startdate date,
+    run_startdate date,
 	run_enddate date,
 	run_starttime time,
 	run_endtime time,
@@ -603,31 +606,32 @@ CREATE TABLE IF NOT EXISTS `runcourse`(
 	reg_enddate date,
 	reg_starttime time,
 	reg_endtime time,
+	template_id int,
 	course_id int,
-    template_id int,
 	PRIMARY KEY (`rcourse_id`),
-    FOREIGN KEY (template_id) REFERENCES feedbacktemplate(template_id),
 	FOREIGN KEY (instructor_id) REFERENCES user(user_id),
+	FOREIGN KEY (template_id) REFERENCES feedbacktemplate(template_id),
 	FOREIGN KEY (course_id) REFERENCES course(course_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO runcourse VALUES
-	(1,  'Quantum Leap - Run 1', '2023-07-10', '2023-07-12', '12:00:00', '14:00:00', 4, 'face-to-face', 'SCIS SR 2-4', 'Closed', 40, 20, 0, 2, '2023-06-05', '2023-06-10', '10:00:00', '10:00:00', 2, 1), 
-    (2,  'Cybersecurity - Introduction to SSL Certificates - Run 1', '2023-10-05', '2023-10-05', '09:00:00', '11:00:00', 3, 'face-to-face', 'SCIS SR 3-3', 'Closed', 40, 15, 0, 2, '2023-08-01', '2023-08-06', '10:00:00', '10:00:00', 4, 1),
-    (3,  'SAP Cloud Accelerated Learning Experience (S.C.A.L.E) - Run 1', '2023-10-15', '2023-11-15', '15:00:00', '17:00:00', 5, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 25, 15, 10, 2, '2023-09-01', '2023-09-06', '10:00:00', '10:00:00', 6, 1),
-    (4,  'Overview of Big Data with Kx - Run 1', '2023-11-20', '2023-12-20', '10:00:00', '12:00:00', 46, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 40, 25, 15, 2, '2023-10-05', '2023-10-10', '10:00:00', '10:00:00', 8, 1),
-    (5,  'Business Intelligence and Analytic - Run 1', '2023-10-10', '2023-11-10', '14:00:00', '16:00:00', 41, 'online', 'Zoom' , 'Ongoing', 30, 20, 0, 2, '2023-09-12', '2023-09-17', '10:00:00', '10:00:00', 21, 1),
-    (6,  'IT Project Management - Run 1', '2023-11-01', '2023-11-20', '15:00:00', '17:00:00', 47, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 20, 15, 10, 2, '2023-10-05', '2023-10-10', '10:00:00', '10:00:00', 23, 1),
-    (7,  'Constitutional Law - Run 1', '2023-11-01', '2023-11-25', '17:00:00', '19:00:00', 42, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 35, 10, 0, 2, '2023-10-02', '2023-10-07', '10:00:00', '10:00:00', 27, 1),
-    (8,  'Cost Accounting - Run 1', '2023-11-20', '2023-12-10', '13:00:00', '15:30:00', 43, 'online', 'Teams', 'Ongoing', 25, 15, 0, 2, '2023-10-20', '2023-11-05', '10:00:00', '10:00:00', 28, 1),
-    (9,  'Analysing data made easy with SAP Analytics Cloud - Run 1', '2023-12-05', '2023-12-20', '10:00:00', '11:00:00', 44, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 30, 20, 0, 1, '2023-10-10', '2023-11-10', '10:00:00', '10:00:00', 17, 1),
-    (10, 'Information Systems Management Fundamentals - Run 1' , '2023-10-01', '2023-10-02', '10:00:00', '11:00:00', 19, 'online', 'Zoom', 'Closed', 40, 20, 0, 1, '2023-09-03', '2023-09-08', '10:00:00', '10:00:00', 20, 1),
-    (11, 'Stress Management with Technology - Run 1' , '2024-01-10', '2024-02-28', '09:00:00', '12:00:00', 20, 'face-to-face', 'SCIS SR 2-3', 'Ongoing', 40, 25, 50, 2, '2023-10-15', '2023-11-25', '10:00:00', '10:00:00', 18, 1),
-    (12, 'Python Programming for Data Analysis - Run 1' ,'2023-12-05', '2023-12-25', '14:00:00', '16:00:00', 3, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 25, 15, 0, 2, '2023-10-15', '2023-11-20', '10:00:00', '10:00:00', 5, 1),
-    (13, 'Blockchain and Smart Contracts - Run 1' , '2023-11-25', '2023-12-15', '16:00:00', '18:00:00', 5, 'face-to-face', 'SCIS SR 2-4', 'Ongoing', 35, 20, 0, 2, '2023-10-15', '2023-11-10', '10:00:00', '10:00:00', 10, 1),
-    (14, 'Mulesoft Certified Developer - Run 1' , '2023-12-08', '2023-12-28', '15:00:00', '17:00:00', 46, 'face-to-face', 'SCIS SR 3-2', 'Ongoing', 30, 20, 0, 2, '2023-10-16', '2023-11-10', '10:00:00', '10:00:00', 12, 1),
-    (15, 'Intro to Digital Marketing - Run 1' , '2023-12-10', '2024-02-02', '09:30:00', '11:30:00', 41, 'face-to-face', 'SCIS SR 2-3', 'Ongoing', 40, 30, 0, 2, '2023-10-15', '2023-11-15', '10:00:00', '10:00:00', 14, 1),
-    (16, 'Intro to Drupal & Drupal Certification - Run 1' , '2023-12-15', '2024-01-19', '14:00:00', '16:00:00', 42, 'face-to-face', 'SCIS SR 2-3', 'Ongoing', 25, 15, 0, 2, '2023-10-15', '2023-11-10', '10:00:00', '10:00:00', 15, 1);
+    (1, 'Quantum Leap - Run 1' ,'2023-07-10', '2023-08-07', '12:00:00', '14:00:00', 4, 'face-to-face', 'SCIS SR 2-4', 'Closed', 35, 20, 0, 2, '2023-06-05', '2023-06-10', '10:00:00', '10:00:00', 1, 2), 
+    (2, 'Cybersecurity - Introduction to SSL Certificates - Run 1' ,'2023-09-05', '2023-10-05', '09:00:00', '11:00:00', 3, 'face-to-face', 'SCIS SR 3-3', 'Closed', 30, 15, 0, 2, '2023-08-01', '2023-08-06', '10:00:00', '10:00:00', 1, 4),
+    (3, 'SAP Cloud Accelerated Learning Experience (S.C.A.L.E) - Run 1' ,'2023-10-15', '2023-11-15', '15:00:00', '17:00:00', 5, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 25, 15, 10, 2, '2023-09-01', '2023-09-06', '10:00:00', '10:00:00', 1, 6),
+    (4, 'Overview of Big Data with Kx - Run 1' ,'2023-11-20', '2023-12-20', '10:00:00', '12:00:00', 46, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 40, 25, 15, 2, '2023-10-05', '2023-10-10', '10:00:00', '10:00:00', 1, 8),
+    (5, 'Business Intelligence and Analytic - Run 1' ,'2023-10-10', '2023-11-10', '14:00:00', '16:00:00', 41, 'online', NULL , 'Ongoing', 30, 20, 0, 2, '2023-09-12', '2023-09-17', '10:00:00', '10:00:00', 1, 21),
+    (6, 'IT Project Management - Run 1' ,'2023-11-01', '2023-11-20', '15:00:00', '17:00:00', 47, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 20, 15, 10, 2, '2023-10-05', '2023-10-10', '10:00:00', '10:00:00', 1, 23),
+    (7, 'Constitutional Law - Run 1' ,'2023-11-01', '2023-11-25', '17:00:00', '19:00:00', 42, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 35, 10, 0, 2, '2023-10-02', '2023-10-07', '10:00:00', '10:00:00', 1, 27),
+    (8, 'Cost Accounting - Run 1' ,'2023-11-20', '2023-12-10', '13:00:00', '15:30:00', 43, 'online', NULL, 'Ongoing', 25, 15, 0, 2, '2023-10-20', '2023-10-25', '10:00:00', '10:00:00', 1, 28),
+    (9, 'Analysing data made easy with SAP Analytics Cloud - Run 1' ,'2023-12-05', '2023-12-20', '10:00:00', '11:00:00', 44, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 30, 20, 0, 1, '2023-11-10', '2023-11-15', '10:00:00', '10:00:00', 1, 17),
+    (10, 'Information Systems Management Fundamentals - Run 1' ,'2023-10-01', '2023-10-25', '10:00:00', '11:00:00', 19, 'online', NULL, 'Closed', 30, 20, 0, 1, '2023-09-03', '2023-09-08', '10:00:00', '10:00:00', 1, 19),
+    (11, 'Stress Management with Technology - Run 1' ,'2023-09-15', '2023-10-15', '09:00:00', '12:00:00', 20, 'face-to-face', 'SCIS SR 2-3', 'Closed', 40, 25, 50, 2, '2023-08-01', '2023-08-05', '10:00:00', '10:00:00', 1, 18),
+    (12, 'Python Programming for Data Analysis - Run 1' ,'2023-12-05', '2023-12-25', '14:00:00', '16:00:00', 3, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 25, 15, 0, 2, '2023-10-15', '2023-10-20', '10:00:00', '10:00:00', 1, 5),
+    (13, 'Blockchain and Smart Contracts - Run 1' ,'2023-11-25', '2023-12-15', '16:00:00', '18:00:00', 5, 'face-to-face', 'SCIS SR 2-4', 'Ongoing', 35, 20, 0, 2, '2023-10-10', '2023-10-15', '10:00:00', '10:00:00', 1, 10),
+    (14, 'Mulesoft Certified Developer - Run 1' ,'2023-12-08', '2023-12-28', '15:00:00', '17:00:00', 46, 'face-to-face', 'SCIS SR 3-2', 'Ongoing', 30, 20, 0, 2, '2023-11-05', '2023-11-10', '10:00:00', '10:00:00', 1, 12),
+    (15, 'Intro to Digital Marketing - Run 1' ,'2023-10-10', '2023-11-10', '09:30:00', '11:30:00', 41, 'face-to-face', 'SCIS SR 2-3', 'Ongoing', 40, 30, 0, 2, '2023-09-05', '2023-09-10', '10:00:00', '10:00:00', 1, 14),
+    (16, 'Intro to Drupal & Drupal Certification - Run 1' ,'2023-10-15', '2023-11-15', '14:00:00', '16:00:00', 42, 'face-to-face', 'SCIS SR 2-3', 'Ongoing', 25, 15, 0, 2, '2023-09-05', '2023-09-10', '10:00:00', '10:00:00', 1, 15);
+ 
 
 DROP TABLE IF EXISTS `feedback`;
 CREATE TABLE IF NOT EXISTS `feedback`(
@@ -2225,7 +2229,12 @@ INSERT INTO registration VALUES
     (119, 10, 50, 'Enrolled'),
     (120, 10, 51, 'Enrolled'),
     (121, 10, 52, 'Enrolled'),
-    (122, 10, 53, 'Enrolled');
+    (122, 10, 53, 'Enrolled'),
+    (123, 11, 1, 'Enrolled'),
+    (124, 10, 1, 'Enrolled'),
+    (125, 12, 1, 'Enrolled'),
+    (126, 13, 1, 'Enrolled');
+
 
 DROP TABLE IF EXISTS `lesson`;
 CREATE TABLE IF NOT EXISTS `lesson`(

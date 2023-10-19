@@ -130,7 +130,7 @@ export default {
       } else if (this.user_role === "Admin") {
         items.push(
           { path: "/adminViewManagement", label: "User Management" },
-          { label: "Feedback Template" }, // rmb to add path
+          { path: "/adminViewFeedbackTemplate", label: "Feedback Template" }, // rmb to add path
           { label: "Dashboard" } // rmb to add path
         );
       }

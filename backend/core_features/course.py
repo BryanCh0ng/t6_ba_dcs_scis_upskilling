@@ -165,7 +165,7 @@ class GetCourse(Resource):
 						}
 					)
 
-        return json.loads(json.dumps({"message": "There is no such course"})), 404
+        return {"code": 404, "message": "There is no such course"}, 404
 
 @api.route("/create_course", methods=["POST"])
 @api.doc(description="Create course")
@@ -174,7 +174,7 @@ class CreateCourse(Resource):
         try:
             # Get the data for creating a new course from the request body
             new_course_data = request.json
-            print(new_course_data)
+            #print(new_course_data)
             new_course_name = new_course_data.get("course_Name") 
 
             # Assuming new_course_name is the input course name you want to check against the database
@@ -633,7 +633,8 @@ class GetCompletedCourses(Resource):
             .join(UserStudent, Registration.user_ID == UserStudent.user_ID) \
             .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID) \
             .filter(UserStudent.user_ID == user_id) \
-            .filter(RunCourse.run_Enddate <= current_datetime)
+            .filter(RunCourse.run_Enddate <= current_datetime) \
+            .filter(Registration.reg_Status == "Enrolled")
 
 
         if course_name:
@@ -1214,6 +1215,70 @@ class GetAllCoursesWithRegistrationCount(Resource):
             return jsonify({"code": 200, "data": result_data})
 
         return jsonify({"code": 404, "message": "No courses found"})
+    
+retrieve_all_run_course_by_course_id_admin = api.parser()
+retrieve_all_run_course_by_course_id_admin.add_argument("course_name", help="Enter course name")
+retrieve_all_run_course_by_course_id_admin.add_argument("coursecat_id", help="Enter course category id")
+retrieve_all_run_course_by_course_id_admin.add_argument("course_status", help="Enter run course status")
+retrieve_all_run_course_by_course_id_admin.add_argument("course_id", help="Enter course id")
+@api.route("/get_all_run_course_by_course_id")
+@api.doc(description="Get all run course by course id")
+class GetAllCoursesWithRegistrationCount(Resource):
+    @api.expect(retrieve_all_run_course_by_course_id_admin)
+    def get(self):
+        args = retrieve_all_run_course_by_course_id_admin.parse_args()
+        course_name = args.get("course_name", "")
+        course_category_id = args.get("coursecat_id", "")
+        runcourse_status = args.get("course_status", "")
+        course_id = args.get("course_id", "")
+
+        query = db.session.query(
+            Course,
+            CourseCategory.coursecat_Name,
+            RunCourse,
+            func.coalesce(func.count(Registration.reg_ID), 0).label("registration_count")
+        ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).outerjoin(
+            Registration, RunCourse.rcourse_ID == Registration.rcourse_ID
+        ).join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID).group_by(Course.course_ID, RunCourse.rcourse_ID)
+
+        if course_name:
+            query = query.filter(Course.course_Name.contains(course_name))
+        if course_category_id:
+            query = query.filter(Course.coursecat_ID == course_category_id)
+        if runcourse_status:
+            query = query.filter(RunCourse.runcourse_Status == runcourse_status)
+        if course_id:
+            query = query.filter(RunCourse.course_ID == course_id)
+
+        results = query.all()
+        db.session.close()
+
+        if results:
+            result_data = []
+            for result in results:
+                run_course_attrs = {
+                    'run_Startdate': format_date_time(result[2].run_Startdate),
+                    'run_Enddate': format_date_time(result[2].run_Enddate),
+                    'run_Starttime': format_date_time(result[2].run_Starttime),
+                    'run_Endtime': format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                }
+
+                modified_run_course = {**result[2].json(), **run_course_attrs}
+
+                course_info = {
+                    **result[0].json(),
+                    "coursecat_Name": result[1],
+                    **modified_run_course,
+                    "registration_count": result[3]
+                }
+                result_data.append(course_info)
+            return jsonify({"code": 200, "data": result_data})
+
+        return jsonify({"code": 404, "message": "No courses found"})
 
 # Admin - Get All Course
 retrieve_all_courses_admin = api.parser()
@@ -1719,3 +1784,56 @@ class GetAllCoursesWithRegistrationCount(Resource):
             return jsonify({"code": 200, "data": result_data})
 
         return jsonify({"code": 404, "message": "No courses found"})
+
+# Student - Check if Course is Completed using user_id and rcourse_id
+is_course_completed = api.parser()
+is_course_completed.add_argument("rcourse_id", help="Enter rcourse id")
+@api.route("/is_course_completed")
+@api.doc(description="Check if Course is Completed using user_id and rcourse_id ")
+class IsCourseCompleted(Resource):
+    @api.expect(is_course_completed)
+    def get(self):
+        try:
+            args = is_course_completed.parse_args()
+            user_id = session.get('user_ID')
+            rcourse_id = args.get("rcourse_id")
+            current_datetime = datetime(2023, 12, 30, 0, 0, 0)
+            print(current_datetime)
+
+            # if student has existing completed course
+            query = db.session.query(
+                RunCourse,
+                Registration
+            ).select_from(RunCourse).join(
+                Registration,
+                Registration.rcourse_ID == RunCourse.rcourse_ID
+            ).filter(
+                RunCourse.rcourse_ID == rcourse_id,
+                RunCourse.run_Enddate <= current_datetime,
+                Registration.user_ID == user_id,
+                Registration.reg_Status == 'Enrolled'
+            )
+
+            results = query.all()
+            db.session.close()
+
+            if results:
+                # if student completed course, check if there is existing feedback response
+                sub_query = db.session.query(
+                    Feedback
+                ).filter(
+                    Feedback.submitted_By == user_id,
+                    Feedback.rcourse_ID == rcourse_id
+                )
+                feedback_result = sub_query.all()
+                print(feedback_result)
+                
+                if feedback_result:
+                    return jsonify({"code": 200, "isCourseCompleted": True, "isFeedbackDone": True })
+                else: 
+                    return jsonify({"code": 200, "isCourseCompleted": True, "isFeedbackDone": False })
+            else:
+                return jsonify({"code": 200, "isCourseCompleted": False, "isFeedbackDone": False})
+
+        except Exception as e:
+            return jsonify({"code": 500, "message": str(e)})
