@@ -448,7 +448,7 @@ class AddAdmin(Resource):
     
     def send_email_to_admin(self, fullName, email):
         msg = Message("Welcome to Upskilling Engagement System",
-                    sender="nic.wong@live.com", recipients=[email])
+                    sender="upskilling.engagement@outlook.com", recipients=[email])
         #Need to change this when we deployed to AWS 
         reset_password_link = f'http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email={email}'
         """

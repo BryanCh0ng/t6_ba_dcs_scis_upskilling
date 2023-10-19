@@ -109,6 +109,10 @@ body {
   background-color: #007E94 !important;
 }
 
+.bg-light-grey {
+  background-color: lightgray;
+}
+
 .btn-blue-green {
   background-color: #009490 !important;
 }
@@ -135,4 +139,8 @@ body {
   --bs-nav-pills-link-active-bg: white;
   color: #151C55;
   font-weight: 700;
+}
+
+body {
+  background-color: #F8F8F8;
 }

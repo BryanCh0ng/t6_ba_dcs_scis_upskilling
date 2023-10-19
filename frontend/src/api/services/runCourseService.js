@@ -54,6 +54,21 @@ class runCourseService extends BaseApiService {
       return this.handleError(error);
     }
   }
+
+  async CourseApplyFeedbackTemplate(rcourse_id, template_id) {
+    try {
+        const response = await axiosClient.post("/runcourse/course_apply_feedback_template", {
+            rcourse_id: rcourse_id,
+            template_id: template_id,
+        });
+        console.log(response.data);
+        return response.data;
+        
+    } catch (error) {
+        return this.handleError(error);
+    }
+  }
+
   async getCourseFormats() {
     try {
         let response = await axiosClient.get("/runcourse/get_course_formats");
