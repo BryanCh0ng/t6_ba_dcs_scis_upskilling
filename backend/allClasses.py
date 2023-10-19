@@ -192,7 +192,7 @@ class Interest(db.Model):
 class FeedbackTemplate(db.Model):
     __tablename__ = 'feedbacktemplate'
 
-    template_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    template_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     template_Name = db.Column(db.String(255), nullable=False)
     # created_on = db.Column(db.DateTime, default=datetime.now ,  nullable=False)
     created_On = db.Column(db.Date,  nullable=False)
@@ -221,14 +221,14 @@ class FeedbackTemplate(db.Model):
 class TemplateAttribute(db.Model):
     __tablename__ = 'templateattribute'
 
-    template_Attribute_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    template_Attribute_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     question = db.Column(db.String(255), nullable=False)
     input_Type = db.Column(db.String(255),  nullable=False)
     template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'),  nullable=False) 
 
 
 
-    def __init__(self, template_Attribute_ID, question, input_Type, template_ID ):
+    def __init__(self, question, input_Type, template_ID, template_Attribute_ID=None):
         self.template_Attribute_ID = template_Attribute_ID
         self.question = question
         self.input_Type = input_Type
@@ -244,23 +244,18 @@ class TemplateAttribute(db.Model):
         return result
     
 ##################  Likert Scale Class Creation ##################
-class LikertScale(db.Model):
-    __tablename__ = 'likertscale'
+class InputOption(db.Model):
+    __tablename__ = 'inputoption'
 
-    likert_Scale_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    input_Option_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     template_Attribute_ID = db.Column(db.Integer,db.ForeignKey('templateattribute.template_Attribute_ID'),  nullable=False)
     position = db.Column(db.Integer,  nullable=False)
     textlabel = db.Column(db.String(255), nullable=False) 
 
-
-
-    def __init__(self, likert_Scale_ID, template_Attribute_ID, position, textlabel ):
-        self.likert_Scale_ID = likert_Scale_ID
+    def __init__(self, template_Attribute_ID, position, textlabel ):
         self.template_Attribute_ID = template_Attribute_ID
         self.position = position
         self.textlabel = textlabel
-
-
 
     def json(self):
         columns = self.__mapper__.column_attrs.keys()
@@ -302,6 +297,7 @@ class RunCourse(db.Model):
     __tablename__ = 'runcourse'
 
     rcourse_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
+    run_Name = db.Column(db.String(255), nullable=False)
     run_Startdate = db.Column(db.Date, nullable=False)
     run_Enddate = db.Column(db.Date, nullable=False)
     run_Starttime = db.Column(Time, nullable=False)
@@ -321,10 +317,11 @@ class RunCourse(db.Model):
     course_ID = db.Column(db.Integer, db.ForeignKey('course.course_ID'), nullable=False)
     template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'),  nullable=False) 
 
-    def __init__(self, run_Startdate, run_Enddate, run_Starttime, run_Endtime, instructor_ID,
+    def __init__(self, run_Name, run_Startdate, run_Enddate, run_Starttime, run_Endtime, instructor_ID,
                  course_Format, course_Venue, runcourse_Status, course_Size, course_Minsize, course_Fee,
                  class_Duration, reg_Startdate, reg_Enddate, reg_Starttime, reg_Endtime,
                   course_ID , template_ID):
+        self.run_Name = run_Name 
         self.run_Startdate = run_Startdate
         self.run_Enddate = run_Enddate
         self.run_Starttime = run_Starttime

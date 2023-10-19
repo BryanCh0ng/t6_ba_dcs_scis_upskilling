@@ -436,6 +436,7 @@ export default {
         return {
             //Initializing values for the form fields 
             formData: {
+                runName: "",
                 selectedInstructor: "",
                 instructors: [],
                 datePickerFormat: "dd/MM/yyyy",
@@ -596,6 +597,9 @@ export default {
             try {
                 const runcourseData = await RunCourseService.getRunCourseById(this.runcourseId);
 
+                //NEED TO CHANGE
+                this.formData.runName = runcourseData.run_Name;
+
                 this.instructorID = runcourseData.instructor_ID;
 
                 this.formData.startDate = new Date(runcourseData.run_Startdate);
@@ -716,6 +720,7 @@ export default {
             this.v$.$reset();
 
             this.formData = {
+                runName: "",
                 selectedInstructor: "",
                 instructors: [],
                 datePickerFormat: "dd/MM/yyyy",
@@ -779,6 +784,9 @@ export default {
                 console.log('Form has no validation errors');
 
                 try {
+
+                    //NEED TO CHANGE
+                    this.submitFormData["run_Name"] = "test";
 
                     this.submitFormData["run_Startdate"] = this.formatDateToYYYYMMDD(this.formData.startDate);
 
