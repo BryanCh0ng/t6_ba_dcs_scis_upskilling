@@ -22,8 +22,8 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
-                    Submit
+                <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn" title="Add Admin">
+                    Add Admin
                 </button>
                 
             </form>

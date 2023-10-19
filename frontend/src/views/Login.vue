@@ -18,12 +18,12 @@
                 <router-link to="/forgotPassword" id="forgotpsd">Forgot password?</router-link>
               </div>
 
-              <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+              <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn" title="Sign In">
                 Sign In
               </button>
 
               <p class="text-center mt-2">
-                Don't have an account? <router-link to="/register">Sign Up</router-link>
+                Don't have an account? <router-link to="/register" title="Sign Up">Sign Up</router-link>
               </p>
             </form>
         </form-container>

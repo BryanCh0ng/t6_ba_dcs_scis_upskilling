@@ -8,7 +8,7 @@
 
       <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Courses</h5>
-          <button class="btn btn-primary" @click="goToCreateCourse">Create Course</button>
+          <button class="btn btn-primary" @click="goToCreateCourse" title="Create Course">Create Course</button>
       </div>
 
       <div class="container col-12">

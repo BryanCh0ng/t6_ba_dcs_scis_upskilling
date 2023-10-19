@@ -79,7 +79,7 @@
             <button
               v-if="!element.destroyed"
               @click="destroyComponent(element.id)"
-              class="btn btn-secondary mt-5 mb-5 col-12"
+              class="btn btn-secondary mt-5 mb-5 col-12" title="Remove Question"
             >
               Remove Question {{ element.qnNum }}
             </button>
@@ -91,13 +91,13 @@
         </div>
         <div class="row">
           <div class="col-6 form-group">
-            <button type="button" class="btn btn-primary shadow-sm w-100 mt-5" @click="openModal" data-bs-toggle="modal" data-bs-target="#preview_modal">
+            <button type="button" class="btn btn-primary shadow-sm w-100 mt-5" @click="openModal" data-bs-toggle="modal" data-bs-target="#preview_modal" title="Preview">
               Preview
             </button>
           </div>
 
           <div class="col-6 form-group">
-            <button type="submit" @click="submitFeedbackTemplate" class="btn btn-edit shadow-sm w-100 mt-5">
+            <button type="submit" @click="submitFeedbackTemplate" class="btn btn-edit shadow-sm w-100 mt-5" title="Save Changes">
               Save Changes
             </button>
           </div>
