@@ -214,7 +214,6 @@ class Interest(db.Model):
         for column in columns:
             result[column] = getattr(self, column)
         return result
-    
 
     
 ##################  Template Attribute Class Creation ##################
@@ -317,8 +316,9 @@ class RunCourse(db.Model):
 
     def __init__(self, run_Name, run_Startdate, run_Enddate, run_Starttime, run_Endtime, instructor_ID,
                  course_Format, course_Venue, runcourse_Status, course_Size, course_Minsize, course_Fee,
-                class_Duration, reg_Startdate, reg_Enddate, reg_Starttime, reg_Endtime, course_ID, template_ID):
-        self.run_Name = run_Name  
+                 class_Duration, reg_Startdate, reg_Enddate, reg_Starttime, reg_Endtime,
+                  course_ID , template_ID):
+        self.run_Name = run_Name 
         self.run_Startdate = run_Startdate
         self.run_Enddate = run_Enddate
         self.run_Starttime = run_Starttime
