@@ -173,12 +173,11 @@ export default {
     },
     async submit()  {
       const rcourse_id = this.course.rcourse_ID;
-      const template_id = this.course.template_ID
-      const user_id = 1
+      const template_id = this.course.template_ID   bb
       const data = {
         'rcourse_id': rcourse_id,
         'template_id': template_id,
-        'user_id': user_id,
+        'user_id': this.user_ID,
         'data': this.templateData,
         'common_questions_data': this.common_questions
       }

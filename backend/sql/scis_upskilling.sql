@@ -582,7 +582,12 @@ INSERT INTO inputoption VALUES
 	(37, 12, 2, 'Poor'),
 	(38, 12, 3, 'Neutral'),
 	(39, 12, 4, 'Good'),
-	(40, 12, 5, 'Excellent');
+	(40, 12, 5, 'Excellent'),
+    (46, 13, 1, 'Very Poor'),
+    (47, 13, 2, 'Poor'),
+	(48, 13, 3, 'Neutral'),
+	(49, 13, 4, 'Good'),
+	(50, 13, 5, 'Excellent');  
 
 DROP TABLE IF EXISTS `runcourse`;
 CREATE TABLE IF NOT EXISTS `runcourse`(
