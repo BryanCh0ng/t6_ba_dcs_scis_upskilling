@@ -321,6 +321,15 @@ const routes = [
    
     }
   },
+  {
+    path: '/viewCourseFeedback/:id',
+    name: 'viewCourseFeedback',
+    component: () => import('../views/feedback/viewCourseFeedback.vue'),
+    meta: {
+        title: 'View Course Feedback',
+   
+    }
+  },
 ]
 
 const router = createRouter({

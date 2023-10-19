@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="container col-12">
-      <h5 class="pb-3">All Feedback for {{run_name}}</h5>
+      <h5 class="pb-3">All Feedback for {{coursename}}</h5>
       <div  v-if="feedbackData && feedbackData.length > 0" class="table-responsive">
         <table class="table bg-white">
           <thead>
@@ -32,7 +32,7 @@
   
 <script>
 import FeedbackService from "@/api/services/FeedbackService.js";
-import runCourseService from "@/api/services/runCourseService.js";
+import CourseService from "@/api/services/CourseService.js";
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 
 export default {
@@ -41,7 +41,7 @@ export default {
     },
     data() {
         return {
-          run_name:"",
+          coursename:"",
           questions: [],
           feedbackData: [],
           itemsPerPage: 10,
@@ -49,20 +49,20 @@ export default {
         }
     },
     mounted() {
-        this.fetchRunCourseFeedbackData();
+        this.fetchCourseFeedbackData();
     },
     methods: {
-        async fetchRunCourseFeedbackData() {
+        async fetchCourseFeedbackData() {
             try {
-              const rcourse_id = this.$route.params.id
-              const feedbackForRunCourse = await FeedbackService.getFeedbackForRunCourse(rcourse_id);
-              if (feedbackForRunCourse.code == 200) {
-                this.questions = feedbackForRunCourse.questions
-                this.feedbackData = feedbackForRunCourse.data.map(item => item.answers);
+              const course_id = this.$route.params.id
+              const feedbackForCourse = await FeedbackService.getFeedbackForCourse(course_id);
+              if (feedbackForCourse.code == 200) {
+                this.questions = feedbackForCourse.questions
+                this.feedbackData = feedbackForCourse.data.map(item => item.answers);
               }
-              
-              const runcourse_Name = await runCourseService.getRunCourseName(rcourse_id);
-              this.run_name = runcourse_Name.data
+                         
+              const course_Name = await CourseService.getCourseName(course_id);
+              this.coursename = course_Name.data
                 
             } catch (error) {
                 console.error(error);

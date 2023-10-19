@@ -20,7 +20,7 @@
                   <a href="" @click.prevent="sort('course_Name')" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                 <th scope="col">
                   <a href="" @click.prevent="sort('course_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'course_Status'" :sortDirection="getSortDirection('course_Status')"/></a></th>
-                <th scope="col">Feedback Analysis</th>
+                <th scope="col">Feedback</th>
                 <th scope="col">Course Details</th>
                 <th scope="col">Course Run(s)</th>
                 <th scope="col">Action(s)</th>
@@ -32,7 +32,7 @@
                   <course-name-desc :name="course.course_Name" :category="course.coursecat_Name" :description="course.course_Desc"></course-name-desc>
                 </td>
                 <td>{{ course.course_Status }}</td>
-                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback</a></td>
+                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToViewCourseFeedback(course.course_ID)">View Feedback</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewCourseRun(course.course_ID)">View Runs</a></td>
                 <div>
@@ -195,6 +195,9 @@
       },
       goToViewCourseRun(courseID) {
         this.$router.push({ name: 'adminViewCourseRun', params: {id: courseID}});
+      },
+      goToViewCourseFeedback(course_ID) {
+        this.$router.push({ name: 'viewCourseFeedback', params: { id: course_ID } });
       }
     },
     async created() {

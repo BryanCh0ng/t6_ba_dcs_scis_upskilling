@@ -19,7 +19,7 @@
                 <a href="" @click.prevent="sort('reg_Enddate')" class="text-decoration-none text-dark">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
               <th scope="col">
                 <a href="" @click.prevent="sort('runcourse_Status')" class="text-decoration-none text-dark">Run Status <sort-icon :sortColumn="sortColumn === 'runcourse_Status'" :sortDirection="getSortDirection('runcourse_Status')"/></a></th>
-              <th scope="col">Feedback Analysis</th>
+              <th scope="col">Feedback</th>
               <th scope="col">Course Details</th>
               <th scope="col">Feedback Template</th>
               <th scope="col">Action(s)</th>

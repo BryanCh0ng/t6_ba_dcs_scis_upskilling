@@ -1805,6 +1805,7 @@ class GetStudentName(Resource):
         else:
             print('else')
             return jsonify({"code": 404, "message": "Course not found"})
+        
 # Student - Check if Course is Completed using user_id and rcourse_id
 is_course_completed = api.parser()
 is_course_completed.add_argument("rcourse_id", help="Enter rcourse id")

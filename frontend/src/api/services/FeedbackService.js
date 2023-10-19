@@ -54,6 +54,20 @@ class FeedbackService extends BaseApiService {
           throw new Error('Error fetching course feedback');
         }
     }
+
+    async getFeedbackForCourse(course_ID) {
+        try {
+            // console.log(course_ID)
+            const response = await axiosClient.get('/feedback/get_feedback_for_course', {
+                params: {
+                    course_ID: course_ID,
+                },
+            });
+            return response.data;
+        } catch (error) {
+          throw new Error('Error fetching course feedback');
+        }
+    }
     
 }
 
