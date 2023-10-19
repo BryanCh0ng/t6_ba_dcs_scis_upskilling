@@ -3,17 +3,17 @@
     <!-- Ratings -->
     <div class="row">
       <!-- Display Total No. of Feedbacks -->
-      <div class="col-12 col-md-4 dashboard mb-3 custom-col">
+      <div class="col-12 col-md-4 dashboard pt-3 mb-3 custom-col">
         <h2 class="fs-1">{{totalNoOfFeedback}}</h2>
         <p><strong>Total No. of Feedbacks</strong></p>
       </div>
       <!-- Display Overall Average Course Ratings if not instructor-specific -->
-      <div v-if="courseSpecific" class="col-12 col-md-4 mb-3 dashboard custom-col">
+      <div v-if="courseSpecific" class="col-12 col-md-4 pt-3 mb-3 dashboard custom-col">
         <h2 class="fs-1">{{courseAverageRating}} / 5</h2>
         <p><strong>Overall Average Course Ratings</strong></p>
       </div>
       <!-- Display Overall Average Instructor Ratings if not course-specific -->
-      <div v-if="instructorSpecific" class="col-12 col-md-4 mb-3 dashboard custom-col">
+      <div v-if="instructorSpecific" class="col-12 col-md-4 pt-3 mb-3 dashboard custom-col">
         <h2 class="fs-1">{{instructorAverageRating}} / 5</h2>
         <p><strong>Overall Average Instructor Ratings</strong></p>
       </div>
@@ -22,36 +22,36 @@
     <!-- Sentiment Course -->
     <div class="row">
       <!-- Display Overall Course Sentiment -->
-      <div class="col-12 col-md-6 dashboard mb-3 custom-col" v-if="courseSpecific">
+      <div class="col-12 col-md-6 dashboard pt-3 mb-3 custom-col" v-if="courseSpecific">
         <WordCloud :wordData="positiveCourseWordData"/> <!-- tryout, need to change -->
         <p><strong>Overall Course Sentiment</strong></p>
       </div>
       <!-- Display Overall Course Positive WordCloud -->
-      <div class="col-12 col-md-6 dashboard mb-3 custom-col" v-if="courseSpecific">
+      <div class="col-12 col-md-6 dashboard pt-3 mb-3 custom-col" v-if="courseSpecific">
         <!-- Include Word Cloud component here for positive feedback -->
         <WordCloud :wordData="positiveCourseWordData"/>
         <p><strong>Overall Course Positive WordCloud</strong></p>
       </div>
       <!-- Display Overall Course Negative WordCloud -->
-      <div class="col-12 col-md-6 dashboard mb-3 custom-col" v-if="courseSpecific">
+      <div class="col-12 col-md-6 dashboard pt-3 mb-3 custom-col" v-if="courseSpecific">
         <!-- Include Word Cloud component here for positive feedback -->
         <WordCloud :wordData="negativeCourseWordData"/>
         <p><strong>Overall Course Negative WordCloud</strong></p>
       </div>
 
       <!-- Display Overall Instructor Sentiment -->
-      <div class="col-12 col-md-6 dashboard mb-3 custom-col" v-if="instructorSpecific">
+      <div class="col-12 col-md-6 dashboard pt-3 mb-3 custom-col" v-if="instructorSpecific">
         <WordCloud :wordData="overallInstructorWordData"/>
         <p><strong>Overall Instructor Sentiment</strong></p>
       </div>
       <!-- Display Overall Instructor Positive WordCloud -->
-      <div class="col-12 col-md-6 dashboard mb-3 custom-col" v-if="instructorSpecific">
+      <div class="col-12 col-md-6 dashboard pt-3 mb-3 custom-col" v-if="instructorSpecific">
         <!-- Include Word Cloud component here for positive feedback -->
         <WordCloud :wordData="positiveInstructorWordData"/>
         <p><strong>Overall Instructor Positive WordCloud</strong></p>
       </div>
       <!-- Display Overall Course Negative WordCloud -->
-      <div class="col-12 col-md-6 dashboard mb-3 custom-col" v-if="instructorSpecific">
+      <div class="col-12 col-md-6 dashboard pt-3 mb-3 custom-col" v-if="instructorSpecific">
         <!-- Include Word Cloud component here for negative feedback -->
         <WordCloud :wordData="negativeInstructorWordData"/>
         <p><strong>Overall Instructor Negative WordCloud</strong></p>
@@ -63,7 +63,7 @@
       <div
         v-for="(topic, index) in courseDoneWellTopics"
         :key="index"
-        class="col-12 col-md-6 dashboard mb-3 custom-col"
+        class="col-12 col-md-6 dashboard pt-3 mb-3 custom-col"
       >
         <!-- Include Word Cloud component here for course done well topic -->
         <WordCloud :wordData="courseDoneWellTopics[index].wordData" />
@@ -74,7 +74,7 @@
       <div
         v-for="(topic, index) in courseSuggestionsTopics"
         :key="index"
-        class="col-12 col-md-6 dashboard mb-3 custom-col"
+        class="col-12 col-md-6 dashboard pt-3 mb-3 custom-col"
       >
         <!-- Include Word Cloud component here for course suggestions topic -->
         <WordCloud :wordData="courseSuggestionsTopics[index].wordData" />
@@ -85,7 +85,7 @@
       <div
         v-for="(topic, index) in instructorDoneWellTopics"
         :key="index"
-        class="col-12 col-md-6 dashboard mb-3 custom-col"
+        class="col-12 col-md-6 dashboard pt-3 mb-3 custom-col"
       >
         <!-- Include Word Cloud component here for instructor done well topic -->
         <WordCloud :wordData="instructorDoneWellTopics[index].wordData" />
@@ -96,7 +96,7 @@
       <div
         v-for="(topic, index) in instructorSuggestionsTopics"
         :key="index"
-        class="col-12 col-md-6 dashboard mb-3 custom-col"
+        class="col-12 col-md-6 dashboard pt-3 mb-3 custom-col"
       >
         <!-- Include Word Cloud component here for instructor suggestions topic -->
         <WordCloud :wordData="instructorSuggestionsTopics[index].wordData" />

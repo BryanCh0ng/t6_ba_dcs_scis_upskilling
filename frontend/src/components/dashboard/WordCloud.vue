@@ -47,7 +47,7 @@ export default {
 
       const fontSizeScale = d3.scaleLinear()
         .domain([0, d3.max(wordCloudData, (d) => d.size)])
-        .range([15, 35]); // Adjust the maximum font size as needed
+        .range([18, 35]); // Adjust the maximum font size as needed
 
       const wordCloudLayout = cloud()
         .size([this.width, this.height])

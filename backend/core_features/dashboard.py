@@ -25,13 +25,13 @@ from sklearn.decomposition import NMF
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import silhouette_score
 from sklearn.model_selection import train_test_split
-from sqlalchemy import func, and_, exists
+from sqlalchemy import func, and_, exists, or_
 
 # Local Imports
 from allClasses import *
 
 stop_words = set(stopwords.words('english')) # Setup stop words
-custom_stop_words = ['the', 'course', 'content', 'instructor', 'professor', 'prof', 'apply', 'learn', 'really', 'allow', 'provide', 'help', 'gave', 'give', 'think', 'could', 'would', 'can', 'will', 'check', 'make', 'made', 'time', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'many', 'sure', 'able', 'quite', 'need', 'want']
+custom_stop_words = ['the', 'course', 'content', 'instructor', 'professor', 'prof', 'apply', 'learn', 'really', 'allow', 'provide', 'help', 'gave', 'give', 'think', 'could', 'would', 'can', 'will', 'check', 'make', 'made', 'time', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'many', 'sure', 'able', 'quite', 'need', 'want', 'bit', 'lot', 'look', 'try', 'let', 'tried', 'suggestion', 'current', 'currently']
 stop_words.update(custom_stop_words) # Add custom stop word
 lemmatizer = WordNetLemmatizer() # Set up Lemmatizer
 
@@ -51,7 +51,7 @@ class CourseAverageRatings(Resource):
         args = average_course_ratings.parse_args()
         course_ID = args.get("course_ID", "")
 
-        keywords = ['rate', 'course']  # Define keywords to identify relevant questions
+        keywords = ['course']  # Define keywords to identify relevant questions
 
         try:
             total_ratings = []
@@ -130,7 +130,7 @@ class InstructorAverageRatings(Resource):
         args = instructor_average_ratings.parse_args()
         instructor_ID = args.get("instructor_ID", "")
 
-        keywords = ['rate', 'instructor']  # Define keywords to identify relevant questions
+        keywords = ['instructor']  # Define keywords to identify relevant questions
         try:
 
             total_ratings = []
@@ -164,8 +164,10 @@ class InstructorAverageRatings(Resource):
 
                 if feedback_entries:
                     for entry in feedback_entries:
-                        total_ratings.append(int(entry.answer))  # assuming 'answer' contains the Likert Scale value as an integer
-                        total_questions += 1
+                        if entry.answer.isdigit():
+                            total_ratings.append(int(entry.answer))
+                            total_questions += 1
+
 
             # Calculate the instructor-specific average rating
             if total_ratings and total_questions > 0:
@@ -265,7 +267,7 @@ def tune_nmf_hyperparameters(corpus, n_topics_range, max_df_range):
             tfidf_matrix_train = tfidf_vectorizer.fit_transform(X_train)
 
             # Perform NMF with the current n_topics
-            nmf_model = NMF(n_components=n_topics, random_state=1)
+            nmf_model = NMF(n_components=n_topics, max_iter=1000, random_state=1)
             nmf_matrix_train = nmf_model.fit_transform(tfidf_matrix_train)
 
             # Calculate silhouette score on the validation set
@@ -301,7 +303,8 @@ class CourseDoneWellFeedback(Resource):
         args = feedback_course_done_well_specific.parse_args()
         course_ID = args.get("course_ID", "")
 
-        keywords = ['course', 'done well']
+        keywords = ['course']
+        optional_keywords = ['done well', 'contributed', 'did well']
 
         # Query the database to retrieve feedback related to the specified course (using rcourse_ID)
         if not course_ID:
@@ -310,7 +313,7 @@ class CourseDoneWellFeedback(Resource):
                 db.session.query(Feedback.answer)
                 .join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID)
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
-                .filter(TemplateAttribute.input_Type == 'Text')
+                .filter(TemplateAttribute.input_Type == 'Text Field')
             )
 
         else:
@@ -320,13 +323,22 @@ class CourseDoneWellFeedback(Resource):
                 .join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID)
                 .filter(RunCourse.course_ID == course_ID)
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
-                .filter(TemplateAttribute.input_Type == 'Text')
+                .filter(TemplateAttribute.input_Type == 'Text Field')
             )
 
         for keyword in keywords:
             course_well_query = course_well_query.filter(func.lower(TemplateAttribute.question).contains(keyword))
-        
+
+        optional_keyword_filter = or_(
+            *[
+                func.lower(TemplateAttribute.question).contains(keyword)
+                for keyword in optional_keywords
+            ]
+        )
+        course_well_query = course_well_query.filter(optional_keyword_filter)
+
         results = course_well_query.all()
+
         db.session.close()
 
         if results:
@@ -393,7 +405,8 @@ class CourseImproveFeedback(Resource):
         args = feedback_course_improve_specific.parse_args()
         course_ID = args.get("course_ID", "")
 
-        keywords = ['course', 'improve']
+        keywords = ['course']
+        optional_keywords = ['improve', 'suggestions']
 
         # Query the database to retrieve feedback related to the specified course (using rcourse_ID)
         if not course_ID:
@@ -402,7 +415,7 @@ class CourseImproveFeedback(Resource):
                 db.session.query(Feedback.answer)
                 .join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID)
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
-                .filter(TemplateAttribute.input_Type == 'Text')
+                .filter(TemplateAttribute.input_Type == 'Text Field')
             )
         else:
             # If course_ID is provided, filter feedback for the specific course
@@ -411,11 +424,19 @@ class CourseImproveFeedback(Resource):
                 .join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID)
                 .filter(RunCourse.course_ID == course_ID)
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
-                .filter(TemplateAttribute.input_Type == 'Text')
+                .filter(TemplateAttribute.input_Type == 'Text Field')
             )
 
         for keyword in keywords:
             course_improve_query = course_improve_query.filter(func.lower(TemplateAttribute.question).contains(keyword))
+        
+        optional_keyword_filter = or_(
+            *[
+                func.lower(TemplateAttribute.question).contains(keyword)
+                for keyword in optional_keywords
+            ]
+        )
+        course_improve_query = course_improve_query.filter(optional_keyword_filter)
 
         results = course_improve_query.all()
         db.session.close()
@@ -485,9 +506,10 @@ class InstructorDoneWellFeedback(Resource):
     def get(self):
         # Parse the user_ID from the request arguments
         args = feedback_instructor_done_well_specific.parse_args()
-        user_ID = args.get("user_ID", "")
+        user_ID = args.get("user_ID", None)
 
-        keywords = ['instructor', 'did well']
+        keywords = ['instructor']
+        optional_keywords = ['did well', 'contributed', 'done well', 'strengths']
 
         # Query the database to retrieve feedback related to the specified course (using rcourse_ID)
         if not user_ID:
@@ -496,7 +518,7 @@ class InstructorDoneWellFeedback(Resource):
                 db.session.query(Feedback.answer)
                 .join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID)
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
-                .filter(TemplateAttribute.input_Type == 'Text')
+                .filter(TemplateAttribute.input_Type == 'Text Field')
             )
 
         else:
@@ -506,14 +528,23 @@ class InstructorDoneWellFeedback(Resource):
                 .join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID)
                 .filter(RunCourse.instructor_ID == user_ID)
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
-                .filter(TemplateAttribute.input_Type == 'Text')
+                .filter(TemplateAttribute.input_Type == 'Text Field')
             )
 
         for keyword in keywords:
             instructor_well_query = instructor_well_query.filter(func.lower(TemplateAttribute.question).contains(keyword))
+
+        optional_keyword_filter = or_(
+            *[
+                func.lower(TemplateAttribute.question).contains(keyword)
+                for keyword in optional_keywords
+            ]
+        )
+
+        instructor_well_query = instructor_well_query.filter(optional_keyword_filter)
         
         results = instructor_well_query.all()
-        # print(results)
+
         db.session.close()
 
         if results:
@@ -581,7 +612,8 @@ class InstructorDoneWellFeedback(Resource):
         args = feedback_instructor_improve_specific.parse_args()
         user_ID = args.get("user_ID", "")
 
-        keywords = ['instructor', 'improve']
+        keywords = ['instructor']
+        optional_keywords = ['improve', 'suggestions']
 
         # Query the database to retrieve feedback related to the specified course (using rcourse_ID)
         if not user_ID:
@@ -590,7 +622,7 @@ class InstructorDoneWellFeedback(Resource):
                 db.session.query(Feedback.answer)
                 .join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID)
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
-                .filter(TemplateAttribute.input_Type == 'Text')
+                .filter(TemplateAttribute.input_Type == 'Text Field')
             )
 
         else:
@@ -600,14 +632,22 @@ class InstructorDoneWellFeedback(Resource):
                 .join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID)
                 .filter(RunCourse.instructor_ID == user_ID)
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
-                .filter(TemplateAttribute.input_Type == 'Text')
+                .filter(TemplateAttribute.input_Type == 'Text Field')
             )
-
+        
         for keyword in keywords:
             instructor_improve_query = instructor_improve_query.filter(func.lower(TemplateAttribute.question).contains(keyword))
         
+        optional_keyword_filter = or_(
+            *[
+                func.lower(TemplateAttribute.question).contains(keyword)
+                for keyword in optional_keywords
+            ]
+        )
+        instructor_improve_query = instructor_improve_query.filter(optional_keyword_filter)
+        
         results = instructor_improve_query.all()
-        # print(results)
+        
         db.session.close()
 
         if results:
