@@ -34,6 +34,7 @@ class ManagementService extends BaseApiService {
     // All Instructors
     async getAllInstructorsAndTrainers(user_Name, role_Name, organization_Name) {
         try {
+            
             let instructorsAndTrainers = await axiosClient.get("/management/get_all_instructors_and_trainers", {
                 params: {
                     instructor_name: user_Name,
@@ -41,6 +42,7 @@ class ManagementService extends BaseApiService {
                     organization_name: organization_Name
                 }
             });
+            
             return instructorsAndTrainers.data;
         } catch (error) {
             return this.handleError(error);
