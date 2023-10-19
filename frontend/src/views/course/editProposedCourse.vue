@@ -6,13 +6,9 @@
       </h2>
       <h2 v-else class="text-center mb-4">Edit Proposed Course</h2>
 
-      <!-- Error Message -->
-      <error-message :error-message="errorMessage" />
-
       <form @submit.prevent="submitForm">
         <div class="form-group mt-5 mb-4">
-          <input
-            v-model="course_name"
+          <input v-model="course_name"
             type="text"
             placeholder="Course Name"
             class="form-control border-0 shadow-sm px-4 field mb-3"
@@ -73,21 +69,36 @@
         </div>
       </form>
     </div>
+
     <!-- Success modal -->
-    <success-modal :show="showSuccessModal" :message="successMessage" @close="hideSuccessModal"/>
+    <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
   </div>
 </template>
 
 <script>
-import ErrorMessage from "../../components/ErrorMessage.vue";
-import DropdownField from "../../components/DropdownField.vue";
+import DropdownField from "@/components/DropdownField.vue";
 import { required, maxLength } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 import UserService from "@/api/services/UserService.js";
 import CourseCategoryService from "@/api/services/CourseCategoryService.js";
 import ProposedCourseService from "@/api/services/proposedCourseService.js";
-// import CourseService from "@/api/services/CourseService.js";
-import SuccessModal from "../../components/SuccessModal.vue";
+import DefaultModal from "@/components/DefaultModal.vue";
+
+// Utility function to show a success message
+function showSuccessMessage(vm) {
+  vm.title = "Proposed Course Updated Successfully";
+  vm.message = "You have successfully updated the proposed course details.";
+  vm.showAlert = true;
+  vm.buttonType = "success";
+}
+
+// Utility function to show an unsuccessful message
+function showUnsuccessMessage(vm) {
+  vm.title = "Proposed Course Unsuccessful";
+  vm.message = "There is already a course with the same course name. Please change it to a different one.";
+  vm.showAlert = true;
+  vm.buttonType = "danger";
+}
 
 export default {
   setup() {
@@ -102,8 +113,10 @@ export default {
       course_name: "",
       course_desc: "",
       errorMessage: "",
-      showSuccessModal: false,
-      successMessage: "",
+      showAlert: false,
+      title: "",
+      message: "",
+      buttonType: "",
       descPlaceholder: "Course Description",
       categoryDropdownOptions: []
     };
@@ -119,20 +132,19 @@ export default {
   },
 
   components: {
-    ErrorMessage,
     DropdownField,
-    SuccessModal
+    DefaultModal
   },
 
   async created() {
     this.getUserID();
     const action = this.$route.params.action;
-    this.action = action
+    this.action = action;
     if (this.action == 'approve') {
       const user_ID = await UserService.getUserID();
       const role = await UserService.getUserRole(user_ID);
       if (role == 'Student') {
-        this.$router.push({ name: 'studentViewProfile' }); 
+        this.$router.push({ name: 'studentViewProfile' });
       } else if (role == 'Instructor' || role == 'Trainer') {
         this.$router.push({ name: 'instructorTrainerViewProfile' });
       }
@@ -161,6 +173,7 @@ export default {
         this.user_ID = null;
       }
     },
+
     async get_user_role() {
       try {
         const user_role = await UserService.getUserRole()
@@ -170,29 +183,23 @@ export default {
         this.user_role = null;
       }
     },
+
     async fetchProposedCourseDetails() {
       try {
         const courseId = this.$route.params.courseId;
-        console.log(courseId)
         const response = await ProposedCourseService.getProposedCourseByCourseId(courseId);
-        console.log(response)
-        const courseData = response.data 
+        const courseData = response.data;
 
         if (courseData) {
           this.course_name = courseData.course_Name;
-          // console.log(this.course_name)
           this.course_desc = courseData.course_Desc;
-
           const coursecat_ID = courseData.coursecat_ID;
           this.category = coursecat_ID;
-
-          this.pcourse_ID = courseData.pcourse_ID
-
+          this.pcourse_ID = courseData.pcourse_ID;
           const defaultOption = this.categoryDropdownOptions.find(option => option.coursecat_ID === coursecat_ID);
           if (defaultOption) {
             this.category = defaultOption.coursecat_ID;
           }
-
         } else {
           console.error('Proposed course not found.');
         }
@@ -232,82 +239,67 @@ export default {
       try {
         if (this.action == 'approve') {
           const result = await ProposedCourseService.updateProposedCourse(courseId, formData);
-          console.log(result)
+          console.log(result);
           if (result.message == "Proposed course updated successfully") {
             let approve_result;
             if (result.success) {
-                const course = await ProposedCourseService.getProposedCourseByCourseId(courseId);
-                const acceptPromise = ProposedCourseService.approveProposedCourse({ "pcourseID": course['data'].pcourse_ID });
-                approve_result = await acceptPromise;
-              } else {
-                approve_result = { code: 200 };
-              }
-              if (approve_result.code == 200) {
-                this.successMessage = approve_result.message
-                this.showSuccessModal = true;
-              } else {
-                this.errorMessage = approve_result.message;
-              }
-          } else if (result.message == "Course Update Unsuccessful. A course with the same name already exists.") {
-            this.errorMessage = "A course with the same name already exists.";
-          }
+              const course = await ProposedCourseService.getProposedCourseByCourseId(courseId);
+              const acceptPromise = ProposedCourseService.approveProposedCourse({ "pcourseID": course['data'].pcourse_ID });
+              approve_result = await acceptPromise;
+            } else {
+              approve_result = { code: 200 };
+            }
 
-          
+            if (approve_result.code == 200) {
+              showSuccessMessage(this);
+            } else {
+              this.errorMessage = approve_result.message;
+            }
+          } else if (result.message == "Course Update Unsuccessful. A course with the same name already exists.") {
+            showUnsuccessMessage(this);
+          }
         } else {
           const result = await ProposedCourseService.updateProposedCourse(courseId, formData);
-          console.log(result)
+          console.log(result);
           if (result.message == "Proposed course updated successfully") {
-            this.showSuccessModal = true;
-            this.successMessage = result.message
-          } else if (result.message == "Course Update Unsuccessful. A course with the same name already exists."){
-            this.errorMessage = result.message;
+            showSuccessMessage(this);
+          } else if (result.message == "Course Update Unsuccessful. A course with the same name already exists.") {
+            showUnsuccessMessage(this);
           }
         }
-        } catch (error) {
-            console.error('Error submitting form:', error);
-        }
-      },
-
-      async hideSuccessModal() {
-        this.showSuccessModal = false;
-        if (this.action == 'approve')
-          this.$router.push({ name: 'adminViewProposedCourse'});
-        else {
-          if (this.user_role === 'Student' ) {
-            this.$router.push({ name: 'studentViewProfile'});
-          } else if (this.user_role === 'Instructor' || this.user_role === 'Trainer') {
-            this.$router.push({ name: 'instructorTrainerViewProfile'});
-          }
-        }
-      },
-      cancelForm() {
-        this.$router.go(-1);
-      },
-
-      limitCourseDescription() {
-        if (this.course_desc.length > 800) {
-          this.course_desc = this.course_desc.substring(0, 800); // Limit the description to 800 characters
-        }
-      },
+      } catch (error) {
+        console.error('Error submitting form:', error);
+      }
     },
-    computed: {
-      courseDescLength() {
-        return this.course_desc.length;
-      },
+
+    async handleModalClosed(value) {
+      this.showAlert = value;
+
+      if (this.action == 'approve' && this.buttonType === "success") {
+        this.$router.push({ name: 'adminViewProposedCourse' });
+      } else {
+        if (this.user_role === 'Student' && this.buttonType === "success") {
+          this.$router.push({ name: 'studentViewProfile' });
+        } else if (this.user_role === 'Instructor' || this.user_role === 'Trainer') {
+          this.$router.push({ name: 'instructorTrainerViewProfile' });
+        }
+      }
     },
+
+    cancelForm() {
+      this.$router.go(-1);
+    },
+
+    limitCourseDescription() {
+      if (this.course_desc.length > 800) {
+        this.course_desc = this.course_desc.substring(0, 800); // Limit the description to 800 characters
+      }
+    },
+  },
+  computed: {
+    courseDescLength() {
+      return this.course_desc.length;
+    },
+  },
 };
 </script>
-
-<style scoped>
-.modal-content {
-  width: 50%;
-  height: 15%;
-}
-
-.close-btn {
-  position: absolute;
-  bottom: 25px;
-  right: 20px;
-  width: 150px;
-}
-</style>

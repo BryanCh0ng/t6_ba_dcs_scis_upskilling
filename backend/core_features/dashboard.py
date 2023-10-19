@@ -230,8 +230,6 @@ def preprocess_text(text_series):
         
         text = text.lower() # Convert text to lowercase
 
-        text = contractions.fix(text) # Expand contractions using the contractions library
-
         text = re.sub(r'[^a-zA-Z\s-]', '', text) # Remove non-alphabetic characters and split hyphenated words
 
         tokens = nltk.word_tokenize(text) # Tokenize text

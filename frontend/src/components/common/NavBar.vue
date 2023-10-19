@@ -2,7 +2,7 @@
   <div class="content">
     <nav class="navbar navbar-expand-xxl">
       <div class="container-fluid">
-        <a class="navbar-brand no-underline" href="#">
+        <a class="navbar-brand no-underline" id="navbar-link" :href="getNavbarLink()">
           <img src="../../assets/smulogo.png" title="smu logo" class="navlogo" />
           <span class="system-name">
             <span class="vertical-line"></span>
@@ -130,7 +130,7 @@ export default {
       } else if (this.user_role === "Admin") {
         items.push(
           { path: "/adminViewManagement", label: "User Management" },
-          { label: "Feedback Template" }, // rmb to add path
+          { path: "/adminViewFeedbackTemplate", label: "Feedback Template" }, // rmb to add path
           { label: "Dashboard" } // rmb to add path
         );
       }
@@ -181,6 +181,17 @@ export default {
       } catch (error) {
         console.error('Error fetching user ID:', error);
         this.user_name = null;
+      }
+    },
+    getNavbarLink() {
+      if (this.user_role === "Student") {
+        return "/studentViewCourse";
+      } else if (this.user_role === "Admin") {
+        return "/adminViewCourse";
+      } else if (this.user_role === "Trainer" || this.user_role === "Instructor") {
+        return "/instructorTrainerViewVotingCampaign";
+      } else {
+        return "/"; // Set a default link for cases where the role doesn't match
       }
     },
     isActiveLink(linkPath) {

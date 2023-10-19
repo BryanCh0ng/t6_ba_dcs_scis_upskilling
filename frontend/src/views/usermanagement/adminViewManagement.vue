@@ -432,16 +432,18 @@ export default {
       this.$router.push({ name: 'studentViewProfile' }); 
     } else if (role == 'Instructor' || role == 'Trainer') {
       this.$router.push({ name: 'instructorTrainerViewProfile' });
-    } else {
+    } else if (role == 'Admin') {
       try {
         let admin_response = await ManagementService.getAllAdmin(null)
+        // console.log(admin_response)
         this.admin = admin_response.data
 
         let student_response = await ManagementService.getAllStudent(null, null)
         this.student = student_response.data
 
-        let response = await ManagementService.getAllInstructorsAndTrainers(null, null, null)
-        this.instructors_trainers = response.data
+        let instructor_response = await ManagementService.getAllInstructorsAndTrainers(null, null, null)
+        console.log(instructor_response)
+        this.instructors_trainers = instructor_response.data
       } catch (error) {
         console.error("Error fetching course details:", error);
       }
