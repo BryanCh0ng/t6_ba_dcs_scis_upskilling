@@ -13,7 +13,7 @@
               <table class="table table-responsive">
                 <h4>Available Run Course(s)</h4>
                 <tr v-for="(course, key) in not_included_courses" :key="key" class="mt-2">
-                  <td class="mt-2"> {{ course.run_Name }} </td>
+                  <td class="mt-2"> {{ course.run_Name }} <br> Feedback Start date: {{ course.feedback_start_date }}</td>
                   <td class="mt-2"> <button class="btn btn-primary mt-2 bg-primary text-light" @click="selectCourse(course)">Select</button> </td>
                 </tr>
               </table>
@@ -22,9 +22,10 @@
               <table class="table table-responsive">
                 <h4>Run Course(s) Applied</h4>
                 <tr v-for="(included_course, key) in included_courses" :key="key">
-                  <td class="mt-2"> {{ included_course.run_Name }} </td>
+                  <td class="mt-2"> {{ included_course.run_Name }} <br> Feedback Start date: {{ included_course.feedback_start_date }}</td>
                   <td v-if="included_course.feedback_start_date && isBeforeCurrentDate(included_course.feedback_start_date)" class="mt-2"><button class="btn btn-danger bg-danger text-light mt-2" @click="removeCourse(included_course)">Remove</button> </td>
-                  <td v-else><button class="btn btn-danger bg-danger text-light mt-2">Remove</button></td> 
+                  <td v-else-if="!original_included_courses.find(course => course.run_Name ===  included_course.run_Name)" class="mt-2"><button class="btn btn-danger bg-danger text-light mt-2" @click="removeCourse(included_course)">Remove</button> </td>
+                  <td v-else><button class="btn btn-danger bg-danger text-light mt-2 disabled">Remove</button></td> 
                 </tr>
               </table>
             </div>
@@ -57,6 +58,7 @@
     return {
       not_included_courses: [],
       included_courses: [],
+      original_included_courses: [],
       error: false,
       errorMessage: '',
       successMsge: '',
@@ -80,6 +82,7 @@
           if(response.code == 200) {
             this.not_included_courses = response.course_name_no_template;
             this.included_courses = response.course_names_using;
+            this.original_included_courses = response.course_names_using;
           } else {
             this.error = true;
             this.errorMessage = response.message
@@ -107,7 +110,9 @@
     async apply(){
       this.error = false; 
       this.errorMessage = '';
-      this.successMsge = ''
+      this.successMsge = '';
+      console.log(this.included_courses)
+      console.log(this.not_included_courses)
       const data = {
         not_included_courses: this.not_included_courses,
         included_courses: this.included_courses,
@@ -136,14 +141,24 @@
     isBeforeCurrentDate(feedbackStartDate) {
       const currentDate = new Date();
       return new Date(feedbackStartDate) > currentDate;
+    },
+    isCourseInOriginalIncludedCourse(courseToFind){
+      console.log(courseToFind)
+      console.log(this.included_courses)
+      console.log(this.original_included_courses)
+      let found = this.original_included_courses.find(course => course.run_Name === courseToFind);
+      console.log(found)
+      return found;
     } 
   },
   watch: {
     modalOpen() {
+      console.log('open')
       this.fetchData(); 
     },
   },
   mounted() {
+    console.log('mounted')
     this.fetchData(); 
   },
   };
@@ -156,5 +171,10 @@
 
   .btn.apply {
     margin-right: 20px;
+  }
+
+  table tr {
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
   }
   </style>

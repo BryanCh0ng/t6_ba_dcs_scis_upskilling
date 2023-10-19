@@ -578,6 +578,7 @@ export default {
         async fetchFeedbackTemplates() {
             try {
                 const feedback_template_response = await FeedbackTemplateService.getAllTemplates();
+                console.log(feedback_template_response)
                 if (feedback_template_response.code == 200) {
                     this.formData.feedbackTemplates =  feedback_template_response.templates
                 } else {
@@ -662,6 +663,7 @@ export default {
         },
         async fetchTemplateByID() {
             try {
+                console.log(this.templateID)
                 let response = await FeedbackTemplateService.getTemplateById(this.templateID);
                 console.log(response)
                 if(response.code == 200) {
@@ -865,8 +867,9 @@ export default {
                     this.submitFormData["reg_Endtime"] = this.formatTimeObjectToString(this.formData.closingTime);
 
                     this.submitFormData["template_ID"] = this.formData.feedbackTemplates.find(i => i.template_Name === this.formData.selectedTemplate).template_ID;
+                    console.log(this.submitFormData["template_ID"])
 
-                    //For Edit Course (Updating the run course and course)
+                    //For Edit Course (Updating the run course and course)  
                     if (!this.create) {
 
                         this.submitFormData["course_ID"] = this.courseID;

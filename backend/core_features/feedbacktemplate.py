@@ -38,7 +38,6 @@ class GetAllTemplates(Resource):
                     template.existingFeedback = True
                   elif datetime.now().date() > course.run_Enddate: #TO CAHNGE TO FEEDBACK START DATE:
                     template.existingFeedback = True
-          print(template.existingFeedback)
         db.session.close()
         templates_json = [template.json() for template in templates]
         templates_json = [{'template_ID': template.template_ID, 'template_Name': template.template_Name, 'created_On': common.format_date_time(template.created_On),'existingFeedback': template.existingFeedback} for template in templates]
@@ -164,7 +163,6 @@ class CreateFeedbackTemplate(Resource):
 
                     for inputOption in inputOptions:
                         textlabel = inputOption.get("option")
-                        print(textlabel)
 
                         newInputOption = InputOption(templateAttributeID, position, textlabel)
                         db.session.add(newInputOption)
@@ -274,7 +272,8 @@ class GetCourseNamesByFeedbackTemplateId(Resource):
           for runcourse in courses_no_template:
             course_name_no_template.append({
               'run_Name': runcourse.run_Name,
-              'rcourse_id': runcourse.rcourse_ID
+              'rcourse_id': runcourse.rcourse_ID,
+              "feedback_start_date": common.format_date_time(runcourse.run_Startdate) #TO CHANGE TO FEEDBACK START DATE AFTERWARDS
             })
 
         return {"code": 200, "course_names_using": course_names_using, "course_name_no_template": course_name_no_template}, 200
@@ -304,8 +303,6 @@ class EditFeedbackTemplate(Resource):
             courses_using_template = RunCourse.query.filter_by(template_ID = template_id).all()
             if courses_using_template:
               for course in courses_using_template:
-                  print(course.run_Startdate)
-                  print(type(course.run_Startdate))
                   if datetime.now().date() > course.run_Startdate: #TO CAHNGE TO FEEDBACK START DATE
                     return {"code": 404, "message": "There are run courses with ongoing feedback period, unable to edit feedback template" }, 404
                   elif datetime.now().date() > course.run_Enddate: #TO CAHNGE TO FEEDBACK START DATE:
@@ -454,36 +451,41 @@ class ApplyFeedbackTemplateToCourses(Resource):
         templateID = req.get("template_ID")
         included_courses = req.get("included_courses")
         not_included_courses = req.get("not_included_courses")
+
         errorCourseRecord = []
 
-        print(included_courses)
-        print(not_included_courses)
         def update_course_template(course_list, template_id, included_course):
             if included_course:
+              haveError = False
               for course in course_list:
-                  course_record = RunCourse.query.filter(RunCourse.rcourse_ID == course.get("rcourse_id")).first()
+                  course_record = RunCourse.query.filter(RunCourse.rcourse_ID == course['rcourse_id']).first()
                   if course_record:
-                      if course_record.run_Startdate < datetime.now().date(): #TO CHANGE TO FEEDBACK START DATE
+                      if course_record.template_ID == template_id:
+                         haveError = False
+                      elif course_record.template_ID != template_id and course_record.run_Startdate > datetime.now().date(): #TO CHANGE TO FEEDBACK START DATE
                         course_record.template_ID = template_id
+                        haveError = False
                       else:
                         errorCourseRecord.append(course_record.run_Name) 
-                        return False
+                        haveError = True
                   else:
-                      return False
-              return True
+                      haveError = True
+              return haveError
             else:
+              haveError = False
               for course in course_list:
                 course_record = RunCourse.query.filter(RunCourse.rcourse_ID == course.get("rcourse_id")).first()
                 if course_record:
-                      course_record.template_ID = template_id
+                      course_record.template_ID = None
+                      db.session.commit()
                 else:
-                    return False
-              return True
+                    haveError = True
+              return haveError
         try:
-            success1 = update_course_template(included_courses, templateID, True)
-            success2 = update_course_template(not_included_courses, None, False)
+            have_error_included = update_course_template(included_courses, templateID, True)
+            have_error_not_included = update_course_template(not_included_courses, None, False)
 
-            if success1 and success2:
+            if have_error_included == False and have_error_not_included == False:
                 db.session.commit()
                 return {"code": 200, "message": "Successfully apply feedback template to course(s)"}, 200
             else:
@@ -519,7 +521,6 @@ class GetFeedbackTemplateCommonQuestions(Resource):
         common_questions = query.all()
         db.session.close()
 
-        print(common_questions)
         if common_questions:
           question_dict = {}
           if common_questions:

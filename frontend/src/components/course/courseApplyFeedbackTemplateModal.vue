@@ -11,6 +11,7 @@
           <div class="mt-4 mb-4 container form-group row">
             <label class="mb-1">Select Feedback Template for {{ course.run_Name }}</label>
             <select class="form-control" v-model="selectedOption">
+              <option disabled selected>Select a Feedback Template</option>
               <option v-for="feedback_template in feedback_templates" :key="feedback_template.template_ID" :value="feedback_template.template_ID">{{ feedback_template.template_Name }}</option>
             </select>
           </div>
@@ -57,7 +58,7 @@
       button.disabled = false;
       if(this.course.course_ID) {
         this.selectedOption = this.course.template_ID
-      }
+      } 
       try {
         console.log('created')
         let response = await FeedbackTemplateService.getAllTemplates()

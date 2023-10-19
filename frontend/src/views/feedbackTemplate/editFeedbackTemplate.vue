@@ -13,7 +13,7 @@
         </div>
         <div class="form-group">
           <label>1. Question To Ask</label>
-          <textarea disabled="true" class="form-control" type="text" :placeholder="'How would you rate the course?'" />
+          <textarea disabled="true" class="form-control" type="text" :placeholder="'How would you rate the course?'"></textarea>
         </div>
         <div class="form-group mt-2">
           <label>1. Input Type</label>

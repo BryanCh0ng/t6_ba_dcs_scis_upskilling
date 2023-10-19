@@ -2,21 +2,10 @@ import { axiosClient } from "../axiosClient";
 import BaseApiService from "../BaseApiService";
 
 class FeedbackTemplateService extends BaseApiService {
-    /*async getAllTemplates() {
-        try {
-            let response = await axiosClient.get("/feedbacktemplate/get_all_templates");
-            return response.data;
-
-        } catch (error) {
-            return this.handleError(error);
-        }
-    }*/
-
     async getAllTemplates() {
         try {
             let response = await axiosClient.get("/feedbacktemplate/get_all_templates");
-            
-            return response.data.data.templates;
+            return response.data;
 
         } catch (error) {
             return this.handleError(error);
