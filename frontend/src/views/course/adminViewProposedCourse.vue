@@ -42,8 +42,11 @@
                     {{ pending_course.submitted_by }}
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(pending_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action status="pending_approve" :id="pending_course.course_ID" @click="editCourse(pending_course.course_ID, 'approve')"></course-action></td>
+                  <div>
+                    <td><course-action status="pending_approve" :id="pending_course.course_ID" @click="editCourse(pending_course.course_ID, 'approve')"></course-action></td>
                   <td><course-action status="pending_reject" :id="pending_course.course_ID" @click="openReject(pending_course)" data-bs-toggle="modal" data-bs-target="#rejected_modal"></course-action></td>
+                  </div>
+                  
                 </tr>
               </tbody>
             </table>

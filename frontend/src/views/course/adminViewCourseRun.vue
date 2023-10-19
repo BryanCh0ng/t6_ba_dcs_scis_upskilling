@@ -1,8 +1,8 @@
 <template>
     <div>
 
-    <div class="container col-12 d-flex mb-3 w-100" v-if="courses && courses.length > 0">
-      <h5 class="col m-auto">All Run Courses for {{ courses[0].course_Name }}</h5>
+    <div class="container col-12 d-flex mb-3 w-100">
+      <h5 class="col m-auto">All Run Courses for '{{ course_Name }}'</h5>
       <button class="btn btn-primary" @click="goToCreateRunCourse(courses[0].course_ID)">Create Run Course</button>
     </div>
 
@@ -42,17 +42,20 @@
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
               <!-- TO CHANGE TO FEEDBACK START DATE -->
               <td v-if="course.run_Startdate && isBeforeCurrentDate(course.run_Startdate)"><a v-if="course.course_Status != 'Retired'" class="text-nowrap text-dark text-decoration-underline apply-feedback-template" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
-              <td v-else></td>
-              <td v-if="course.runcourse_Status=='Ongoing'">
-                <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
-              </td>
-              <td v-else-if="course.runcourse_Status=='Closed'">
-                <course-action @action-and-message-updated="handleActionData" status="open_for_registration" :course="course" :courseName="course.courseName" ></course-action>
-              </td>
-              <td><course-action status="Edit" :course="course" @click="goToEditRunCourseWithId(course.rcourse_ID)"></course-action></td>
-              <td v-if="course.runcourse_Status=='Closed'">
-                <course-action @action-and-message-updated="handleActionData" status="delete-run-course" :course="course" :courseName="course.courseName" ></course-action>
-              </td>
+              <td v-else>-</td>
+              <div>
+                <td v-if="course.runcourse_Status=='Ongoing'">
+                  <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
+                </td>
+                <td v-else-if="course.runcourse_Status=='Closed'">
+                  <course-action @action-and-message-updated="handleActionData" status="open_for_registration" :course="course" :courseName="course.courseName" ></course-action>
+                </td>
+                <td><course-action status="Edit" :course="course" @click="goToEditRunCourseWithId(course.rcourse_ID)"></course-action></td>
+                <td v-if="course.runcourse_Status=='Closed'">
+                  <course-action @action-and-message-updated="handleActionData" status="delete-run-course" :course="course" :courseName="course.courseName" ></course-action>
+                </td>
+              </div>
+              
             </tr>               
           </tbody>
         </table>
@@ -121,7 +124,9 @@
         search_course_name: null,
         search_course_category: null,
         modalOpenFeedbackTemplate: false,
-        showFeedbackTemplateModal: false
+        showFeedbackTemplateModal: false,
+        course_Name: '',
+        course_ID: '',
       }
     },
     computed: {
@@ -210,8 +215,13 @@
         return new Date(feedbackStartDate) > currentDate;
       }
     },
-    created() {
-     this.loadData();
+    async created() {
+      const { id: course_ID } = this.$route.params;
+      this.course_ID = course_ID
+
+      let response = await CourseService.getCourseName(this.course_ID);
+      this.course_Name = response.data
+      this.loadData();
     },
     mounted() {
       const buttonElement = document.createElement('button');

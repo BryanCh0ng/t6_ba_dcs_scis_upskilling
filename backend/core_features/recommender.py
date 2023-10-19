@@ -46,6 +46,7 @@ class RecommenderUserRegistration(Resource):
 
         #put into dataframe
         df = pd.DataFrame(reg_list)
+        df = df.drop_duplicates(subset=["user_ID", "rcourse_ID"])
         df["registered"] = 1
         pivot_df = df.pivot(index="user_ID", columns="rcourse_ID", values="registered").fillna(0).astype(int)
         pivot_df.reset_index(inplace=True)
@@ -197,6 +198,7 @@ class RecommenderCourseRegistration(Resource):
 
             # Create a user-course interaction matrix
             df = pd.DataFrame(reg_list)
+            df = df.drop_duplicates(subset=['rcourse_ID', 'user_ID'])
             df["registered"] = 1
             pivot_df = df.pivot(index="rcourse_ID", columns="user_ID", values="registered").fillna(0).astype(int)
 
