@@ -41,21 +41,18 @@
               <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
               <!-- TO CHANGE TO FEEDBACK START DATE -->
-              <td v-if="course.run_Startdate && isBeforeCurrentDate(course.run_Startdate)"><a v-if="course.course_Status != 'Retired'" class="text-nowrap text-dark text-decoration-underline apply-feedback-template" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
-              <td v-else>-</td>
-              <div>
-                <td v-if="course.runcourse_Status=='Ongoing'">
-                  <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
-                </td>
-                <td v-else-if="course.runcourse_Status=='Closed'">
-                  <course-action @action-and-message-updated="handleActionData" status="open_for_registration" :course="course" :courseName="course.courseName" ></course-action>
-                </td>
-                <td><course-action status="Edit" :course="course" @click="goToEditRunCourseWithId(course.rcourse_ID)"></course-action></td>
-                <td v-if="course.runcourse_Status=='Closed'">
-                  <course-action @action-and-message-updated="handleActionData" status="delete-run-course" :course="course" :courseName="course.courseName" ></course-action>
-                </td>
-              </div>
-              
+              <td v-if="course.run_Startdate && isBeforeCurrentDate(course.run_Startdate)"><a v-if="course.course_Status != 'Retired'" class="btn btn-info" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
+              <td v-else><a v-if="course.course_Status != 'Retired'" class="btn btn-info disabled">Apply Feedback Template</a></td>
+              <td v-if="course.runcourse_Status=='Ongoing'">
+                <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
+              </td>
+              <td v-else-if="course.runcourse_Status=='Closed'">
+                <course-action @action-and-message-updated="handleActionData" status="open_for_registration" :course="course" :courseName="course.courseName" ></course-action>
+              </td>
+              <td><course-action status="Edit" :course="course" @click="goToEditRunCourseWithId(course.rcourse_ID)"></course-action></td>
+              <td v-if="course.runcourse_Status=='Closed'">
+                <course-action @action-and-message-updated="handleActionData" status="delete-run-course" :course="course" :courseName="course.courseName" ></course-action>
+              </td>
             </tr>               
           </tbody>
         </table>

@@ -517,22 +517,19 @@ CREATE TABLE IF NOT EXISTS `templateattribute`(
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO templateattribute VALUES 
-	(1, 'Content - How would you rate the course content and course structure?', 'Likert Scale', 1),
-	(2, 'Duration - How would you rate the course content and course structure?', 'Likert Scale', 1),
-	(3, 'Relevancy - How would you rate the course content and course structure?', 'Likert Scale', 1),
-	(4, 'What are the areas of the course can we can improve?', 'Text Field', 1), 
-	(5, 'What elements of the course most contributed to your learning?', 'Text Field', 1),
-	(6, 'What suggestions do you have to improve the course?', 'Text Field', 1), 
-	(7, 'Clarity - How would you rate the Instructor?', 'Likert Scale', 1),
-	(8, 'Pace - How would you rate the Instructor?', 'Likert Scale', 1),
-	(9, 'Helpfulness - How would you rate the Instructor?', 'Likert Scale', 1),
-	(10, 'Knowledge - How would you rate the Instructor?', 'Likert Scale', 1),
-	(11, 'What are the areas that the instructor did well on?', 'Text Field', 1),
-	(12, 'What are the areas that the instructor can improve on?', 'Text Field', 1),
-	(13, "What are the strengths of the instructor's teaching?", 'Text', 1),
-	(14, "What suggestions do you have to improve the instructor's teaching?", 'Text', 1),
-    (15, 'How would you rate the course?', 'Likert Scale', NULL),
-    (16, 'Any Feedbacks for the course', 'Text Field', NULL);
+    (1, 'Content - How would you rate the course content and course structure?', 'Likert Scale', 1),
+    (2, 'Duration - How would you rate the course content and course structure?', 'Likert Scale', 1),
+    (3, 'Relevancy - How would you rate the course content and course structure?', 'Likert Scale', 1),
+    (4, 'What elements of the course most contributed to your learning?', 'Text Field', 1),
+    (5, 'What suggestions do you have to improve the course?', 'Text Field', 1), 
+    (6, 'Clarity - How would you rate the Instructor?', 'Likert Scale', 1),
+    (7, 'Pace - How would you rate the Instructor?', 'Likert Scale', 1),
+    (8, 'Helpfulness - How would you rate the Instructor?', 'Likert Scale', 1),
+    (9, 'Knowledge - How would you rate the Instructor?', 'Likert Scale', 1),
+    (10, "What are the strengths of the instructor's teaching?", 'Text Field', 1),
+    (11, "What suggestions do you have to improve the instructor's teaching?", 'Text Field', 1),
+    (12, 'How would you rate the course?', 'Likert Scale', NULL),
+    (13, 'Any Feedbacks for the course', 'Text Field', NULL);
 
 DROP TABLE IF EXISTS `inputoption`;
 CREATE TABLE IF NOT EXISTS `inputoption`(
@@ -584,7 +581,12 @@ INSERT INTO inputoption VALUES
 	(37, 12, 2, 'Poor'),
 	(38, 12, 3, 'Neutral'),
 	(39, 12, 4, 'Good'),
-	(40, 12, 5, 'Excellent');
+	(40, 12, 5, 'Excellent'),
+    (46, 13, 1, 'Very Poor'),
+    (47, 13, 2, 'Poor'),
+	(48, 13, 3, 'Neutral'),
+	(49, 13, 4, 'Good'),
+	(50, 13, 5, 'Excellent');  
 
 DROP TABLE IF EXISTS `runcourse`;
 CREATE TABLE IF NOT EXISTS `runcourse`(

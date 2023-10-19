@@ -24,6 +24,10 @@ class GetTemplate(Resource):
         data = new_student_feedback.get("data")
         common_questions_data = new_student_feedback.get("common_questions_data")
 
+        print(courseID)
+        print(templateID)
+        print(userID)
+
         def submit_common_questions(common_questions_data):
             try:
               for eachdata in common_questions_data:
@@ -45,6 +49,8 @@ class GetTemplate(Resource):
                 for eachdata in data:
                    AttributeID = eachdata.get("attribute_id")
                    answer = eachdata.get("answer")
+                   print(AttributeID)
+                   print(answer)
                    NewFeedback =Feedback( None, templateID, userID, AttributeID, answer, courseID)
                    db.session.add(NewFeedback)
                    db.session.commit()
