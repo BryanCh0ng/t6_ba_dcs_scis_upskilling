@@ -26,6 +26,34 @@ class FeedbackService extends BaseApiService {
             return this.handleError(error);
         }
     }
+
+    async getFeedbackForRunCourse(runcourse_ID) {
+        try {
+            // console.log(course_ID)
+            const response = await axiosClient.get('/feedback/get_feedback_for_runcourse', {
+                params: {
+                    runcourse_ID: runcourse_ID,
+                },
+            });
+            return response.data;
+        } catch (error) {
+          throw new Error('Error fetching course feedback');
+        }
+    }
+
+    async getFeedbackForCourseInstructor(course_ID, instructor_ID) {
+        try {
+            const response = await axiosClient.get('/feedback/get_feedback_for_course_and_instructor', {
+                params: {
+                    course_ID: course_ID,
+                    instructor_ID: instructor_ID,
+                },
+            });
+            return response.data;
+        } catch (error) {
+          throw new Error('Error fetching course feedback');
+        }
+    }
     
 }
 

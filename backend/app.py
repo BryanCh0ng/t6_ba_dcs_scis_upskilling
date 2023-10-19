@@ -16,6 +16,7 @@ from core_features.votecourse import api as votecourse
 from core_features.feedbacktemplate import api as feedbacktemplate
 from core_features.dashboard import api as dashboard
 from core_features.recommender import api as recommender
+from core_features.feedback import api as feedback
 from core_features.common import api as common
 from core_features.feedback import api as feedback
 from flask_mail import Mail
@@ -40,6 +41,7 @@ api.add_namespace(votecourse)
 api.add_namespace(feedbacktemplate)
 api.add_namespace(dashboard)
 api.add_namespace(recommender)
+api.add_namespace(feedback)
 api.add_namespace(common)
 api.add_namespace(feedback)
 

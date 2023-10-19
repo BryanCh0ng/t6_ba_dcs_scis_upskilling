@@ -258,6 +258,7 @@ const routes = [
         requiresAuth: true
     }
   },
+  // Need to add authentication
   {
     path: '/viewDashboard',
     name: 'viewDashboard',
@@ -310,7 +311,16 @@ const routes = [
         title: 'Submit Feedback',
         requiresAuth: true
     },
-  }
+  },
+  {
+    path: '/viewRunCourseFeedback/:id',
+    name: 'viewRunCourseFeedback',
+    component: () => import('../views/feedback/viewRunCourseFeedback.vue'),
+    meta: {
+        title: 'View Run Course Feedback',
+   
+    }
+  },
 ]
 
 const router = createRouter({
