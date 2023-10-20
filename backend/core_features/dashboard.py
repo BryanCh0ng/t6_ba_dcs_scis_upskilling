@@ -413,7 +413,7 @@ class CourseSentimentData(Resource):
                 db.session.query(Feedback, TemplateAttribute)
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
                 .filter(func.lower(TemplateAttribute.question).like("%course%"))
-                .filter(TemplateAttribute.input_Type == "Text")
+                .filter(TemplateAttribute.input_Type == "Text Field")
             )
 
             if rcourseID:
@@ -527,7 +527,7 @@ class InstructorSentimentData(Resource):
                 db.session.query(Feedback, TemplateAttribute)
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
                 .filter(func.lower(TemplateAttribute.question).like("%instructor%"))
-                .filter(TemplateAttribute.input_Type == "Text")
+                .filter(TemplateAttribute.input_Type == "Text Field")
             )
 
             if rcourseID:
@@ -684,7 +684,7 @@ class CourseWordcloudData(Resource):
                 db.session.query(Feedback, TemplateAttribute)
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
                 .filter(func.lower(TemplateAttribute.question).like("%course%"))
-                .filter(TemplateAttribute.input_Type == "Text")
+                .filter(TemplateAttribute.input_Type == "Text Field")
             )
 
             if rcourseID:
@@ -806,7 +806,7 @@ class InstructorWordcloudData(Resource):
                 db.session.query(Feedback, TemplateAttribute)
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
                 .filter(func.lower(TemplateAttribute.question).like("%instructor%"))
-                .filter(TemplateAttribute.input_Type == "Text")
+                .filter(TemplateAttribute.input_Type == "Text Field")
             )
 
             if rcourseID:
