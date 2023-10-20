@@ -12,7 +12,7 @@
           <thead>
             <tr class="text-nowrap">
               <th scope="col">
-                <a href="" @click.prevent="sort('course_Name')" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                <a href="" @click.prevent="sort('run_Name')" class="text-decoration-none text-dark">Run Name / Description <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/></a></th>
               <th scope="col">
                 <a href="" @click.prevent="sort('registration_count')" class="text-decoration-none text-dark">Registration Count <sort-icon :sortColumn="sortColumn === 'registration_count'" :sortDirection="getSortDirection('registration_count')"/></a></th>
               <th scope="col">
@@ -21,13 +21,14 @@
                 <a href="" @click.prevent="sort('runcourse_Status')" class="text-decoration-none text-dark">Run Status <sort-icon :sortColumn="sortColumn === 'runcourse_Status'" :sortDirection="getSortDirection('runcourse_Status')"/></a></th>
               <th scope="col">Feedback Analysis</th>
               <th scope="col">Course Details</th>
-              <th scope="col" colspan="3">Action(s)</th>
+              <th scope="col">Feedback Template</th>
+              <th scope="col">Action(s)</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(course, key) in displayedCourses" :key="key">
               <td class="name">
-                <course-name-desc :name="course.course_Name" :category="course.coursecat_Name" :description="course.course_Desc"></course-name-desc>
+                <course-name-desc :name="course.run_Name" :category="course.coursecat_Name" :description="course.course_Desc"></course-name-desc>
               </td>
               <td class="reg_count">
                 {{ course.registration_count }}
@@ -38,18 +39,19 @@
               <td>{{ course.runcourse_Status }}</td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToRunCourseFeedbackAnalysis(course.course_ID)">View Feedback Analysis</a></td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-              <div>
-                <td v-if="course.runcourse_Status=='Ongoing'">
-                  <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
-                </td>
-                <td v-else-if="course.runcourse_Status=='Closed' && isCourseStartDateBeforeCurrentDate(course.run_Startdate)">
-                  <course-action @action-and-message-updated="handleActionData" status="open_for_registration" :course="course" :courseName="course.courseName" ></course-action>
-                </td>
-                <td v-if="course"><course-action status="Edit" :course="course" @click="goToEditRunCourseWithId(course.rcourse_ID)"></course-action></td>
-                <td v-if="course.runcourse_Status=='Closed'">
-                  <course-action @action-and-message-updated="handleActionData" status="delete-run-course" :course="course" :courseName="course.courseName" ></course-action>
-                </td>
-              </div>
+               <!-- TO CHANGE TO FEEDBACK START DATE -->
+              <td v-if="course.run_Startdate && isBeforeCurrentDate(course.run_Startdate)"><a v-if="course.course_Status != 'Retired'" class="btn btn-info" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
+              <td v-else><a v-if="course.course_Status != 'Retired'" class="btn btn-info disabled">Apply Feedback Template</a></td>
+              <td v-if="course.runcourse_Status=='Ongoing'">
+                <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
+              </td>
+              <td v-else-if="course.runcourse_Status=='Closed'">
+                <course-action @action-and-message-updated="handleActionData" status="open_for_registration" :course="course" :courseName="course.courseName" ></course-action>
+              </td>
+              <td><course-action status="Edit" :course="course" @click="goToEditRunCourseWithId(course.rcourse_ID)"></course-action></td>
+              <td v-if="course.runcourse_Status=='Closed'">
+                <course-action @action-and-message-updated="handleActionData" status="delete-run-course" :course="course" :courseName="course.courseName" ></course-action>
+              </td>
             </tr>               
           </tbody>
         </table>
@@ -70,6 +72,12 @@
       </div>
     </div>
 
+    <div class="modal fade" id="apply_course_feedback_template_modal" tabindex="-1" aria-hidden="true" ref="applyCourseFeedbackTemplateModal">
+      <div class="modal-dialog modal-lg"> 
+        <course-apply-feedback-template-modal :modalOpen="modalOpenFeedbackTemplate" v-if="showFeedbackTemplateModal" @model-after-action-close="modalAfterActionClose" :course="selectedCourse" @close-modal="closeFeedbackTemplateModal" />
+      </div>
+    </div>
+
   </div>
 
 </template>
@@ -84,6 +92,7 @@ import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
 import CourseService from "@/api/services/CourseService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
+import courseApplyFeedbackTemplateModal from '@/components/course/courseApplyFeedbackTemplateModal.vue'
 import CommonService from "@/api/services/CommonService.js";
 import UserService from "@/api/services/UserService.js";
 
@@ -96,7 +105,8 @@ export default {
     courseNameDesc,
     courseDateTime,
     SearchFilter,
-    modalAfterAction
+    modalAfterAction,
+    courseApplyFeedbackTemplateModal
   },
   data() {
     return {
@@ -111,7 +121,9 @@ export default {
       actionCourse: {},
       search_status: null,
       search_course_name: null,
-      search_course_category: null
+      search_course_category: null,
+      modalOpenFeedbackTemplate: false,
+      showFeedbackTemplateModal: false
     }
   },
   computed: {
@@ -199,11 +211,25 @@ export default {
     goToRunCourseFeedbackAnalysis(courseID) {
       this.$router.push({ name: 'viewRunCourseFeedbackAnalysis', params: {id: courseID}});
     },
+    openFeedbackTemplateModal(course) {
+        this.selectedCourse = course
+        this.modalOpenFeedbackTemplate = !this.modalOpenFeedbackTemplate;
+        this.showFeedbackTemplateModal = true;
+    },
+    closeFeedbackTemplateModal() {
+      this.modalOpenFeedbackTemplate = false;
+      this.showFeedbackTemplateModal = false;
+      this.selectedCourse = null;
+    },
     isCourseStartDateBeforeCurrentDate(courseStartDate) {
       console.log(courseStartDate)
       const currentDate = new Date();
       return new Date(courseStartDate) > currentDate;
     },
+    isBeforeCurrentDate(feedbackStartDate){
+      const currentDate = new Date();
+      return new Date(feedbackStartDate) > currentDate;
+    }
   },
   async created() {
     const user_ID = await UserService.getUserID();
@@ -224,10 +250,21 @@ export default {
     this.$el.appendChild(buttonElement);
     const modalElement = this.$refs.afterActionModal;
     modalElement.addEventListener('hidden.bs.modal', this.modalAfterActionClose);
+
+    const buttonElement2 = document.createElement('button');
+    buttonElement2.className = 'btn btn-primary d-none invisible-btn';
+    buttonElement2.setAttribute('data-bs-toggle', 'modal');
+    buttonElement2.setAttribute('data-bs-target', '#apply_course_feedback_template_modal'); 
+    this.$el.appendChild(buttonElement2);
+    const modalElement2 = this.$refs.applyCourseFeedbackTemplateModal;
+    modalElement2.addEventListener('hidden.bs.modal', this.modalAfterActionClose);
   },
   beforeUnmount() {
     const modalElement = this.$refs.afterActionModal;
     modalElement.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
+
+    const modalElement2 = this.$refs.applyCourseFeedbackTemplateModal;
+    modalElement2.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
   },
   }
 </script>

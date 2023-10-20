@@ -187,6 +187,69 @@ const routes = [
     }
   },
   {
+    path: '/createFeedbackTemplate',
+    name: 'createFeedbackTemplate',
+    component: () => import('../views/feedbackTemplate/createFeedbackTemplate.vue'),
+    meta: {
+        title: 'Create Feedback Template',
+        requiresAuth: true
+    }
+  },
+  {
+    path: '/editFeedbackTemplate/:id',
+    name: 'editFeedbackTemplate',
+    component: () => import('../views/feedbackTemplate/editFeedbackTemplate.vue'),
+    meta: {
+        title: 'Edit Feedback Template',
+        requiresAuth: true
+    },
+  },
+  {
+    path: '/adminViewFeedbackTemplate',
+    name: 'adminViewFeedbackTemplate',
+    component: () => import('../views/feedbackTemplate/adminViewFeedbackTemplate.vue'),
+    meta: {
+        title: 'Admin View Feedback Template',
+        requiresAuth: true
+    },
+  },
+  {
+    path: '/adminViewCourse',
+    name: 'adminViewCourse',
+    component: () => import('../views/course/adminViewCourse.vue'),
+    meta: {
+        title: 'Admin View Course',
+        requiresAuth: true
+    }
+  },
+  {
+    path: '/createFeedbackTemplate',
+    name: 'createFeedbackTemplate',
+    component: () => import('../views/feedbackTemplate/createFeedbackTemplate.vue'),
+    meta: {
+        title: 'Create Feedback Template',
+        requiresAuth: true
+    }
+  },
+  {
+    path: '/editFeedbackTemplate/:id',
+    name: 'editFeedbackTemplate',
+    component: () => import('../views/feedbackTemplate/editFeedbackTemplate.vue'),
+    meta: {
+        title: 'Edit Feedback Template',
+        requiresAuth: true
+    },
+  },
+  {
+    path: '/adminViewFeedbackTemplate',
+    name: 'adminViewFeedbackTemplate',
+    component: () => import('../views/feedbackTemplate/adminViewFeedbackTemplate.vue'),
+    meta: {
+        title: 'Admin View Feedback Template',
+        requiresAuth: true
+    },
+  },
+  {
     path: '/adminViewCourse',
     name: 'adminViewCourse',
     component: () => import('../views/course/adminViewCourse.vue'),
@@ -202,7 +265,6 @@ const routes = [
     meta: {
         title: 'Admin View Dashboard',
         requiresAuth: true
-   
     }
   },
   {
@@ -222,6 +284,14 @@ const routes = [
         title: 'Admin View Feedback Analysis of a Particular Run Course',
         requiresAuth: true
     }
+  },
+  {
+    path: '/submitFeedback/:id',
+    name: 'submitFeedback',
+    component: () => import('../views/feedback/submitFeedback.vue'),
+    meta: {
+        title: 'Submit Feedback',
+    },
   },
   {
     path: '/adminViewManagement',
@@ -246,7 +316,8 @@ const routes = [
     name: 'adminAddAdmin',
     component: () => import('../views/usermanagement/adminAddAdmin.vue'),
     meta: {
-        title: 'Admin Add Admin'
+        title: 'Admin Add Admin',
+        requiresAuth: true
     }
   },
   {
@@ -255,6 +326,7 @@ const routes = [
     component: () => import('../views/course/adminViewCourseRun.vue'),
     meta: {
         title: 'Submit Feedback',
+        requiresAuth: true
     },
   }
 ]

@@ -177,7 +177,7 @@ class GetAllInstructorsAndTrainers(Resource):
             results = query.all()
 
             def get_instructor_average_ratings(instructor_ID):
-                keywords = ['rate', 'instructor']  # Define keywords to identify relevant questions
+                keywords = ['rate', 'Instructor']  # Define keywords to identify relevant questions
             
                 total_ratings = []
                 total_questions = 0
@@ -198,6 +198,7 @@ class GetAllInstructorsAndTrainers(Resource):
 
                 for feedback_template, template_attribute in relevant_questions:
                     question_id = template_attribute.template_Attribute_ID
+                                    
                     feedback_entries = db.session.query(Feedback) \
                         .filter(Feedback.template_Attribute_ID == question_id)
 
@@ -209,8 +210,9 @@ class GetAllInstructorsAndTrainers(Resource):
 
                     if feedback_entries:
                         for entry in feedback_entries:
-                            total_ratings.append(int(entry.answer))  # assuming 'answer' contains the Likert Scale value as an integer
-                            total_questions += 1
+                            if entry.answer.isdigit():
+                                total_ratings.append(int(entry.answer))
+                                total_questions += 1
 
                 # Calculate the instructor-specific average rating
                 if total_ratings and total_questions > 0:
@@ -219,7 +221,7 @@ class GetAllInstructorsAndTrainers(Resource):
                     instructor_average_rating = 0
 
                 db.session.close()
-
+                
                 return instructor_average_rating
 
             if results:
@@ -448,7 +450,7 @@ class AddAdmin(Resource):
     
     def send_email_to_admin(self, fullName, email):
         msg = Message("Welcome to Upskilling Engagement System",
-                    sender="nic.wong@live.com", recipients=[email])
+                    sender="upskilling.engagement@outlook.com", recipients=[email])
         #Need to change this when we deployed to AWS 
         reset_password_link = f'http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email={email}'
         """

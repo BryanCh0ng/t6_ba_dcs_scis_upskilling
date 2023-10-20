@@ -35,14 +35,11 @@
                 <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToCourseFeedbackAnalysis(course.course_ID)">View Feedback Analysis</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewCourseRun(course.course_ID)">View Runs</a></td>
-                <div>
-                  <td v-if="course.course_Status === 'Active'"><course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-                  <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-                  <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action></td>
-                  <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course" @click="goToCreateRunCourseWithId(course.course_ID)"></course-action></td>
-                  <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Retire" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-                </div>
-                
+                <td v-if="course.course_Status === 'Active'"><course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
+                <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
+                <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action></td>
+                <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course" @click="goToCreateRunCourseWithId(course.course_ID)"></course-action></td>
+                <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Retire" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
               </tr>               
             </tbody>
           </table>
@@ -62,7 +59,7 @@
           <modal-after-action :course="actionCourse" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
         </div>
       </div>
-  
+
     </div>
   
 </template>
@@ -76,7 +73,7 @@
   import SearchFilter from "@/components/search/AdminCommonSearchFilter.vue";
   import CourseService from "@/api/services/CourseService.js";
   import modalAfterAction from '@/components/course/modalAfterAction.vue';
-  import CommonService from "@/api/services/CommonService.js"
+  import CommonService from "@/api/services/CommonService.js";
   import UserService from "@/api/services/UserService.js";
   
   export default {
@@ -102,7 +99,7 @@
         actionCourse: {},
         search_status: 'Active',
         search_course_name: null,
-        search_course_category: null
+        search_course_category: null,
       }
     },
     computed: {
@@ -151,6 +148,7 @@
         modalButtonElement.click();
       },
       async loadData() {
+        console.log('load')
         try {
           let response = await CourseService.searchAllCourseAdmin(this.search_course_name, this.search_course_category, this.search_status)
           
@@ -161,6 +159,7 @@
         }
       },
       modalAfterActionClose() {
+        console.log('test')
         this.loadData();
       },
       sort(column) {

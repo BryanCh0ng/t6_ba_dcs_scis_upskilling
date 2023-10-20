@@ -294,6 +294,42 @@ class CreateRunCourse(Resource):
             return {
                 "message": "Failed to create a new run course: " + str(e)
             }, 500
+        
+# Apply Feedback Template to Course
+course_apply_feedback_template = api.parser()
+course_apply_feedback_template.add_argument("rcourse_id", help="Enter course id")
+course_apply_feedback_template.add_argument("template_id", help="Enter template id")
+@api.route("/course_apply_feedback_template")
+@api.doc(description="Apply feedback template to a course")
+class CourseApplyFeedbackTemplate(Resource):
+    @api.expect(course_apply_feedback_template)
+    def post(self):
+        try:
+            args = course_apply_feedback_template.parse_args()
+            rcourseID = args.get("rcourse_id")
+            templateID = args.get("template_id")
+            
+            course = RunCourse.query.filter_by(rcourse_ID=rcourseID).first()
+            print(course)
+            print(templateID)
+
+            # check if template id is valid
+            if course is None:
+                return jsonify({"message": "run course course not found", "code": 404}), 404
+
+            if datetime.now().date() > course.run_Startdate: #TO CHANGE TO FEEDBACK DATE
+                return jsonify({"message": "run course in ongoing feedback period", "code": 404}), 404
+            elif datetime.now().date() > course.run_Enddate:  #TO CHANGE TO FEEDBACK DATE
+                return jsonify({"message": "run course in past feedback period", "code": 404}), 404
+
+            course.template_ID = templateID
+            db.session.commit()
+            return jsonify({"code": 200, "message": "Run course assign feedback template success"})
+
+        except Exception as e:
+            db.session.rollback()
+            print(str(e))
+            return jsonify({"code": 500, "message": "Failed. " + str(e)})
 
 get_course_formats = api.parser()
 @api.route("/get_course_formats")
