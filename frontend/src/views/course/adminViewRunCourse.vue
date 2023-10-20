@@ -36,7 +36,7 @@
                 <course-date-time :date="course.reg_Enddate" :time="course.reg_Endtime"></course-date-time>
               </td>
               <td>{{ course.runcourse_Status }}</td>
-              <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
+              <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToRunCourseFeedbackAnalysis(course.course_ID)">View Feedback Analysis</a></td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
               <div>
                 <td v-if="course.runcourse_Status=='Ongoing'">
@@ -195,6 +195,9 @@ export default {
     },
     goToCreateRunCourse(courseID){
       this.$router.push({ name: 'createRunCourse', params: {id: courseID}});
+    },
+    goToRunCourseFeedbackAnalysis(courseID) {
+      this.$router.push({ name: 'viewRunCourseFeedbackAnalysis', params: {id: courseID}});
     },
     isCourseStartDateBeforeCurrentDate(courseStartDate) {
       console.log(courseStartDate)

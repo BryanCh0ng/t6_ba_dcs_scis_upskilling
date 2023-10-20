@@ -125,13 +125,13 @@ export default {
         items.push(
           { path: "/instructorTrainerViewProfile", label: "Profile" },
           { label: "Blacklist" }, // rmb to add path
-          {  label: "Dashboard" } // rmb to add path
+          { label: "Dashboard" } // rmb to add path
         );
       } else if (this.user_role === "Admin") {
         items.push(
           { path: "/adminViewManagement", label: "User Management" },
           { label: "Feedback Template" }, // rmb to add path
-          { label: "Dashboard" } // rmb to add path
+          { path: "/viewDashboard", label: "Dashboard" } // rmb to add path
         );
       }
 

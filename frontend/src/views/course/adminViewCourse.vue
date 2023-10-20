@@ -32,7 +32,7 @@
                   <course-name-desc :name="course.course_Name" :category="course.coursecat_Name" :description="course.course_Desc"></course-name-desc>
                 </td>
                 <td>{{ course.course_Status }}</td>
-                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
+                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToCourseFeedbackAnalysis(course.course_ID)">View Feedback Analysis</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewCourseRun(course.course_ID)">View Runs</a></td>
                 <div>
@@ -194,7 +194,10 @@
       },
       goToViewCourseRun(courseID) {
         this.$router.push({ name: 'adminViewCourseRun', params: {id: courseID}});
-      }
+      },
+      goToCourseFeedbackAnalysis(courseID) {
+        this.$router.push({ name: 'viewCourseFeedbackAnalysis', params: {id: courseID}});
+      },
     },
     async created() {
       const user_ID = await UserService.getUserID();

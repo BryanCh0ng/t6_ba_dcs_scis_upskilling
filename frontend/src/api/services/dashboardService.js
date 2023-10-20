@@ -22,7 +22,7 @@ class DashboardService extends BaseApiService {
 
     async getInstructorAverageRatings(instructor_ID) {
         try {
-            console.log(instructor_ID);
+            //console.log(instructor_ID);
             const response = await axiosClient.get(
                 "/dashboard/instructor_average_ratings",
                 {
@@ -56,18 +56,66 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getCourseFeedbacks() {
+    async getCourseSentimentData(course_ID, rcourse_ID) {
         try {
-            let response = await axiosClient.get("/dashboard/course_feedbacks")
+            console.log(course_ID)
+            console.log(rcourse_ID)
+            let response = await axiosClient.get("/dashboard/course_sentiment_data",
+                {
+                    params: {
+                        course_ID: course_ID,
+                        rcourse_ID: rcourse_ID
+                    },
+                }
+            );
             return response 
         } catch(error) {
             return this.handleError(error)
         }
     }
 
-    async getInstructorFeedbacks() {
+    async getInstructorSentimentData(course_ID, rcourse_ID) {
         try {
-            let response = await axiosClient.get("/dashboard/instructor_feedbacks")
+            let response = await axiosClient.get("/dashboard/instructor_sentiment_data",
+                {
+                    params: {
+                        course_ID: course_ID,
+                        rcourse_ID: rcourse_ID
+                    },
+                }
+            );
+            return response 
+        } catch(error) {
+            return this.handleError(error)
+        }
+    }
+
+    async getCourseWordcloudData(course_ID, rcourse_ID) {
+        try {
+            let response = await axiosClient.get("/dashboard/course_wordcloud_data",
+                {
+                    params: {
+                        course_ID: course_ID,
+                        rcourse_ID: rcourse_ID
+                    },
+                }
+            );
+            return response 
+        } catch(error) {
+            return this.handleError(error)
+        }
+    }
+
+    async getInstructorWordcloudData(course_ID, rcourse_ID) {
+        try {
+            let response = await axiosClient.get("/dashboard/instructor_wordcloud_data",
+                {
+                    params: {
+                        course_ID: course_ID,
+                        rcourse_ID: rcourse_ID
+                    },
+                }
+            )
             return response 
         } catch(error) {
             return this.handleError(error)

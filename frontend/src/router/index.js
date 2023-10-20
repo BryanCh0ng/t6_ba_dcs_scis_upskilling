@@ -200,8 +200,27 @@ const routes = [
     name: 'viewDashboard',
     component: () => import('../views/dashboard/viewDashboard.vue'),
     meta: {
-        title: 'View Dashboard',
+        title: 'Admin View Dashboard',
+        requiresAuth: true
    
+    }
+  },
+  {
+    path: '/viewCourseFeedbackAnalysis/:id',
+    name: 'viewCourseFeedbackAnalysis',
+    component: () => import('../views/dashboard/viewDashboard.vue'),
+    meta: {
+        title: 'Admin View Feedback Analysis of a Particular Course',
+        requiresAuth: true
+    }
+  },
+  {
+    path: '/viewRunCourseFeedbackAnalysis/:id',
+    name: 'viewRunCourseFeedbackAnalysis',
+    component: () => import('../views/dashboard/viewDashboard.vue'),
+    meta: {
+        title: 'Admin View Feedback Analysis of a Particular Run Course',
+        requiresAuth: true
     }
   },
   {
