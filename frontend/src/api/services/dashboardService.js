@@ -2,7 +2,6 @@ import { axiosClient } from "../axiosClient";
 import BaseApiService from "../BaseApiService";
 
 class DashboardService extends BaseApiService {
-
     async getCourseAverageRatings(course_ID) {
         try {
             // console.log(course_ID)
@@ -13,7 +12,7 @@ class DashboardService extends BaseApiService {
             });
             return response.data;
         } catch (error) {
-          throw new Error('Error fetching course feedback');
+            throw new Error("Error fetching course feedback");
         }
     }
 
@@ -26,7 +25,7 @@ class DashboardService extends BaseApiService {
             });
             return response.data;
         } catch (error) {
-          throw new Error('Error fetching course feedback');
+            throw new Error("Error fetching course feedback");
         }
     }
 
@@ -40,7 +39,7 @@ class DashboardService extends BaseApiService {
             });
             return response.data;
         } catch (error) {
-          throw new Error('Error fetching course feedback');
+            throw new Error("Error fetching course feedback");
         }
     }
 
@@ -141,6 +140,72 @@ class DashboardService extends BaseApiService {
           throw new Error('Error fetching course feedback');
         }
     }
+    async getCourseSentimentData(course_ID, rcourse_ID) {
+        try {
+            console.log(course_ID)
+            console.log(rcourse_ID)
+            let response = await axiosClient.get("/dashboard/course_sentiment_data",
+                {
+                    params: {
+                        course_ID: course_ID,
+                        rcourse_ID: rcourse_ID
+                    },
+                }
+            );
+            return response 
+        } catch(error) {
+            return this.handleError(error)
+        }
+    }
+
+    async getInstructorSentimentData(course_ID, rcourse_ID) {
+        try {
+            let response = await axiosClient.get("/dashboard/instructor_sentiment_data",
+                {
+                    params: {
+                        course_ID: course_ID,
+                        rcourse_ID: rcourse_ID
+                    },
+                }
+            );
+            return response 
+        } catch(error) {
+            return this.handleError(error)
+        }
+    }
+
+    async getCourseWordcloudData(course_ID, rcourse_ID) {
+        try {
+            let response = await axiosClient.get("/dashboard/course_wordcloud_data",
+                {
+                    params: {
+                        course_ID: course_ID,
+                        rcourse_ID: rcourse_ID
+                    },
+                }
+            );
+            return response 
+        } catch(error) {
+            return this.handleError(error)
+        }
+    }
+
+    async getInstructorWordcloudData(course_ID, rcourse_ID) {
+        try {
+            let response = await axiosClient.get("/dashboard/instructor_wordcloud_data",
+                {
+                    params: {
+                        course_ID: course_ID,
+                        rcourse_ID: rcourse_ID
+                    },
+                }
+            )
+            return response 
+        } catch(error) {
+            return this.handleError(error)
+        }
+    }
+    
 }
 
 export default new DashboardService();

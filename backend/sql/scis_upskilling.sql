@@ -140,7 +140,6 @@ INSERT INTO user VALUES
     (113, 'Evelyn Koh', 'evelyn.koh.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
     (114, 'Joseph Wong', 'joseph.wong.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student');
 
-
 DROP TABLE IF EXISTS `externaluser`;
 CREATE TABLE IF NOT EXISTS `externaluser` (
 	external_id int NOT NULL AUTO_INCREMENT, 
