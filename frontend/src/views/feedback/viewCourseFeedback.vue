@@ -1,11 +1,15 @@
 <template>
   <div>
     <div class="container col-12">
-      <h5 class="pb-3">All Feedback for {{coursename}}</h5>
-      <div  v-if="feedbackData && feedbackData.length > 0" class="table-responsive">
+      <div class="container col-12 d-flex mb-3 w-100">
+        <h5 class="col m-auto">All Feedback for {{coursename}}</h5>
+        <button class="btn btn-primary" title="Export">Export</button>
+      </div>
+
+      <div  v-if="feedbackData && feedbackData.length > 0" class="table-responsive rounded">
         <table class="table bg-white">
           <thead>
-            <tr class="text-nowrap">
+            <tr>
               <th scope="col" v-for="(question, index) in questions" :key="index" class="table-column custom-col">
                 {{ question.question }}
               </th>

@@ -1,13 +1,24 @@
 <template>
   <div>
     <div class="container col-12">
-      <h5 class="pb-3">All Feedback for {{run_name}}</h5>
-      <div  v-if="feedbackData && feedbackData.length > 0" class="table-responsive">
+      <div class="container col-12 d-flex mb-3 w-100">
+        <h5 class="col m-auto">All Feedback for {{ run_name }}</h5>
+        <button class="btn btn-primary" title="Export">Export</button>
+      </div>
+
+      <div v-if="feedbackData && feedbackData.length > 0" class="table-responsive rounded">
         <table class="table bg-white">
           <thead>
-            <tr class="text-nowrap">
-              <th scope="col" v-for="(question, index) in questions" :key="index" class="table-column custom-col">
-                {{ question.question }}
+            <tr>
+              <th
+                scope="col"
+                v-for="(question, index) in questions"
+                :key="index"
+                class="table-column custom-col text-nowrap align-middle"
+              >
+                <div class="question-container">
+                  {{ question.question }}
+                </div>
               </th>
             </tr>
           </thead>
@@ -17,19 +28,22 @@
             </tr>
           </tbody>
         </table>
-        
-
       </div>
       <div v-else-if="feedbackData=[]">
         <p>No records found</p>
       </div>
     </div>
-    <vue-awesome-paginate v-if="feedbackData.length/itemsPerPage > 0" v-model="localCurrentPageCourses" :totalItems="feedbackData.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeCourses" class="justify-content-center pagination-container"/>
-    
+    <vue-awesome-paginate
+      v-if="feedbackData.length / itemsPerPage > 0"
+      v-model="localCurrentPageCourses"
+      :totalItems="feedbackData.length"
+      :items-per-page="itemsPerPage"
+      @page-change="handlePageChangeCourses"
+      class="justify-content-center pagination-container"
+    />
   </div>
-
 </template>
-  
+
 <script>
 import FeedbackService from "@/api/services/FeedbackService.js";
 import runCourseService from "@/api/services/runCourseService.js";
@@ -86,12 +100,13 @@ export default {
 </script>
 
 <style scoped>
-
-  .table-responsive .table th.table-column {
-    width: 50px !important;
-  } 
+  .table th .question-container {
+    width: 300px;
+    max-width: 300px !important;
+    white-space: normal;
+    overflow: hidden;
+  }
 
   @import '../../assets/css/course.css';
   @import '../../assets/css/paginate.css';
-
 </style>

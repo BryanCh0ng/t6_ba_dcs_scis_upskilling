@@ -54,6 +54,7 @@ class GetTemplate(Resource):
                    NewFeedback =Feedback( None, templateID, userID, AttributeID, answer, courseID)
                    db.session.add(NewFeedback)
                    db.session.commit()
+                   db.session.close()
 
                 submit_common_questions_success = submit_common_questions(common_questions_data)
                 if (submit_common_questions_success):
@@ -183,6 +184,7 @@ class GetStudentFeedbackIncludingAnswersAndTemplate(Resource):
                   }
                   question_dict[attribute.question] = question_data
                 common_questions_list = list(question_dict.values())
+                db.session.close()
             return {"code": 200, "template": common_questions_list}, 200
           else:
               return {"code": 400, "message": "There is no such template"}, 404
@@ -306,6 +308,8 @@ class RunCourseFeedback(Resource):
                 # Convert the dictionary values to a list
                 feedback_list = list(feedback_dict.values())
 
+                db.session.close()
+
                 return jsonify({'data': feedback_list, 'questions': unique_questions_list, 'code': 200})
 
             else:
@@ -404,6 +408,8 @@ class RunCourseFeedback(Resource):
                 # Convert the dictionary values to a list
                 feedback_list = list(feedback_dict.values())
 
+                db.session.close()
+
                 return jsonify({'data': feedback_list, 'questions': questions, 'code': 200})
 
             else:
@@ -464,6 +470,8 @@ class RunCourseFeedback(Resource):
 
                 # Convert the dictionary values to a list
                 feedback_list = list(feedback_dict.values())
+
+                db.session.close()
 
                 return jsonify({'data': feedback_list, 'questions': unique_questions_list, 'code': 200})
 

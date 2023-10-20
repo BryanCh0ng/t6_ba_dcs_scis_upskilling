@@ -105,14 +105,14 @@ export default {
           );
         }
       } 
-      // else {
-      //   // Add the default links for users who are not logged in
-      //   links.push(
-      //     { path: "/adminViewCourse", label: "View Courses" },
-      //     { path: "/proposeCourse", label: "Propose Course" },
-      //     { path: "/contactUs", label: "Contact Us" }
-      //   );
-      // }
+      else {
+        // Default links for users who are not logged in
+        links.push(
+          { path: "/adminViewCourse", label: "View Courses" },
+          { path: "/proposeCourse", label: "Propose Course" },
+          { path: "/contactUs", label: "Contact Us" }
+        );
+      }
 
       return links;
     },
@@ -125,13 +125,13 @@ export default {
         items.push(
           { path: "/instructorTrainerViewProfile", label: "Profile" },
           { label: "Blacklist" }, // rmb to add path
-          {  label: "Dashboard" } // rmb to add path
+          { path: "/viewDashboard", label: "Dashboard" }
         );
       } else if (this.user_role === "Admin") {
         items.push(
           { path: "/adminViewManagement", label: "User Management" },
           { path: "/adminViewFeedbackTemplate", label: "Feedback Template" }, // rmb to add path
-          { label: "Dashboard" } // rmb to add path
+          { path: "/viewDashboard", label: "Dashboard" }
         );
       }
 

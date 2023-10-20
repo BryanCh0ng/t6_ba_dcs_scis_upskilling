@@ -358,6 +358,7 @@ class GetStudentName(Resource):
         rcourse_id = args.get("rcourse_id", "")
 
         runcourse = RunCourse.query.filter_by(rcourse_ID=rcourse_id).first()
+        db.session.close()
 
         if runcourse:
             runcourse_name = runcourse.run_Name
