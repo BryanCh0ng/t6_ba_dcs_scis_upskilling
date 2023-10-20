@@ -3,7 +3,10 @@
     <div class="container col-12">
       <div class="container col-12 d-flex mb-3 w-100">
         <h5 class="col m-auto">All Feedback for {{ run_name }}</h5>
-        <button class="btn btn-primary" title="Export">Export</button>
+        <div>
+          <button class="btn btn-primary me-2" title="View Analysis">View Analysis</button>
+          <button class="btn btn-primary" title="Export" @click="exportToCSV">Export to CSV</button>
+        </div>
       </div>
 
       <div v-if="feedbackData && feedbackData.length > 0" class="table-responsive rounded">
@@ -14,7 +17,7 @@
                 scope="col"
                 v-for="(question, index) in questions"
                 :key="index"
-                class="table-column custom-col text-nowrap align-middle"
+                class="table-column text-nowrap"
               >
                 <div class="question-container">
                   {{ question.question }}
@@ -48,6 +51,7 @@
 import FeedbackService from "@/api/services/FeedbackService.js";
 import runCourseService from "@/api/services/runCourseService.js";
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
+import Papa from 'papaparse';
 
 export default {
     components: {
@@ -85,6 +89,30 @@ export default {
         handlePageChangeCourses(newPage) {
           this.localCurrentPageCourses = newPage;
           this.$emit('page-change', newPage);
+        },
+        exportToCSV() {
+          // Prepare the CSV data with questions as the first row
+          const csvData = [this.questions.map(question => question.question)];
+
+          // Add the data rows
+          csvData.push(...this.feedbackData.map(row => row.map(cell => cell.toString())));
+
+          // Create a CSV string using Papaparse
+          const csv = Papa.unparse(csvData);
+
+          // Create a Blob and download link
+          const blob = new Blob([csv], { type: 'text/csv' });
+
+          // Set the file name to the course name
+          const runcourse_Name = this.run_name;
+          const fileName = `${runcourse_Name}_feedback_data.csv`;
+
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName; // Set the file name here
+          a.click();
+          URL.revokeObjectURL(url);
         },
     }, 
     computed: {

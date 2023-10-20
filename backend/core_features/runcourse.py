@@ -362,7 +362,7 @@ class GetStudentName(Resource):
 
         if runcourse:
             runcourse_name = runcourse.run_Name
-            # print(runcourse_name)
+            
             return jsonify({"code": 200, "data": runcourse_name})
         else:
             print('else')

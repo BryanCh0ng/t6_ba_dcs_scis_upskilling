@@ -38,7 +38,7 @@
                 <course-date-time :date="course.reg_Enddate" :time="course.reg_Endtime"></course-date-time>
               </td>
               <td>{{ course.runcourse_Status }}</td>
-              <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToViewRunCourseFeedback(course.rcourse_ID)">View Feedback</a></td>
+              <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details" @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
               <!-- TO CHANGE TO FEEDBACK START DATE -->
               <td v-if="course.run_Startdate && isBeforeCurrentDate(course.run_Startdate)"><a v-if="course.course_Status != 'Retired'" class="text-nowrap text-dark text-decoration-underline apply-feedback-template" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
@@ -215,9 +215,7 @@
         const currentDate = new Date();
         return new Date(feedbackStartDate) > currentDate;
       },
-      goToViewRunCourseFeedback(rcourse_ID) {
-        this.$router.push({ name: 'viewRunCourseFeedback', params: { id: rcourse_ID } });
-      }
+      
     },
     async created() {
       const { id: course_ID } = this.$route.params;

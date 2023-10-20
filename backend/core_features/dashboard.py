@@ -35,7 +35,6 @@ custom_stop_words = ['the', 'course', 'content', 'instructor', 'professor', 'pro
 stop_words.update(custom_stop_words) # Add custom stop word
 lemmatizer = WordNetLemmatizer() # Set up Lemmatizer
 
-
 api = Namespace('dashboard', description='Dashboard related operations')
 
 # ================================================== DASHBOARD FUNCTIONS ================================================== #
@@ -701,3 +700,417 @@ class InstructorDoneWellFeedback(Resource):
             return jsonify({"code": 200, "data": response_data, "topic_words_list": topic_words_list_formatted})
 
         return jsonify({"code": 404, "message": "No matching course interest information found"})
+
+# Get the topic for specific run course (did well)
+feedback_runcourse_well_specific = api.parser()
+feedback_runcourse_well_specific.add_argument("runcourse_ID", help="Enter runcourse_ID")
+
+@api.route("/feedback_runcourse_well_specific")
+@api.doc(description="RunCourse-specific feedback")
+class RunCourseWellFeedback(Resource):
+    @api.expect(feedback_runcourse_well_specific)
+    def get(self):
+        # Parse the runcourse_ID from the request arguments
+        args = feedback_runcourse_well_specific.parse_args()
+        runcourse_ID = args.get("runcourse_ID", "")
+
+        keywords = ['course']
+        optional_keywords = ['done well', 'contributed', 'did well']
+
+        # Query the database to retrieve feedback related to the specified course (using rcourse_ID)
+        if not runcourse_ID:
+            # If course_ID is empty, retrieve feedback for all courses
+            runcourse_well_query = (
+                db.session.query(Feedback.answer)
+                .join(RunCourse, Feedback.rcourse_ID == runcourse_ID)
+                .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
+                .filter(TemplateAttribute.input_Type == 'Text Field')
+            )
+        else:
+            # If course_ID is provided, filter feedback for the specific course
+            runcourse_well_query = (
+                db.session.query(Feedback.answer)
+                .join(RunCourse, Feedback.rcourse_ID == runcourse_ID)
+                .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
+                .filter(TemplateAttribute.input_Type == 'Text Field')
+            )
+
+        for keyword in keywords:
+            runcourse_well_query = runcourse_well_query.filter(func.lower(TemplateAttribute.question).contains(keyword))
+        
+        optional_keyword_filter = or_(
+            *[
+                func.lower(TemplateAttribute.question).contains(keyword)
+                for keyword in optional_keywords
+            ]
+        )
+        runcourse_well_query = runcourse_well_query.filter(optional_keyword_filter)
+
+        results = runcourse_well_query.all()
+        db.session.close()
+
+        if results:
+            result_data = []
+            for result in results:
+                feedback = {
+                    "answer": result[0],
+                }
+                result_data.append(feedback)
+            
+
+            # Create a Pandas DataFrame from the result_data list
+            df_runcourse_well = pd.DataFrame(result_data)
+            df_runcourse_well = drop_col(df_runcourse_well)
+            df_runcourse_well['preprocessed_text'] = preprocess_text(df_runcourse_well['answer'])
+            
+            corpus = df_runcourse_well['preprocessed_text']
+            
+            topics_range = range(3, 9)
+            
+            max_df_range = [0.70, 0.75, 0.80, 0.85, 0.9, 0.95]
+            
+            best_n_topics, best_max_df, best_silhouette_score = tune_nmf_hyperparameters(corpus, topics_range, max_df_range)
+
+            tfidf_vectorizer = TfidfVectorizer(max_df=best_max_df, stop_words='english')
+            tfidf_matrix = tfidf_vectorizer.fit_transform(corpus)
+
+            nmf_model = NMF(n_components=best_n_topics, random_state=1)
+            nmf_matrix = nmf_model.fit_transform(tfidf_matrix)
+
+            feature_names = tfidf_vectorizer.get_feature_names_out()
+            topic_words_list = []
+
+            for topic_idx, topic in enumerate(nmf_model.components_):
+                top_words_indices = topic.argsort()[:-10 - 1:-1]
+                top_words = [feature_names[i] for i in top_words_indices]
+                top_word_probabilities = [topic[i] for i in top_words_indices]
+                topic_data = [{"word": word, "size": prob} for word, prob in zip(top_words, top_word_probabilities)]
+                topic_words_list.append(topic_data)
+            
+            topic_words_list_formatted = []
+
+            for topic_words in topic_words_list:
+                word_data = {"wordData": topic_words}
+                topic_words_list_formatted.append(word_data)
+
+            dominant_topics = nmf_matrix.argmax(axis=1) + 1
+            df_runcourse_well['topic_number'] = dominant_topics
+
+            # Convert the DataFrame to JSON
+            response_data = df_runcourse_well.to_dict(orient='records')
+
+            return jsonify({"code": 200, "data": response_data, "topic_words_list": topic_words_list_formatted})
+
+        return jsonify({"code": 404, "message": "No matching course interest information found"})
+
+
+# Get the topic for specific run course instructor (did well)
+feedback_runcourse_instructor_well_specific = api.parser()
+feedback_runcourse_instructor_well_specific.add_argument("runcourse_ID", help="Enter runcourse_ID")
+
+@api.route("/feedback_runcourse_instructor_well_specific")
+@api.doc(description="RunCourse-specific feedback")
+class RunCourseWellFeedback(Resource):
+    @api.expect(feedback_runcourse_instructor_well_specific)
+    def get(self):
+        # Parse the runcourse_ID from the request arguments
+        args = feedback_runcourse_instructor_well_specific.parse_args()
+        runcourse_ID = args.get("runcourse_ID", "")
+
+        keywords = ['instructor']
+        optional_keywords = ['did well', 'contributed', 'done well', 'strengths']
+
+        # Query the database to retrieve feedback related to the specified course (using rcourse_ID)
+        if not runcourse_ID:
+            # If course_ID is empty, retrieve feedback for all courses
+            runcourse_instructor_well_query = (
+                db.session.query(Feedback.answer)
+                .join(RunCourse, Feedback.rcourse_ID == runcourse_ID)
+                .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
+                .filter(TemplateAttribute.input_Type == 'Text Field')
+            )
+        else:
+            # If course_ID is provided, filter feedback for the specific course
+            runcourse_instructor_well_query = (
+                db.session.query(Feedback.answer)
+                .join(RunCourse, Feedback.rcourse_ID == runcourse_ID)
+                .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
+                .filter(TemplateAttribute.input_Type == 'Text Field')
+            )
+
+        for keyword in keywords:
+            runcourse_instructor_well_query = runcourse_instructor_well_query.filter(func.lower(TemplateAttribute.question).contains(keyword))
+        
+        optional_keyword_filter = or_(
+            *[
+                func.lower(TemplateAttribute.question).contains(keyword)
+                for keyword in optional_keywords
+            ]
+        )
+        runcourse_instructor_well_query = runcourse_instructor_well_query.filter(optional_keyword_filter)
+
+        results = runcourse_instructor_well_query.all()
+        db.session.close()
+
+        if results:
+            result_data = []
+            for result in results:
+                feedback = {
+                    "answer": result[0],
+                }
+                result_data.append(feedback)
+            
+
+            # Create a Pandas DataFrame from the result_data list
+            df_runcourse_instructor_well = pd.DataFrame(result_data)
+            df_runcourse_instructor_well = drop_col(df_runcourse_instructor_well)
+            df_runcourse_instructor_well['preprocessed_text'] = preprocess_text(df_runcourse_instructor_well['answer'])
+            
+            corpus = df_runcourse_instructor_well['preprocessed_text']
+            
+            topics_range = range(3, 9)
+            
+            max_df_range = [0.70, 0.75, 0.80, 0.85, 0.9, 0.95]
+            
+            best_n_topics, best_max_df, best_silhouette_score = tune_nmf_hyperparameters(corpus, topics_range, max_df_range)
+
+            tfidf_vectorizer = TfidfVectorizer(max_df=best_max_df, stop_words='english')
+            tfidf_matrix = tfidf_vectorizer.fit_transform(corpus)
+
+            nmf_model = NMF(n_components=best_n_topics, random_state=1)
+            nmf_matrix = nmf_model.fit_transform(tfidf_matrix)
+
+            feature_names = tfidf_vectorizer.get_feature_names_out()
+            topic_words_list = []
+
+            for topic_idx, topic in enumerate(nmf_model.components_):
+                top_words_indices = topic.argsort()[:-10 - 1:-1]
+                top_words = [feature_names[i] for i in top_words_indices]
+                top_word_probabilities = [topic[i] for i in top_words_indices]
+                topic_data = [{"word": word, "size": prob} for word, prob in zip(top_words, top_word_probabilities)]
+                topic_words_list.append(topic_data)
+            
+            topic_words_list_formatted = []
+
+            for topic_words in topic_words_list:
+                word_data = {"wordData": topic_words}
+                topic_words_list_formatted.append(word_data)
+
+            dominant_topics = nmf_matrix.argmax(axis=1) + 1
+            df_runcourse_instructor_well['topic_number'] = dominant_topics
+
+            # Convert the DataFrame to JSON
+            response_data = df_runcourse_instructor_well.to_dict(orient='records')
+
+            return jsonify({"code": 200, "data": response_data, "topic_words_list": topic_words_list_formatted})
+
+        return jsonify({"code": 404, "message": "No matching course interest information found"})
+
+
+# Get the topic for specific run course (improve)
+feedback_runcourse_improve_specific = api.parser()
+feedback_runcourse_improve_specific.add_argument("runcourse_ID", help="Enter runcourse_ID")
+
+@api.route("/feedback_runcourse_improve_specific")
+@api.doc(description="RunCourse-specific feedback")
+class RunCourseWellFeedback(Resource):
+    @api.expect(feedback_runcourse_improve_specific)
+    def get(self):
+        # Parse the runcourse_ID from the request arguments
+        args = feedback_runcourse_improve_specific.parse_args()
+        runcourse_ID = args.get("runcourse_ID", "")
+
+        keywords = ['course']
+        optional_keywords = ['improve', 'suggestions']
+
+        # Query the database to retrieve feedback related to the specified course (using rcourse_ID)
+        if not runcourse_ID:
+            # If course_ID is empty, retrieve feedback for all courses
+            runcourse_improve_query = (
+                db.session.query(Feedback.answer)
+                .join(RunCourse, Feedback.rcourse_ID == runcourse_ID)
+                .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
+                .filter(TemplateAttribute.input_Type == 'Text Field')
+            )
+        else:
+            # If course_ID is provided, filter feedback for the specific course
+            runcourse_improve_query = (
+                db.session.query(Feedback.answer)
+                .join(RunCourse, Feedback.rcourse_ID == runcourse_ID)
+                .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
+                .filter(TemplateAttribute.input_Type == 'Text Field')
+            )
+
+        for keyword in keywords:
+            runcourse_improve_query = runcourse_improve_query.filter(func.lower(TemplateAttribute.question).contains(keyword))
+        
+        optional_keyword_filter = or_(
+            *[
+                func.lower(TemplateAttribute.question).contains(keyword)
+                for keyword in optional_keywords
+            ]
+        )
+        runcourse_improve_query = runcourse_improve_query.filter(optional_keyword_filter)
+
+        results = runcourse_improve_query.all()
+        db.session.close()
+
+        if results:
+            result_data = []
+            for result in results:
+                feedback = {
+                    "answer": result[0],
+                }
+                result_data.append(feedback)
+            
+
+            # Create a Pandas DataFrame from the result_data list
+            df_runcourse_improve = pd.DataFrame(result_data)
+            df_runcourse_improve = drop_col(df_runcourse_improve)
+            df_runcourse_improve['preprocessed_text'] = preprocess_text(df_runcourse_improve['answer'])
+            
+            corpus = df_runcourse_improve['preprocessed_text']
+            
+            topics_range = range(3, 9)
+            
+            max_df_range = [0.70, 0.75, 0.80, 0.85, 0.9, 0.95]
+            
+            best_n_topics, best_max_df, best_silhouette_score = tune_nmf_hyperparameters(corpus, topics_range, max_df_range)
+
+            tfidf_vectorizer = TfidfVectorizer(max_df=best_max_df, stop_words='english')
+            tfidf_matrix = tfidf_vectorizer.fit_transform(corpus)
+
+            nmf_model = NMF(n_components=best_n_topics, random_state=1)
+            nmf_matrix = nmf_model.fit_transform(tfidf_matrix)
+
+            feature_names = tfidf_vectorizer.get_feature_names_out()
+            topic_words_list = []
+
+            for topic_idx, topic in enumerate(nmf_model.components_):
+                top_words_indices = topic.argsort()[:-10 - 1:-1]
+                top_words = [feature_names[i] for i in top_words_indices]
+                top_word_probabilities = [topic[i] for i in top_words_indices]
+                topic_data = [{"word": word, "size": prob} for word, prob in zip(top_words, top_word_probabilities)]
+                topic_words_list.append(topic_data)
+            
+            topic_words_list_formatted = []
+
+            for topic_words in topic_words_list:
+                word_data = {"wordData": topic_words}
+                topic_words_list_formatted.append(word_data)
+
+            dominant_topics = nmf_matrix.argmax(axis=1) + 1
+            df_runcourse_improve['topic_number'] = dominant_topics
+
+            # Convert the DataFrame to JSON
+            response_data = df_runcourse_improve.to_dict(orient='records')
+
+            return jsonify({"code": 200, "data": response_data, "topic_words_list": topic_words_list_formatted})
+
+        return jsonify({"code": 404, "message": "No matching course interest information found"})
+
+
+# Get the topic for specific run course instructor (did well)
+feedback_runcourse_instructor_improve_specific = api.parser()
+feedback_runcourse_instructor_improve_specific.add_argument("runcourse_ID", help="Enter runcourse_ID")
+
+@api.route("/feedback_runcourse_instructor_improve_specific")
+@api.doc(description="RunCourse-specific feedback")
+class RunCourseWellFeedback(Resource):
+    @api.expect(feedback_runcourse_instructor_improve_specific)
+    def get(self):
+        # Parse the runcourse_ID from the request arguments
+        args = feedback_runcourse_instructor_improve_specific.parse_args()
+        runcourse_ID = args.get("runcourse_ID", "")
+
+        keywords = ['instructor']
+        optional_keywords = ['improve', 'suggestions']
+
+
+        # Query the database to retrieve feedback related to the specified course (using rcourse_ID)
+        if not runcourse_ID:
+            # If course_ID is empty, retrieve feedback for all courses
+            runcourse_instructor_improve_query = (
+                db.session.query(Feedback.answer)
+                .join(RunCourse, Feedback.rcourse_ID == runcourse_ID)
+                .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
+                .filter(TemplateAttribute.input_Type == 'Text Field')
+            )
+        else:
+            # If course_ID is provided, filter feedback for the specific course
+            runcourse_instructor_improve_query = (
+                db.session.query(Feedback.answer)
+                .join(RunCourse, Feedback.rcourse_ID == runcourse_ID)
+                .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
+                .filter(TemplateAttribute.input_Type == 'Text Field')
+            )
+
+        for keyword in keywords:
+            runcourse_instructor_improve_query = runcourse_instructor_improve_query.filter(func.lower(TemplateAttribute.question).contains(keyword))
+        
+        optional_keyword_filter = or_(
+            *[
+                func.lower(TemplateAttribute.question).contains(keyword)
+                for keyword in optional_keywords
+            ]
+        )
+        runcourse_instructor_improve_query = runcourse_instructor_improve_query.filter(optional_keyword_filter)
+
+        results = runcourse_instructor_improve_query.all()
+        db.session.close()
+
+        if results:
+            result_data = []
+            for result in results:
+                feedback = {
+                    "answer": result[0],
+                }
+                result_data.append(feedback)
+            
+
+            # Create a Pandas DataFrame from the result_data list
+            runcourse_instructor_improve_query = pd.DataFrame(result_data)
+            runcourse_instructor_improve_query = drop_col(runcourse_instructor_improve_query)
+            runcourse_instructor_improve_query['preprocessed_text'] = preprocess_text(runcourse_instructor_improve_query['answer'])
+            
+            corpus = runcourse_instructor_improve_query['preprocessed_text']
+            
+            topics_range = range(3, 9)
+            
+            max_df_range = [0.70, 0.75, 0.80, 0.85, 0.9, 0.95]
+            
+            best_n_topics, best_max_df, best_silhouette_score = tune_nmf_hyperparameters(corpus, topics_range, max_df_range)
+
+            tfidf_vectorizer = TfidfVectorizer(max_df=best_max_df, stop_words='english')
+            tfidf_matrix = tfidf_vectorizer.fit_transform(corpus)
+
+            nmf_model = NMF(n_components=best_n_topics, random_state=1)
+            nmf_matrix = nmf_model.fit_transform(tfidf_matrix)
+
+            feature_names = tfidf_vectorizer.get_feature_names_out()
+            topic_words_list = []
+
+            for topic_idx, topic in enumerate(nmf_model.components_):
+                top_words_indices = topic.argsort()[:-10 - 1:-1]
+                top_words = [feature_names[i] for i in top_words_indices]
+                top_word_probabilities = [topic[i] for i in top_words_indices]
+                topic_data = [{"word": word, "size": prob} for word, prob in zip(top_words, top_word_probabilities)]
+                topic_words_list.append(topic_data)
+            
+            topic_words_list_formatted = []
+
+            for topic_words in topic_words_list:
+                word_data = {"wordData": topic_words}
+                topic_words_list_formatted.append(word_data)
+
+            dominant_topics = nmf_matrix.argmax(axis=1) + 1
+            runcourse_instructor_improve_query['topic_number'] = dominant_topics
+
+            # Convert the DataFrame to JSON
+            response_data = runcourse_instructor_improve_query.to_dict(orient='records')
+
+            return jsonify({"code": 200, "data": response_data, "topic_words_list": topic_words_list_formatted})
+
+        return jsonify({"code": 404, "message": "No matching course interest information found"})
+
+

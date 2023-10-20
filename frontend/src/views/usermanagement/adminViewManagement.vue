@@ -70,7 +70,7 @@
 
       <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Student Database</h5>
-          <button v-show="showBlacklistButton" class="btn btn-danger me-3 font-weight-bold text-nowrap" @click="blacklist" title="Blacklist Student">Blacklist Student</button>
+          <button v-show="showBlacklistButton" class="btn btn-danger me-2 font-weight-bold text-nowrap" @click="blacklist" title="Blacklist Student">Blacklist Student</button>
           <button v-show="showRemoveButton" class="btn btn-danger font-weight-bold text-nowrap" @click="removeFromBlacklist" title="Remove from Blacklist">Remove from Blacklist</button>
       </div>
 

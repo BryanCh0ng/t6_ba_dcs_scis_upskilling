@@ -85,6 +85,62 @@ class DashboardService extends BaseApiService {
           throw new Error('Error fetching course feedback');
         }
     }
+
+    async getRunCourseWellFeedback(runcourse_ID) {
+        try {
+            // console.log(course_ID)
+            const response = await axiosClient.get('/dashboard/feedback_runcourse_well_specific', {
+                params: {
+                    runcourse_ID: runcourse_ID,
+                },
+            });
+            return response.data;
+        } catch (error) {
+          throw new Error('Error fetching course feedback');
+        }
+    }
+
+    async getRunCourseInstructorWellFeedback(runcourse_ID) {
+        try {
+            // console.log(course_ID)
+            const response = await axiosClient.get('/dashboard/feedback_runcourse_instructor_well_specific', {
+                params: {
+                    runcourse_ID: runcourse_ID,
+                },
+            });
+            return response.data;
+        } catch (error) {
+          throw new Error('Error fetching course feedback');
+        }
+    }
+
+    async getRunCourseImproveFeedback(runcourse_ID) {
+        try {
+            // console.log(course_ID)
+            const response = await axiosClient.get('/dashboard/feedback_runcourse_improve_specific', {
+                params: {
+                    runcourse_ID: runcourse_ID,
+                },
+            });
+            return response.data;
+        } catch (error) {
+          throw new Error('Error fetching course feedback');
+        }
+    }
+
+    async getRunCourseInstructorImproveFeedback(runcourse_ID) {
+        try {
+            // console.log(course_ID)
+            const response = await axiosClient.get('/dashboard/feedback_runcourse_improve_specific', {
+                params: {
+                    runcourse_ID: runcourse_ID,
+                },
+            });
+            return response.data;
+        } catch (error) {
+          throw new Error('Error fetching course feedback');
+        }
+    }
 }
 
 export default new DashboardService();

@@ -1,5 +1,7 @@
 <template>
   <div class="container text-center">
+    <h2 class="mb-5">Feedback Analysis</h2>
+    
     <!-- Ratings -->
     <div class="row">
       <!-- Display Total No. of Feedbacks -->
