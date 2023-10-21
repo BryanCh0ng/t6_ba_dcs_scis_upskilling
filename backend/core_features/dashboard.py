@@ -47,6 +47,7 @@ api = Namespace('dashboard', description='Dashboard related operations')
 # To get course average ratings - all and specific
 average_course_ratings = api.parser()
 average_course_ratings.add_argument("course_ID", help="Enter course_ID")
+average_course_ratings.add_argument("runcourse_ID", help="Enter runcourse_ID")
 
 @api.route("/course_average_ratings")
 @api.doc(description="Course specific feedback")
@@ -54,6 +55,7 @@ class CourseAverageRatings(Resource):
     def get(self):
         args = average_course_ratings.parse_args()
         course_ID = args.get("course_ID", "")
+        runcourse_ID = args.get("runcourse_ID", "")
 
         keywords = ['course']  # Define keywords to identify relevant questions
 
@@ -66,28 +68,32 @@ class CourseAverageRatings(Resource):
                 .join(TemplateAttribute, FeedbackTemplate.template_ID == TemplateAttribute.template_ID) \
                 .join(Feedback, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID) \
                 .join(RunCourse, RunCourse.rcourse_ID == Feedback.rcourse_ID) \
-                .join(Course, Course.course_ID == RunCourse.course_ID) \
                 .filter(TemplateAttribute.input_Type == 'Likert Scale')
 
             for keyword in keywords:
                 relevant_questions = relevant_questions.filter(func.lower(TemplateAttribute.question).contains(keyword))
 
+            if runcourse_ID:
+                relevant_questions = relevant_questions.filter(RunCourse.rcourse_ID == runcourse_ID)  # Filter by a specific "Run Course" if runcourse_ID is provided
+            
             if course_ID:
-                relevant_questions = relevant_questions.filter(Course.course_ID == course_ID)  # Filter by a specific course if course_ID is provided
+                relevant_questions = relevant_questions.filter(RunCourse.course_ID == course_ID)
 
             for feedback_template, template_attribute in relevant_questions:
                 question_id = template_attribute.template_Attribute_ID
                 feedback_entries = db.session.query(Feedback) \
                     .filter(Feedback.template_Attribute_ID == question_id)
 
+                if runcourse_ID:
+                    feedback_entries = feedback_entries.filter(Feedback.rcourse_ID == runcourse_ID)  # Filter by a specific "Run Course" if runcourse_ID is provided
+                
                 if course_ID:
-                    feedback_entries = feedback_entries.filter(Course.course_ID == course_ID)  # Filter by a specific course if course_ID is provided
+                    feedback_entries = feedback_entries.filter(Feedback.rcourse_ID.in_(db.session.query(RunCourse.rcourse_ID).filter(RunCourse.course_ID == course_ID)))
 
                 feedback_entries = feedback_entries.all()
 
                 if feedback_entries:
                     for entry in feedback_entries:
-                        # print(entry)
                         total_ratings.append(int(entry.answer))  # Assuming 'answer' contains the Likert Scale value as an integer
                         total_questions += 1
             
@@ -107,6 +113,7 @@ class CourseAverageRatings(Resource):
                 "code": 200,
                 "data": {
                     "course_ID": course_ID,
+                    "runcourse_ID": runcourse_ID,
                     "overall_average_rating": overall_average_rating,
                     "total_feedback": total_feedback
                 },
@@ -124,7 +131,8 @@ class CourseAverageRatings(Resource):
 
 # To get instructor specific average ratings
 instructor_average_ratings = api.parser()
-instructor_average_ratings.add_argument("instructor_ID", help="Enter instructor_ID")
+instructor_average_ratings.add_argument("course_ID", help="Enter course_ID")
+instructor_average_ratings.add_argument("runcourse_ID", help="Enter runcourse_ID")
 
 @api.route("/instructor_average_ratings")
 @api.doc(description="Instructor specific feedback")
@@ -132,11 +140,12 @@ class InstructorAverageRatings(Resource):
     @api.expect(instructor_average_ratings)
     def get(self):
         args = instructor_average_ratings.parse_args()
+        course_ID = args.get("course_ID", "")
+        runcourse_ID = args.get("runcourse_ID", "")
         instructor_ID = args.get("instructor_ID", "")
 
         keywords = ['instructor']  # Define keywords to identify relevant questions
         try:
-
             total_ratings = []
             total_questions = 0
 
@@ -149,8 +158,15 @@ class InstructorAverageRatings(Resource):
             
             for keyword in keywords:
                 relevant_questions = relevant_questions.filter(func.lower(TemplateAttribute.question).contains(keyword))
-
-            if instructor_ID:  # Filter by instructor ID if provided
+                
+            # Filter by course_ID and runcourse_ID
+            if course_ID:
+                relevant_questions = relevant_questions.filter(RunCourse.course_ID == course_ID)
+            if runcourse_ID:
+                relevant_questions = relevant_questions.filter(RunCourse.rcourse_ID == runcourse_ID)
+            
+            # Filter by instructor ID if provided
+            if instructor_ID:
                 relevant_questions = relevant_questions.filter(RunCourse.instructor_ID == instructor_ID)
 
             relevant_questions = relevant_questions.all()
@@ -160,9 +176,16 @@ class InstructorAverageRatings(Resource):
                 feedback_entries = db.session.query(Feedback) \
                     .filter(Feedback.template_Attribute_ID == question_id)
 
+                # Filter by course_ID and runcourse_ID
+                if course_ID:
+                    feedback_entries = feedback_entries.filter(Feedback.rcourse_ID.in_(db.session.query(RunCourse.rcourse_ID).filter(RunCourse.course_ID == course_ID)))
+                if runcourse_ID:
+                    feedback_entries = feedback_entries.filter(Feedback.rcourse_ID == runcourse_ID)
+
+                # Filter by instructor ID if provided
                 if instructor_ID:
                     feedback_entries = feedback_entries.join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID) \
-                        .filter(RunCourse.instructor_ID == instructor_ID)  # Filter by instructor ID if provided
+                        .filter(RunCourse.instructor_ID == instructor_ID)
 
                 feedback_entries = feedback_entries.all()
 
@@ -171,7 +194,6 @@ class InstructorAverageRatings(Resource):
                         if entry.answer.isdigit():
                             total_ratings.append(int(entry.answer))
                             total_questions += 1
-
 
             # Calculate the instructor-specific average rating
             if total_ratings and total_questions > 0:
@@ -186,6 +208,8 @@ class InstructorAverageRatings(Resource):
             response_data = {
                 "code": 200,
                 "data": {
+                    "course_ID": course_ID,
+                    "runcourse_ID": runcourse_ID,
                     "instructor_ID": instructor_ID,
                     "instructor_average_rating": instructor_average_rating
                 },
@@ -199,6 +223,7 @@ class InstructorAverageRatings(Resource):
             }
 
         return jsonify(response_data)
+
 
 def drop_col(df):
     df = df.dropna(how='all')

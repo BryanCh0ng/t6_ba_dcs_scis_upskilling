@@ -1,7 +1,7 @@
 <template>
   <div class="container text-center">
     <h2 v-if="currentViewMode === 'analysis'">Feedback Analysis</h2>
-    <h2 v-else>All Feedback</h2>
+    <h2 v-else>All Feedback Records</h2>
     <h4 class="mb-5 text-secondary" v-if="courseID">For {{courseName}}</h4>
     <h4 class="mb-5 text-secondary" v-else-if="runcourseID">For {{runcourseName}}</h4>
     <h4 class="mb-5 text-secondary" v-else></h4>
@@ -146,12 +146,16 @@
             </tr>
           </tbody>
         </table>
-        
+      </div>
 
+      <div v-else-if="courseID === null && runcourseID === null">
+        <p class="text-center">Please filter to view the respective feedback records. </p>
       </div>
+
       <div v-else-if="feedbackData=[]">
-        <p>No records found</p>
+        <p class="text-center">No records found</p>
       </div>
+      
     </div>
     <vue-awesome-paginate v-if="feedbackData.length/itemsPerPage > 0" v-model="localCurrentPageCourses" :totalItems="feedbackData.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeCourses" class="justify-content-center pagination-container"/>
     
@@ -159,7 +163,6 @@
 </template>
 
 <script>
-// import WordCloud from "@/components/dashboard/WordCloud.vue";
 import DashboardService from '@/api/services/dashboardService';
 import DoughnutChart from "@/components/dashboard/DoughnutChart.vue";
 import WordChart from "@/components/dashboard/WordChart.vue"
@@ -173,7 +176,6 @@ import FeedbackService from "@/api/services/FeedbackService.js";
 export default {
   name: "ViewDashboard",
   components: {
-    // WordCloud,
     DoughnutChart,
     WordChart,
     VueAwesomePaginate
@@ -219,7 +221,8 @@ export default {
   async created() {
     const user_ID = await UserService.getUserID();
     const role = await UserService.getUserRole(user_ID);
-    if (role != 'Admin') {
+    console.log(role)
+    if (role !== 'Admin' && role !== 'Trainer' && role !== 'Instructor') {
       this.$router.push({ name: 'proposeCourse' }); //need to change
     } else {
       document.title = "Feedback Analysis"; //need to change
@@ -229,7 +232,13 @@ export default {
       } else if (window.history.state.back === "/adminViewRunCourse") {
         this.runcourseID = this.$route.params.id;
         console.log(this.runcourseID);
-      } 
+      } else if (window.history.state.back && window.history.state.back.startsWith("/adminViewCourseRun/")) {
+        this.runcourseID = this.$route.params.id;
+        console.log(this.runcourseID);
+      } else if (window.history.state.back === "/instructorTrainerViewProfile") {
+        this.runcourseID = this.$route.params.id;
+        console.log(this.runcourseID);
+      }
       await this.fetchData();
     }
   },
@@ -249,7 +258,7 @@ export default {
       // Instructor Average Rating
       async fetchInstructorAverageRating() {
         try {
-          const response = await DashboardService.getInstructorAverageRatings(null);
+          const response = await DashboardService.getInstructorAverageRatings(this.courseID, this.runcourseID);
           // console.log(response)
           this.instructorAverageRating = response.data.instructor_average_rating; 
           // console.log(this.instructorAverageRating)
@@ -284,7 +293,7 @@ export default {
         try {
           // course
           const response = await DashboardService.getInstructorDoneWellFeedback(this.courseID, this.runcourseID);
-          console.log(response)
+          // console.log(response)
           this.instructorDoneWellTopics = response.topic_words_list; 
           
         } catch (error) {
@@ -296,7 +305,7 @@ export default {
         try {
           // course
           const response = await DashboardService.getInstructorImproveFeedback(this.courseID, this.runcourseID);
-          console.log(response)
+          // console.log(response)
           this.instructorSuggestionsTopics = response.topic_words_list; 
           
         } catch (error) {
@@ -330,7 +339,7 @@ export default {
           this.sentimentData2.dataArray = sentiment_percentages;
           this.sentimentData2.label = "Overall Instructor Sentiment";
 
-          console.log(this.sentimentData2.dataArray)
+          // console.log(this.sentimentData2.dataArray)
         }
 
       } catch (error) {
@@ -344,9 +353,9 @@ export default {
           const { positive_word_data, negative_word_data } = response.data;
 
           this.positiveCourseWordData = positive_word_data;
-          console.log(this.positiveCourseWordData)
+          // console.log(this.positiveCourseWordData)
           this.negativeCourseWordData = negative_word_data;
-          console.log(this.positiveCourseWordData)
+          // console.log(this.positiveCourseWordData)
         }
       } catch (error) {
         console.error("Error fetching instructor feedbacks: ", error);
@@ -381,10 +390,7 @@ export default {
           this.questions = feedbackForCourse.questions
           this.feedbackData = feedbackForCourse.data.map(item => item.answers);
         }
-                         
-        const course_Name = await CourseService.getCourseName(course_id);
-        this.coursename = course_Name.data
-                
+        
       } catch (error) {
         console.error(error);
       }
@@ -428,7 +434,8 @@ export default {
       this.currentViewMode = this.currentViewMode === 'analysis' ? 'feedback' : 'analysis';
     },
     async fetchData() {
-      await Promise.all([
+      // Create an array of promises to fetch data
+      const dataPromises = [
         this.fetchCourseAverageRating(),
         this.fetchInstructorAverageRating(),
         this.fetchCourseDoneWellTopics(),
@@ -441,8 +448,15 @@ export default {
         this.fetchInstructorWordcloudData(),
         this.fetchCourseName(),
         this.fetchRunCourseName(),
-        this.fetchCourseFeedbackData(),
-      ]);
+      ];
+
+      // Conditionally add the promise for fetching feedback data
+      if (this.courseID || this.runcourseID) {
+        dataPromises.push(this.fetchCourseFeedbackData());
+      }
+
+      // Wait for all promises to resolve
+      await Promise.all(dataPromises);
     }
   },
   computed: {
