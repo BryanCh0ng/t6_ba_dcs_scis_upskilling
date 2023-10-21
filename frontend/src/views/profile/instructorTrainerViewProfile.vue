@@ -106,7 +106,9 @@
                           <course-date :date="proposed_course.proposed_Date"></course-date>
                         </td>
                         <td class="vote_count">{{ proposed_course.voteCount }}</td>
-                        <td class="status">{{ proposed_course.pcourse_Status }}</td>
+                        <td class="pl-0 border-top">
+                          <course-status :status="proposed_course.pcourse_Status"></course-status>
+                        </td>
                         <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                         <div v-if="proposed_course.pcourse_Status == 'Pending'">
                           <td><course-action status="Edit" :id="proposed_course.course_ID" @click="editCourse(proposed_course.course_ID)"></course-action></td>
@@ -229,6 +231,7 @@ import CourseService from "@/api/services/CourseService.js";
 import UserService from "@/api/services/UserService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
 import CommonService from "@/api/services/CommonService.js";
+import courseStatus from '../../components/course/courseStatus.vue';
 
 export default {
   components: {
@@ -241,7 +244,8 @@ export default {
     StudentSearchFilter,
     courseDate,
     courseDuration,
-    modalAfterAction
+    modalAfterAction,
+    courseStatus
   },
 
   data() {
@@ -258,7 +262,6 @@ export default {
         localCurrentPageProposed: 1,
         localCurrentPageConducted: 1,
         activeTab: 'assigned',
-        statusOptionsAssigned: ["Enrolled", "Pending", "Not Enrolled", "Dropped"],
         statusOptionsProposed: ["Approved", "Rejected", "Pending"],
         currentDate: new Date(),
         receivedMessage: '',

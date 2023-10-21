@@ -25,7 +25,7 @@
       </div>
     </div>
     <div class="modal-footer"> 
-      <button class="btn btn-danger" :disabled="disabled" id="reject-proposed-course-btn" @click="reject">Reject</button>
+      <button class="btn btn-danger" :disabled="disabled" :title="disabled ? 'Proposed Course Rejected, please close modal' : ''" id="reject-proposed-course-btn" @click="reject">Reject</button>
     </div>
   </div>
 </template>

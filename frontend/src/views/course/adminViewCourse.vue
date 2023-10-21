@@ -31,7 +31,9 @@
                 <td class="name">
                   <course-name-desc :name="course.course_Name" :category="course.coursecat_Name" :description="course.course_Desc"></course-name-desc>
                 </td>
-                <td>{{ course.course_Status }}</td>
+                <td class="pl-0 border-top">
+                    <course-status :status="course.course_Status"></course-status>
+                </td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToCourseFeedbackAnalysis(course.course_ID)">View Feedback Analysis</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewCourseRun(course.course_ID)">View Runs</a></td>
@@ -77,6 +79,7 @@
   import modalAfterAction from '@/components/course/modalAfterAction.vue';
   import CommonService from "@/api/services/CommonService.js";
   import UserService from "@/api/services/UserService.js";
+  import courseStatus from '@/components/course/courseStatus.vue';
   
   export default {
     components: {
@@ -86,7 +89,8 @@
       VueAwesomePaginate,
       courseNameDesc,
       SearchFilter,
-      modalAfterAction
+      modalAfterAction,
+      courseStatus
     },
     data() {
       return {

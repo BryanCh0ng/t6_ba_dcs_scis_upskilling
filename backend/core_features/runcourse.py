@@ -305,6 +305,10 @@ class CourseApplyFeedbackTemplate(Resource):
     @api.expect(course_apply_feedback_template)
     def post(self):
         try:
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unauthorized Access, Failed to apply feedback template to run course"}, 404
+
             args = course_apply_feedback_template.parse_args()
             rcourseID = args.get("rcourse_id")
             templateID = args.get("template_id")
