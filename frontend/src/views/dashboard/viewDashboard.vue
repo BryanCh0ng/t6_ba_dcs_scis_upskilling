@@ -1,4 +1,5 @@
 <template>
+  <div>
   <div class="container text-center">
     <h2 v-if="currentViewMode === 'analysis'">Feedback Analysis</h2>
     <h2 v-else>All Feedback Records</h2>
@@ -159,6 +160,7 @@
     </div>
     <vue-awesome-paginate v-if="feedbackData.length/itemsPerPage > 0" v-model="localCurrentPageCourses" :totalItems="feedbackData.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeCourses" class="justify-content-center pagination-container"/>
     
+  </div>
   </div>
 </template>
 
