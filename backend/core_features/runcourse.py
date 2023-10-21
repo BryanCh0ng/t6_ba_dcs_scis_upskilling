@@ -62,6 +62,9 @@ class GetRunCourse(Resource):
             course.run_Endtime = course.run_Endtime.strftime('%H:%M:%S')
             course.reg_Starttime = course.reg_Starttime.strftime('%H:%M:%S')
             course.reg_Endtime = course.reg_Endtime.strftime('%H:%M:%S')
+            course.feedback_Starttime = course.feedback_Starttime.strftime('%H:%M:%S')
+            course.feedback_Endtime = course.feedback_Endtime.strftime('%H:%M:%S')
+
             return jsonify(
                 {
                     "code": 200,
@@ -214,6 +217,11 @@ class EditRunCourse(Resource):
             runcourse.reg_Starttime = runcourse.reg_Starttime.strftime('%H:%M:%S')
             runcourse.reg_Endtime = runcourse.reg_Endtime.strftime('%H:%M:%S')
 
+            runcourse.feedback_Startdate = runcourse.feedback_Startdate.strftime('%Y-%m-%d')
+            runcourse.feedback_Enddate = runcourse.feedback_Enddate.strftime('%Y-%m-%d')
+            runcourse.feedback_Starttime = runcourse.feedback_Starttime.strftime('%H:%M:%S')
+            runcourse.feedback_Endtime = runcourse.feedback_Endtime.strftime('%H:%M:%S')
+
             return {
                 'message': 'Run course updated successfully',
                 'data': runcourse.json()
@@ -283,6 +291,11 @@ class CreateRunCourse(Resource):
             new_run_course.reg_Starttime = new_run_course.reg_Starttime.strftime('%H:%M:%S')
             new_run_course.reg_Endtime = new_run_course.reg_Endtime.strftime('%H:%M:%S')
 
+            new_run_course.feedback_Startdate = new_run_course.feedback_Startdate.strftime('%Y-%m-%d')
+            new_run_course.feedback_Enddate = new_run_course.feedback_Enddate.strftime('%Y-%m-%d')
+            new_run_course.feedback_Starttime = new_run_course.feedback_Starttime.strftime('%H:%M:%S')
+            new_run_course.feedback_Endtime = new_run_course.feedback_Endtime.strftime('%H:%M:%S')
+
             return {
                 'message': 'Run course created successfully',
                 'data': new_run_course.json()  # Assuming new_run_course.json() returns the required data as a dictionary
@@ -348,3 +361,35 @@ class GetCourseFormats(Resource):
             return json.loads(json.dumps(distinct_course_formats, default=str)), 200
 
         return json.loads(json.dumps({"message": "No course formats found."})), 404
+
+# Modify the parser name to avoid overlap
+retrieve_run_course_count = api.parser()
+retrieve_run_course_count.add_argument("course_id", help="Enter course id")
+@api.route("/get_run_course_count_by_course_id")
+@api.doc(description="Get run course count by course id")
+class GetRunCourseCount(Resource):
+    @api.expect(retrieve_run_course_count)
+    def get(self):
+        courseID = retrieve_run_course_count.parse_args().get("course_id")
+        
+        run_course_count = RunCourse.query.filter_by(course_ID=courseID).count()
+
+        course = Course.query.filter_by(course_ID=courseID).first()
+
+        db.session.close()
+
+        if run_course_count >= 0:
+
+            course_name = course.course_Name
+
+            return jsonify(
+                {
+                    "code": 200,
+                    "data": {
+                        "run_course_count": run_course_count,
+                        "course_name": course_name
+                    }
+                }
+            )
+        
+        return json.loads(json.dumps({"message": "There are no run courses for this course ID", "code": 404}, default=str))

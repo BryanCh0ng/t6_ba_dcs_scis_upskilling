@@ -6,20 +6,75 @@
             <h2 v-else class="text-center">Edit Run Course</h2>
 
             <form @submit.prevent="onSubmit" @reset="onReset">
-                <!--Instructor Name-->
+                <!--Run Course Name-->
                 <div class="form-group mt-5 mb-4">
-                    <dropdown-field v-model="formData.selectedInstructor" :default-placeholder="'Instructor'"
-                        :errors="v$?.formData.selectedInstructor?.$errors[0]?.$message">
-                        <option v-for="instructor in formData.instructors" :key="instructor.user_ID"
-                            :value="instructor.user_Name">
-                            {{ instructor.user_Name }}
-                        </option>
-                    </dropdown-field>
+                    <input v-model="formData.runName" type="text" placeholder="Run Course Name" required autofocus readonly
+                            :class="{ 'form-control': true, 'border-0': !v$?.formData.runName?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.runName?.$error }" />
+                    <div v-if="v$?.formData.runName?.$error" class="text-danger">
+                        <span v-for="error in v$?.formData.runName?.$errors" :key="error.$uid">{{ error.$message }}</span>
+                    </div>
                 </div>
+
                 <div class="row mb-4">
-                    <!--Start Date-->
+                    <!--Opening Date For Registration-->
                     <div class="col-md-6 form-group">
-                        <VueDatePicker v-model="formData.startDate" placeholder="Start Date" :enable-time-picker="false"
+                        <VueDatePicker v-model="formData.openingDate" placeholder="Registration Opening Date"
+                            :enable-time-picker="false"
+                            :class="{ 'form-control': true, 'border-0': !v$?.formData.openingDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.openingDate?.$error }"
+                            input-class-name="dp-custom-input" :format="this.formData.datePickerFormat" required>
+                        </VueDatePicker>
+                        <div v-if="v$?.formData.openingDate?.$error" class="text-danger">
+                            <span v-for="error in v$?.formData.openingDate?.$errors" :key="error.$uid">{{ error.$message
+                            }}</span>
+                        </div>
+                    </div>
+                    <!--Opening Time For Registration-->
+                    <div class="col-md-6 form-group mt-4 mt-md-0">
+                        <VueDatePicker v-model="formData.openingTime" placeholder="Registration Start Time"
+                            time-picker required
+                            :class="{ 'form-control': true, 'border-0': !v$?.formData.openingTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.openingTime?.$error }"
+                            input-class-name="dp-custom-input"><template #input-icon>
+                                <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template>
+                        </VueDatePicker>
+                        <div v-if="v$?.formData.openingTime?.$error" class="text-danger">
+                            <span v-for="error in v$?.formData.openingTime?.$errors" :key="error.$uid">{{ error.$message
+                            }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <!--Closing Date For Registration-->
+                    <div class="col-md-6 form-group">
+                        <VueDatePicker v-model="formData.closingDate" placeholder="Registration Closing Date"
+                            :enable-time-picker="false"
+                            :class="{ 'form-control': true, 'border-0': !v$?.formData.closingDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.closingDate?.$error }"
+                            input-class-name="dp-custom-input" :format="this.formData.datePickerFormat" required>
+                        </VueDatePicker>
+                        <div v-if="v$?.formData.closingDate?.$error" class="text-danger">
+                            <span v-for="error in v$?.formData.closingDate?.$errors" :key="error.$uid">{{ error.$message
+                            }}</span>
+                        </div>
+                    </div>
+                    <!--Closing Time For Registration-->
+                    <div class="col-md-6 form-group mt-4 mt-md-0">
+                        <VueDatePicker v-model="formData.closingTime" placeholder="Registration Closing Time"
+                            time-picker required
+                            :class="{ 'form-control': true, 'border-0': !v$?.formData.closingTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.closingTime?.$error }"
+                            input-class-name="dp-custom-input"><template #input-icon>
+                                <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template>
+                        </VueDatePicker>
+                        <div v-if="v$?.formData.closingTime?.$error" class="text-danger">
+                            <span v-for="error in v$?.formData.closingTime?.$errors" :key="error.$uid">{{ error.$message
+                            }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <!--Course Start Date-->
+                    <div class="col-md-6 form-group">
+                        <VueDatePicker v-model="formData.startDate" placeholder="Course Start Date" :enable-time-picker="false"
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.startDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.startDate?.$error }"
                             input-class-name="dp-custom-input" :format="this.formData.datePickerFormat" required>
                         </VueDatePicker>
@@ -28,22 +83,9 @@
                             }}</span>
                         </div>
                     </div>
-                    <!--End Date-->
-                    <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <VueDatePicker v-model="formData.endDate" placeholder="End Date" :enable-time-picker="false"
-                            :class="{ 'form-control': true, 'border-0': !v$?.formData.endDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.endDate?.$error }"
-                            input-class-name="dp-custom-input" :format="this.formData.datePickerFormat" required>
-                        </VueDatePicker>
-                        <div v-if="v$?.formData.endDate?.$error" class="text-danger">
-                            <span v-for="error in v$?.formData.endDate?.$errors" :key="error.$uid">{{ error.$message
-                            }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-4">
-                    <!--Start Time-->
-                    <div class="col-md-6 form-group">
-                        <VueDatePicker v-model="formData.startTime" placeholder="Start Time" time-picker required
+                     <!--Start Time-->
+                     <div class="col-md-6 form-group mt-4 mt-md-0">
+                        <VueDatePicker v-model="formData.startTime" placeholder="Course Start Time" time-picker required
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.startTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.startTime?.$error }"
                             input-class-name="dp-custom-input"><template #input-icon>
                                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template>
@@ -53,9 +95,23 @@
                             }}</span>
                         </div>
                     </div>
+                </div>
+
+                <div class="row mb-4">
+                    <!--End Date-->
+                    <div class="col-md-6 form-group">
+                        <VueDatePicker v-model="formData.endDate" placeholder="Course End Date" :enable-time-picker="false"
+                            :class="{ 'form-control': true, 'border-0': !v$?.formData.endDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.endDate?.$error }"
+                            input-class-name="dp-custom-input" :format="this.formData.datePickerFormat" required>
+                        </VueDatePicker>
+                        <div v-if="v$?.formData.endDate?.$error" class="text-danger">
+                            <span v-for="error in v$?.formData.endDate?.$errors" :key="error.$uid">{{ error.$message
+                            }}</span>
+                        </div>
+                    </div>
                     <!--End Time-->
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <VueDatePicker v-model="formData.endTime" placeholder="End Time" time-picker required
+                        <VueDatePicker v-model="formData.endTime" placeholder="Course End Time" time-picker required
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.endTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.endTime?.$error }"
                             input-class-name="dp-custom-input"><template #input-icon>
                                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template>
@@ -66,6 +122,18 @@
                         </div>
                     </div>
                 </div>
+
+                <!--Instructor Name-->
+                <div class="row mb-4">
+                    <dropdown-field v-model="formData.selectedInstructor" :default-placeholder="'Instructor'"
+                        :errors="v$?.formData.selectedInstructor?.$errors[0]?.$message">
+                        <option v-for="instructor in formData.instructors" :key="instructor.user_ID"
+                            :value="instructor.user_Name">
+                            {{ instructor.user_Name }}
+                        </option>
+                    </dropdown-field>
+                </div>
+                
                 <div class="row mb-4">
                     <!--Course Format-->
                     <div class="col-md-6 form-group">
@@ -86,6 +154,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="row mb-4">
                     <!--Course Size-->
                     <div class="col-md-6 form-group">
@@ -106,60 +175,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row mb-4">
-                    <!--Opening Date For Registration-->
-                    <div class="col-md-6 form-group">
-                        <VueDatePicker v-model="formData.openingDate" placeholder="Opening Date For Registration"
-                            :enable-time-picker="false"
-                            :class="{ 'form-control': true, 'border-0': !v$?.formData.openingDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.openingDate?.$error }"
-                            input-class-name="dp-custom-input" :format="this.formData.datePickerFormat" required>
-                        </VueDatePicker>
-                        <div v-if="v$?.formData.openingDate?.$error" class="text-danger">
-                            <span v-for="error in v$?.formData.openingDate?.$errors" :key="error.$uid">{{ error.$message
-                            }}</span>
-                        </div>
-                    </div>
-                    <!--Opening Time For Registration-->
-                    <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <VueDatePicker v-model="formData.openingTime" placeholder="Opening Time For Registration"
-                            time-picker required
-                            :class="{ 'form-control': true, 'border-0': !v$?.formData.openingTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.openingTime?.$error }"
-                            input-class-name="dp-custom-input"><template #input-icon>
-                                <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template>
-                        </VueDatePicker>
-                        <div v-if="v$?.formData.openingTime?.$error" class="text-danger">
-                            <span v-for="error in v$?.formData.openingTime?.$errors" :key="error.$uid">{{ error.$message
-                            }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-4">
-                    <!--Closing Date For Registration-->
-                    <div class="col-md-6 form-group">
-                        <VueDatePicker v-model="formData.closingDate" placeholder="Closing Date For Registration"
-                            :enable-time-picker="false"
-                            :class="{ 'form-control': true, 'border-0': !v$?.formData.closingDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.closingDate?.$error }"
-                            input-class-name="dp-custom-input" :format="this.formData.datePickerFormat" required>
-                        </VueDatePicker>
-                        <div v-if="v$?.formData.closingDate?.$error" class="text-danger">
-                            <span v-for="error in v$?.formData.closingDate?.$errors" :key="error.$uid">{{ error.$message
-                            }}</span>
-                        </div>
-                    </div>
-                    <!--Closing Time For Registration-->
-                    <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <VueDatePicker v-model="formData.closingTime" placeholder="Closing Time For Registration"
-                            time-picker required
-                            :class="{ 'form-control': true, 'border-0': !v$?.formData.closingTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.closingTime?.$error }"
-                            input-class-name="dp-custom-input"><template #input-icon>
-                                <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template>
-                        </VueDatePicker>
-                        <div v-if="v$?.formData.closingTime?.$error" class="text-danger">
-                            <span v-for="error in v$?.formData.closingTime?.$errors" :key="error.$uid">{{ error.$message
-                            }}</span>
-                        </div>
-                    </div>
-                </div>
+               
                 <div class="row mb-4">
                     <!--Course Fee-->
                     <div class="col-md-6 form-group">
@@ -179,6 +195,58 @@
                                 {{ feedbackTemplate.template_Name }}
                             </option>
                         </dropdown-field>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <!--Feedback Start Date-->
+                    <div class="col-md-6 form-group">
+                        <VueDatePicker v-model="formData.feedbackStartDate" placeholder="Feedback Start Date" :enable-time-picker="false"
+                            :class="{ 'form-control': true, 'border-0': !v$?.formData.feedbackStartDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.feedbackStartDate?.$error }"
+                            input-class-name="dp-custom-input" :format="this.formData.datePickerFormat" required>
+                        </VueDatePicker>
+                        <div v-if="v$?.formData.feedbackStartDate?.$error" class="text-danger">
+                            <span v-for="error in v$?.formData.feedbackStartDate?.$errors" :key="error.$uid">{{ error.$message
+                            }}</span>
+                        </div>
+                    </div>
+                    <!--Feedback Start Time-->
+                    <div class="col-md-6 form-group mt-4 mt-md-0">
+                        <VueDatePicker v-model="formData.feedbackStartTime" placeholder="Feedback Start Time" time-picker required
+                            :class="{ 'form-control': true, 'border-0': !v$?.formData.feedbackStartTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.feedbackStartTime?.$error }"
+                            input-class-name="dp-custom-input"><template #input-icon>
+                                <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template>
+                        </VueDatePicker>
+                        <div v-if="v$?.formData.feedbackStartTime?.$error" class="text-danger">
+                            <span v-for="error in v$?.formData.feedbackStartTime?.$errors" :key="error.$uid">{{ error.$message
+                            }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <!--Feedback End Date-->
+                    <div class="col-md-6 form-group">
+                        <VueDatePicker v-model="formData.feedbackEndDate" placeholder="Feedback End Date" :enable-time-picker="false"
+                            :class="{ 'form-control': true, 'border-0': !v$?.formData.feedbackEndDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.feedbackEndDate?.$error }"
+                            input-class-name="dp-custom-input" :format="this.formData.datePickerFormat" required>
+                        </VueDatePicker>
+                        <div v-if="v$?.formData.feedbackEndDate?.$error" class="text-danger">
+                            <span v-for="error in v$?.formData.feedbackEndDate?.$errors" :key="error.$uid">{{ error.$message
+                            }}</span>
+                        </div>
+                    </div>
+                    <!--Feedback End Time-->
+                    <div class="col-md-6 form-group mt-4 mt-md-0">
+                        <VueDatePicker v-model="formData.feedbackEndTime" placeholder="Feedback End Time" time-picker required
+                            :class="{ 'form-control': true, 'border-0': !v$?.formData.feedbackEndTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.feedbackEndTime?.$error }"
+                            input-class-name="dp-custom-input"><template #input-icon>
+                                <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" /></template>
+                        </VueDatePicker>
+                        <div v-if="v$?.formData.feedbackEndTime?.$error" class="text-danger">
+                            <span v-for="error in v$?.formData.feedbackEndTime?.$errors" :key="error.$uid">{{ error.$message
+                            }}</span>
+                        </div>
                     </div>
                 </div>
 
@@ -278,7 +346,7 @@ const startDateGreaterThanClosingDateValidator = helpers.withParams(
 );
 
 const startDateGreaterThanClosingDateValidatorWithMessage = helpers.withMessage(
-    'Please select a start date after the selected closing date for registration',
+    'Please select a course start date after the selected registration closing date',
     startDateGreaterThanClosingDateValidator
 )
 
@@ -302,7 +370,7 @@ const endDateFromStartDateValidator = helpers.withParams(
 );
 
 const endDateFromStartDateValidatorWithMessage = helpers.withMessage(
-    'Please select an end date that falls on or after the selected start date',
+    'Please select a course end date that falls on or after the selected course start date',
     endDateFromStartDateValidator
 )
 
@@ -326,7 +394,7 @@ const dateFromTodayValidator = helpers.withParams(
 );
 
 const dateFromTodayValidatorWithMessage = helpers.withMessage(
-    'Please select an opening date for registration from today onwards.',
+    'Please select a registration opening date from today onwards.',
     dateFromTodayValidator
 );
 
@@ -349,8 +417,56 @@ const closingDateGreaterThanOpeningDateValidator = helpers.withParams(
 );
 
 const closingDateGreaterThanOpeningDateValidatorWithMessage = helpers.withMessage(
-    'Please select a closing date for registration after the selected opening date for registration',
+    'Please select a registration closing date after the selected registration opening date',
     closingDateGreaterThanOpeningDateValidator
+)
+
+//Function: Check whether Feedback Start Date is greater than the Course End Date 
+const validateFeedbackStartDateGreaterThanEndDate = function (value) {
+
+    if (value === null || this.formData.endDate === null) {
+        return true;
+    }
+
+    if (value.getFullYear() > this.formData.endDate.getFullYear() || (value.getFullYear() === this.formData.endDate.getFullYear() && (value.getMonth() + 1) > (this.formData.endDate.getMonth() + 1)) || (value.getFullYear() === this.formData.endDate.getFullYear() && (value.getMonth() + 1) === (this.formData.endDate.getMonth() + 1) && value.getDate() > this.formData.endDate.getDate())) {
+        return true;
+    }
+
+    return false;
+};
+
+const feedbackStartDateGreaterThanEndDateValidator = helpers.withParams(
+    { type: 'feedbackStartDateGreaterThanEndDate' },
+    validateFeedbackStartDateGreaterThanEndDate
+);
+
+const feedbackStartDateGreaterThanEndDateValidatorWithMessage = helpers.withMessage(
+    'Please select a feedback start date after the selected course end date',
+    feedbackStartDateGreaterThanEndDateValidator
+)
+
+//Function: Check whether Feedback End Date is equal to or greater than the Feedback Start Date 
+const validateFeedbackEndDateFromFeedbackStartDate = function (value) {
+    if (value === null || this.formData.feedbackStartDate === null) {
+        return true;
+    }
+
+    if (value.getFullYear() > this.formData.feedbackStartDate.getFullYear() || (value.getFullYear() === this.formData.feedbackStartDate.getFullYear() && (value.getMonth() + 1) > (this.formData.feedbackStartDate.getMonth() + 1)) ||
+        (value.getFullYear() === this.formData.feedbackStartDate.getFullYear() && value.getMonth() === this.formData.feedbackStartDate.getMonth() && value.getDate() >= this.formData.feedbackStartDate.getDate())) {
+        return true;
+    }
+
+    return false;
+};
+
+const feedbackEndDateFromFeedbackStartDateValidator = helpers.withParams(
+    { type: 'feedbackEndDateFromFeedbackStartDate' },
+    validateFeedbackEndDateFromFeedbackStartDate
+);
+
+const feedbackEndDateFromFeedbackStartDateValidatorWithMessage = helpers.withMessage(
+    'Please select a feedback end date that falls on or after the selected feedback start date',
+    feedbackEndDateFromFeedbackStartDateValidator
 )
 
 //Validating the time fields 
@@ -387,8 +503,44 @@ const endTimeGreaterThanStartTimeValidator = helpers.withParams(
 );
 
 const endTimeGreaterThanStartTimeValidatorWithMessage = helpers.withMessage(
-    'Please select an end time later than the selected start time',
+    'Please select a course end time later than the selected course start time',
     endTimeGreaterThanStartTimeValidator
+)
+
+//Function: Check whether Feedback End Time is greater than Feedback Start Time when Feedback Start Date and Feedback End Date are the same 
+const validateFeedbackEndTimeGreaterThanFeeedbackStartTime = function (value) {
+    const allValuesFilled = (
+        value !== null &&
+        this.formData.feedbackStartTime !== null &&
+        this.formData.feedbackStartDate !== null &&
+        this.formData.feedbackEndDate !== null
+    );
+
+    if (allValuesFilled) {
+        if (this.formData.feedbackStartDate.toISOString().split('T')[0] === this.formData.feedbackEndDate.toISOString().split('T')[0]) {
+
+            // Convert time values to seconds
+            const startTimeInSeconds = parseInt(this.formData.feedbackStartTime.hours) * 3600 + parseInt(this.formData.feedbackStartTime.minutes) * 60 + parseInt(this.formData.feedbackStartTime.seconds);
+            const endTimeInSeconds = parseInt(value.hours) * 3600 + parseInt(value.minutes) * 60 + parseInt(value.seconds);
+
+            // Compare time values in seconds
+            return startTimeInSeconds < endTimeInSeconds;
+
+        }
+    }
+
+    // Skip validation if any value is missing or start date doesn't equal end date
+    return true;
+};
+
+const feedbackEndTimeGreaterThanFeedbackStartTimeValidator = helpers.withParams(
+    { type: 'feedbackEndTimeGreaterThanFeedbackStartTime' },
+    validateFeedbackEndTimeGreaterThanFeeedbackStartTime
+);
+
+const feedbackEndTimeGreaterThanFeedbackStartTimeValidatorWithMessage = helpers.withMessage(
+    'Please select a feedback end time later than the selected feedback start time',
+    feedbackEndTimeGreaterThanFeedbackStartTimeValidator
 )
 
 
@@ -437,29 +589,29 @@ export default {
             //Initializing values for the form fields 
             formData: {
                 runName: "",
-                selectedInstructor: "",
-                instructors: [],
                 datePickerFormat: "dd/MM/yyyy",
-                startDate: null,
-                endDate: null,
-                startTime: null,
-                endTime: null,
-                selectedFormat: "",
-                /*courseFormats: [
-                    { id: 0, name: "Online" },
-                    { id: 1, name: "Face-to-Face" },
-                ],*/
-                courseFormats: [],
-                venue: "",
-                courseSize: "",
-                minimumSlots: "",
                 openingDate: null,
                 openingTime: null,
                 closingDate: null,
                 closingTime: null,
+                startDate: null,
+                endDate: null,
+                startTime: null,
+                endTime: null,
+                instructors: [],
+                selectedInstructor: "",
+                courseFormats: [],
+                selectedFormat: "",
+                venue: "",
+                courseSize: "",
+                minimumSlots: "",
                 courseFee: "",
-                selectedTemplate: "",
                 feedbackTemplates: [],
+                selectedTemplate: "",
+                feedbackStartDate: null,
+                feedbackStartTime: null, 
+                feedbackEndDate: null, 
+                feedbackEndTime: null
             },
             errorMsg: [],
             //Modal 
@@ -484,21 +636,25 @@ export default {
     validations() {
         return {
             formData: {
+                openingDate: { required: helpers.withMessage('Please select a valid registration opening date', required), dateFromToday: dateFromTodayValidatorWithMessage },
+                openingTime: { required: helpers.withMessage('Please select a valid registration opening time', required) },
+                closingDate: { required: helpers.withMessage('Please select a valid registration closing date', required), closingDateGreaterThanOpeningDate: closingDateGreaterThanOpeningDateValidatorWithMessage },
+                closingTime: { required: helpers.withMessage('Please select a valid registration closing time', required) },
+                startDate: { required: helpers.withMessage('Please select a valid course start date', required), startDateGreaterThanClosingDate: startDateGreaterThanClosingDateValidatorWithMessage },
+                startTime: { required: helpers.withMessage('Please select a valid course start time', required) },
+                endDate: { required: helpers.withMessage('Please select a valid course end date', required), endDateFromStartDate: endDateFromStartDateValidatorWithMessage },
+                endTime: { required: helpers.withMessage('Please select a valid course end time', required), endTimeGreaterThanStartTime: endTimeGreaterThanStartTimeValidatorWithMessage },
                 selectedInstructor: { required: helpers.withMessage('Please select a valid instructor', required) },
-                startDate: { required: helpers.withMessage('Please select a valid start date', required), startDateGreaterThanClosingDate: startDateGreaterThanClosingDateValidatorWithMessage },
-                endDate: { required: helpers.withMessage('Please select a valid end date', required), endDateFromStartDate: endDateFromStartDateValidatorWithMessage },
-                startTime: { required: helpers.withMessage('Please select a valid start time', required) },
-                endTime: { required: helpers.withMessage('Please select a valid end time', required), endTimeGreaterThanStartTime: endTimeGreaterThanStartTimeValidatorWithMessage },
                 selectedFormat: { required: helpers.withMessage('Please select a valid course format', required) },
                 venue: { required: helpers.withMessage('Please provide a valid venue', required) },
                 courseSize: { required: helpers.withMessage('Please provide a valid course size', required), numeric: helpers.withMessage('Please provide a valid numeric value', numeric) },
                 minimumSlots: { required: helpers.withMessage('Please provide a valid minimum slots', required), numeric: helpers.withMessage('Please provide a valid numeric value', numeric), minSlotsSmallerThanCourseSize: minSlotsSmallerThanCourseSizeValidatorWithMessage },
-                openingDate: { required: helpers.withMessage('Please select a valid opening date for registration', required), dateFromToday: dateFromTodayValidatorWithMessage },
-                openingTime: { required: helpers.withMessage('Please select a valid opening time for registration', required) },
-                closingDate: { required: helpers.withMessage('Please select a valid closing date for registration', required), closingDateGreaterThanOpeningDate: closingDateGreaterThanOpeningDateValidatorWithMessage },
-                closingTime: { required: helpers.withMessage('Please select a valid closing time for registration', required) },
                 courseFee: { required: helpers.withMessage('Please provide a valid course fee', required), currency: currencyValidatorWithMessage },
-                selectedTemplate: { required: helpers.withMessage('Please select a valid feedback template', required) }
+                selectedTemplate: { required: helpers.withMessage('Please select a valid feedback template', required) },
+                feedbackStartDate: { required: helpers.withMessage('Please select a valid feedback start date', required), feedbackStartDateGreaterThanEndDate: feedbackStartDateGreaterThanEndDateValidatorWithMessage },
+                feedbackStartTime: { required: helpers.withMessage('Please select a valid feedback start time', required) },
+                feedbackEndDate: { required: helpers.withMessage('Please select a valid feedback end date', required), feedbackEndDateFromFeedbackStartDate: feedbackEndDateFromFeedbackStartDateValidatorWithMessage },
+                feedbackEndTime: { required: helpers.withMessage('Please select a valid feedback end time', required), feedbackEndTimeGreaterThanFeedbackStartTime: feedbackEndTimeGreaterThanFeedbackStartTimeValidatorWithMessage }
             }
         }
     },
@@ -535,7 +691,7 @@ export default {
             if (!this.showAlert && this.buttonType === "success") {
                 this.$router.push('/adminViewRunCourse');
             }
-        }, 
+        },
         async fetchCoaches() {
             try {
                 this.formData.instructors = await UserService.getAllCoaches();
@@ -578,7 +734,7 @@ export default {
         async fetchFeedbackTemplates() {
             try {
                 const feedback_template_response = await FeedbackTemplateService.getAllTemplates();
-                console.log(feedback_template_response)
+        
                 if (feedback_template_response.code == 200) {
                     this.formData.feedbackTemplates =  feedback_template_response.templates
                 } else {
@@ -589,34 +745,62 @@ export default {
                 this.errorMsg.push('Error fetching feedback templates');
             }
         },
+        async fetchRunCourseByCourseID() {
+            try {
+                const response = await RunCourseService.getRunCourseCountByCourseId(this.courseId);
+
+                console.log(response.data.run_course_count)
+                
+                this.formData.runName = response.data.course_name + " - Run " + (parseInt(response.data.run_course_count) + 1);
+
+                //console.log(response.data);
+            } catch (error) {
+                console.error('Error fetching run course name:', error);
+                this.errorMsg.push('Error fetching run course name');
+            }
+        },
         async fetchFormFieldsData() {
             await this.fetchCoaches();
             await this.fetchCourseFormats();
             await this.fetchFeedbackTemplates();
+            
+            if(this.create) {
+                await this.fetchRunCourseByCourseID();
+            }
 
             if (this.errorMsg.length > 0) {
                 this.title = "Form Data Retrieval Error";
                 throw new Error("There is a problem retrieving the data for the form fields")
             }
         },
-        async fetchRunCourseByID() {
+        async fetchRunCourseByRunCourseID() {
             try {
                 const runcourseData = await RunCourseService.getRunCourseById(this.runcourseId);
 
                 //NEED TO CHANGE
                 this.formData.runName = runcourseData.run_Name;
 
-                this.instructorID = runcourseData.instructor_ID;
+                this.formData.openingDate = new Date(runcourseData.reg_Startdate);
+
+                const openingTimeParts = runcourseData.reg_Starttime.split(":");
+                this.formData.openingTime = { hours: parseInt(openingTimeParts[0]), minutes: parseInt(openingTimeParts[1]), seconds: 0 }
+
+                this.formData.closingDate = new Date(runcourseData.reg_Enddate);
+
+                const closingTimeParts = runcourseData.reg_Endtime.split(":");
+                this.formData.closingTime = { hours: parseInt(closingTimeParts[0]), minutes: parseInt(closingTimeParts[1]), seconds: 0 }
 
                 this.formData.startDate = new Date(runcourseData.run_Startdate);
-
-                this.formData.endDate = new Date(runcourseData.run_Enddate);
 
                 const startTimeParts = runcourseData.run_Starttime.split(":");
                 this.formData.startTime = { hours: parseInt(startTimeParts[0]), minutes: parseInt(startTimeParts[1]), seconds: 0 }
 
+                this.formData.endDate = new Date(runcourseData.run_Enddate);
+
                 const endTimeParts = runcourseData.run_Endtime.split(":");
                 this.formData.endTime = { hours: parseInt(endTimeParts[0]), minutes: parseInt(endTimeParts[1]), seconds: 0 }
+
+                this.instructorID = runcourseData.instructor_ID;
 
                 if (runcourseData.course_Format === "face-to-face") {
                     this.formData.selectedFormat = this.formData.courseFormats[0].name;
@@ -630,20 +814,20 @@ export default {
 
                 this.formData.minimumSlots = (runcourseData.course_Minsize).toString();
 
-                this.formData.openingDate = new Date(runcourseData.reg_Startdate);
-
-                const openingTimeParts = runcourseData.reg_Starttime.split(":");
-                this.formData.openingTime = { hours: parseInt(openingTimeParts[0]), minutes: parseInt(openingTimeParts[1]), seconds: 0 }
-
-                this.formData.closingDate = new Date(runcourseData.reg_Enddate);
-
-                const closingTimeParts = runcourseData.reg_Endtime.split(":");
-                this.formData.closingTime = { hours: parseInt(closingTimeParts[0]), minutes: parseInt(closingTimeParts[1]), seconds: 0 }
-
                 this.formData.courseFee = (runcourseData.course_Fee).toString();
 
                 this.templateID = runcourseData.template_ID;
 
+                this.formData.feedbackStartDate = new Date(runcourseData.feedback_Startdate);
+
+                const feedbackStartTimeParts = runcourseData.feedback_Starttime.split(":");
+                this.formData.feedbackStartTime = { hours: parseInt(feedbackStartTimeParts[0]), minutes: parseInt(feedbackStartTimeParts[1]), seconds: 0 }
+
+                this.formData.feedbackEndDate = new Date(runcourseData.feedback_Enddate);
+
+                const feedbackEndTimeParts = runcourseData.feedback_Endtime.split(":");
+                this.formData.feedbackEndTime = { hours: parseInt(feedbackEndTimeParts[0]), minutes: parseInt(feedbackEndTimeParts[1]), seconds: 0 }
+              
                 this.courseID = runcourseData.course_ID;
 
             } catch (error) {
@@ -663,12 +847,10 @@ export default {
         },
         async fetchTemplateByID() {
             try {
-                console.log(this.templateID)
                 let response = await FeedbackTemplateService.getTemplateById(this.templateID);
-                console.log(response)
+            
                 if(response.code == 200) {
                     const templateData = response.data.template;
-                    console.log(templateData);
                     this.formData.selectedTemplate = templateData.feedback_template_name;
                 }
             } catch (error) {
@@ -678,7 +860,7 @@ export default {
         },
         async fetchEditRunCourseData() {
             try {
-                await this.fetchRunCourseByID();
+                await this.fetchRunCourseByRunCourseID();
 
                 //need instructor id from runcourse
                 await this.fetchCoachByID();
@@ -697,8 +879,9 @@ export default {
         },
         async createRunCourse() {
             try {
+                console.log(this.courseId)
                 this.createRunCourseResponse = await RunCourseService.createRunCourse(this.courseId, this.submitFormData);
-                console.log(this.createRunCourseResponse);
+               
             } catch (error) {
                 console.error('Error creating a new run course:', error);
                 this.title = "Run Course Creation Failed";
@@ -732,29 +915,29 @@ export default {
 
             this.formData = {
                 runName: "",
-                selectedInstructor: "",
-                instructors: [],
                 datePickerFormat: "dd/MM/yyyy",
-                startDate: null,
-                endDate: null,
-                startTime: null,
-                endTime: null,
-                selectedFormat: "",
-                /*courseFormats: [
-                    { id: 0, name: "Online" },
-                    { id: 1, name: "Face-to-Face" },
-                ],*/
-                courseFormats: [],
-                venue: "",
-                courseSize: "",
-                minimumSlots: "",
                 openingDate: null,
                 openingTime: null,
                 closingDate: null,
                 closingTime: null,
+                startDate: null,
+                startTime: null,
+                endDate: null,
+                endTime: null,
+                instructors: [],
+                selectedInstructor: "",
+                courseFormats: [],
+                selectedFormat: "",
+                venue: "",
+                courseSize: "",
+                minimumSlots: "",
                 courseFee: "",
-                selectedTemplate: "",
                 feedbackTemplates: [],
+                selectedTemplate: "",
+                feedbackStartDate: null,
+                feedbackStartTime: null, 
+                feedbackEndDate: null, 
+                feedbackEndTime: null
             }
 
             try {
@@ -798,8 +981,6 @@ export default {
 
                     //NEED TO CHANGE
                     this.submitFormData["run_Name"] = "test";
-
-                    this.submitFormData["run_Startdate"] = this.formatDateToYYYYMMDD(this.formData.startDate);
 
                     this.submitFormData["run_Startdate"] = this.formatDateToYYYYMMDD(this.formData.startDate);
 
@@ -868,8 +1049,15 @@ export default {
 
                     this.submitFormData["reg_Endtime"] = this.formatTimeObjectToString(this.formData.closingTime);
 
+                    this.submitFormData["feedback_Startdate"] = this.formatDateToYYYYMMDD(this.formData.feedbackStartDate);
+
+                    this.submitFormData["feedback_Enddate"] = this.formatDateToYYYYMMDD(this.formData.feedbackEndDate);
+
+                    this.submitFormData["feedback_Starttime"] = this.formatTimeObjectToString(this.formData.feedbackStartTime);
+
+                    this.submitFormData["feedback_Endtime"] = this.formatTimeObjectToString(this.formData.feedbackEndTime);
+
                     this.submitFormData["template_ID"] = this.formData.feedbackTemplates.find(i => i.template_Name === this.formData.selectedTemplate).template_ID;
-                    console.log(this.submitFormData["template_ID"])
 
                     //For Edit Course (Updating the run course and course)  
                     if (!this.create) {
@@ -879,14 +1067,7 @@ export default {
                         //Update the run course 
                         await this.updateRunCourse();
 
-                        /*this.title = "Run Course Update Success"
-                        this.message = "Run Course Update was successful"
-                        this.buttonType = "success"
-                        this.showAlert = !this.showAlert;*/
-
                         this.setSuccessAlert("Run Course Update")
-
-                        //console.log('Form has submitted successfully')
 
                     } else {
 
@@ -895,17 +1076,11 @@ export default {
                         await this.createRunCourse();
 
                         this.setSuccessAlert("Run Course Creation")
-
-                        /*this.title = "Run Course Creation Success"
-                        this.message = "Run Course Creation was successful"
-                        this.buttonType = "success"
-                        this.showAlert = !this.showAlert;*/
                     }
 
                 } catch (error) {
                     const errorMsgParts = error.toString().split(":")
                     this.message = errorMsgParts[1];
-                    //this.message = error
                     this.buttonType = "danger"
                     this.showAlert = !this.showAlert;
                 }
@@ -922,6 +1097,7 @@ export default {
 </script>
   
 <style lang="scss">
+
 //For the datepicker and timepicker fields 
 .dp-custom-input {
     /* Set border color to transparent by default */
