@@ -21,7 +21,7 @@
   
         <div class="row">
           <div class="col-12 form-group">
-            <button type="button" :disabled="disabled" class="btn btn-edit shadow-sm w-100 mt-5" @click="submit">
+            <button type="button" :disabled="disabled" :title="disabled ? 'Unable to submit, please ensure that all fields have been filled.' : ''" class="btn btn-edit shadow-sm w-100 mt-5" @click="submit">
               Submit
             </button>
           </div>
@@ -173,7 +173,7 @@ export default {
     },
     async submit()  {
       const rcourse_id = this.course.rcourse_ID;
-      const template_id = this.course.template_ID   bb
+      const template_id = this.course.template_ID
       const data = {
         'rcourse_id': rcourse_id,
         'template_id': template_id,

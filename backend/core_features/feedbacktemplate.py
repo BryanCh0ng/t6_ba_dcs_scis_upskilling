@@ -126,6 +126,10 @@ class GetTemplate(Resource):
 @api.doc(description="Post feedback template attribute")
 class CreateFeedbackTemplate(Resource):
     def post(self):
+        user_role = common.getUserRole()
+        if (user_role) != 'Admin':
+          return {"message": "Unauthorized Access, Failed to create feedback template"}, 404
+ 
         req = request.json
         templateName = req.get("feedback_template_name")
         currentDate = datetime.now().strftime('%Y-%m-%d')
@@ -289,7 +293,10 @@ class EditFeedbackTemplate(Resource):
     def put(self, template_id):
 
         try: 
-            #Get the updated data from the request body 
+          user_role = common.getUserRole()
+          if (user_role) != 'Admin':
+            return {"message": "Unauthorized Access, Failed to edit feedback template"}, 404
+            #Get the updated data from the request body
             data = request.json
         
             template = FeedbackTemplate.query.filter_by(template_ID=template_id).first()
@@ -359,6 +366,10 @@ class DeleteFeedbackTemplate(Resource):
     @api.expect(delete_feedback_template)
     def post(self):
       try:
+        user_role = common.getUserRole()
+        if (user_role) != 'Admin':
+          return {"message": "Unauthorized Access, Failed to delete feedback template"}, 404
+
         args = delete_feedback_template.parse_args()
         templateID = args.get("template_ID")
         feedback_template = FeedbackTemplate.query.filter_by(template_ID = templateID).first() # get first feedback template
@@ -448,6 +459,10 @@ class GetFeedbackTemplateRecords(Resource):
 @api.doc(description="Apply Feedback Template to Courses")
 class ApplyFeedbackTemplateToCourses(Resource):
     def post(self):
+        user_role = common.getUserRole()
+        if (user_role) != 'Admin':
+            return {"message": "Unauthorized Access, Failed to edit feedback template"}, 404
+  
         req = request.json
         templateID = req.get("template_ID")
         included_courses = req.get("included_courses")

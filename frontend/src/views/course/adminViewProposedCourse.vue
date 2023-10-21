@@ -89,7 +89,9 @@
                   <td class="submitted_by_name">
                     {{ proposed_course.submitted_by_name }}
                   </td>
-                  <td>{{ proposed_course.pcourse_Status }}</td>
+                  <td class="pl-0 border-top">
+                    <course-status :status="proposed_course.pcourse_Status"></course-status>
+                  </td>
                   <td v-if="proposed_course.reason === 'NULL' || proposed_course.reason === null " class="text-center">-</td>
                   <td v-else-if="proposed_course.reason !== NULL">{{ proposed_course.reason }}</td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
@@ -127,6 +129,7 @@ import CourseService from "@/api/services/CourseService.js";
 import courseDate from '@/components/course/courseDate.vue';
 import CommonService from "@/api/services/CommonService.js";
 import UserService from "@/api/services/UserService.js";
+import courseStatus from '../../components/course/courseStatus.vue';
 
 export default {
   components: {
@@ -139,6 +142,7 @@ export default {
     SearchFilter,
     CommonSearchFilter,
     courseDate,
+    courseStatus
   },
   data() {
     return {

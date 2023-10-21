@@ -25,7 +25,7 @@
                   <td class="mt-2"> {{ included_course.run_Name }} <br> Feedback Start date: {{ included_course.feedback_start_date }}</td>
                   <td v-if="included_course.feedback_start_date && isBeforeCurrentDate(included_course.feedback_start_date)" class="mt-2"><button class="btn btn-danger bg-danger text-light mt-2" @click="removeCourse(included_course)">Remove</button> </td>
                   <td v-else-if="!original_included_courses.find(course => course.run_Name ===  included_course.run_Name)" class="mt-2"><button class="btn btn-danger bg-danger text-light mt-2" @click="removeCourse(included_course)">Remove</button> </td>
-                  <td v-else><button class="btn btn-danger bg-danger text-light mt-2 disabled">Remove</button></td> 
+                  <td v-else><button class="btn btn-danger bg-danger text-light mt-2 disabled" :title="'Unable to remove run course due to ongoing/past feedback period'">Remove</button></td> 
                 </tr>
               </table>
             </div>

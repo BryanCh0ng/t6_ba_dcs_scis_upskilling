@@ -24,7 +24,7 @@
             </ul>
           </div>
           <div class="col-6 offset-6 d-flex justify-content-between">
-            <button type="button" :disabled="disabled" class="mt-4 btn delete btn-danger float-right w-100"  @click="deleteTemplate">Delete</button>
+            <button type="button" :disabled="disabled" :title="disabled ? 'Unable to delete feedback template due to ongoing/past feedback period' : ''" class="mt-4 btn delete btn-danger float-right w-100"  @click="deleteTemplate">Delete</button>
             <button type="button" class="mt-4 btn btn-secondary float-right w-100" data-bs-dismiss="modal" aria-label="Close" @click="closeModal">Cancel</button>
           </div>
           
