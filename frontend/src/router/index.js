@@ -329,25 +329,7 @@ const routes = [
         title: 'Submit Feedback',
         requiresAuth: true
     },
-  },
-  {
-    path: '/viewRunCourseFeedback/:id',
-    name: 'viewRunCourseFeedback',
-    component: () => import('../views/feedback/viewRunCourseFeedback.vue'),
-    meta: {
-        title: 'View Run Course Feedback',
-   
-    }
-  },
-  {
-    path: '/viewCourseFeedback/:id',
-    name: 'viewCourseFeedback',
-    component: () => import('../views/feedback/viewCourseFeedback.vue'),
-    meta: {
-        title: 'View Course Feedback',
-   
-    }
-  },
+  }
 ]
 
 const router = createRouter({
