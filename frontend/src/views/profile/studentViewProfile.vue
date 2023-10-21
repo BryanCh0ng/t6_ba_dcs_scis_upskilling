@@ -58,8 +58,8 @@
                   <td>
                     <course-date-time :date="registered_course.reg_Enddate" :time="registered_course.reg_Endtime"></course-date-time>
                   </td>
-                  <td>
-                    {{ registered_course.reg_Status }}
+                  <td class="pl-0 border-top">
+                    <course-status :status="registered_course.reg_Status"></course-status>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(registered_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                   <td v-if="(registered_course.reg_Status === 'Enrolled' || registered_course.reg_Status === 'Pending') && isClosingDateValid(registered_course.reg_Enddate)">
@@ -113,8 +113,8 @@
                   <td>
                     <course-name-desc :name="interested_course.course_Name" :category="interested_course.coursecat_Name" :description="interested_course.course_Desc"></course-name-desc>
                   </td>
-                  <td>
-                    {{ interested_course.vote_Status }}
+                  <td class="pl-0 border-top">
+                    <course-status :status="interested_course.vote_Status"></course-status>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(interested_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                   <td v-if="interested_course.vote_Status == 'Ongoing'">
@@ -169,7 +169,9 @@
                   <td class="proposed_date">
                     <course-date :date="proposed_course.proposed_Date"></course-date>
                   </td>
-                  <td>{{ proposed_course.pcourse_Status }}</td>
+                  <td class="pl-0 border-top">
+                    <course-status :status="proposed_course.pcourse_Status"></course-status>
+                  </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                   <div v-if="proposed_course.pcourse_Status == 'Pending'">
                     <td><course-action status="Edit" :id="proposed_course.course_ID" @click="editCourse(proposed_course.course_ID)"></course-action></td>
@@ -288,6 +290,7 @@ import UserService from "@/api/services/UserService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
 import modalRejectedReason from '@/components/course/modalRejectedReason.vue';
 import CommonService from '@/api/services/CommonService';
+import courseStatus from '../../components/course/courseStatus.vue';
 
 export default {
   components: {
@@ -302,6 +305,7 @@ export default {
     modalAfterAction,
     modalRejectedReason,
     courseDate,
+    courseStatus
   },
   data() {
     return {

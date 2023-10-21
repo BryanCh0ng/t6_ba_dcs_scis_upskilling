@@ -45,7 +45,9 @@
                     <td class="current_interest">
                         {{ vote_course.voteCount }}
                     </td>
-                    <td class="text-nowrap">{{ vote_status && vote_status[vote_course.vote_Status] }}</td>
+                    <td class="pl-0 border-top">
+                      <course-status v-if="vote_status" :status="vote_status[vote_course.vote_Status]"></course-status>
+                    </td>
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(vote_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                     <div v-if="vote_course && vote_course.vote_Status === 'Ongoing'">
                       <td><course-action status="Close" @action-and-message-updated="handleActionData" :course="vote_course"></course-action></td>
@@ -137,7 +139,8 @@ import ProposalCourseRelatedSearchFilter from "@/components/search/ProposalCours
 import UserService from "@/api/services/UserService.js";
 import CourseService from "@/api/services/CourseService.js";
 import modalAfterAction from '@/components/course/modalAfterAction.vue';
-import CommonService from "@/api/services/CommonService.js"
+import CommonService from "@/api/services/CommonService.js";
+import courseStatus from '../../components/course/courseStatus.vue';
 
 export default {
   components: {
@@ -149,7 +152,8 @@ export default {
     SearchFilter,
     courseDate,
     modalAfterAction,
-    ProposalCourseRelatedSearchFilter
+    ProposalCourseRelatedSearchFilter,
+    courseStatus
   },
 
   data() {
