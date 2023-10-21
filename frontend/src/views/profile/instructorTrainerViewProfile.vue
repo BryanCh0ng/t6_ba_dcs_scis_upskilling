@@ -25,7 +25,7 @@
                 <thead>
                     <tr class="text-nowrap">
                     <th scope="col">
-                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'assigned')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Name', 'assigned')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/></a></th>
                     <th scope="col">Venue</th>
                      <th scope="col">
                         <a href="" @click.prevent="sort('run_Startdate', 'assigned')" class="text-decoration-none text-dark">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
@@ -39,7 +39,7 @@
                 <tbody>
                     <tr v-for="(assigned_course, key) in displayedAssignedCourses" :key="key">
                         <td class="name">
-                            <course-name-desc :name="assigned_course.course_Name" :category="assigned_course.coursecat_Name" :description="assigned_course.course_Desc"></course-name-desc>
+                            <course-name-desc :name="assigned_course.run_Name" :category="assigned_course.coursecat_Name" :description="assigned_course.course_Desc"></course-name-desc>
                         </td>
                         <td> {{ assigned_course.course_Venue }} </td>
                         <td class="start_date">
@@ -147,21 +147,21 @@
                 <thead>
                     <tr class="text-nowrap">
                     <th scope="col">
-                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'conducted')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Name', 'conducted')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/></a></th>
                     <th scope="col">
                       <a href="" @click.prevent="sort('course_Venue', 'conducted')" class="text-decoration-none text-dark">Venue <sort-icon :sortColumn="sortColumn === 'course_Venue'" :sortDirection="getSortDirection('course_Venue')"/></a></th>
                     <th scope="col">
                       <a href="" @click.prevent="sort('run_Startdate', 'conducted')" class="text-decoration-none text-dark">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
                     <th scope="col">
                       <a href="" @click.prevent="sort('run_Enddate', 'conducted')" class="text-decoration-none text-dark">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
+                    <th scope="col">Feedback</th>
                     <th scope="col">Course Details</th>
-                    <th scope="col">Action(s)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(conducted_course, key) in displayedConductedCourses" :key="key">
                     <td class="name">
-                        <course-name-desc :name="conducted_course.course_Name" :category="conducted_course.coursecat_Name" :description="conducted_course.course_Desc"></course-name-desc>
+                        <course-name-desc :name="conducted_course.run_Name" :category="conducted_course.coursecat_Name" :description="conducted_course.course_Desc"></course-name-desc>
                     </td>
                     <td> {{ conducted_course.course_Venue }} </td>
                     <td class="start_date">
@@ -170,10 +170,9 @@
                     <td class="end_date">
                         <course-date :date="conducted_course.run_Enddate"></course-date>
                     </td>
+                    <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToRunCourseFeedbackAnalysis(conducted_course.rcourse_ID)">View Feedback Analysis</a></td>
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(conducted_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                    <td>
-                      <course-action status="feedback-analysis" :id="conducted_course.course_ID"></course-action>
-                    </td>
+                    
                     </tr>
                 </tbody>
                 </table>
@@ -435,6 +434,9 @@ export default {
 
     editCourse(courseId) {
       this.$router.push({ name: 'editProposedCourse', params: { courseId } });
+    },
+    goToRunCourseFeedbackAnalysis(courseID) {
+      this.$router.push({ name: 'viewRunCourseFeedbackAnalysis', params: {id: courseID}});
     },
 
     async loadData() {
