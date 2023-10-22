@@ -88,6 +88,23 @@ class runCourseService extends BaseApiService {
       return this.handleError(error);
     }
   }
+
+  async getAvailableInstructors(startDate, endDate, startTime, endTime) {
+    try {
+      let response = await axiosClient.get("/runcourse/get_available_instructors", { 
+        params: { 
+          run_Startdate: startDate,
+          run_Enddate: endDate,
+          run_Starttime: startTime, 
+          run_Endtime: endTime
+        } 
+      });
+      return response.data.data.available_instructors
+
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
 }
 
 export default new runCourseService();

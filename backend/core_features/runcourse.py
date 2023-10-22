@@ -153,6 +153,7 @@ class GetRunCourse(Resource):
 
 edit_runcourse = api.parser()
 @api.route("/edit_runcourse/<int:runcourse_id>", methods=["PUT"])
+@api.doc(description="Edit run course")
 class EditRunCourse(Resource):
     @api.expect(edit_runcourse)
     def put(self, runcourse_id):
@@ -233,6 +234,7 @@ class EditRunCourse(Resource):
                 "message": "Failed to update run course: " + str(e)
             }, 500
 
+create_runcourse = api.parser()
 @api.route("/create_runcourse/<int:course_id>", methods=["POST"])
 @api.doc(description="Create run course")
 class CreateRunCourse(Resource):
@@ -362,7 +364,6 @@ class GetCourseFormats(Resource):
 
         return json.loads(json.dumps({"message": "No course formats found."})), 404
 
-# Modify the parser name to avoid overlap
 retrieve_run_course_count = api.parser()
 retrieve_run_course_count.add_argument("course_id", help="Enter course id")
 @api.route("/get_run_course_count_by_course_id")
@@ -370,26 +371,104 @@ retrieve_run_course_count.add_argument("course_id", help="Enter course id")
 class GetRunCourseCount(Resource):
     @api.expect(retrieve_run_course_count)
     def get(self):
-        courseID = retrieve_run_course_count.parse_args().get("course_id")
-        
-        run_course_count = RunCourse.query.filter_by(course_ID=courseID).count()
+        try: 
+            courseID = retrieve_run_course_count.parse_args().get("course_id")
+            
+            run_course_count = RunCourse.query.filter_by(course_ID=courseID).count()
 
-        course = Course.query.filter_by(course_ID=courseID).first()
+            course = Course.query.filter_by(course_ID=courseID).first()
 
-        db.session.close()
+            db.session.close()
 
-        if run_course_count >= 0:
+            if run_course_count >= 0:
 
-            course_name = course.course_Name
+                course_name = course.course_Name
 
+                return jsonify(
+                    {
+                        "code": 200,
+                        "data": {
+                            "run_course_count": run_course_count,
+                            "course_name": course_name
+                        }
+                    }
+                )
+            
             return jsonify(
                 {
+                    "code": 404,
+                    "message": "There are no run courses for this course ID"
+                }
+
+            )
+        
+        except Exception as e:
+            db.session.rollback()
+            return jsonify(
+                {
+                    "code": 500, 
+                    "message": "Failed to retrieve run course count: " + str(e)
+                }
+            )
+
+get_available_instructors = api.parser()
+get_available_instructors.add_argument("run_Startdate", help="Enter run course start date")
+get_available_instructors.add_argument("run_Enddate", help="Enter run course end date")
+get_available_instructors.add_argument("run_Starttime", help="Enter run course start time")
+get_available_instructors.add_argument("run_Endtime", help="Enter run course end time")
+@api.route("/get_available_instructors", methods=["GET"])
+@api.doc(description="Get all the available instructors")
+class GetAvailableInstructors(Resource):
+    def get(self):
+        try: 
+            
+            args = get_available_instructors.parse_args()
+
+            start_date = datetime.strptime(args.get('run_Startdate'), '%Y-%m-%d').date()
+            end_date = datetime.strptime(args.get('run_Enddate'), '%Y-%m-%d').date()
+            start_time = datetime.strptime(args.get('run_Starttime'), '%H:%M:%S').time()
+            end_time = datetime.strptime(args.get('run_Endtime'), '%H:%M:%S').time()
+
+             # Query the role_name column for users with role_name 'Instructor' or 'Trainer'
+            coaches = User.query.filter(User.role_Name.in_(['Instructor', 'Trainer'])).all()
+
+            # Join RunCourse with User table 
+            runs_with_instructors = db.session.query(RunCourse, User).join(User, RunCourse.instructor_ID == User.user_ID).all()
+
+            # List comprehension to filter instructors and create a list of dictionaries
+            available_instructors = [
+                {
+                    "user_ID": user.user_ID,
+                    "user_Name": user.user_Name
+                    # Add other user details as needed
+                }
+                for user in User.query.filter(User.role_Name.in_(['Instructor', 'Trainer'])).all()
+                if user.user_Name not in [
+                    user.user_Name
+                    for run_course, user in runs_with_instructors
+                    if run_course.run_Startdate <= end_date and run_course.run_Enddate >= start_date
+                    and run_course.run_Endtime >= start_time and run_course.run_Starttime <= end_time
+                ]
+            ]
+
+            # Return the list of available instructors in the desired format
+            return jsonify(
+                {   
                     "code": 200,
                     "data": {
-                        "run_course_count": run_course_count,
-                        "course_name": course_name
+                        "available_instructors": available_instructors
                     }
                 }
             )
+
+    
+        except Exception as e:
+            db.session.rollback()
+            return jsonify(
+                {
+                    "code": 500, 
+                    "message": "Failed to retrieve available instructors: " + str(e)
+                }
+            )
+
         
-        return json.loads(json.dumps({"message": "There are no run courses for this course ID", "code": 404}, default=str))

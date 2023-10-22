@@ -672,6 +672,28 @@ export default {
             this.showAlert = !this.showAlert;
         }
     },
+    watch: {
+        'formData.closingDate':{
+            handler: 'filterInstructors',
+            immediate: true // This ensures the watcher is triggered when the component is mounted
+        },
+        'formData.startDate': {
+            handler: 'filterInstructors',
+            immediate: true // This ensures the watcher is triggered when the component is mounted
+        },
+        'formData.endDate': {
+            handler: 'filterInstructors',
+            immediate: true // This ensures the watcher is triggered when the component is mounted
+        },
+        'formData.startTime': {
+            handler: 'filterInstructors',
+            immediate: true // This ensures the watcher is triggered when the component is mounted
+        },
+        'formData.endTime': {
+            handler: 'filterInstructors',
+            immediate: true // This ensures the watcher is triggered when the component is mounted
+        }
+    },
     methods: {
         restrictToNumbers(fieldName) {
             // Allow only numeric input
@@ -749,7 +771,7 @@ export default {
             try {
                 const response = await RunCourseService.getRunCourseCountByCourseId(this.courseId);
 
-                console.log(response.data.run_course_count)
+                //console.log(response.data.run_course_count)
                 
                 this.formData.runName = response.data.course_name + " - Run " + (parseInt(response.data.run_course_count) + 1);
 
@@ -877,6 +899,68 @@ export default {
                 throw new Error("There is a problem retrieving the data for this run course");
             }
         },
+         //Converting Object to String (For Date variable)
+         formatDateToYYYYMMDD(dateObj) {
+            const parsedYear = dateObj.getFullYear();
+            const parsedMonth = dateObj.getMonth() + 1;
+            const parsedDay = dateObj.getDate();
+            return `${parsedYear}-${parsedMonth}-${parsedDay}`;
+        },
+        //Converting Object to String (For Time variable)
+        formatTimeObjectToString(timeObject) {
+            const hours = String(timeObject.hours).padStart(2, '0');
+            const minutes = String(timeObject.minutes).padStart(2, '0');
+            const seconds = String(timeObject.seconds).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        },
+        async filterInstructors() {
+            // This method will be called when the date input's value changes
+            if (this.formData.closingDate && this.formData.startDate && this.formData.endDate && this.formData.startTime && this.formData.endTime) {
+
+                const closingDay = this.formData.closingDate.getDate();
+                const closingMonth = this.formData.closingDate.getMonth() + 1;
+                const closingYear = this.formData.closingDate.getFullYear();
+
+                const startDay = this.formData.startDate.getDate();
+                const startMonth = this.formData.startDate.getMonth() + 1;
+                const startYear = this.formData.startDate.getFullYear();
+
+                if (startYear > closingYear ||
+                    (startYear === closingYear && startMonth > closingMonth) ||
+                    (startYear === closingYear && startMonth === closingMonth && startDay > closingDay)
+                ) {
+                    // Start date is greater than opening date
+                    //console.log('Start date is greater than opening date.');
+
+                    const endDay = this.formData.endDate.getDate();
+                    const endMonth = this.formData.endDate.getMonth() + 1;
+                    const endYear = this.formData.endDate.getFullYear();
+            
+                    const startHours = this.formData.startTime.hours;
+                    const startMinutes = this.formData.startTime.minutes;
+
+                    const endHours = this.formData.endTime.hours;
+                    const endMinutes = this.formData.endTime.minutes;
+
+                    // Check if end date is greater than or equal to start date
+                    // If start date is equal to end date, check start time and end time
+                    if (endYear > startYear ||
+                        (endYear === startYear && endMonth > startMonth) ||
+                        (endYear === startYear && endMonth === startMonth && endDay >= startDay) ||
+                        (endYear === startYear && endMonth === startMonth && endDay === startDay && (endHours > startHours || (endHours === startHours && endMinutes >= startMinutes)))) {
+                        
+                        //console.log('Valid date and time range.');
+                        
+                        try {
+                            const response = await RunCourseService.getAvailableInstructors(this.formatDateToYYYYMMDD(this.formData.startDate), this.formatDateToYYYYMMDD(this.formData.endDate), this.formatTimeObjectToString(this.formData.startTime), this.formatTimeObjectToString(this.formData.endTime));
+                            this.formData.instructors = response
+                        } catch (error) {
+                            console.error('Error fetching filtered instructors:', error);
+                        }
+                    } 
+                }
+            } 
+        },
         async createRunCourse() {
             try {
                 console.log(this.courseId)
@@ -950,20 +1034,6 @@ export default {
             }
 
         },
-        //Converting Object to String (For Date variable)
-        formatDateToYYYYMMDD(dateObj) {
-            const parsedYear = dateObj.getFullYear();
-            const parsedMonth = dateObj.getMonth() + 1;
-            const parsedDay = dateObj.getDate();
-            return `${parsedYear}-${parsedMonth}-${parsedDay}`;
-        },
-        //Converting Object to String (For Time variable)
-        formatTimeObjectToString(timeObject) {
-            const hours = String(timeObject.hours).padStart(2, '0');
-            const minutes = String(timeObject.minutes).padStart(2, '0');
-            const seconds = String(timeObject.seconds).padStart(2, '0');
-            return `${hours}:${minutes}:${seconds}`;
-        },
         setSuccessAlert(action) {
             this.title = `${action} Success`;
             this.message = `${action} was successful`;
@@ -980,7 +1050,7 @@ export default {
                 try {
 
                     //NEED TO CHANGE
-                    this.submitFormData["run_Name"] = "test";
+                    this.submitFormData["run_Name"] = this.formData.runName;
 
                     this.submitFormData["run_Startdate"] = this.formatDateToYYYYMMDD(this.formData.startDate);
 
