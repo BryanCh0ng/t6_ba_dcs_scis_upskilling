@@ -13,7 +13,6 @@ import os
 import sys
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_dir)
-from app import mail, bcrypt
 
 # ==================== LOGIN FUNCTIONS ====================#
 # login()
@@ -33,6 +32,7 @@ login_model = api.model("login_model", {
 class Login(Resource):
     @api.expect(login_model)
     def post(self):
+        from app import mail, bcrypt
         # get inputted email and password
         data = request.get_json()
         email = data['email']
@@ -95,6 +95,7 @@ class VerifyEmail(Resource):
             return "Failed: " + str(e), 500
 
     def send_email(self, email):
+        from app import mail, bcrypt
         msg = Message('Welcome to Upskilling Engagement System',
                   sender='upskilling.engagement@outlook.com',
                   recipients=[email])
@@ -123,6 +124,7 @@ register_model = api.model("register_model", {
 class Register(Resource):
     @api.expect(register_model)
     def post(self):
+        from app import mail, bcrypt
         # get inputs
         data = request.get_json()
         print(data)
@@ -203,6 +205,7 @@ class ForgotPassword(Resource):
             return "Failed: " + str(e), 500
 
     def send_email(self, email):
+        from app import mail, bcrypt
         msg = Message('[Upskilling Engagement System] Reset Password',
                   sender='upskilling.engagement@outlook.com',
                   recipients=[email])
@@ -222,6 +225,7 @@ reset_password_model = api.model("reset_password_model", {
 class ResetPassword(Resource):
     @api.expect(reset_password_model)
     def post(self):
+        from app import mail, bcrypt
         # get inputted data
         data = request.get_json()
         password = data['password']

@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
+from flask_apscheduler import APScheduler
 from core_features import common
 from allClasses import *
 import json
@@ -10,6 +11,55 @@ api = Namespace('registration', description='Registration related operations')
 # get_all_registrations()
 # create_new_registration()
 # update_registration()
+
+scheduler = APScheduler()
+scheduler.init_app(app)
+scheduler.start()
+
+@scheduler.task('interval', id='check_registration_close', seconds=3600, misfire_grace_time=900)
+def check_registration_close():
+    regList = Registration.query.all()
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    current_time = datetime.now().strftime("%H:%M:%S")
+
+    for reg in regList:
+        rcourseid_set = set()
+        rcourseid_set.add(reg.json()["rcourse_ID"])
+
+    for rcourseid in rcourseid_set:
+        rcourse = RunCourse.query.filter(RunCourse.rcourse_ID == rcourseid).first().json()
+        rcourse_enddate = rcourse["reg_Enddate"]
+
+        if rcourse_enddate == current_date:
+            rcourse_endtime = rcourse["reg_Endtime"]
+
+            if rcourse_endtime <= current_time:
+                coursesize = rcourse["course_Size"]
+                registrations = Registration.query.filter(Registration.rcourse_ID == rcourseid).all()
+                registrations_num = len(registrations.json())
+
+                if coursesize >= registrations_num:
+                    for registration in registrations:
+                        try:
+                            setattr(registration, "reg_Status", "Enrolled")
+
+                            db.session.commit()
+                            db.session.close()
+
+                            return jsonify(
+                                {
+                                    "code": 201,
+                                    "data": registration.json(),
+                                    "message": "Registration has been successfully updated!"
+                                }
+                            )
+    
+                        except Exception as e:
+                            db.session.rollback()
+                            return "Failed" + str(e), 500
+                        
+                else:
+                    continue        
 
 # get_all_registrations()
 get_all_registrations = api.parser()
@@ -179,7 +229,46 @@ class GetRegistrationByUserID(Resource):
                 "message": "No such registration record exists"
             }
         )
-    
+
+#get_registration_by_rcourseid
+get_registration_by_rcourseid = api.parser()
+get_registration_by_rcourseid.add_argument("rcourse_ID", help="Enter run course ID")
+@api.route("/get_registration_by_rcourseid")
+@api.doc(description="Gets registration by run course ID")    
+class GetRegistrationByRCourseID(Resource):
+    @api.expect(get_registration_by_rcourseid)
+    def get(self):
+        user_role = common.getUserRole()
+        if (user_role) != 'Admin':
+            return {
+                "message": "Unathorized Access, Failed to create run course"
+            }, 404
+        
+        arg = get_registration_by_rcourseid.parse_args().get("rcourse_ID")
+        rcourse_ID = arg if arg else ""
+
+        regList = Registration.query.filter(Registration.rcourse_ID == rcourse_ID).all()
+        db.session.close()
+
+        if len(regList):
+            return jsonify(
+                {
+                    "code": 200,
+                    "data": {
+                        "reg_list": [reg.json() for reg in regList]
+                    }
+                }
+            )
+        
+        return jsonify(
+            {
+                "code": 404,
+                "message": "No such registration record exists"
+            }
+        )
+
+
+
 # Drop registered course
 drop_registered_course = api.parser()
 drop_registered_course.add_argument("rcourse_ID", type=int, help="Run Course ID")
