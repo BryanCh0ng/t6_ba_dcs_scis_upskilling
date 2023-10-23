@@ -336,9 +336,9 @@ class CourseApplyFeedbackTemplate(Resource):
             if course is None:
                 return jsonify({"message": "run course course not found", "code": 404}), 404
 
-            if datetime.now().date() > course.run_Startdate: #TO CHANGE TO FEEDBACK DATE
+            if datetime.now().date() > course.feedback_Startdate:
                 return jsonify({"message": "run course in ongoing feedback period", "code": 404}), 404
-            elif datetime.now().date() > course.run_Enddate:  #TO CHANGE TO FEEDBACK DATE
+            elif datetime.now().date() > course.feedback_Enddate:
                 return jsonify({"message": "run course in past feedback period", "code": 404}), 404
 
             course.template_ID = templateID
