@@ -148,41 +148,36 @@ class CreateNewRegistration(Resource):
                 db.session.rollback()
                 return "Failed to create new registration: " + str(e), 500
 
-#update_registration()
-update_registration_model = api.model("update_registration_model", {
-    "reg_ID": fields.Integer(description="Registration ID", required=True),
-    "rcourse_ID" : fields.Integer(description="Run Course ID", required=True),
-    "user_ID" : fields.Integer(description="User ID", required=True),
-    "reg_Status" : fields.String(description="Registration status", required=True)
-})
-
-@api.route("/update_registration", methods=["PUT"])
-@api.doc(description="Update registration record")
+update_registration = api.parser()
+@api.route("/update_registration/<int:reg_id>", methods=["PUT"])
+@api.doc(description="Update registration record by registration id")
 class UpdateRegistration(Resource):
-    @api.expect(update_registration_model)
-    def put(self):
-        data = request.get_json()
-        reg_ID = data["reg_ID"]
-        registration = Registration.query.filter_by(reg_ID=reg_ID).first()
+    @api.expect(update_registration)
+    def put(self, reg_id):
+        try: 
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {
+                    "message": "Unathorized Access, Failed to edit registration"
+                }, 404
 
-        if not registration:
-            db.session.close()
-            return jsonify(
-                {
-                    "code": 404,
-                    "message": "No such registration record exists"
-                }
-            )
-        
-        try:
-            if data["user_ID"] != registration.user_ID:
-                return {"message": "Unathorized Access, No rights to update registration"}, 404 
+            #Get the update data from the request body
+            update_data = request.json
 
-            for key, value in data.items():
-                setattr(registration, key, value)
+            registration = Registration.query.filter_by(reg_ID=reg_id).first()
+
+            if not registration:
+                return jsonify(
+                    {
+                        "code": 404,
+                        "message": "No registration record found"
+                    }
+                )
+            
+            for field, value in update_data.items():
+                setattr(registration, field, value)
 
             db.session.commit()
-            db.session.close()
 
             return jsonify(
                 {
@@ -191,10 +186,15 @@ class UpdateRegistration(Resource):
                     "message": "Registration has been successfully updated!"
                 }
             )
-        
+            
         except Exception as e:
             db.session.rollback()
-            return "Failed" + str(e), 500
+            return jsonify(
+                {
+                    "code": 500,
+                    "message": "Failed to update registration record: " + str(e)
+                }
+            )
 
 #get_registration_by_userid()
 get_registration_by_userid = api.parser()
@@ -233,41 +233,95 @@ class GetRegistrationByUserID(Resource):
 #get_registration_by_rcourseid
 get_registration_by_rcourseid = api.parser()
 get_registration_by_rcourseid.add_argument("rcourse_ID", help="Enter run course ID")
+get_registration_by_rcourseid.add_argument("student_name", help="Enter student name")
+get_registration_by_rcourseid.add_argument("reg_status", help="Enter registration status")
 @api.route("/get_registration_by_rcourseid")
 @api.doc(description="Gets registration by run course ID")    
 class GetRegistrationByRCourseID(Resource):
     @api.expect(get_registration_by_rcourseid)
     def get(self):
-        user_role = common.getUserRole()
-        if (user_role) != 'Admin':
-            return {
-                "message": "Unathorized Access, Failed to create run course"
-            }, 404
-        
-        arg = get_registration_by_rcourseid.parse_args().get("rcourse_ID")
-        rcourse_ID = arg if arg else ""
+        try: 
 
-        regList = Registration.query.filter(Registration.rcourse_ID == rcourse_ID).all()
-        db.session.close()
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {
+                    "message": "Unathorized Access, Failed to create run course"
+                }, 404
+    
+            
+            args = get_registration_by_rcourseid.parse_args()
+            rcourse_ID = args.get("rcourse_ID", "")
 
-        if len(regList):
+            query = (
+                db.session.query(Registration, User)
+                .join(Registration, User.user_ID == Registration.user_ID)
+                .filter(Registration.rcourse_ID == rcourse_ID)
+            )
+
+            #regList = Registration.query.filter(Registration.rcourse_ID == rcourse_ID).all()
+
+            student_name = args.get("student_name", "")
+            reg_status = args.get("reg_status", "")
+
+            if student_name: 
+                student_name = student_name.lower()
+                query = query.filter(User.user_Name.ilike(f"%{student_name}%"))
+            
+            if reg_status:
+                query = query.filter(Registration.reg_Status == reg_status)
+            
+
+            filtered_results = query.all()
+            db.session.close()
+
+            """
+            if len(regList):
+                return jsonify(
+                    {
+                        "code": 200,
+                        "data": {
+                            "reg_list": [reg.json() for reg in regList]
+                        }
+                    }
+                )
+            """
+
+            if filtered_results:
+                data = []
+
+                for registration, user in filtered_results:
+                    combined_data = {
+                        "user_ID": user.user_ID,
+                        "user_Email": user.user_Email,
+                        "user_Name": user.user_Name,
+                        "reg_ID": registration.reg_ID,
+                        "reg_Status": registration.reg_Status
+                        # Add more attributes from both tables as needed
+                    }
+
+                    data.append(combined_data)
+
+                return jsonify(
+                    {
+                        "code": 200, 
+                        "data": data
+                    }
+                )
+            
             return jsonify(
                 {
-                    "code": 200,
-                    "data": {
-                        "reg_list": [reg.json() for reg in regList]
-                    }
+                    "code": 404,
+                    "message": "No registration records found for this run course."
                 }
             )
-        
-        return jsonify(
-            {
-                "code": 404,
-                "message": "No such registration record exists"
-            }
-        )
 
-
+        except Exception as e:
+            return jsonify(
+                {
+                    "code": 500,
+                    "message": "Failed to retreive run course registration: " + str(e)
+                }
+            )
 
 # Drop registered course
 drop_registered_course = api.parser()
@@ -301,3 +355,4 @@ class dropRegisteredCourse(Resource):
         except Exception as e:
             db.session.rollback()
             return {"message": "Failed to drop the course: " + str(e)}, 500
+

@@ -31,6 +31,32 @@ class RegistrationService extends BaseApiService {
         }
     }
 
+    async getRegistrationByRunCourseID(rcourse_ID, student_name, reg_status) {
+        try {
+            const response = await axiosClient.get("/registration/get_registration_by_rcourseid", {
+                params: {
+                    rcourse_ID: rcourse_ID,
+                    student_name: student_name,
+                    reg_status: reg_status
+                }
+            });
+          
+            return response.data;
+
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
+    async updateRegistration(reg_ID, data) {
+        try {
+            const response = await axiosClient.put(`/registration/update_registration/${reg_ID}`, data);
+            return response.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
 }
 
 export default new RegistrationService();

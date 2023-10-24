@@ -319,6 +319,15 @@ const routes = [
         title: 'Submit Feedback',
         requiresAuth: true
     },
+  },
+  {
+    path: '/adminViewRegistration/:id',
+    name: 'adminViewRegistration',
+    component: () => import('../views/course/adminViewRegistration.vue'),
+    meta: {
+        title: 'Admin View Student Registration',
+        requiresAuth: true
+    },
   }
 ]
 
