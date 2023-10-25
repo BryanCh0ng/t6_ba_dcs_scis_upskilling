@@ -120,22 +120,23 @@ export default {
       try {
         const response = await ContactUsService.createNewMsg(formData);
         console.log('API Response:', response);
-        this.resetForm();
         this.showSuccessModal = true;
       } catch (error) {
         console.error('Error submitting form:', error);
       }
     },
-    hideSuccessModal() {
+    async hideSuccessModal() {
       this.showSuccessModal = false;
-      this.resetForm();
+      const user_ID = await UserService.getUserID();
+      const role = await UserService.getUserRole(user_ID);
+      if (role == 'Student') {
+        this.$router.push({name: "studentViewCourse"});
+      } else if (role == 'Instructor' || role == 'Trainer') {
+        this.$router.push({ name: 'instructorTrainerViewProfile' });
+      }
+      
     },
-    resetForm() {
-      this.subject = "";
-      this.message = "";
-      this.subjectPlaceholder = "Subject";
-      this.messagePlaceholder = "Message";
-    },
+    
   },
 };
 </script>
