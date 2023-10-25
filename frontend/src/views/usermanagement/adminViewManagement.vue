@@ -1,6 +1,6 @@
 <template>
   <div>
-  <ul class="nav nav-pills justify-content-center mb-5">
+  <ul class="nav nav-pills justify-content-center mb-5 pt-4">
     <li class="nav-item">
       <a class="nav-link" :class="{ 'active': activeTab === 'admin' }" @click="activeTab = 'admin'">All Admin</a>
     </li> 

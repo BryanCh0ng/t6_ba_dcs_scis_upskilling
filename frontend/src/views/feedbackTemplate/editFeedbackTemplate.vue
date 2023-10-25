@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container">
+    <div class="container pt-4">
       <div class="text-center">
         <h2>Feedback Template</h2>
         <h4 class="text-grey">Customized feedback for a specific course</h4>

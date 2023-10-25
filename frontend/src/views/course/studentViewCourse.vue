@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ul class="nav nav-pills justify-content-center">
+    <ul class="nav nav-pills justify-content-center pt-4">
       <li class="nav-item">
         <a class="nav-link" :class="{ active: activeTab === 'course_reg' }" @click="activeTab = 'course_reg'">Courses Available to Register</a>
       </li>

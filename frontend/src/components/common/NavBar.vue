@@ -34,7 +34,10 @@
               <div class="nav-link dropdown">
                 <!-- Dropdown toggle button -->
                 <span class="dropdown-toggle btn dropdownbtn" id="userDropdown" role="button" @click="toggleUserDropdown" aria-expanded="false">
-                  {{ user_name }} <!-- Display the user's name -->
+                  <div class="username-container">
+                    <span id="username">{{ user_name }}</span>
+                  </div>
+                  
                 </span>
 
                 <!-- Dropdown content container -->
@@ -324,18 +327,25 @@ export default {
 }
 
 .dropdown-toggle.btn.dropdownbtn {
-  width: 130px;
+  width: 150px;
   background-color: transparent;
   color: #151c55;
   border: 4px solid #151c55;
   border-radius: 5px;
   padding: 5px 10px;
   position: relative;
-  white-space: nowrap;
-  width:auto;
-  min-width: 150px; 
   /* padding-left: 90px; */
 }
+
+.username-container {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+  display: inline-block;
+  height:20px;
+}
+
 .loginbtn {
   position: relative;
   top: 5px;
@@ -382,6 +392,7 @@ export default {
     bottom: 120%;
     left: 5px;
     transform: translateY(-10px);
+    margin-bottom: 40px;
   }
 
   .dropdown-content {

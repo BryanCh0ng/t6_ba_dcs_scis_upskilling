@@ -4,7 +4,7 @@
         :status-options="statusOptions"
         :search-api="searchAllCourseAdmin" 
         @search-complete="handleSearchComplete" 
-        :default-status="'Active'" />
+        :default-status="'Active'" class="pt-4"/>
 
       <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Courses</h5>
