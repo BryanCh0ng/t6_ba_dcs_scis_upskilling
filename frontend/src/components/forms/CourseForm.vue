@@ -2,9 +2,9 @@
     <div id="courseform">
         <div class="container">
 
-            <h2 v-if="view === 'createCourse'" class="text-center">Create Course For Registration</h2>
-            <h2 v-else-if="view === 'proposeCourse'" class="text-center">Propose a Course</h2>
-            <h2 v-else class="text-center">Edit Course</h2>
+            <h2 v-if="view === 'createCourse'" class="text-center pt-3">Create Course For Registration</h2>
+            <h2 v-else-if="view === 'proposeCourse'" class="text-center pt-3">Propose a Course</h2>
+            <h2 v-else class="text-center pt-3">Edit Course</h2>
 
             <form @submit.prevent="onSubmit" @reset="onReset">
                 <!--Course Name-->

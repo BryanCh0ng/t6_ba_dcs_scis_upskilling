@@ -2,7 +2,7 @@
   <div id="contactus">
     <!-- CONTACT US FORM -->
     <div class="container">
-      <h2 class="text-center mb-4">Contact Us</h2>
+      <h2 class="text-center mb-4 pt-4">Contact Us</h2>
 
       <!-- Error Message -->
       <error-message :error-message="errorMessage" />
