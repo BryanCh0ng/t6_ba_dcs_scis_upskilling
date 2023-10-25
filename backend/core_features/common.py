@@ -8,7 +8,7 @@ from datetime import datetime, date, time
 import logging
 app.logger.setLevel(logging.DEBUG)
 
-api = Namespace('common', description='Course related operations')
+api = Namespace('common', description='Common related operations')
 
 sort_records = api.parser()
 sort_records.add_argument("sort_column", help="Enter sort column")
