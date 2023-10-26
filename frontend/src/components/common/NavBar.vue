@@ -343,7 +343,7 @@ export default {
   text-overflow: ellipsis;
   max-width: 100px;
   display: inline-block;
-  height:20px;
+  height:22px;
 }
 
 .loginbtn {

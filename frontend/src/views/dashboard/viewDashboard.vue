@@ -9,15 +9,15 @@
 
     <div class="container col-12 d-flex mt-3 mb-3 w-100 justify-content-between">
         <button class="btn btn-primary font-weight-bold" title="Toggle" @click="toggleViewMode">Toggle View</button>
-        <button v-if="currentViewMode === 'analysis'" class="btn btn-primary font-weight-bold" title="Export" @click="exportToCSV">Export Analysis to PDF</button>
-        <button v-if="currentViewMode === 'feedback'" class="btn btn-primary font-weight-bold" title="Export" @click="exportToCSV">Export Feedback to CSV</button>
+        <button v-if="currentViewMode === 'analysis'" class="btn btn-primary font-weight-bold" title="Export to PDF" @click="exportToPDF">Export Analysis to PDF</button>
+        <button v-if="currentViewMode === 'feedback'" class="btn btn-primary font-weight-bold" title="Export to CSV" @click="exportToCSV">Export Feedback to CSV</button>
     </div>
   </div>
 
-  <div class="container text-center analysis-view" v-if="currentViewMode === 'analysis'">
+  <div class="container text-center analysis-view" v-if="currentViewMode === 'analysis'" ref="analysisView">
     
     <!-- Ratings -->
-    <div class="row">
+    <div class="row page-break">
       <!-- Display Total No. of Feedbacks -->
       <div class="col-12 col-md-4 dashboard pt-2 mb-3 custom-col">
         <h2 class="fs-1">{{totalNoOfFeedback}}</h2>
@@ -38,38 +38,38 @@
     <!-- Sentiment Course -->
     <div class="row">
       <!-- Display Overall Course Sentiment -->
-      <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col" v-if="courseSpecific">
+      <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="courseSpecific">
         <DoughnutChart v-if="sentimentData1.labelArray.length > 0 && sentimentData1.dataArray.length > 0"
           :datasets="sentimentData1" :chartId="0" />
         <p><strong>Overall Course Sentiment</strong></p>
       </div>
       <!-- Display Overall Course Positive WordCloud -->
-      <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col" v-if="courseSpecific">
+      <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="courseSpecific">
         <!-- Include Word Cloud component here for positive feedback -->
         <WordChart v-if="positiveCourseWordData.length > 0" :datasets="positiveCourseWordData" :chartId="2" :label="'Overall Course Positive WordCloud'" />
         <p><strong>Overall Course Positive WordCloud</strong></p>
       </div>
       <!-- Display Overall Course Negative WordCloud -->
-      <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col" v-if="courseSpecific">
+      <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="courseSpecific">
         <!-- Include Word Cloud component here for positive feedback -->
         <WordChart v-if="negativeCourseWordData.length > 0" :datasets="negativeCourseWordData" :chartId="3" :label="'Overall Course Negative WordCloud'" />
         <p><strong>Overall Course Negative WordCloud</strong></p>
       </div>
 
       <!-- Display Overall Instructor Sentiment -->
-      <div class="col-12 col-md-6 dashboard mb-3 custom-col" v-if="instructorSpecific">
+      <div class="col-12 col-md-6 dashboard mb-3 custom-col page-break" v-if="instructorSpecific">
         <DoughnutChart v-if="sentimentData2.labelArray.length > 0 && sentimentData2.dataArray.length > 0"
           :datasets="sentimentData2" :chartId="1" />
         <p><strong>Overall Instructor Sentiment</strong></p>
       </div>
       <!-- Display Overall Instructor Positive WordCloud -->
-      <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col" v-if="instructorSpecific">
+      <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="instructorSpecific">
         <!-- Include Word Cloud component here for positive feedback -->
         <WordChart v-if="positiveInstructorWordData.length > 0" :datasets="positiveInstructorWordData" :chartId="4" :label="'Overall Instructor Positive WordCloud'" />
         <p><strong>Overall Instructor Positive WordCloud</strong></p>
       </div>
       <!-- Display Overall Course Negative WordCloud -->
-      <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col" v-if="instructorSpecific">
+      <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="instructorSpecific">
         <!-- Include Word Cloud component here for negative feedback -->
         <WordChart v-if="negativeInstructorWordData.length > 0" :datasets="negativeInstructorWordData" :chartId="5" :label="'Overall Instructor Negative WordCloud'" />
         <p><strong>Overall Instructor Negative WordCloud</strong></p>
@@ -81,11 +81,11 @@
       <div
         v-for="(topic, index) in courseDoneWellTopics"
         :key="index"
-        class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col"
+        class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break"
       >
         <!-- Include Word Cloud component here for course done well topic -->
         <!-- <WordCloud :wordData="courseDoneWellTopics[index].wordData" /> -->
-        <WordChart v-if="courseDoneWellTopics.length > 0" :datasets="courseDoneWellTopics[index].wordData" :chartId="6 + index" :label="'Overall Course Done Well'" />
+        <WordChart v-if="courseDoneWellTopics.length > 0" :datasets="courseDoneWellTopics[index].wordData" :chartId="6 + index" :label="'Overall Course Done Well'" :size1="15" :size2="25" :fit="false"/>
         <p><strong>Overall Course Done Well - Topic {{ index + 1 }}</strong></p>
       </div>
 
@@ -93,11 +93,11 @@
       <div
         v-for="(topic, index) in courseSuggestionsTopics"
         :key="index"
-        class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col"
+        class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break"
       >
         <!-- Include Word Cloud component here for course suggestions topic -->
         <!-- <WordCloud :wordData="courseSuggestionsTopics[index].wordData" /> -->
-        <WordChart v-if="courseSuggestionsTopics.length > 0" :datasets="courseSuggestionsTopics[index].wordData" :chartId="15 + index" :label="'Overall Course Suggestions'" />
+        <WordChart v-if="courseSuggestionsTopics.length > 0" :datasets="courseSuggestionsTopics[index].wordData" :chartId="15 + index" :label="'Overall Course Suggestions'" :size1="15" :size2="25" :fit="false" />
         <p><strong>Overall Course Suggestions - Topic {{ index + 1 }}</strong></p>
       </div>
 
@@ -105,11 +105,11 @@
       <div
         v-for="(topic, index) in instructorDoneWellTopics"
         :key="index"
-        class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col"
+        class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break"
       >
         <!-- Include Word Cloud component here for instructor done well topic -->
         <!-- <WordCloud :wordData="instructorDoneWellTopics[index].wordData" /> -->
-        <WordChart v-if="instructorDoneWellTopics.length > 0" :datasets="instructorDoneWellTopics[index].wordData" :chartId="24 + index" :label="'Overall Instructor Done Well'" />
+        <WordChart v-if="instructorDoneWellTopics.length > 0" :datasets="instructorDoneWellTopics[index].wordData" :chartId="24 + index" :label="'Overall Instructor Done Well'" :size1="15" :size2="25" :fit="false" />
         <p><strong>Overall Instructor Done Well - Topic {{ index + 1 }}</strong></p>
       </div>
 
@@ -117,11 +117,11 @@
       <div
         v-for="(topic, index) in instructorSuggestionsTopics"
         :key="index"
-        class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col"
+        class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break"
       >
         <!-- Include Word Cloud component here for instructor suggestions topic -->
         <!-- <WordCloud :wordData="instructorSuggestionsTopics[index].wordData" /> -->
-        <WordChart v-if="instructorSuggestionsTopics.length > 0" :datasets="instructorSuggestionsTopics[index].wordData" :chartId="33 + index" :label="'Overall Instructor Suggestions'" />
+        <WordChart v-if="instructorSuggestionsTopics.length > 0" :datasets="instructorSuggestionsTopics[index].wordData" :chartId="33 + index" :label="'Overall Instructor Suggestions'" :size1="15" :size2="25" :fit="false"/>
         <p><strong>Overall Instructor Suggestions - Topic {{ index + 1 }}</strong></p>
       </div>
     </div>
@@ -174,13 +174,14 @@ import RunCourseService from "@/api/services/runCourseService.js";
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import Papa from 'papaparse';
 import FeedbackService from "@/api/services/FeedbackService.js";
+import html2pdf from 'html2pdf.js';
 
 export default {
   name: "ViewDashboard",
   components: {
     DoughnutChart,
     WordChart,
-    VueAwesomePaginate
+    VueAwesomePaginate,
   },
   data() {
     return {
@@ -422,15 +423,46 @@ export default {
         courseName = this.runcourseName;
       }
 
-     
       const fileName = `${courseName}_feedback_data.csv`;
 
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = fileName; // Set the file name here
+      a.download = fileName;
       a.click();
       URL.revokeObjectURL(url);
+    },
+    exportToPDF() {
+      try {
+        const container = this.$refs.analysisView;
+
+        let courseName; 
+        if (this.courseID) {
+          courseName = this.courseName;
+        } else if (this.runcourseName ){
+          courseName = this.runcourseName;
+        } else {
+          courseName = "overall"
+        }
+
+        const fileName = `${courseName}_feedback_analysis.pdf`;
+
+        const options = {
+          margin: 5,
+          filename: fileName,
+          image: { type: 'jpeg', quality: 1 },
+          html2canvas: { scale:1 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { before: '.page-break:nth-child(3n)' },
+        };
+
+        const pdf = html2pdf().from(container).set(options).outputPdf();
+        
+        console.log("PDF generation successful.");
+        pdf.save();
+      } catch (error) {
+        console.error("Error exporting to PDF:", error);
+      }
     },
     toggleViewMode() {
       this.currentViewMode = this.currentViewMode === 'analysis' ? 'feedback' : 'analysis';

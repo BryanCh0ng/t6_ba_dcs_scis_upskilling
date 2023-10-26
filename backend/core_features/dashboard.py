@@ -31,7 +31,7 @@ from sqlalchemy import func, and_, exists, or_
 from allClasses import *
 
 stop_words = set(stopwords.words('english')) # Setup stop words
-custom_stop_words = ['the', 'course', 'content', 'instructor', 'professor', 'prof', 'apply', 'learn', 'really', 'allow', 'provide', 'help', 'gave', 'give', 'think', 'could', 'would', 'can', 'will', 'check', 'make', 'made', 'time', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'many', 'sure', 'able', 'quite', 'need', 'want', 'bit', 'lot', 'look', 'try', 'let', 'tried', 'suggestion', 'current', 'currently', 'instead', 'come', 'dont', 'came']
+custom_stop_words = ['the', 'course', 'content', 'instructor', 'professor', 'prof', 'apply', 'learn', 'really', 'allow', 'provide', 'help', 'gave', 'give', 'think', 'could', 'would', 'can', 'will', 'check', 'make', 'made', 'time', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'many', 'sure', 'able', 'quite', 'need', 'want', 'bit', 'lot', 'look', 'try', 'let', 'tried', 'suggestion', 'current', 'currently', 'instead', 'come', 'dont', 'came', 'does', 'doesnt', 'furthermore', 'especially']
 stop_words.update(custom_stop_words) # Add custom stop word
 lemmatizer = WordNetLemmatizer() # Set up Lemmatizer
 
@@ -469,7 +469,7 @@ class CourseImproveFeedback(Resource):
         query = query.filter(optional_keyword_filter)
 
         results = query.all()
-        print(results)
+        # print(results)
         db.session.close()
 
         if results:

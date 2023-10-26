@@ -22,7 +22,20 @@ export default {
         label: {
             type: String,
             required: true
-        }
+        },
+        size1: {
+            type: Number,
+            default: 10
+        },
+        size2: {
+            type: Number,
+            default: 10
+        },
+        fit: {
+            type: Boolean,
+            default: true
+        },
+
     },
     mounted() {
         this.$nextTick(() => {
@@ -41,14 +54,14 @@ export default {
                     datasets: [
                         {
                             label: this.label,
-                            data: this.datasets.map((d) => 10 + d.size* 10),
+                            data: this.datasets.map((d) => this.size1 + d.size* this.size2),
                             originalSizes: this.datasets.map((d) => d.size),
                             hoverOffset: 4
                         },
                     ],
                 },
                 options: {
-                    fit: true,
+                    fit: this.fit,
                     padding: 2,
                     plugins: {  
                         legend: {

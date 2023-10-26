@@ -4,8 +4,8 @@ import BaseApiService from "../BaseApiService";
 class DashboardService extends BaseApiService {
     async getCourseAverageRatings(course_ID, runcourse_ID) {
         try {
-            console.log(course_ID)
-            console.log(runcourse_ID)
+            // console.log(course_ID)
+            // console.log(runcourse_ID)
             const response = await axiosClient.get('/dashboard/course_average_ratings', {
                 params: {
                     course_ID: course_ID,
@@ -121,8 +121,8 @@ class DashboardService extends BaseApiService {
     }
     async getCourseSentimentData(course_ID, rcourse_ID) {
         try {
-            console.log(course_ID)
-            console.log(rcourse_ID)
+            // console.log(course_ID)
+            // console.log(rcourse_ID)
             let response = await axiosClient.get("/dashboard/course_sentiment_data",
                 {
                     params: {
