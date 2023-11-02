@@ -21,7 +21,7 @@
 
       <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Admin Database</h5>
-          <button class="btn btn-primary font-weight-bold text-nowrap" @click="goToAddAdmin">Add Admin</button>
+          <button class="btn btn-primary font-weight-bold text-nowrap" @click="goToAddAdmin" title="Add Admin">Add Admin</button>
       </div>
 
       <div class="container col-12">
@@ -46,7 +46,7 @@
                 </td>
 
                 <td v-if="user.user_ID !== user_ID">
-                  <button class="btn btn-danger font-weight-bold text-nowrap" @click="removeAdmin(user.user_ID)">Remove</button>
+                  <button class="btn btn-danger font-weight-bold text-nowrap" @click="removeAdmin(user.user_ID)" title="Remove Admin">Remove</button>
                 </td>
                 <td v-else></td>
               </tr>
@@ -70,8 +70,8 @@
 
       <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Student Database</h5>
-          <button v-show="showBlacklistButton" class="btn btn-danger me-3 font-weight-bold text-nowrap" @click="blacklist">Blacklist Student</button>
-          <button v-show="showRemoveButton" class="btn btn-danger font-weight-bold text-nowrap" @click="removeFromBlacklist">Remove from Blacklist</button>
+          <button v-show="showBlacklistButton" class="btn btn-danger me-2 font-weight-bold text-nowrap" @click="blacklist" title="Blacklist Student">Blacklist Student</button>
+          <button v-show="showRemoveButton" class="btn btn-danger font-weight-bold text-nowrap" @click="removeFromBlacklist" title="Remove from Blacklist">Remove from Blacklist</button>
       </div>
 
       <div class="container col-12 table-responsive">

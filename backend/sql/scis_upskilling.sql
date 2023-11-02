@@ -517,17 +517,17 @@ CREATE TABLE IF NOT EXISTS `templateattribute`(
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO templateattribute VALUES 
-    (1, 'Content - How would you rate the course content and course structure?', 'Likert Scale', 1),
-    (2, 'Duration - How would you rate the course content and course structure?', 'Likert Scale', 1),
-    (3, 'Relevancy - How would you rate the course content and course structure?', 'Likert Scale', 1),
-    (4, 'What elements of the course most contributed to your learning?', 'Text Field', 1),
-    (5, 'What suggestions do you have to improve the course?', 'Text Field', 1), 
-    (6, 'Clarity - How would you rate the Instructor?', 'Likert Scale', 1),
-    (7, 'Pace - How would you rate the Instructor?', 'Likert Scale', 1),
-    (8, 'Helpfulness - How would you rate the Instructor?', 'Likert Scale', 1),
-    (9, 'Knowledge - How would you rate the Instructor?', 'Likert Scale', 1),
-    (10, "What are the strengths of the instructor's teaching?", 'Text Field', 1),
-    (11, "What suggestions do you have to improve the instructor's teaching?", 'Text Field', 1),
+	(1, 'Content - How would you rate the course content and course structure?', 'Likert Scale', 1),
+	(2, 'Duration - How would you rate the course content and course structure?', 'Likert Scale', 1),
+	(3, 'Relevancy - How would you rate the course content and course structure?', 'Likert Scale', 1),
+	(4, 'What elements of the course most contributed to your learning?', 'Text Field', 1),
+	(5, 'What suggestions do you have to improve the course?', 'Text Field', 1), 
+	(6, 'Clarity - How would you rate the Instructor?', 'Likert Scale', 1),
+	(7, 'Pace - How would you rate the Instructor?', 'Likert Scale', 1),
+	(8, 'Helpfulness - How would you rate the Instructor?', 'Likert Scale', 1),
+	(9, 'Knowledge - How would you rate the Instructor?', 'Likert Scale', 1),
+	(10, "What are the strengths of the instructor's teaching?", 'Text Field', 1),
+	(11, "What suggestions do you have to improve the instructor's teaching?", 'Text Field', 1),
     (12, 'How would you rate the course?', 'Likert Scale', NULL),
     (13, 'Any Feedbacks for the course', 'Text Field', NULL);
 

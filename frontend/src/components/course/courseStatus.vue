@@ -29,15 +29,17 @@
             case 'Offered':
                 return 'mt-1 pt-2 pb-2 badge text-light bg-medium-sea-green';
             case 'Ongoing':
-                return 'mt-1 pt-2 pb-2 badge text-light bg-blue';
+                return 'mt-1 pt-2 pb-2 badge text-light bg-medium-sea-green';
             case 'Active':
                 return 'mt-1 pt-2 pb-2 badge text-light bg-medium-sea-green';
             case 'Retired':
-                return 'mt-1 pt-2 pb-2 badge text-light bg-crimson';
+                return 'mt-1 pt-2 pb-2 badge text-light bg-secondary';
             case 'Open for voting':
-                return 'mt-1 pt-2 pb-2 badge text-light bg-blue';
+                return 'mt-1 pt-2 pb-2 badge text-light bg-medium-sea-green';
             case 'Offered for students to register':
                 return 'mt-1 pt-2 pb-2 badge text-light bg-medium-sea-green';
+            case 'Inactive':
+                return 'mt-1 pt-2 pb-2 badge text-light bg-crimson';
             default:
                 return 'mt-1 pt-2 pb-2 badge text-light bg-secondary';
             } 
