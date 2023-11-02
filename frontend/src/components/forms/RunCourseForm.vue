@@ -952,7 +952,8 @@ export default {
                         //console.log('Valid date and time range.');
                         
                         try {
-                            const response = await RunCourseService.getAvailableInstructors(this.formatDateToYYYYMMDD(this.formData.startDate), this.formatDateToYYYYMMDD(this.formData.endDate), this.formatTimeObjectToString(this.formData.startTime), this.formatTimeObjectToString(this.formData.endTime));
+                            const response = await RunCourseService.getAvailableInstructors(this.runcourseId, this.formatDateToYYYYMMDD(this.formData.startDate), this.formatDateToYYYYMMDD(this.formData.endDate), this.formatTimeObjectToString(this.formData.startTime), this.formatTimeObjectToString(this.formData.endTime));
+                            console.log(response)
                             this.formData.instructors = response
                         } catch (error) {
                             console.error('Error fetching filtered instructors:', error);

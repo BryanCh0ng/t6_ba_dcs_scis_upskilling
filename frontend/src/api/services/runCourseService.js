@@ -89,10 +89,11 @@ class runCourseService extends BaseApiService {
     }
   }
 
-  async getAvailableInstructors(startDate, endDate, startTime, endTime) {
+  async getAvailableInstructors(runCourseID, startDate, endDate, startTime, endTime) {
     try {
       let response = await axiosClient.get("/runcourse/get_available_instructors", { 
         params: { 
+          rcourse_ID: runCourseID,
           run_Startdate: startDate,
           run_Enddate: endDate,
           run_Starttime: startTime, 

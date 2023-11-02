@@ -412,6 +412,7 @@ class GetRunCourseCount(Resource):
             )
 
 get_available_instructors = api.parser()
+get_available_instructors.add_argument("rcourse_ID", help="Enter run course ID")
 get_available_instructors.add_argument("run_Startdate", help="Enter run course start date")
 get_available_instructors.add_argument("run_Enddate", help="Enter run course end date")
 get_available_instructors.add_argument("run_Starttime", help="Enter run course start time")
@@ -424,16 +425,17 @@ class GetAvailableInstructors(Resource):
             
             args = get_available_instructors.parse_args()
 
+            run_course_id = args.get("rcourse_ID", "")
             start_date = datetime.strptime(args.get('run_Startdate'), '%Y-%m-%d').date()
             end_date = datetime.strptime(args.get('run_Enddate'), '%Y-%m-%d').date()
             start_time = datetime.strptime(args.get('run_Starttime'), '%H:%M:%S').time()
             end_time = datetime.strptime(args.get('run_Endtime'), '%H:%M:%S').time()
 
-             # Query the role_name column for users with role_name 'Instructor' or 'Trainer'
-            coaches = User.query.filter(User.role_Name.in_(['Instructor', 'Trainer'])).all()
-
-            # Join RunCourse with User table 
-            runs_with_instructors = db.session.query(RunCourse, User).join(User, RunCourse.instructor_ID == User.user_ID).all()
+            if run_course_id:
+                runs_with_instructors = db.session.query(RunCourse, User).join(User, RunCourse.instructor_ID == User.user_ID).filter(RunCourse.rcourse_ID != run_course_id).all()
+            else: 
+                # Join RunCourse with User table 
+                runs_with_instructors = db.session.query(RunCourse, User).join(User, RunCourse.instructor_ID == User.user_ID).all()
 
             # List comprehension to filter instructors and create a list of dictionaries
             available_instructors = [
