@@ -47,8 +47,6 @@
               <td v-else class="text-nowrap"><a v-if="course.course_Status != 'Retired'" class="btn btn-info disabled text-light" title="Unable to remove run course due to ongoing/past feedback period">Apply Feedback Template</a></td>
               <td>
                 <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(course.rcourse_ID)">View Lessons</a>
-                <br>
-                <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="addEditLessons(course.rcourse_ID)">Add/Edit Lessons</a>
               </td>
               <td v-if="course.runcourse_Status=='Ongoing'">
                 <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
@@ -56,6 +54,7 @@
               <td v-else-if="course.runcourse_Status=='Closed'">
                 <course-action @action-and-message-updated="handleActionData" status="open_for_registration" :course="course" :courseName="course.courseName" ></course-action>
               </td>
+              <td><course-action status="add-edit-lessons"></course-action></td>
               <td><course-action status="Edit" :course="course" @click="goToEditRunCourseWithId(course.rcourse_ID)"></course-action></td>
               <td v-if="course.runcourse_Status=='Closed'">
                 <course-action @action-and-message-updated="handleActionData" status="delete-run-course" :course="course" :courseName="course.courseName" ></course-action>
@@ -226,9 +225,6 @@ export default {
     viewLessons(courseID) {
       this.$router.push({ name: 'viewRunCourseLesson', params: {id: courseID}});
     },
-    addEditLessons(courseID) {
-      this.$router.push({ name: 'addEditLessons', params: {id: courseID}});
-    }, 
     closeFeedbackTemplateModal() {
       this.modalOpenFeedbackTemplate = false;
       this.showFeedbackTemplateModal = false;

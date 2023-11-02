@@ -28,7 +28,7 @@
                   <course-name-desc :name="lesson.run_course.run_Name" :category="lesson.run_course.coursecat_Name" :description="lesson.run_course.course_Desc"></course-name-desc>
                 </td>
                 <td>{{ lesson.instructor_Name }}</td>
-                <td><course-date-time :date="lesson.lesson_Date"></course-date-time></td>
+                <td class="text-nowrap"><course-date-time :date="lesson.lesson_Date"></course-date-time></td>
                 <td><course-date-time :time="lesson.lesson_Starttime"></course-date-time></td>
                 <td><course-date-time :time="lesson.lesson_Endtime"></course-date-time></td>
                 <td>{{ lesson.lesson_Status }}</td>
@@ -46,13 +46,6 @@
         </div>
       </div>
       <vue-awesome-paginate v-if="lessons.length/itemsPerPage > 0" v-model="localCurrentPageLessons" :totalItems="lessons.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeLessons" class="justify-content-center pagination-container"/>
-      
-      <!-- <div class="modal fade" id="after_action_modal" tabindex="-1" aria-hidden="true" ref="afterActionModal">
-        <div class="modal-dialog modal-lg"> 
-          <modal-after-action :course="actionLesson" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
-        </div>
-      </div> -->
-
     </div>
   
 </template>
@@ -62,10 +55,7 @@
   import modalCourseContent from '@/components/course/modalCourseContent.vue';
   import courseNameDesc from '@/components/course/courseNameDesc.vue';
   import { VueAwesomePaginate } from 'vue-awesome-paginate';
-  // import CourseService from "@/api/services/CourseService.js";
-  // import modalAfterAction from '@/components/course/modalAfterAction.vue';
   import CommonService from "@/api/services/CommonService.js";
-  // import UserService from "@/api/services/UserService.js";
   import LessonService from "@/api/services/LessonService.js";
   import courseDateTime from "@/components/course/courseDateTime.vue";
   
@@ -76,7 +66,6 @@
       modalCourseContent,
       VueAwesomePaginate,
       courseNameDesc,
-      // modalAfterAction,
       courseDateTime
     },
     data() {
@@ -89,7 +78,6 @@
         localCurrentPageLessons: 1,
         receivedMessage: '',
         errorMsge: 'No records found'
-        // actionLesson: {},
       }
     },
     computed: {
@@ -108,16 +96,10 @@
         this.selectedCourse = null;
         this.showModal = false;
       },
-      handlePageChangeCourses(newPage) {
+      handlePageChangeLessons(newPage) {
         this.localCurrentPageLessons = newPage;
         this.$emit('page-change', newPage);
       },
-      // handleActionData(actionData) {
-      //   this.receivedMessage = actionData.message;
-      //   this.actionCourse = actionData.course
-      //   const modalButtonElement = this.$el.querySelector('.invisible-btn')
-      //   modalButtonElement.click();
-      // },
       async loadData() {
         console.log('load')
         try {
@@ -128,16 +110,10 @@
           } else {
             this.errorMsge = response.message
           }
-          console.log(this.lessons)
-          // console.log(this.courses)
         } catch (error) {
           console.error("Error fetching lesson details:", error);
         }
       },
-      // modalAfterActionClose() {
-      //   console.log('test')
-      //   this.loadData();
-      // },
       sort(column) {
         if (this.sortColumn === column) {
           this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -162,19 +138,6 @@
     async created() {
       this.loadData();
     },
-    // mounted() {
-    //   const buttonElement = document.createElement('button');
-    //   buttonElement.className = 'btn btn-primary d-none invisible-btn';
-    //   buttonElement.setAttribute('data-bs-toggle', 'modal');
-    //   buttonElement.setAttribute('data-bs-target', '#after_action_modal');
-    //   this.$el.appendChild(buttonElement);
-    //   const modalElement = this.$refs.afterActionModal;
-    //   modalElement.addEventListener('hidden.bs.modal', this.modalAfterActionClose);
-    // },
-    // beforeUnmount() {
-    //   const modalElement = this.$refs.afterActionModal;
-    //   modalElement.removeEventListener('hidden.bs.modal', this.modalAfterActionClose)
-    // },
     }
 </script>
   
