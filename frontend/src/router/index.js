@@ -348,15 +348,15 @@ const routes = [
         requiresAuth: true
     }, 
   }, 
-  {
-    path: '/viewAttendance/:lessonId',
-    name: 'viewAttendance',
-    component: () => import('../views/attendance/viewAttendance.vue'),
-    meta: {
-        title: 'View Attendance',
-        requiresAuth: true
-    }, 
-  } 
+  // {
+  //   path: '/viewAttendance/:lessonId',
+  //   name: 'viewAttendance',
+  //   component: () => import('../views/attendance/viewAttendance.vue'),
+  //   meta: {
+  //       title: 'View Attendance',
+  //       requiresAuth: true
+  //   }, 
+  // } 
 ]
 
 const router = createRouter({

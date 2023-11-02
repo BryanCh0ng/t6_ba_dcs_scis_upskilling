@@ -383,7 +383,6 @@ class Lesson(db.Model):
     lesson_Starttime = db.Column(db.Time, nullable=False) 
     lesson_Endtime = db.Column(db.Time, nullable=False) 
 
-
     def __init__(self, lesson_ID, rcourse_ID, lesson_Date, lesson_Starttime, lesson_Endtime):
         self.lesson_ID = lesson_ID
         self.rcourse_ID = rcourse_ID
@@ -408,15 +407,16 @@ class AttendenceRecord(db.Model):
     status = db.Column(db.String(15), nullable=False)
     reason = db.Column(db.String(255), nullable=False)
     attrecord_Status = db.Column(db.String(20), nullable=False) 
+    user_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'), nullable=False)
 
 
-
-    def __init__(self, attrecord_ID, lesson_ID, status, reason, attrecord_Status):
+    def __init__(self, attrecord_ID, lesson_ID, status, reason, attrecord_Status, user_ID):
         self.attrecord_ID = attrecord_ID
         self.lesson_ID = lesson_ID
         self.status = status
         self.reason = reason
         self.attrecord_Status = attrecord_Status
+        self.user_ID = user_ID
 
 
     def json(self):
