@@ -325,7 +325,6 @@ class BlacklistStudent(Resource):
             return "Failed. " + str(e), 500
 
 # Automate blacklist
-
 @scheduler.task('interval', id='check_and_blacklist_users', seconds=3600, misfire_grace_time=900) 
 # Define the function to check and blacklist users
 def check_and_blacklist_users():
@@ -345,7 +344,9 @@ def check_and_blacklist_users():
             ).all()
 
             for run_course in run_courses:
+                
                 lessons = db.session.query(Lesson).filter(Lesson.rcourse_ID == run_course.rcourse_ID).all()
+                total_lessons = len(lessons)
 
                 attendance_records = db.session.query(AttendanceRecord).filter(
                     AttendanceRecord.user_ID == user_ID,
@@ -355,7 +356,6 @@ def check_and_blacklist_users():
                 valid_reason_keywords = ["sick", "doctor appointment", "medical leave", "family emergency", "mc", "personal reasons", "hospitalized"]
 
                 missed_lessons_without_valid_reason = 0
-                total_lessons = 0
 
                 for record in attendance_records:
                     if record.status == 'Absent':
@@ -374,8 +374,6 @@ def check_and_blacklist_users():
                         blacklist_entry = Blacklist(user_ID=user_ID, blacklist_Datetime=datetime.now())
                         db.session.add(blacklist_entry)
                         db.session.commit()
-            
-
 
         db.session.close()
     except Exception as e:

@@ -86,7 +86,9 @@
                 </th>
                 <th scope="col">Email</th>
                 <th scope="col">Status</th>
-                <th scope="col">Date</th>
+                <th scope="col">
+                  <a href="" class="text-decoration-none text-dark" @click.prevent="sort('blacklist_date', 'student')">Date <sort-icon :sortColumn="sortColumn === 'blacklist_date'" :sortDirection="getSortDirection('blacklist_date')"/></a>
+                </th>
                 <th scope="col">View Course Enrolled/Taken</th>
               </tr>
             </thead>
