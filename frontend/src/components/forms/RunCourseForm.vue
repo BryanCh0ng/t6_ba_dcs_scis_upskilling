@@ -350,7 +350,7 @@ const startDateGreaterThanClosingDateValidatorWithMessage = helpers.withMessage(
     startDateGreaterThanClosingDateValidator
 )
 
-//Function: Check whether End Date is equal to or greater than the Start Date 
+//Function: Check whether End Date is equals to or greater than the Start Date 
 const validateEndDateFromStartDate = function (value) {
     if (value === null || this.formData.startDate === null) {
         return true;
@@ -421,14 +421,15 @@ const closingDateGreaterThanOpeningDateValidatorWithMessage = helpers.withMessag
     closingDateGreaterThanOpeningDateValidator
 )
 
-//Function: Check whether Feedback Start Date is greater than the Course End Date 
+//Function: Check whether Feedback Start Date is greater than or equals to the Course End Date 
 const validateFeedbackStartDateGreaterThanEndDate = function (value) {
 
     if (value === null || this.formData.endDate === null) {
         return true;
     }
 
-    if (value.getFullYear() > this.formData.endDate.getFullYear() || (value.getFullYear() === this.formData.endDate.getFullYear() && (value.getMonth() + 1) > (this.formData.endDate.getMonth() + 1)) || (value.getFullYear() === this.formData.endDate.getFullYear() && (value.getMonth() + 1) === (this.formData.endDate.getMonth() + 1) && value.getDate() > this.formData.endDate.getDate())) {
+    if (value.getFullYear() > this.formData.endDate.getFullYear() || (value.getFullYear() === this.formData.endDate.getFullYear() && (value.getMonth() + 1) > (this.formData.endDate.getMonth() + 1)) ||
+        (value.getFullYear() === this.formData.endDate.getFullYear() && value.getMonth() === this.formData.endDate.getMonth() && value.getDate() >= this.formData.endDate.getDate())) {
         return true;
     }
 
@@ -441,7 +442,7 @@ const feedbackStartDateGreaterThanEndDateValidator = helpers.withParams(
 );
 
 const feedbackStartDateGreaterThanEndDateValidatorWithMessage = helpers.withMessage(
-    'Please select a feedback start date after the selected course end date',
+    'Please select a feedback start date that falls on or after the selected course end date',
     feedbackStartDateGreaterThanEndDateValidator
 )
 
@@ -505,6 +506,42 @@ const endTimeGreaterThanStartTimeValidator = helpers.withParams(
 const endTimeGreaterThanStartTimeValidatorWithMessage = helpers.withMessage(
     'Please select a course end time later than the selected course start time',
     endTimeGreaterThanStartTimeValidator
+)
+
+//Function: Check whether Feedback Start Time is greater than Course End Time when Course End Date and Feedback Start Date are the same 
+const validateFeedbackStartTimeGreaterThanCourseEndTime = function (value) {
+    const allValuesFilled = (
+        value !== null &&
+        this.formData.endTime !== null &&
+        this.formData.endDate !== null &&
+        this.formData.feedbackStartDate !== null
+    );
+
+    if (allValuesFilled) {
+        if (this.formData.endDate.toISOString().split('T')[0] === this.formData.feedbackStartDate.toISOString().split('T')[0]) {
+
+            // Convert time values to seconds
+            const startTimeInSeconds = parseInt(this.formData.endTime.hours) * 3600 + parseInt(this.formData.endTime.minutes) * 60 + parseInt(this.formData.endTime.seconds);
+            const endTimeInSeconds = parseInt(value.hours) * 3600 + parseInt(value.minutes) * 60 + parseInt(value.seconds);
+
+            // Compare time values in seconds
+            return startTimeInSeconds < endTimeInSeconds;
+
+        }
+    }
+
+    // Skip validation if any value is missing or start date doesn't equal end date
+    return true;
+};
+
+const feedbackStartTimeGreaterThanCourseEndTimeValidator = helpers.withParams(
+    { type: 'feedbackStartTimeGreaterThanCourseEndTime' },
+    validateFeedbackStartTimeGreaterThanCourseEndTime
+);
+
+const feedbackStartTimeGreaterThanCourseEndTimeValidatorWithMessage = helpers.withMessage(
+    'Please select a feedback start time later than the selected course end time',
+    feedbackStartTimeGreaterThanCourseEndTimeValidator
 )
 
 //Function: Check whether Feedback End Time is greater than Feedback Start Time when Feedback Start Date and Feedback End Date are the same 
@@ -652,7 +689,7 @@ export default {
                 courseFee: { required: helpers.withMessage('Please provide a valid course fee', required), currency: currencyValidatorWithMessage },
                 selectedTemplate: { required: helpers.withMessage('Please select a valid feedback template', required) },
                 feedbackStartDate: { required: helpers.withMessage('Please select a valid feedback start date', required), feedbackStartDateGreaterThanEndDate: feedbackStartDateGreaterThanEndDateValidatorWithMessage },
-                feedbackStartTime: { required: helpers.withMessage('Please select a valid feedback start time', required) },
+                feedbackStartTime: { required: helpers.withMessage('Please select a valid feedback start time', required), feedbackStartTimeGreaterThanCourseEndTime: feedbackStartTimeGreaterThanCourseEndTimeValidatorWithMessage },
                 feedbackEndDate: { required: helpers.withMessage('Please select a valid feedback end date', required), feedbackEndDateFromFeedbackStartDate: feedbackEndDateFromFeedbackStartDateValidatorWithMessage },
                 feedbackEndTime: { required: helpers.withMessage('Please select a valid feedback end time', required), feedbackEndTimeGreaterThanFeedbackStartTime: feedbackEndTimeGreaterThanFeedbackStartTimeValidatorWithMessage }
             }
@@ -964,7 +1001,6 @@ export default {
         },
         async createRunCourse() {
             try {
-                console.log(this.courseId)
                 this.createRunCourseResponse = await RunCourseService.createRunCourse(this.courseId, this.submitFormData);
                
             } catch (error) {
@@ -1050,7 +1086,6 @@ export default {
 
                 try {
 
-                    //NEED TO CHANGE
                     this.submitFormData["run_Name"] = this.formData.runName;
 
                     this.submitFormData["run_Startdate"] = this.formatDateToYYYYMMDD(this.formData.startDate);
