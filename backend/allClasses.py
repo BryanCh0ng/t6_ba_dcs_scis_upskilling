@@ -399,7 +399,7 @@ class Lesson(db.Model):
         return result
     
 ##################  Attendence Record Class Creation ##################
-class AttendenceRecord(db.Model):
+class AttendanceRecord(db.Model):
     __tablename__ = 'attendancerecord'
 
     attrecord_ID = db.Column(db.Integer, nullable=False, primary_key=True)

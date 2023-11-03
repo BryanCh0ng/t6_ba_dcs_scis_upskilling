@@ -85,8 +85,9 @@
                   <a href="" class="text-decoration-none text-dark" @click.prevent="sort('user_Name', 'student')">Name <sort-icon :sortColumn="sortColumn === 'user_Name'" :sortDirection="getSortDirection('user_Name')"/></a>
                 </th>
                 <th scope="col">Email</th>
-                <th scope="col">Blacklisted</th>
-                <th scope="col">View Course Taken</th>
+                <th scope="col">Status</th>
+                <th scope="col">Date</th>
+                <th scope="col">View Course Enrolled/Taken</th>
               </tr>
             </thead>
             <tbody>
@@ -105,7 +106,11 @@
                   <span v-if="user.is_blacklisted === true" class="text-danger">Blacklisted</span>
                   <span v-else>Not Blacklisted</span>
                 </td>
-                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewCourses(user.user_ID)">View Course Taken</a></td>
+                <td class="blacklist_Datetime mr-5">
+                  <span v-if="user.blacklist_date === ''">-</span>
+                  <span v-else>{{ user.blacklist_date }}</span>
+                </td>
+                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewCourses(user.user_ID)">View Course Enrolled/Taken</a></td>
               </tr> 
             </tbody>
           </table>
