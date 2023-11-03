@@ -2085,18 +2085,20 @@ INSERT INTO feedback VALUES
     (1318, 1, 52, 9, '5', 10),
     (1319, 1, 52, 10, '', 10),
     (1320, 1, 52, 11, 'Can summarise some things to help with understanding', 10),
+    (1321, 1, 53, 13, 'Sometimes the same example/scenario would be used, maybe give more examples.', 10),
     -- user_id 53
-    (1321, 1, 53, 1, '4', 10),
-    (1322, 1, 53, 2, '5', 10),
-    (1323, 1, 53, 3, '3', 10),
-    (1324, 1, 53, 4, 'group project', 10),
-    (1325, 1, 53, 5, 'revision lessons', 10),
-    (1326, 1, 53, 6, '2', 10),
-    (1327, 1, 53, 7, '1', 10),
-    (1328, 1, 53, 8, '4', 10),
-    (1329, 1, 53, 9, '5', 10),
-    (1330, 1, 53, 10, 'Engaging', 10),
-    (1331, 1, 53, 11, 'Sometimes the same example/scenario would be used, maybe give more examples.', 10);
+    (1322, 1, 53, 1, '4', 10),
+    (1323, 1, 53, 2, '5', 10),
+    (1324, 1, 53, 3, '3', 10),
+    (1325, 1, 53, 4, 'group project', 10),
+    (1326, 1, 53, 5, 'revision lessons', 10),
+    (1327, 1, 53, 6, '2', 10),
+    (1328, 1, 53, 7, '1', 10),
+    (1329, 1, 53, 8, '4', 10),
+    (1330, 1, 53, 9, '5', 10),
+    (1331, 1, 53, 10, 'Engaging', 10),
+    (1332, 1, 53, 11, 'Sometimes the same example/scenario would be used, maybe give more examples.', 10),
+    (1333, 1, 53, 13, 'Sometimes the same example/scenario would be used, maybe give more examples.', 10);
     
 DROP TABLE IF EXISTS `registration`;
 CREATE TABLE IF NOT EXISTS `registration`(
