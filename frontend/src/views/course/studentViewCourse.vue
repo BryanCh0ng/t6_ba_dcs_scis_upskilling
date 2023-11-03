@@ -60,7 +60,7 @@
                     <a class="text-nowrap text-dark text-decoration-underline view-course-details" @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a>
                   </td>
                   <td>
-                    <course-action @action-and-message-updated="handleActionData" :status="course.course_Status" :course="course"></course-action>
+                    <course-action @action-and-message-updated="handleActionData" :status="course.runcourse_Status" :course="course"></course-action>
                   </td>
                 </tr>
               </tbody>
