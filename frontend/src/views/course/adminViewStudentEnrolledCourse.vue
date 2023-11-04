@@ -17,6 +17,7 @@
                 <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'registered')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
               <th scope="col">
                 <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'registered')">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
+              <th scope="col">Attendance Rate</th>
               <th scope="col">Course Details</th>
             </tr>
           </thead>
@@ -24,13 +25,16 @@
           <tbody>
             <tr v-for="(registered_course, key) in displayedRegisteredCourses" :key="key">
               <td>
-                <course-name-desc :name="registered_course.course_Name" :category="registered_course.coursecat_Name" :description="registered_course.course_Desc"></course-name-desc>
+                <course-name-desc :name="registered_course.run_Name" :category="registered_course.coursecat_Name" :description="registered_course.course_Desc"></course-name-desc>
               </td>
               <td>
                 <course-date-time :date="registered_course.run_Startdate" :time="registered_course.run_Starttime"></course-date-time>
               </td>
               <td>
                 <course-date-time :date="registered_course.run_Enddate" :time="registered_course.run_Endtime"></course-date-time>
+              </td>
+              <td>
+                {{registered_course.attendance_rate}}%
               </td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(registered_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
               
@@ -92,7 +96,7 @@ export default {
       selectedCourse: null,
       itemsPerPage: 10,
       localCurrentPageRegistered: 1,
-      statusOptionsRegistered: ["Enrolled", "Pending", "Not Enrolled", "Dropped"],
+      // statusOptionsRegistered: ["Enrolled", "Pending", "Not Enrolled", "Dropped"],
       currentDate: new Date(),
       receivedMessage: '',
       actionCourse: {},
@@ -107,7 +111,7 @@ export default {
     let response = await ManagementService.getStudentName(this.user_ID);
     this.student_Name = response.data
 
-    const registeredCourses = await CourseService.adminGetUserCourses(this.user_ID, null, null);
+    const registeredCourses = await CourseService.adminGetStudentEnrolledCourses(this.user_ID, null, null);
     this.registered_courses = registeredCourses.data;
 
   },
@@ -140,7 +144,7 @@ export default {
       try {
         user_ID = this.user_ID
 
-        let response = await CourseService.adminGetUserCourses(
+        let response = await CourseService.adminGetStudentEnrolledCourses(
           user_ID,
           course_Name,
           coursecat_ID,

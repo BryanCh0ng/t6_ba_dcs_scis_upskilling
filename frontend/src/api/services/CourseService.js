@@ -477,9 +477,10 @@ class CourseService extends BaseApiService {
         }
     }
 
-    async adminGetUserCourses(user_ID, course_Name, coursecat_ID) {
+    async adminGetStudentEnrolledCourses(user_ID, course_Name, coursecat_ID) {
         try {
-            const endpoint = `/course/user_courses/${user_ID}`;
+            
+            const endpoint = `/course/studentEnrolledCourse/${user_ID}`;
             const params = {
               course_name: course_Name,
               coursecat_id: coursecat_ID

@@ -11,7 +11,7 @@
     <button class="btn btn-info open_for_voting text-light font-weight-bold text-nowrap" v-else-if="status == 'Approved'" title="Open for Voting">Open for Voting</button>
     <button @click=voteAction(course.course_ID) class="btn btn-danger close text-light font-weight-bold text-nowrap" v-else-if="status == 'Close'" title="Close Voting">Close</button>
     <button @click="promote_to_course()" class="btn btn-success promote_to_course text-light font-weight-bold text-nowrap" v-else-if="status == 'promote_to_course'" title="Promote to Course">Promote to course</button>
-    <!-- <button class="btn btn-primary open_for_voting text-light font-weight-bold text-nowrap" v-else-if="status == 'open_for_voting'">Open for Voting</button> -->
+    <button class="btn btn-primary open_for_voting text-light font-weight-bold text-nowrap" v-else-if="status == 'open_for_voting'">Open for Voting</button>
     <button class="btn btn-danger close text-light font-weight-bold text-nowrap" v-else-if="status == 'proposed_delete'" title="Delete">Delete</button>
     <button @click="registerCourse()" class="btn btn-success open_for_registration text-light font-weight-bold text-nowrap" v-else-if="status == 'open_for_registration'" title="Open for Registration">Open for Registration</button>
     <button @click="registerCourse()" class="btn btn-danger close_registration text-light font-weight-bold text-nowrap w-100" v-else-if="status == 'close_registration'" title="Close Registration">Close Registration</button>  

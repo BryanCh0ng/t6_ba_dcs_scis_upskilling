@@ -85,8 +85,11 @@
                   <a href="" class="text-decoration-none text-dark" @click.prevent="sort('user_Name', 'student')">Name <sort-icon :sortColumn="sortColumn === 'user_Name'" :sortDirection="getSortDirection('user_Name')"/></a>
                 </th>
                 <th scope="col">Email</th>
-                <th scope="col">Blacklisted</th>
-                <th scope="col">View Course Taken</th>
+                <th scope="col">Status</th>
+                <th scope="col">
+                  <a href="" class="text-decoration-none text-dark" @click.prevent="sort('blacklist_date', 'student')">Date <sort-icon :sortColumn="sortColumn === 'blacklist_date'" :sortDirection="getSortDirection('blacklist_date')"/></a>
+                </th>
+                <th scope="col">View Course Enrolled/Taken</th>
               </tr>
             </thead>
             <tbody>
@@ -105,7 +108,11 @@
                   <span v-if="user.is_blacklisted === true" class="text-danger">Blacklisted</span>
                   <span v-else>Not Blacklisted</span>
                 </td>
-                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewCourses(user.user_ID)">View Course Taken</a></td>
+                <td class="blacklist_Datetime mr-5">
+                  <span v-if="user.blacklist_date === ''">-</span>
+                  <span v-else><course-date :date="user.blacklist_date"></course-date></span>
+                </td>
+                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewCourses(user.user_ID)">View Course Enrolled/Taken</a></td>
               </tr> 
             </tbody>
           </table>
@@ -193,6 +200,7 @@ import ManagementService from "@/api/services/UserManagementService.js";
 import CommonService from "@/api/services/CommonService.js"
 import UserService from "@/api/services/UserService.js";
 import DefaultModal from "@/components/DefaultModal.vue";
+import courseDate from "@/components/course/courseDate.vue";
 
 export default {
   components: {
@@ -202,7 +210,8 @@ export default {
     DefaultModal,
     SearchFilter,
     StudentSearchFilter,
-    NameSearchFilter
+    NameSearchFilter,
+    courseDate
   },
   data() {
     return {

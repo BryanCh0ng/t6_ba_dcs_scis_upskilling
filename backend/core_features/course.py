@@ -1652,12 +1652,11 @@ combined_search_parser = api.parser()
 combined_search_parser.add_argument("course_name", help="Enter course name", location="args")
 combined_search_parser.add_argument("coursecat_id", help="Enter course category id", location="args")
 
-@api.route("/user_courses/<int:user_id>")
+@api.route("/studentEnrolledCourse/<int:user_ID>")
 class GetUserCourses(Resource):
     @api.expect(combined_search_parser)
-    def get(self, user_id):
+    def get(self, user_ID):
         try:
-            print(user_id)
             args = combined_search_parser.parse_args()
             course_name = args.get("course_name")
             coursecat_id = args.get("coursecat_id")
@@ -1678,13 +1677,13 @@ class GetUserCourses(Resource):
                 CourseCategory,
                 CourseCategory.coursecat_ID == Course.coursecat_ID
             ).filter(
-                User.user_ID == user_id,
+                User.user_ID == user_ID,
                 Registration.reg_Status == "Enrolled"
             )
 
             # Apply filters if course_name and coursecat_id are provided
             if course_name:
-                base_query = base_query.filter(Course.course_Name == course_name)
+                base_query = base_query.filter(RunCourse.run_Name == course_name)
             if coursecat_id:
                 base_query = base_query.filter(Course.coursecat_ID == coursecat_id)
 
@@ -1703,7 +1702,44 @@ class GetUserCourses(Resource):
                     'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
                 }
 
-                modified_run_course = {**result[2].json(), **run_course_attrs}
+                # Query lessons for this RunCourse
+                lessons = db.session.query(Lesson).filter(Lesson.rcourse_ID == result[2].rcourse_ID).all()
+
+                # Calculate attendance rate
+                total_lessons = len(lessons)
+                attended_lessons = 0
+                missed_lessons_with_valid_reason = 0
+
+                # Query attendance records for this run_course
+                attendance_records = db.session.query(AttendanceRecord).filter(
+                    AttendanceRecord.user_ID == user_ID,
+                    AttendanceRecord.lesson_ID.in_([lesson.lesson_ID for lesson in lessons])
+                ).all()
+
+                valid_reason_keywords = ["sick", "doctor appointment", "medical leave", "family emergency", "mc", "personal reasons", "hospitalised"]
+
+                # Count attended and missed lessons with valid reasons
+                for record in attendance_records:
+                    if record.status == 'Present' or record.status == 'Late':
+                        attended_lessons += 1
+                    elif record.status == 'Absent':
+                        if record.reason:
+                            # Check if the reason is not empty or only contains whitespace
+                            trimmed_reason = record.reason.strip()
+                            
+                            if trimmed_reason.lower() in valid_reason_keywords:
+                                # print("Valid Reason Found")
+                                missed_lessons_with_valid_reason += 1
+                            
+
+                # Calculate attendance rate
+                if total_lessons > 0:
+                    attendance_rate = ((attended_lessons + missed_lessons_with_valid_reason) / total_lessons) * 100
+                else:
+                    attendance_rate = 0
+                
+
+                modified_run_course = {**result[2].json(), **run_course_attrs, "attendance_rate": attendance_rate}
 
                 course_info = {
                     **result[0].json(),

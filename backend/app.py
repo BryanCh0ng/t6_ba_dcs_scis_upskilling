@@ -19,6 +19,8 @@ from core_features.recommender import api as recommender
 from core_features.feedback import api as feedback
 from core_features.common import api as common
 from core_features.feedback import api as feedback
+from core_features.lesson import api as lesson
+# from core_features.attendance import api as attendance
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
 
@@ -44,6 +46,8 @@ api.add_namespace(recommender)
 api.add_namespace(feedback)
 api.add_namespace(common)
 api.add_namespace(feedback)
+api.add_namespace(lesson)
+# api.add_namespace(attendance)
 
 CORS(app, supports_credentials=True)
 # ==================== CONNECTING TO DATABASE ====================#
