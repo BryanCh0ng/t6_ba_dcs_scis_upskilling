@@ -2,14 +2,18 @@ import { axiosClient } from "../axiosClient";
 import BaseApiService from "../BaseApiService";
 
 class DashboardService extends BaseApiService {
-    async getCourseAverageRatings(course_ID, runcourse_ID) {
+    async getCourseAverageRatings(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             // console.log(course_ID)
             // console.log(runcourse_ID)
             const response = await axiosClient.get('/dashboard/course_average_ratings', {
                 params: {
                     course_ID: course_ID,
-                    runcourse_ID: runcourse_ID
+                    coursecat_ID: coursecat_ID,
+                    rcourse_ID: rcourse_ID,
+                    instructor_ID: instructor_ID,
+                    run_Startdate: run_Startdate,
+                    run_Enddate: run_Enddate
                 },
             });
             return response.data;
@@ -18,12 +22,16 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getInstructorAverageRatings(course_ID, runcourse_ID) {
+    async getInstructorAverageRatings(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             const response = await axiosClient.get('/dashboard/instructor_average_ratings', {
                 params: {
                     course_ID: course_ID,
-                    runcourse_ID: runcourse_ID
+                    coursecat_ID: coursecat_ID,
+                    rcourse_ID: rcourse_ID,
+                    instructor_ID: instructor_ID,
+                    run_Startdate: run_Startdate,
+                    run_Enddate: run_Enddate
                 },
             });
             return response.data;
@@ -119,15 +127,17 @@ class DashboardService extends BaseApiService {
           throw new Error('Error fetching course feedback');
         }
     }
-    async getCourseSentimentData(course_ID, rcourse_ID) {
+    async getCourseSentimentData(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
-            // console.log(course_ID)
-            // console.log(rcourse_ID)
             let response = await axiosClient.get("/dashboard/course_sentiment_data",
                 {
                     params: {
                         course_ID: course_ID,
-                        rcourse_ID: rcourse_ID
+                        coursecat_ID: coursecat_ID,
+                        rcourse_ID: rcourse_ID,
+                        instructor_ID: instructor_ID,
+                        run_Startdate: run_Startdate,
+                        run_Enddate: run_Enddate
                     },
                 }
             );
@@ -137,13 +147,17 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getInstructorSentimentData(course_ID, rcourse_ID) {
+    async getInstructorSentimentData(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             let response = await axiosClient.get("/dashboard/instructor_sentiment_data",
                 {
                     params: {
                         course_ID: course_ID,
-                        rcourse_ID: rcourse_ID
+                        coursecat_ID: coursecat_ID,
+                        rcourse_ID: rcourse_ID,
+                        instructor_ID: instructor_ID,
+                        run_Startdate: run_Startdate,
+                        run_Enddate: run_Enddate
                     },
                 }
             );
@@ -153,13 +167,17 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getCourseWordcloudData(course_ID, rcourse_ID) {
+    async getCourseWordcloudData(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             let response = await axiosClient.get("/dashboard/course_wordcloud_data",
                 {
                     params: {
                         course_ID: course_ID,
-                        rcourse_ID: rcourse_ID
+                        coursecat_ID: coursecat_ID,
+                        rcourse_ID: rcourse_ID,
+                        instructor_ID: instructor_ID,
+                        run_Startdate: run_Startdate,
+                        run_Enddate: run_Enddate
                     },
                 }
             );
@@ -169,13 +187,17 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getInstructorWordcloudData(course_ID, rcourse_ID) {
+    async getInstructorWordcloudData(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             let response = await axiosClient.get("/dashboard/instructor_wordcloud_data",
                 {
                     params: {
                         course_ID: course_ID,
-                        rcourse_ID: rcourse_ID
+                        coursecat_ID: coursecat_ID,
+                        rcourse_ID: rcourse_ID,
+                        instructor_ID: instructor_ID,
+                        run_Startdate: run_Startdate,
+                        run_Enddate: run_Enddate
                     },
                 }
             )

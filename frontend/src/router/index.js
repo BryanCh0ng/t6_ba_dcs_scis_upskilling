@@ -287,6 +287,15 @@ const routes = [
     }
   },
   {
+    path: '/viewInstructorFeedbackAnalysis/:id',
+    name: 'viewInstructorFeedbackAnalysis',
+    component: () => import('../views/dashboard/viewDashboard.vue'),
+    meta: {
+        title: 'Admin View Feedback Analysis of a Particular Instructor',
+        requiresAuth: true
+    }
+  },
+  {
     path: '/submitFeedback/:id',
     name: 'submitFeedback',
     component: () => import('../views/feedback/submitFeedback.vue'),

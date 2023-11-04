@@ -663,12 +663,12 @@ export default {
         },
         async fetchTemplateByID() {
             try {
-                console.log(this.templateID)
+                //console.log(this.templateID)
                 let response = await FeedbackTemplateService.getTemplateById(this.templateID);
-                console.log(response)
+                //console.log(response)
                 if(response.code == 200) {
                     const templateData = response.data.template;
-                    console.log(templateData);
+                    //console.log(templateData);
                     this.formData.selectedTemplate = templateData.feedback_template_name;
                 }
             } catch (error) {
@@ -698,7 +698,7 @@ export default {
         async createRunCourse() {
             try {
                 this.createRunCourseResponse = await RunCourseService.createRunCourse(this.courseId, this.submitFormData);
-                console.log(this.createRunCourseResponse);
+                //console.log(this.createRunCourseResponse);
             } catch (error) {
                 console.error('Error creating a new run course:', error);
                 this.title = "Run Course Creation Failed";

@@ -39,24 +39,24 @@ api = Namespace('course', description='Course related operations')
 # 			)
 # 		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
 
-# retrieve_all_courses_hr = api.parser()
-# @api.route("/get_all_courses_admin")
-# @api.doc(description="Get all courses (Admin)")
-# class GetAllCoursesHR(Resource):
-# 	@api.expect(retrieve_all_courses_hr)
-# 	def get(self):
-# 		courseList = Course.query.all()
-# 		db.session.close()
-# 		if len(courseList):
-# 			return jsonify(
-# 				{
-# 					"code": 200,
-# 					"data": {
-# 						"course": [course.json() for course in courseList]
-# 					}
-# 				}
-# 			)
-# 		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
+retrieve_all_courses_hr = api.parser()
+@api.route("/get_all_courses_admin")
+@api.doc(description="Get all courses (Admin)")
+class GetAllCoursesHR(Resource):
+    @api.expect(retrieve_all_courses_hr)
+    def get(self):
+        courseList = Course.query.all()
+        db.session.close()
+        if len(courseList):
+            return jsonify(
+ 				{
+ 					"code": 200,
+ 					"data": {
+ 						"course": [course.json() for course in courseList]
+ 					}
+ 				}
+ 			)
+        return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
 
 retrieve_all_courses_filter_search = api.parser()
 retrieve_all_courses_filter_search.add_argument("course_name", help="Enter course name")

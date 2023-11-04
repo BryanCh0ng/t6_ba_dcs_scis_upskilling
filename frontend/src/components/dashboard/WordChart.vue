@@ -1,22 +1,19 @@
 <template>
     <div id="chart-container">
-        <canvas :id="'chart-' + chartId" width="350" height="250"></canvas>
+        <canvas :id="'chart-' + uniqueChartId" width="350" height="250"></canvas>
     </div>
 </template>
   
 <script>
 import Chart from 'chart.js/auto';
 import { WordCloudController, WordElement } from 'chartjs-chart-wordcloud';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 export default {
     name: 'WordCloud',
     props: {
         datasets: {
             type: Array,
-            required: true
-        },
-        chartId: {
-            type: Number,
             required: true
         },
         label: {
@@ -37,15 +34,24 @@ export default {
         },
 
     },
-    mounted() {
-        this.$nextTick(() => {
-            const ctx = document.getElementById('chart-' + this.chartId);
-            Chart.register(WordCloudController, WordElement);
+    data() {
+        return {
+            uniqueChartId: `${Date.now()}-${Math.floor(Math.random() * 10000)}` // Generate a unique chartId
+        };
+    },
+    methods: {
+        createChart() {
+            const canvas = document.getElementById('chart-' + this.uniqueChartId);
+            if (canvas) {
+                // Destroy the existing chart if it exists
+                const existingChart = Chart.getChart(canvas);
+                if (existingChart) {
+                    existingChart.destroy();
+                }
+            }
 
-            // Change default options for ALL charts
-            /*Chart.defaults.set('plugins.datalabels', {
-                color: '#FE777B'
-            });*/
+            const ctx = canvas.getContext('2d');
+            Chart.register(WordCloudController, WordElement, ChartDataLabels);
 
             new Chart(ctx, {
                 type: 'wordCloud',
@@ -102,7 +108,21 @@ export default {
                 },
                             
             });
-        });
+            
+        }
+    },
+    mounted() {
+        this.createChart();
+    }, 
+    watch: {
+        datasets: {
+            deep: true,
+            handler(newData) {
+                this.createChart();
+                console.log("Received updated datasets:", newData);
+                // You can also call a method to update the chart here if needed
+            }
+        }
     }
 }
 </script>
