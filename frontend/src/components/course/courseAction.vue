@@ -66,7 +66,7 @@ export default {
           response = await CourseService.activateRunCourse(this.course.course_ID);
         } else if (this.status == 'Deactivate') {
           response = await CourseService.deactivateRunCourse(this.course.course_ID);
-        } else  if (this.status == 'Active') {
+        } else  if (this.status == 'Ongoing') {
           response = await RegistrationService.createNewRegistration(this.course.rcourse_ID, user_ID, "Pending");
         } else if (this.status == "registered_drop") {
           response = await RegistrationService.dropRegisteredCourse(this.course.rcourse_ID, user_ID);

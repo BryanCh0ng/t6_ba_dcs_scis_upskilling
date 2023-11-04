@@ -39,6 +39,7 @@
                     </a>
                   </th>
                   <th scope="col">Course Details</th>
+                  <th scope="col">Lessons</th>
                   <th scope="col">Action(s)</th>
                 </tr>
               </thead>
@@ -58,6 +59,9 @@
                   </td>
                   <td>
                     <a class="text-nowrap text-dark text-decoration-underline view-course-details" @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a>
+                  </td>
+                  <td>
+                    <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(course.rcourse_ID)">View Lessons</a>
                   </td>
                   <td>
                     <course-action @action-and-message-updated="handleActionData" :status="course.runcourse_Status" :course="course"></course-action>
@@ -317,6 +321,10 @@ export default {
         console.error("Error fetching user ID:", error);
         this.user_ID = null;
       }
+    },
+
+    viewLessons(courseID) {
+      this.$router.push({ name: 'viewRunCourseLesson', params: {id: courseID}});
     },
   },
   async created() {

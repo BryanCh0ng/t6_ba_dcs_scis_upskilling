@@ -153,25 +153,28 @@ class RecommenderCourseRegistration(Resource):
         try:
             
             course_list_req = request.json['params']['course_list_req']
+
             if not course_list_req:
                 return jsonify({"code": 200, "data": {"course_list": []}})
             
             last_three_reg = request.json['params']['course_list_req'][-3:]
+
             rcourse_id_list = [course['rcourse_ID'] for course in last_three_reg]
+
             user_ID = session.get('user_ID')
             
             reg_list = self.get_registration_data()
+
             pivot_df = self.create_user_course_matrix(reg_list)
+
             course_similarity_df = self.calculate_course_similarity(pivot_df)
 
-            
             rcourse_ids = self.get_registered_courses(user_ID, course_list_req)
+
             recommended_courses_course_similarity = self.recommend_courses(rcourse_id_list, course_similarity_df, rcourse_ids, course_list_req)
 
-            
             recommended_courses_user_similarity = self.recommend_courses_user_similarity(user_ID, rcourse_ids, 10)
 
-            
             combined_recommendations = list(set(tuple(course.items()) for course in recommended_courses_course_similarity + recommended_courses_user_similarity))
 
             recommendations = [dict(course) for course in combined_recommendations]
@@ -182,9 +185,9 @@ class RecommenderCourseRegistration(Resource):
 
     def get_registration_data(self):
         reg_list = []
-        regList = regList = Registration.query.filter(Registration.reg_Status.in_(['Enrolled', 'Pending'])).all()
+        all_registration_list = Registration.query.filter(Registration.reg_Status.in_(['Enrolled', 'Pending'])).all()
 
-        for reg in regList:
+        for reg in all_registration_list:
             rcourse_id = reg.rcourse_ID
             userid = reg.user_ID
             registered_course = self.get_registered_course_info(rcourse_id, userid)
@@ -322,10 +325,10 @@ class RecommenderCourseRegistration(Resource):
         return course_list
 
     def recommend_courses_user_similarity(self, user_ID, rcourse_ids, num_recommendations):
-        regList = Registration.query.filter(Registration.reg_Status.in_(['Enrolled', 'Pending'])).all()
+        all_registration_list = Registration.query.filter(Registration.reg_Status.in_(['Enrolled', 'Pending'])).all()
         
         reg_list = []
-        for reg in regList:
+        for reg in all_registration_list:
             reg = reg.json()
             rcourseid = reg["rcourse_ID"]
             userid = reg["user_ID"]

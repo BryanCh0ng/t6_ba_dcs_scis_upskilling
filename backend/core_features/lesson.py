@@ -175,7 +175,7 @@ class GetLessonsByRcourseId(Resource):
                 lesson["lesson_Status"] == "Ended",
                 lesson["lesson_Date"],
                 lesson["lesson_Starttime"]
-            ), reverse=True)
+            ))
             return {"code": 200, "lessons": sorted_lessons}, 200
 
         except Exception as e:

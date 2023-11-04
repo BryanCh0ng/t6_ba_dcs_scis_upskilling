@@ -33,6 +33,7 @@
                         <a href="" @click.prevent="sort('run_Enddate', 'assigned')" class="text-decoration-none text-dark">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
                     <th scope="col">Start & End Time</th>
                     <th scope="col">Course Details</th>
+                    <th scope="col">Lessons</th>
                     <th scope="col">Action(s)</th>
                     </tr>
                 </thead>
@@ -52,6 +53,9 @@
                           <course-duration :start_time="assigned_course.run_Starttime" :end_time="assigned_course.run_Endtime"></course-duration> 
                         </td>
                         <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(assigned_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
+                        <td>
+                          <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(assigned_course.rcourse_ID)">View Lessons</a>
+                        </td>
                         <td>
                           <course-action status="attendance" :id="assigned_course.course_ID"></course-action>
                         </td>
@@ -156,8 +160,9 @@
                       <a href="" @click.prevent="sort('run_Startdate', 'conducted')" class="text-decoration-none text-dark">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
                     <th scope="col">
                       <a href="" @click.prevent="sort('run_Enddate', 'conducted')" class="text-decoration-none text-dark">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
-                    <th scope="col">Feedback</th>
                     <th scope="col">Course Details</th>
+                    <th scope="col">Lessons</th>
+                    <th scope="col">Feedback</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -172,8 +177,11 @@
                     <td class="end_date">
                         <course-date :date="conducted_course.run_Enddate"></course-date>
                     </td>
-                    <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToRunCourseFeedbackAnalysis(conducted_course.rcourse_ID)">View Feedback Analysis</a></td>
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(conducted_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
+                    <td>
+                      <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(course.rcourse_ID)">View Lessons</a>
+                    </td>
+                    <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToRunCourseFeedbackAnalysis(conducted_course.rcourse_ID)">View Feedback Analysis</a></td>
                     
                     </tr>
                 </tbody>
@@ -459,6 +467,10 @@ export default {
       } catch (error) {
         console.error("Error fetching course details:", error);
       }
+    },
+
+    viewLessons(courseID) {
+      this.$router.push({ name: 'viewRunCourseLesson', params: {id: courseID}});
     },
 
     async getUserID() {

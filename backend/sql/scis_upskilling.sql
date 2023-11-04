@@ -2232,7 +2232,14 @@ INSERT INTO registration VALUES
     (119, 10, 50, 'Enrolled'),
     (120, 10, 51, 'Enrolled'),
     (121, 10, 52, 'Enrolled'),
-    (122, 10, 53, 'Enrolled');
+    (122, 10, 53, 'Enrolled'),
+    (123, 12, 56, 'Pending'),
+    (124, 11, 56, 'Dropped'),
+    (125, 11, 1, 'Enrolled'),
+    (126, 10, 1, 'Enrolled'),
+    (127, 11, 1, 'Enrolled'),
+    (128, 12, 1, 'Enrolled'),
+    (129, 13, 1, 'Enrolled');
 
 
 DROP TABLE IF EXISTS `lesson`;

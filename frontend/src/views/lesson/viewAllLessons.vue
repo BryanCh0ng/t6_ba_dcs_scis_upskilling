@@ -137,6 +137,8 @@
     },
     async created() {
       this.loadData();
+      this.sort('lesson_Date');
+      this.sortDirection = 'desc';
     },
     }
 </script>

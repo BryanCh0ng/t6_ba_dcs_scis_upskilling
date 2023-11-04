@@ -149,11 +149,9 @@ class GetAllAdmin(Resource):
 
 # All Instructors
 retrieve_instructors_trainers = api.parser()
-retrieve_instructors_trainers.add_argument(
-    "instructor_name", help="Enter instructor name")
+retrieve_instructors_trainers.add_argument("instructor_name", help="Enter instructor name")
 retrieve_instructors_trainers.add_argument("role_name", help="Enter role name")
-retrieve_instructors_trainers.add_argument(
-    "organization_name", help="Enter organization")
+retrieve_instructors_trainers.add_argument("organization_name", help="Enter organization")
 
 
 @api.route("/get_all_instructors_and_trainers")
@@ -263,7 +261,6 @@ class GetAllInstructorsAndTrainers(Resource):
 # Student Name
 retrieve_student_name = api.parser()
 retrieve_student_name.add_argument("user_id", help="Enter user id")
-
 
 @api.route("/get_student_name")
 @api.doc(description="Get student name")

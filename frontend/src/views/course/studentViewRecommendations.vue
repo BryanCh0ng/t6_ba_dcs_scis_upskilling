@@ -25,6 +25,7 @@
                     <th scope="col">
                         <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'register_top')">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
                     <th scope="col">Course Details</th>
+                    <th scope="col">Lessons</th>
                     <th scope="col">Action(s)</th>
                   </tr>
                 </thead>
@@ -42,8 +43,10 @@
                     <td class="closing_date">
                       <course-date-time :date="top_pick.reg_Enddate" :time="top_pick.reg_Endtime"></course-date-time>
                     </td>
-                    
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(top_pick)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
+                    <td>
+                      <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(top_pick.rcourse_ID)">View Lessons</a>
+                    </td>
                     <td><course-action @action-and-message-updated="handleActionData" :status="top_pick.runcourse_Status" :course="top_pick"></course-action></td>
                   </tr>
                 </tbody>
@@ -71,6 +74,7 @@
                   <th scope="col">
                       <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'registation_justforyou')">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
                   <th scope="col">Course Details</th>
+                  <th scope="col">Lessons</th>
                   <th scope="col">Action(s)</th>
                 </tr>
               </thead>
@@ -89,7 +93,9 @@
                     <course-date-time :date="reg_course.reg_Enddate" :time="reg_course.reg_Endtime"></course-date-time>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(reg_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-
+                  <td>
+                    <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(reg_course.rcourse_ID)">View Lessons</a>
+                  </td>
                   <td><course-action @action-and-message-updated="handleActionData" :status="reg_course.runcourse_Status" :course="reg_course"></course-action></td>
                   
                 </tr>
@@ -119,6 +125,7 @@
                   <th scope="col">
                       <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'registration_others')">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
                   <th scope="col">Course Details</th>
+                  <th scope="col">Lessons</th>
                   <th scope="col">Action(s)</th>
                 </tr>
               </thead>
@@ -137,6 +144,9 @@
                     <course-date-time :date="reg_course.reg_Enddate" :time="reg_course.reg_Endtime"></course-date-time>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(reg_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
+                  <td>
+                    <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(reg_course.rcourse_ID)">View Lessons</a>
+                  </td>
                   <td><course-action @action-and-message-updated="handleActionData" :status="reg_course.runcourse_Status" :course="reg_course"></course-action></td>
                 </tr>
               </tbody>
@@ -471,7 +481,10 @@ export default {
         }
       }
 
-    }
+    },
+    viewLessons(courseID) {
+      this.$router.push({ name: 'viewRunCourseLesson', params: {id: courseID}});
+    },
   },
   computed: {
     displayedRegCourseForYou() {
