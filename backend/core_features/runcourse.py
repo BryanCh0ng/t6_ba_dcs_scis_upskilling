@@ -36,6 +36,17 @@ class GetAllRunCourses(Resource):
                 course.run_Endtime = course.run_Endtime.strftime('%H:%M:%S')
                 course.reg_Starttime = course.reg_Starttime.strftime('%H:%M:%S')
                 course.reg_Endtime = course.reg_Endtime.strftime('%H:%M:%S')  
+                course.feedback_Starttime = course.feedback_Starttime.strftime('%H:%M:%S')  
+                course.feedback_Endtime = course.feedback_Endtime.strftime('%H:%M:%S') 
+
+            # Check data types
+            for course in runCourseList:
+                print("Type of run_Starttime:", type(course.run_Starttime))
+                print("Type of run_Endtime:", type(course.run_Endtime))
+                print("Type of reg_Starttime:", type(course.reg_Starttime))
+                print("Type of reg_Endtime:", type(course.reg_Endtime))
+
+
             return jsonify(
                 {
                     "code": 200,
