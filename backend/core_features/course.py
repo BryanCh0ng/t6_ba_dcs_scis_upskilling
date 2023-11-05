@@ -1201,10 +1201,10 @@ class GetAllCoursesWithRegistrationCount(Resource):
                     'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
                     'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
                     'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
-                    'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
-                    'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
-                    'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
-                    'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime)
+                    # 'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
+                    # 'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
+                    # 'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
+                    # 'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime)
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -1269,10 +1269,10 @@ class GetAllCoursesWithRegistrationCount(Resource):
                     'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
                     'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
                     'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
-                    'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
-                    'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
-                    'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
-                    'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime),
+                    # 'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
+                    # 'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
+                    # 'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
+                    # 'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}

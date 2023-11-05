@@ -37,6 +37,7 @@ class runCourseService extends BaseApiService {
     }
   }
   async getRunCourseById(runcourseId) {
+    console.log(runcourseId)
     try {
         let runcourse = await axiosClient.get("/runcourse/get_runcourse_by_id", { params: { runcourse_id: runcourseId } });
         return runcourse.data

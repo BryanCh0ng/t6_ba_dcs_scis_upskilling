@@ -357,6 +357,24 @@ const routes = [
         requiresAuth: true
     }, 
   }, 
+  {
+    path: '/createRunCourseLesson/:id',
+    name: 'createRunCourseLesson',
+    component: () => import('../views/lesson/adminCreateRunCourseLesson.vue'),
+    meta: {
+        title: 'Create Run Course Lesson',
+        requiresAuth: true
+    }, 
+  },
+  {
+    path: '/editRunCourseLesson/:id',
+    name: 'editRunCourseLesson',
+    component: () => import('../views/lesson/editRunCourseLesson.vue'),
+    meta: {
+        title: 'Edit Run Course Lesson',
+        requiresAuth: true
+    }, 
+  }
   // {
   //   path: '/viewAttendance/:lessonId',
   //   name: 'viewAttendance',

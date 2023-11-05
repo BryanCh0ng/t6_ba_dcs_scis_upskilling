@@ -14,7 +14,7 @@
         :search-api="searchAllSubmittedProposedCoursesAdmin"
         @search-complete="handleSearchComplete" />
 
-        <div class="container col-12e">
+        <div class="container col-12">
           <h5 class="pb-3">Proposed Course</h5>
           <div v-if="pending_courses && pending_courses.length > 0" class="table-responsive">
             <table class="table bg-white">
