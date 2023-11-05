@@ -70,7 +70,7 @@
                   <th scope="col">
                       <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'registation_justforyou')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
                   <th scope="col">
-                      <a href="" class="register_otherstext-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'registation_justforyou')">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
+                      <a href="" class="register_others text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'registation_justforyou')">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
                   <th scope="col">
                       <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'registation_justforyou')">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
                   <th scope="col">Course Details</th>

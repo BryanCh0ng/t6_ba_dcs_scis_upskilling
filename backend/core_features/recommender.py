@@ -1,5 +1,6 @@
 from flask import request, jsonify, session
 from flask_restx import Namespace, Resource
+from core_features import common
 from allClasses import *
 from datetime import datetime, date, time
 from sqlalchemy import func, select
@@ -128,14 +129,18 @@ class RecommenderUserRegistration(Resource):
                     else:
                         datapoint[field] = rcourse[field]
                
-                datapoint["reg_Startdate"] = format_date_time(rcourse["reg_Startdate"])
-                datapoint["reg_Enddate"] = format_date_time(rcourse["reg_Enddate"])
-                datapoint["run_Startdate"] = format_date_time(rcourse["run_Startdate"])
-                datapoint["run_Enddate"] = format_date_time(rcourse["run_Enddate"])
-                datapoint["reg_Starttime"] = format_date_time(rcourse["reg_Starttime"])
-                datapoint["reg_Endtime"] = format_date_time(rcourse["reg_Endtime"])
-                datapoint["run_Starttime"] = format_date_time(rcourse["run_Starttime"])
-                datapoint["run_Endtime"] = format_date_time(rcourse["run_Endtime"])
+                datapoint["reg_Startdate"] = common.format_date_time(rcourse["reg_Startdate"])
+                datapoint["reg_Enddate"] = common.format_date_time(rcourse["reg_Enddate"])
+                datapoint["run_Startdate"] = common.format_date_time(rcourse["run_Startdate"])
+                datapoint["run_Enddate"] = common.format_date_time(rcourse["run_Enddate"])
+                datapoint["reg_Starttime"] = common.format_date_time(rcourse["reg_Starttime"])
+                datapoint["reg_Endtime"] = common.format_date_time(rcourse["reg_Endtime"])
+                datapoint["run_Starttime"] = common.format_date_time(rcourse["run_Starttime"])
+                datapoint["run_Endtime"] = common.format_date_time(rcourse["run_Endtime"])
+                datapoint["feedback_Startdate"] = common.format_date_time(rcourse["feedback_Startdate"])
+                datapoint["feedback_Enddate"] = common.format_date_time(rcourse["feedback_Enddate"])
+                datapoint["feedback_Starttime"] = common.format_date_time(rcourse["feedback_Starttime"])
+                datapoint["feedback_Endtime"] = common.format_date_time(rcourse["feedback_Endtime"])
 
                 course_list.append(datapoint)
 
@@ -314,12 +319,17 @@ class RecommenderCourseRegistration(Resource):
                 else:
                     datapoint[field] = rcourse[field]
 
-            datapoint["reg_Enddate"] = format_date_time(rcourse["reg_Enddate"])
-            datapoint["run_Startdate"] = format_date_time(rcourse["run_Startdate"])
-            datapoint["run_Enddate"] = format_date_time(rcourse["run_Enddate"])
-            datapoint["reg_Endtime"] = format_date_time(rcourse["reg_Endtime"])
-            datapoint["run_Starttime"] = format_date_time(rcourse["run_Starttime"])
-            datapoint["run_Endtime"] = format_date_time(rcourse["run_Endtime"])
+            datapoint["reg_Enddate"] = common.format_date_time(rcourse["reg_Enddate"])
+            datapoint["run_Startdate"] = common.format_date_time(rcourse["run_Startdate"])
+            datapoint["run_Enddate"] = common.format_date_time(rcourse["run_Enddate"])
+            datapoint["reg_Endtime"] = common.format_date_time(rcourse["reg_Endtime"])
+            datapoint["run_Starttime"] = common.format_date_time(rcourse["run_Starttime"])
+            datapoint["run_Endtime"] = common.format_date_time(rcourse["run_Endtime"])
+            datapoint["feedback_Startdate"] = common.format_date_time(rcourse["feedback_Startdate"])
+            datapoint["feedback_Enddate"] = common.format_date_time(rcourse["feedback_Enddate"])
+            datapoint["feedback_Starttime"] = common.format_date_time(rcourse["feedback_Starttime"])
+            datapoint["feedback_Endtime"] = common.format_date_time(rcourse["feedback_Endtime"])
+            
             course_list.append(datapoint)
 
         return course_list
@@ -759,14 +769,18 @@ class GetTop10CoursesByRegistrationCount(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    'run_Startdate': format_date_time(result[2].run_Startdate),
-                    'run_Enddate': format_date_time(result[2].run_Enddate),
-                    'run_Starttime': format_date_time(result[2].run_Starttime),
-                    'run_Endtime': format_date_time(result[2].run_Endtime),
-                    'reg_Startdate': format_date_time(result[2].reg_Startdate),
-                    'reg_Enddate': format_date_time(result[2].reg_Enddate),
-                    'reg_Starttime': format_date_time(result[2].reg_Starttime),
-                    'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                    'run_Startdate': common.format_date_time(result[2].run_Startdate),
+                    'run_Enddate': common.format_date_time(result[2].run_Enddate),
+                    'run_Starttime': common.format_date_time(result[2].run_Starttime),
+                    'run_Endtime': common.format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': common.format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
+                    'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
+                    'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
+                    'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
+                    'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -877,14 +891,18 @@ class GetCourseRegistrationInfo(Resource):
             result_data = []
             for result in results:
                 run_course_attrs = {
-                    "run_Startdate": result[2].run_Startdate.strftime('%Y-%m-%d'),
-                    "run_Enddate": result[2].run_Enddate.strftime('%Y-%m-%d'),
-                    "run_Starttime": result[2].run_Starttime.strftime('%H:%M:%S'),
-                    "run_Endtime": result[2].run_Endtime.strftime('%H:%M:%S'),
-                    "reg_Startdate": result[2].reg_Startdate.strftime('%Y-%m-%d'),
-                    "reg_Enddate": result[2].reg_Enddate.strftime('%Y-%m-%d'),
-                    "reg_Starttime": result[2].reg_Starttime.strftime('%H:%M:%S'),
-                    "reg_Endtime": result[2].reg_Endtime.strftime('%H:%M:%S'),
+                    'run_Startdate': common.format_date_time(result[2].run_Startdate),
+                    'run_Enddate': common.format_date_time(result[2].run_Enddate),
+                    'run_Starttime': common.format_date_time(result[2].run_Starttime),
+                    'run_Endtime': common.format_date_time(result[2].run_Endtime),
+                    'reg_Startdate': common.format_date_time(result[2].reg_Startdate),
+                    'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
+                    'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
+                    'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
+                    'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
+                    'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
+                    'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
+                    'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -903,10 +921,3 @@ class GetCourseRegistrationInfo(Resource):
         
         return jsonify({"code": 404, "message": "No matching course registration information found"})
     
-def format_date_time(value):
-    if isinstance(value, (date, datetime)):
-        return value.strftime('%Y-%m-%d')
-    elif isinstance(value, time):
-        return value.strftime('%H:%M:%S')
-    else:
-        return None
