@@ -40,13 +40,17 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getCourseDoneWellFeedback(course_ID, runcourse_ID) {
+    async getCourseDoneWellFeedback(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             // console.log(course_ID)
             const response = await axiosClient.get('/dashboard/feedback_course_done_well_specific', {
                 params: {
                     course_ID: course_ID,
-                    runcourse_ID: runcourse_ID
+                    coursecat_ID: coursecat_ID,
+                    rcourse_ID: rcourse_ID,
+                    instructor_ID: instructor_ID,
+                    run_Startdate: run_Startdate,
+                    run_Enddate: run_Enddate
                 },
             });
             return response.data;
@@ -55,13 +59,17 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getCourseImproveFeedback(course_ID, runcourse_ID) {
+    async getCourseImproveFeedback(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             // console.log(course_ID)
             const response = await axiosClient.get('/dashboard/feedback_course_improve_specific', {
                 params: {
                     course_ID: course_ID,
-                    runcourse_ID: runcourse_ID
+                    coursecat_ID: coursecat_ID,
+                    rcourse_ID: rcourse_ID,
+                    instructor_ID: instructor_ID,
+                    run_Startdate: run_Startdate,
+                    run_Enddate: run_Enddate
                 },
             });
             return response.data;
@@ -70,13 +78,17 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getInstructorDoneWellFeedback(course_ID, runcourse_ID) {
+    async getInstructorDoneWellFeedback(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             // console.log(course_ID)
             const response = await axiosClient.get('/dashboard/feedback_instructor_done_well_specific', {
                 params: {
                     course_ID: course_ID,
-                    runcourse_ID: runcourse_ID
+                    coursecat_ID: coursecat_ID,
+                    rcourse_ID: rcourse_ID,
+                    instructor_ID: instructor_ID,
+                    run_Startdate: run_Startdate,
+                    run_Enddate: run_Enddate
                 },
             });
             return response.data;
@@ -85,13 +97,17 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getInstructorImproveFeedback(course_ID, runcourse_ID) {
+    async getInstructorImproveFeedback(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             // console.log(course_ID)
             const response = await axiosClient.get('/dashboard/feedback_instructor_improve_specific', {
                 params: {
                     course_ID: course_ID,
-                    runcourse_ID: runcourse_ID
+                    coursecat_ID: coursecat_ID,
+                    rcourse_ID: rcourse_ID,
+                    instructor_ID: instructor_ID,
+                    run_Startdate: run_Startdate,
+                    run_Enddate: run_Enddate
                 },
             });
             return response.data;
@@ -100,33 +116,7 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getRunCourseImproveFeedback(runcourse_ID) {
-        try {
-            // console.log(course_ID)
-            const response = await axiosClient.get('/dashboard/feedback_runcourse_improve_specific', {
-                params: {
-                    runcourse_ID: runcourse_ID,
-                },
-            });
-            return response.data;
-        } catch (error) {
-          throw new Error('Error fetching course feedback');
-        }
-    }
-
-    async getRunCourseInstructorImproveFeedback(runcourse_ID) {
-        try {
-            // console.log(course_ID)
-            const response = await axiosClient.get('/dashboard/feedback_runcourse_improve_specific', {
-                params: {
-                    runcourse_ID: runcourse_ID,
-                },
-            });
-            return response.data;
-        } catch (error) {
-          throw new Error('Error fetching course feedback');
-        }
-    }
+    
     async getCourseSentimentData(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             let response = await axiosClient.get("/dashboard/course_sentiment_data",

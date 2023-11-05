@@ -338,7 +338,7 @@ export default {
     // Topic modeling for a particular course (done well)
     async fetchCourseDoneWellTopics() {
       try {
-        const response = await DashboardService.getCourseDoneWellFeedback(this.courseID, this.runcourseID);
+        const response = await DashboardService.getCourseDoneWellFeedback(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
 
         this.courseDoneWellTopics = response.topic_words_list;
 
@@ -349,7 +349,7 @@ export default {
     // Topic modeling for a particular course (improve)
     async fetchCourseImproveTopics() {
       try {
-        const response = await DashboardService.getCourseImproveFeedback(this.courseID, this.runcourseID);
+        const response = await DashboardService.getCourseImproveFeedback(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
 
         this.courseSuggestionsTopics = response.topic_words_list;
 
@@ -361,7 +361,7 @@ export default {
     async fetchInstructorDoneWellTopics() {
       try {
         // course
-        const response = await DashboardService.getInstructorDoneWellFeedback(this.courseID, this.runcourseID);
+        const response = await DashboardService.getInstructorDoneWellFeedback(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
         // console.log(response)
         this.instructorDoneWellTopics = response.topic_words_list;
 
@@ -373,7 +373,7 @@ export default {
     async fetchInstructorImproveTopics() {
       try {
         // course
-        const response = await DashboardService.getInstructorImproveFeedback(this.courseID, this.runcourseID);
+        const response = await DashboardService.getInstructorImproveFeedback(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
         // console.log(response)
         this.instructorSuggestionsTopics = response.topic_words_list;
 
@@ -638,6 +638,13 @@ export default {
       await this.fetchInstructorSentimentData()
       await this.fetchCourseWordcloudData()
       await this.fetchInstructorWordcloudData()
+      await this.fetchCourseDoneWellTopics()
+      await this.fetchCourseImproveTopics()
+      await this.fetchInstructorDoneWellTopics()
+      await this.fetchInstructorImproveTopics()
+      await this.fetchCourseName()
+      await this.fetchRunCourseName()
+      await this.fetchInstructorName()
 
     },
     handleModalClosed(value) {

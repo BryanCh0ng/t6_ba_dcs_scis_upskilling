@@ -550,7 +550,11 @@ def tune_nmf_hyperparameters(corpus, n_topics_range, max_df_range):
 # Get the topic for specific course or all courses (done well)
 feedback_course_done_well_specific = api.parser()
 feedback_course_done_well_specific.add_argument("course_ID", help="Enter course_ID")
-feedback_course_done_well_specific.add_argument("runcourse_ID", help="Enter runcourse_ID")
+feedback_course_done_well_specific.add_argument("coursecat_ID", help="Enter course category ID")
+feedback_course_done_well_specific.add_argument("rcourse_ID", help="Enter run course ID")
+feedback_course_done_well_specific.add_argument("instructor_ID", help="Enter instructor ID")
+feedback_course_done_well_specific.add_argument("run_Startdate", help="Enter run start date")
+feedback_course_done_well_specific.add_argument("run_Enddate", help="Enter run end date")
 
 @api.route("/feedback_course_done_well_specific")
 @api.doc(description="Course-specific feedback")
@@ -560,7 +564,14 @@ class CourseDoneWellFeedback(Resource):
         # Parse the course_ID from the request arguments
         args = feedback_course_done_well_specific.parse_args()
         course_ID = args.get("course_ID", "")
-        runcourse_ID = args.get("runcourse_ID", "")
+        coursecatID = args.get("coursecat_ID", "")
+        rcourse_ID = args.get("rcourse_ID", "")
+        instructorID = args.get("instructor_ID", "")
+        start_date = args.get('run_Startdate', "")
+        end_date = args.get("run_Enddate", "")
+
+        formatted_start_date = None
+        formatted_end_date = None
 
         keywords = ['course']
         optional_keywords = ['done well', 'contributed', 'did well']
@@ -570,16 +581,6 @@ class CourseDoneWellFeedback(Resource):
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
                 .filter(TemplateAttribute.input_Type == "Text Field")
             )
-
-        if runcourse_ID:
-            # Filter by rcourse_ID
-            query = query.filter(Feedback.rcourse_ID == runcourse_ID)
-
-        elif course_ID:
-            # Join with RunCourse table and filter by course_ID
-            query = query.join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID)
-            query = query.filter(RunCourse.course_ID == course_ID)
-        
 
         for keyword in keywords:
             query = query.filter(func.lower(TemplateAttribute.question).contains(keyword))
@@ -591,6 +592,35 @@ class CourseDoneWellFeedback(Resource):
             ]
         )
         query = query.filter(optional_keyword_filter)
+
+        if course_ID and course_ID != "[]":
+            course_ID = json.loads(course_ID)
+            #print(courseID)
+            query = query.filter(RunCourse.course_ID.in_(course_ID))
+            #print("running", str(query))
+
+        if coursecatID and coursecatID != "[]":
+            coursecatID = json.loads(coursecatID)
+            query = query.filter(Course.coursecat_ID.in_(coursecatID))
+
+        if rcourse_ID and rcourse_ID != "[]":
+            # Filter by rcourse_ID
+            rcourse_ID = json.loads(rcourse_ID)
+            query = query.filter(Feedback.rcourse_ID.in_(rcourse_ID))
+
+        if instructorID and instructorID != "[]":
+            instructorID = json.loads(instructorID)
+            query = query.filter(RunCourse.instructor_ID.in_(instructorID))
+
+        if start_date:
+            formatted_start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+
+        if end_date:
+            formatted_end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+
+        if formatted_start_date and formatted_end_date: 
+            query = query.filter(RunCourse.run_Startdate >= formatted_start_date, RunCourse.run_Enddate <= formatted_end_date)
+
 
         results = query.all()
         # print(results)
@@ -654,7 +684,11 @@ class CourseDoneWellFeedback(Resource):
 # Get the topic for specific course or all courses (improve)
 feedback_course_improve_specific = api.parser()
 feedback_course_improve_specific.add_argument("course_ID", help="Enter course_ID")
-feedback_course_improve_specific.add_argument("runcourse_ID", help="Enter runcourse_ID")
+feedback_course_improve_specific.add_argument("coursecat_ID", help="Enter course category ID")
+feedback_course_improve_specific.add_argument("rcourse_ID", help="Enter run course ID")
+feedback_course_improve_specific.add_argument("instructor_ID", help="Enter instructor ID")
+feedback_course_improve_specific.add_argument("run_Startdate", help="Enter run start date")
+feedback_course_improve_specific.add_argument("run_Enddate", help="Enter run end date")
 
 @api.route("/feedback_course_improve_specific")
 @api.doc(description="Course-specific feedback")
@@ -664,7 +698,14 @@ class CourseImproveFeedback(Resource):
         # Parse the course_ID from the request arguments
         args = feedback_course_improve_specific.parse_args()
         course_ID = args.get("course_ID", "")
-        runcourse_ID = args.get("runcourse_ID", "")
+        coursecatID = args.get("coursecat_ID", "")
+        rcourse_ID = args.get("rcourse_ID", "")
+        instructorID = args.get("instructor_ID", "")
+        start_date = args.get('run_Startdate', "")
+        end_date = args.get("run_Enddate", "")
+
+        formatted_start_date = None
+        formatted_end_date = None
 
         keywords = ['course']
         optional_keywords = ['improve', 'suggestions']
@@ -673,17 +714,7 @@ class CourseImproveFeedback(Resource):
                 db.session.query(Feedback.answer)
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
                 .filter(TemplateAttribute.input_Type == "Text Field")
-            )
-
-        if runcourse_ID:
-            # Filter by rcourse_ID
-            query = query.filter(Feedback.rcourse_ID == runcourse_ID)
-
-        elif course_ID:
-            # Join with RunCourse table and filter by course_ID
-            query = query.join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID)
-            query = query.filter(RunCourse.course_ID == course_ID)
-        
+            )       
 
         for keyword in keywords:
             query = query.filter(func.lower(TemplateAttribute.question).contains(keyword))
@@ -694,7 +725,37 @@ class CourseImproveFeedback(Resource):
                 for keyword in optional_keywords
             ]
         )
+
         query = query.filter(optional_keyword_filter)
+
+        if course_ID and course_ID != "[]":
+            course_ID = json.loads(course_ID)
+            #print(courseID)
+            query = query.filter(RunCourse.course_ID.in_(course_ID))
+            #print("running", str(query))
+
+        if coursecatID and coursecatID != "[]":
+            coursecatID = json.loads(coursecatID)
+            query = query.filter(Course.coursecat_ID.in_(coursecatID))
+
+        if rcourse_ID and rcourse_ID != "[]":
+            # Filter by rcourse_ID
+            rcourse_ID = json.loads(rcourse_ID)
+            query = query.filter(Feedback.rcourse_ID.in_(rcourse_ID))
+
+        if instructorID and instructorID != "[]":
+            instructorID = json.loads(instructorID)
+            query = query.filter(RunCourse.instructor_ID.in_(instructorID))
+
+        if start_date:
+            formatted_start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+
+        if end_date:
+            formatted_end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+
+        if formatted_start_date and formatted_end_date: 
+            query = query.filter(RunCourse.run_Startdate >= formatted_start_date, RunCourse.run_Enddate <= formatted_end_date)
+
 
         results = query.all()
         # print(results)
@@ -762,6 +823,12 @@ class CourseImproveFeedback(Resource):
 feedback_instructor_done_well_specific = api.parser()
 feedback_instructor_done_well_specific.add_argument("course_ID", help="Enter course_ID")
 feedback_instructor_done_well_specific.add_argument("rcourse_ID", help="Enter rcourse_ID")
+feedback_instructor_done_well_specific.add_argument("course_ID", help="Enter course_ID")
+feedback_instructor_done_well_specific.add_argument("coursecat_ID", help="Enter course category ID")
+feedback_instructor_done_well_specific.add_argument("rcourse_ID", help="Enter run course ID")
+feedback_instructor_done_well_specific.add_argument("instructor_ID", help="Enter instructor ID")
+feedback_instructor_done_well_specific.add_argument("run_Startdate", help="Enter run start date")
+feedback_instructor_done_well_specific.add_argument("run_Enddate", help="Enter run end date")
 
 @api.route("/feedback_instructor_done_well_specific")
 @api.doc(description="Instructor-specific feedback")
@@ -770,8 +837,15 @@ class InstructorDoneWellFeedback(Resource):
     def get(self):
         # Parse the user_ID from the request arguments
         args = feedback_instructor_done_well_specific.parse_args()
-        courseID = args.get("course_ID", "")
-        rcourseID = args.get("rcourse_ID", "")
+        course_ID = args.get("course_ID", "")
+        coursecatID = args.get("coursecat_ID", "")
+        rcourse_ID = args.get("rcourse_ID", "")
+        instructorID = args.get("instructor_ID", "")
+        start_date = args.get('run_Startdate', "")
+        end_date = args.get("run_Enddate", "")
+
+        formatted_start_date = None
+        formatted_end_date = None
 
         keywords = ['instructor']
         optional_keywords = ['did well', 'contributed', 'done well', 'strengths']
@@ -781,15 +855,6 @@ class InstructorDoneWellFeedback(Resource):
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
                 .filter(TemplateAttribute.input_Type == "Text Field")
             )
-
-        if rcourseID:
-            # Filter by rcourse_ID
-            query = query.filter(Feedback.rcourse_ID == rcourseID)
-
-        elif courseID:
-            # Join with RunCourse table and filter by course_ID
-            query = query.join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID)
-            query = query.filter(RunCourse.course_ID == courseID)
 
         for keyword in keywords:
             query = query.filter(func.lower(TemplateAttribute.question).contains(keyword))
@@ -802,6 +867,34 @@ class InstructorDoneWellFeedback(Resource):
         )
 
         query = query.filter(optional_keyword_filter)
+
+        if course_ID and course_ID != "[]":
+            course_ID = json.loads(course_ID)
+            #print(courseID)
+            query = query.filter(RunCourse.course_ID.in_(course_ID))
+            #print("running", str(query))
+
+        if coursecatID and coursecatID != "[]":
+            coursecatID = json.loads(coursecatID)
+            query = query.filter(Course.coursecat_ID.in_(coursecatID))
+
+        if rcourse_ID and rcourse_ID != "[]":
+            # Filter by rcourse_ID
+            rcourse_ID = json.loads(rcourse_ID)
+            query = query.filter(Feedback.rcourse_ID.in_(rcourse_ID))
+
+        if instructorID and instructorID != "[]":
+            instructorID = json.loads(instructorID)
+            query = query.filter(RunCourse.instructor_ID.in_(instructorID))
+
+        if start_date:
+            formatted_start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+
+        if end_date:
+            formatted_end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+
+        if formatted_start_date and formatted_end_date: 
+            query = query.filter(RunCourse.run_Startdate >= formatted_start_date, RunCourse.run_Enddate <= formatted_end_date)
         
         results = query.all()
         # print(results)
@@ -866,7 +959,11 @@ class InstructorDoneWellFeedback(Resource):
 # Get the topic for specific instructor or all instructor (improve)
 feedback_instructor_improve_specific = api.parser()
 feedback_instructor_improve_specific.add_argument("course_ID", help="Enter course_ID")
-feedback_instructor_improve_specific.add_argument("rcourse_ID", help="Enter rcourse_ID")
+feedback_instructor_improve_specific.add_argument("coursecat_ID", help="Enter course category ID")
+feedback_instructor_improve_specific.add_argument("rcourse_ID", help="Enter run course ID")
+feedback_course_improve_specific.add_argument("instructor_ID", help="Enter instructor ID")
+feedback_instructor_improve_specific.add_argument("run_Startdate", help="Enter run start date")
+feedback_instructor_improve_specific.add_argument("run_Enddate", help="Enter run end date")
 
 @api.route("/feedback_instructor_improve_specific")
 @api.doc(description="Instructor-specific feedback")
@@ -875,7 +972,15 @@ class InstructorDoneWellFeedback(Resource):
     def get(self):
         # Parse the user_ID from the request arguments
         args = feedback_instructor_improve_specific.parse_args()
-        user_ID = args.get("user_ID", "")
+        course_ID = args.get("course_ID", "")
+        coursecatID = args.get("coursecat_ID", "")
+        rcourse_ID = args.get("rcourse_ID", "")
+        instructorID = args.get("instructor_ID", "")
+        start_date = args.get('run_Startdate', "")
+        end_date = args.get("run_Enddate", "")
+
+        formatted_start_date = None
+        formatted_end_date = None
 
         keywords = ['instructor']
         optional_keywords = ['improve', 'suggestions']
@@ -888,15 +993,6 @@ class InstructorDoneWellFeedback(Resource):
             .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
             .filter(TemplateAttribute.input_Type == "Text Field")
         )
-
-        if rcourseID:
-            # Filter by rcourse_ID
-            query = query.filter(Feedback.rcourse_ID == rcourseID)
-
-        elif courseID:
-            # Join with RunCourse table and filter by course_ID
-            query = query.join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID)
-            query = query.filter(RunCourse.course_ID == courseID)
         
         for keyword in keywords:
             query = query.filter(func.lower(TemplateAttribute.question).contains(keyword))
@@ -908,6 +1004,34 @@ class InstructorDoneWellFeedback(Resource):
             ]
         )
         query = query.filter(optional_keyword_filter)
+
+        if course_ID and course_ID != "[]":
+            course_ID = json.loads(course_ID)
+            #print(courseID)
+            query = query.filter(RunCourse.course_ID.in_(course_ID))
+            #print("running", str(query))
+
+        if coursecatID and coursecatID != "[]":
+            coursecatID = json.loads(coursecatID)
+            query = query.filter(Course.coursecat_ID.in_(coursecatID))
+
+        if rcourse_ID and rcourse_ID != "[]":
+            # Filter by rcourse_ID
+            rcourse_ID = json.loads(rcourse_ID)
+            query = query.filter(Feedback.rcourse_ID.in_(rcourse_ID))
+
+        if instructorID and instructorID != "[]":
+            instructorID = json.loads(instructorID)
+            query = query.filter(RunCourse.instructor_ID.in_(instructorID))
+
+        if start_date:
+            formatted_start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+
+        if end_date:
+            formatted_end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+
+        if formatted_start_date and formatted_end_date: 
+            query = query.filter(RunCourse.run_Startdate >= formatted_start_date, RunCourse.run_Enddate <= formatted_end_date)
         
         results = query.all()
         
