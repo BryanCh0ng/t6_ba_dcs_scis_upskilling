@@ -267,107 +267,83 @@ class RunCourseFeedback(Resource):
             args = retrieve_runcourse_id.parse_args()
             course_ID = args.get("course_ID", "")
             runcourse_ID = args.get("runcourse_ID", "")
+            
+            feedback_dict = {}
+            unique_questions = {}
 
             if course_ID:
-              # Check if the run course exists
-              course = Course.query.get(course_ID)
-              if course is None:
-                return jsonify({'message': 'Course not found.', 'code': 404})
+                # Check if the course exists
+                course = Course.query.get(course_ID)
+                if course is None:
+                    return jsonify({'message': 'Course not found.', 'code': 404})
+                
+                # Retrieve the associated course's name
+                course_name = course.course_Name
+                
+                # Query feedback for run courses associated with the course
+                run_courses = RunCourse.query.filter_by(course_ID=course_ID).all()
+                feedback = Feedback.query.filter(Feedback.rcourse_ID.in_([run_course.rcourse_ID for run_course in run_courses])).all()
 
-              course_name = course.course_Name
+            elif runcourse_ID:
+                # Check if the run course exists
+                runcourse = RunCourse.query.get(runcourse_ID)
+                if runcourse is None:
+                    return jsonify({'message': 'Run course not found.', 'code': 404})
 
-              run_courses = RunCourse.query.filter_by(course_ID=course_ID).all()
-              run_course_ids = [run_course.rcourse_ID for run_course in run_courses]
+                # Retrieve the associated run course's name
+                run_name = runcourse.run_Name
+                
+                # Query feedback for the specified run course
+                feedback = Feedback.query.filter_by(rcourse_ID=runcourse_ID).all()
 
-              feedback = Feedback.query.filter(Feedback.rcourse_ID.in_(run_course_ids)).all()
-              if feedback:
-                  feedback_dict = {}
-                  unique_questions = {}
+            else:
+                return jsonify({'message': 'No course or run course ID provided.', 'code': 400})
 
-                  for entry in feedback:
-                      submitted_by = entry.submitted_By
-                      answers = entry.answer
-                      template_attribute_id = entry.template_Attribute_ID
+            if feedback:
+                for entry in feedback:
+                    submitted_by = entry.submitted_By
+                    answers = entry.answer
+                    template_attribute_id = entry.template_Attribute_ID
 
-                      # Retrieve the associated question for this feedback entry
-                      question = TemplateAttribute.query.get(template_attribute_id).question
+                    # Retrieve the associated question for this feedback entry
+                    question = TemplateAttribute.query.get(template_attribute_id).question
 
-                      # Collect the question in the dictionary of unique questions
-                      unique_questions[template_attribute_id] = question
+                    # Collect the question in the dictionary of unique questions
+                    unique_questions[template_attribute_id] = question
 
-                      if submitted_by not in feedback_dict:
-                          feedback_dict[submitted_by] = {
-                              'submitted_By': submitted_by,
-                              'answers': [],
-                              'course_name': course_name
-                          }
+                    if submitted_by not in feedback_dict:
+                        if course_ID:
+                            feedback_dict[submitted_by] = {
+                                'submitted_By': submitted_by,
+                                'answers': [],
+                                'course_name': course_name
+                            }
+                        elif runcourse_ID:
+                            feedback_dict[submitted_by] = {
+                                'submitted_By': submitted_by,
+                                'runcourse_ID': runcourse_ID,
+                                'run_name': run_name,
+                                'answers': [],
+                            }
 
-                      feedback_dict[submitted_by]['answers'].append(answers)
+                    feedback_dict[submitted_by]['answers'].append(answers)
 
-                  # Convert the dictionary of unique questions to a list of dictionaries
-                  unique_questions_list = [{"template_attribute_id": k, "question": v} for k, v in unique_questions.items()]
+                # Convert the dictionary of unique questions to a list of dictionaries
+                unique_questions_list = [{"template_attribute_id": k, "question": v} for k, v in unique_questions.items()]
 
-                  # Convert the dictionary values to a list
-                  feedback_list = list(feedback_dict.values())
+                # Convert the dictionary values to a list
+                feedback_list = list(feedback_dict.values())
 
-                  db.session.close()
+                db.session.close()
 
-                  return jsonify({'data': feedback_list, 'questions': unique_questions_list, 'code': 200})
+                return jsonify({'data': feedback_list, 'questions': unique_questions_list, 'code': 200})
 
-              else:
-                  return jsonify({'message': 'No feedback found for this course.', 'code': 404})
-
-            if runcourse_ID:
-              # Check if the run course exists
-              runcourse = RunCourse.query.get(runcourse_ID)
-              if runcourse is None:
-                  return jsonify({'message': 'Run course not found.', 'code': 404})
-
-              # Retrieve the associated course's name by querying the Course table
-            
-
-              run_name = runcourse.run_Name
-
-              feedback = Feedback.query.filter_by(rcourse_ID=runcourse_ID).all()
-              if feedback:
-                  feedback_dict = {}
-                  unique_questions = {}
-
-                  for entry in feedback:
-                      submitted_by = entry.submitted_By
-                      answers = entry.answer
-                      template_attribute_id = entry.template_Attribute_ID
-
-                      # Retrieve the associated question for this feedback entry
-                      question = TemplateAttribute.query.get(template_attribute_id).question
-
-                      # Collect the question in the dictionary of unique questions
-                      unique_questions[template_attribute_id] = question
-
-                      if submitted_by not in feedback_dict:
-                          feedback_dict[submitted_by] = {
-                              'submitted_By': submitted_by,
-                              'runcourse_ID': runcourse_ID,
-                              'run_name': run_name,
-                              'answers': [],
-                          }
-
-                      feedback_dict[submitted_by]['answers'].append(answers)
-
-                  # Convert the dictionary of unique questions to a list of dictionaries
-                  unique_questions_list = [{"template_attribute_id": k, "question": v} for k, v in unique_questions.items()]
-
-                  # Convert the dictionary values to a list
-                  feedback_list = list(feedback_dict.values())
-
-                  db.session.close()
-
-                  return jsonify({'data': feedback_list, 'questions': unique_questions_list, 'code': 200})
-
-              else:
-                  return jsonify({'message': 'No feedback found for this runcourse.', 'code': 404})
+            else:
+                return jsonify({'message': 'No feedback found for this course or run course.', 'code': 404})
+              
         except Exception as e:
             return jsonify({"message": "Failed " + str(e), "code": 500})
+
         
 
 # For specific course and instructor 

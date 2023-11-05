@@ -121,7 +121,7 @@
           <!-- Include Word Cloud component here for course done well topic -->
           <!-- <WordCloud :wordData="courseDoneWellTopics[index].wordData" /> -->
           <WordChart v-if="courseDoneWellTopics.length > 0" :datasets="courseDoneWellTopics[index].wordData"
-            :label="'Overall Course Done Well'" :size1="15" :size2="25" :fit="false" />
+            :label="'Overall Course Done Well'" :size1="12" :size2="15" :fit="false" />
           <p><strong>Overall Course Done Well - Topic {{ index + 1 }}</strong></p>
         </div>
 
@@ -131,7 +131,7 @@
           <!-- Include Word Cloud component here for course suggestions topic -->
           <!-- <WordCloud :wordData="courseSuggestionsTopics[index].wordData" /> -->
           <WordChart v-if="courseSuggestionsTopics.length > 0" :datasets="courseSuggestionsTopics[index].wordData"
-            :label="'Overall Course Suggestions'" :size1="15" :size2="25" :fit="false" />
+            :label="'Overall Course Suggestions'" :size1="12" :size2="15" :fit="false" />
           <p><strong>Overall Course Suggestions - Topic {{ index + 1 }}</strong></p>
         </div>
 
@@ -141,7 +141,7 @@
           <!-- Include Word Cloud component here for instructor done well topic -->
           <!-- <WordCloud :wordData="instructorDoneWellTopics[index].wordData" /> -->
           <WordChart v-if="instructorDoneWellTopics.length > 0" :datasets="instructorDoneWellTopics[index].wordData"
-            :label="'Overall Instructor Done Well'" :size1="15" :size2="25" :fit="false" />
+            :label="'Overall Instructor Done Well'" :size1="12" :size2="15" :fit="false" />
           <p><strong>Overall Instructor Done Well - Topic {{ index + 1 }}</strong></p>
         </div>
 
@@ -151,7 +151,7 @@
           <!-- Include Word Cloud component here for instructor suggestions topic -->
           <!-- <WordCloud :wordData="instructorSuggestionsTopics[index].wordData" /> -->
           <WordChart v-if="instructorSuggestionsTopics.length > 0" :datasets="instructorSuggestionsTopics[index].wordData"
-            :label="'Overall Instructor Suggestions'" :size1="15" :size2="25" :fit="false" />
+            :label="'Overall Instructor Suggestions'" :size1="12" :size2="15" :fit="false" />
           <p><strong>Overall Instructor Suggestions - Topic {{ index + 1 }}</strong></p>
         </div>
       </div>
@@ -522,6 +522,7 @@ export default {
         console.error(error);
       }
     },
+
     handlePageChangeCourses(newPage) {
       this.localCurrentPageCourses = newPage;
       this.$emit('page-change', newPage);
@@ -645,6 +646,7 @@ export default {
       await this.fetchCourseName()
       await this.fetchRunCourseName()
       await this.fetchInstructorName()
+      await this.fetchCourseFeedbackData()
 
     },
     handleModalClosed(value) {
@@ -665,7 +667,8 @@ export default {
         this.fetchInstructorWordcloudData(),
         this.fetchCourseName(),
         this.fetchRunCourseName(),
-        this.fetchInstructorName()
+        this.fetchInstructorName(),
+        this.fetchCourseFeedbackData()
       ];
 
       // Conditionally add the promise for fetching feedback data

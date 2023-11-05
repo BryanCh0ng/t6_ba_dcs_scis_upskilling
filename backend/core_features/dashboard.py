@@ -985,9 +985,6 @@ class InstructorDoneWellFeedback(Resource):
         keywords = ['instructor']
         optional_keywords = ['improve', 'suggestions']
 
-        courseID = args.get("course_ID", "")
-        rcourseID = args.get("rcourse_ID", "")
-
         query = (
             db.session.query(Feedback.answer)
             .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)
