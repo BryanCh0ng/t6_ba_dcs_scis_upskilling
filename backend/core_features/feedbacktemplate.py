@@ -270,7 +270,7 @@ class GetCourseNamesByFeedbackTemplateId(Resource):
             course_names_using.append({
               "run_Name": runcourse.run_Name,
               "rcourse_id": runcourse.rcourse_ID,
-              "feedback_start_date": common.format_date_time(runcourse.run_Startdate) #TO CHANGE TO FEEDBACK START DATE AFTERWARDS
+              "feedback_start_date": common.format_date_time(runcourse.feedback_Startdate)
             })
 
         if courses_no_template:
@@ -278,7 +278,7 @@ class GetCourseNamesByFeedbackTemplateId(Resource):
             course_name_no_template.append({
               'run_Name': runcourse.run_Name,
               'rcourse_id': runcourse.rcourse_ID,
-              "feedback_start_date": common.format_date_time(runcourse.run_Startdate) #TO CHANGE TO FEEDBACK START DATE AFTERWARDS
+              "feedback_start_date": common.format_date_time(runcourse.feedback_Startdate)
             })
 
         return {"code": 200, "course_names_using": course_names_using, "course_name_no_template": course_name_no_template}, 200
@@ -478,7 +478,7 @@ class ApplyFeedbackTemplateToCourses(Resource):
                   if course_record:
                       if course_record.template_ID == template_id:
                          haveError = False
-                      elif course_record.template_ID != template_id and course_record.run_Startdate > datetime.now().date(): #TO CHANGE TO FEEDBACK START DATE
+                      elif course_record.template_ID != template_id and course_record.feedback_Startdate > datetime.now().date(): 
                         course_record.template_ID = template_id
                         haveError = False
                       else:

@@ -92,6 +92,33 @@ class runCourseService extends BaseApiService {
         return this.handleError(error);
     }
 }
+  async getRunCourseCountByCourseId(courseId) {
+    try {
+      let run_course_count = await axiosClient.get("/runcourse/get_run_course_count_by_course_id", { params: { course_id: courseId } });
+      return run_course_count.data
+
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
+
+  async getAvailableInstructors(runCourseID, startDate, endDate, startTime, endTime) {
+    try {
+      let response = await axiosClient.get("/runcourse/get_available_instructors", { 
+        params: { 
+          rcourse_ID: runCourseID,
+          run_Startdate: startDate,
+          run_Enddate: endDate,
+          run_Starttime: startTime, 
+          run_Endtime: endTime
+        } 
+      });
+      return response.data.data.available_instructors
+
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
 }
 
 export default new runCourseService();
