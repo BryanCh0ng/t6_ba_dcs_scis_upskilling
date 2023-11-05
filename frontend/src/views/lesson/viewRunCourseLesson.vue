@@ -3,7 +3,7 @@
     <div class="container col-12 d-flex mb-3 w-100">
         <h5 v-if="lessons && lessons.length > 0" class="col m-auto">All Lessons for {{ lessons[0].run_Name }} </h5>
         <h5 v-else>All Lessons</h5>
-        <button v-if="lessons && lessons.length > 0 && !isEndDatePassed(lessons[0].run_course.run_Enddate)" class="btn btn-primary" @click="goToCreateLesson(lessons.rcourse_ID)">Add Lesson</button>
+        <button v-if="lessons && lessons.length > 0 && !isEndDatePassed(lessons[0].run_course.run_Enddate)" class="btn btn-primary" @click="goToCreateLesson(lessons.rcourse_ID)">Add Lesson(s)</button>
     </div>
 
     <div class="container col-12 ">
@@ -208,7 +208,7 @@ export default {
 .action-buttons {
   display: flex;
   flex-wrap: nowrap;
-  gap:10px;
+  gap:8px;
 }
 
 th.actions, td.actions {

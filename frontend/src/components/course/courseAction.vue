@@ -20,14 +20,14 @@
     <button class="btn btn-success feedback-analysis text-light font-weight-bold text-nowrap" v-else-if="status == 'feedback-analysis'" title="View Feedback">View Feedback</button>
     <button @click=runCourseAction(course.rcourse_ID) class="btn btn-danger registered_drop text-light font-weight-bold text-nowrap" v-else-if="status == 'registered_drop'" title="Drop Registered Course">Drop</button>
     <button @click=voteAction(course.vote_ID) class="btn btn-danger say-pass text-light font-weight-bold text-nowrap" v-else-if="status == 'say-pass'" title="Unvote an interested course">Say Pass</button>   
-    <button class="btn btn-primary edit-proposal text-light font-weight-bold text-nowrap" v-else-if="status == 'edit-proposal'" title="Edit">Edit</button>   
+    <button class="btn btn-edit edit edit-proposal text-light font-weight-bold text-nowrap" v-else-if="status == 'edit-proposal'" title="Edit">Edit</button>   
     <button @click=proposalAction(course.pcourse_ID) class="btn btn-danger remove-proposal text-light font-weight-bold text-nowrap" v-else-if="status == 'remove-proposal'" title="Remove Proposal">Remove</button>   
     <button class="btn btn-info provide-feedback text-light font-weight-bold text-nowrap" v-else-if="status == 'provide-feedback'" title="Provide Feedback">Provide Feedback</button>  
     <button class="btn btn-success view-feedback text-light font-weight-bold text-nowrap" v-else-if="status == 'view-feedback'" title="View Feedback">View Feedback</button>  
     <button class="btn btn-secondary rejected-reason text-light font-weight-bold text-nowrap" v-else-if="status == 'rejected-reason'" title="View Rejected Reason">View Rejected Reason</button>  
     <button @click=voteAction(course.course_ID) class="btn btn-danger unoffered-vote text-light font-weight-bold text-nowrap" v-else-if="status == 'unoffered-vote'" title="Delete">Delete</button>
     <button class="btn btn-danger delete-lesson text-light font-weight-bold text-nowrap" v-else-if="status == 'remove-lesson'" title="Remove Lesson">Remove Lesson</button>
-    <button class="btn btn-primary edit-proposal text-light font-weight-bold text-nowrap" v-else-if="status == 'edit-lesson'" title="Edit Lesson">Edit Lesson</button>   
+    <button class="btn btn-edit edit text-light font-weight-bold text-nowrap" v-else-if="status == 'edit-lesson'" title="Edit Lesson">Edit Lesson</button>   
   </div>
 </template>
   

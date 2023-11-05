@@ -35,7 +35,7 @@ class LessonService extends BaseApiService {
     async removeLesson(lesson_ID) {
         try {
             let response = await axiosClient.delete("/lesson/remove_lesson", { params: { lesson_ID: lesson_ID } });
-            console.log(response);
+            // console.log(response);
             return response.data;
         } catch (error) {
             return this.handleError(error);

@@ -79,13 +79,11 @@
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import { useVuelidate } from "@vuelidate/core";
-// import { required, numeric, helpers } from "@vuelidate/validators";
 import runCourseService from "@/api/services/runCourseService.js"
 import LessonService from "@/api/services/LessonService.js"
 import {convertDate, convertTime} from '@/scripts/common/convertDateTime.js'
 import DefaultModal from "@/components/DefaultModal.vue";
 
-// Utility function to show a success message
 function showSuccessMessage(vm) {
   vm.title = "Added Lesson(s) Successfully";
   vm.message = "You have successfully add lesson(s) for the run course.";
@@ -141,7 +139,7 @@ export default {
     async created() {
         const runcourse_id = this.$route.params.id;
         const runcourse_info = await runCourseService.getRunCourseById(runcourse_id);
-        // console.log(runcourse_info);
+        
         if (runcourse_info) {
             this.runcourse_Name = runcourse_info.run_Name;
             this.runcourse_Startdate = runcourse_info.run_Startdate;
@@ -232,29 +230,23 @@ export default {
         },
 
         isLessonTimeValid() {
-            const runcourseStarttimeString = this.runcourse_Starttime; // e.g., "15:00:00"
+            const runcourseStarttimeString = this.runcourse_Starttime;
             const runcourseStarttime = new Date();
-            runcourseStarttime.setHours(...runcourseStarttimeString.split(':').map(Number)); // Set hours, minutes, seconds for today
+            runcourseStarttime.setHours(...runcourseStarttimeString.split(':').map(Number));
 
-            console.log("runcourseStarttime", runcourseStarttimeString);
-
-            const runcourseEndtimeString = this.runcourse_Endtime; // Assume this is defined somewhere
+            const runcourseEndtimeString = this.runcourse_Endtime;
             const runcourseEndtime = new Date();
-            runcourseEndtime.setHours(...runcourseEndtimeString.split(':').map(Number)); // Set hours, minutes, seconds for today
+            runcourseEndtime.setHours(...runcourseEndtimeString.split(':').map(Number)); 
 
             for (const lessonForm of this.formDataArray) {
-                // Assuming lessonForm.lesson_Starttime is an object with hours, minutes, seconds
+        
                 const lessonStartTime = new Date();
                 lessonStartTime.setHours(lessonForm.lesson_Starttime.hours, lessonForm.lesson_Starttime.minutes, lessonForm.lesson_Starttime.seconds);
 
-                
-
-                // Do the same conversion for lessonEndTime
                 const lessonEndTime = new Date();
                 lessonEndTime.setHours(lessonForm.lesson_Endtime.hours, lessonForm.lesson_Endtime.minutes, lessonForm.lesson_Endtime.seconds);
 
                 
-                // First, check if lesson start time is the same as lesson end time
                 if (lessonStartTime.getTime() === lessonEndTime.getTime()) {
                     const customTitle = "Invalid Lesson Times";
                     const customMessage = "The lesson start time cannot be the same as the lesson end time.";
@@ -262,7 +254,6 @@ export default {
                     return false;
                 }
                 
-                // Check if lesson start time is after or equal to runcourse start time
                 if (lessonStartTime < runcourseStarttime) {
                     const customTitle = "Invalid Lesson Start Time";
                     const customMessage = "The lesson start time must be after or equal to the run course start time.";
@@ -270,7 +261,6 @@ export default {
                     return false;
                 }
 
-                // Check if lesson end time is before or equal to runcourse end time
                 if (lessonEndTime > runcourseEndtime) {
                     const customTitle = "Invalid Lesson End Time";
                     const customMessage = "The lesson end time must be before or equal to the run course end time.";
@@ -285,7 +275,6 @@ export default {
         areLessonDatesUnique() {
             const lessonDates = this.formDataArray.map(lessonForm => lessonForm.lessonDate.toISOString().split('T')[0]);
 
-            // Check if there are any duplicate lesson dates
             const uniqueLessonDates = [...new Set(lessonDates)];
 
             if (uniqueLessonDates.length !== this.formDataArray.length) {
@@ -295,7 +284,6 @@ export default {
                 return false;
             }
 
-            // Check if any lesson date exists in current_lessons_list
             for (const lessonDate of lessonDates) {
                 if (this.current_lessons_list.some(lesson => lesson.lesson_Date === lessonDate)) {
                     const customTitle = "Lesson Date Already Exists";

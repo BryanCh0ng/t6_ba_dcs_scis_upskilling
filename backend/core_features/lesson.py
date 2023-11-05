@@ -41,6 +41,11 @@ class GetAllLessons(Resource):
                     run_course[1].run_Enddate = run_course[1].run_Enddate.strftime('%Y-%m-%d')
                     run_course[1].reg_Startdate = run_course[1].reg_Startdate.strftime('%Y-%m-%d')
                     run_course[1].reg_Enddate = run_course[1].reg_Enddate.strftime('%Y-%m-%d')
+                    run_course[1].feedback_Startdate = run_course[1].feedback_Startdate.strftime('%Y-%m-%d')
+                    run_course[1].feedback_Enddate = run_course[1].feedback_Enddate.strftime('%Y-%m-%d')
+                    run_course[1].feedback_Starttime = run_course[1].feedback_Starttime.strftime('%H:%M:%S')
+                    run_course[1].feedback_Endtime = run_course[1].feedback_Endtime.strftime('%H:%M:%S')
+
                     course_info = {
                         **run_course[1].json(),
                         "coursecat_Name": run_course[2].coursecat_Name,
@@ -127,6 +132,10 @@ class GetLessonsByRcourseId(Resource):
                     run_course[1].run_Enddate = run_course[1].run_Enddate.strftime('%Y-%m-%d')
                     run_course[1].reg_Startdate = run_course[1].reg_Startdate.strftime('%Y-%m-%d')
                     run_course[1].reg_Enddate = run_course[1].reg_Enddate.strftime('%Y-%m-%d')
+                    run_course[1].feedback_Startdate = run_course[1].feedback_Startdate.strftime('%Y-%m-%d')
+                    run_course[1].feedback_Enddate = run_course[1].feedback_Enddate.strftime('%Y-%m-%d')
+                    run_course[1].feedback_Starttime = run_course[1].feedback_Starttime.strftime('%H:%M:%S')
+                    run_course[1].feedback_Endtime = run_course[1].feedback_Endtime.strftime('%H:%M:%S')
                     
                     course_info = {
                         **run_course[1].json(),
@@ -140,7 +149,7 @@ class GetLessonsByRcourseId(Resource):
                 else:
                     return {"code": 400, 'message': "An error has occurred while retrieving run details"}, 400
             except Exception as e:
-                print(str(e))
+                
                 return  {"code": 404, 'message':  "Failed " + str(e)}, 400
 
         try:
@@ -220,7 +229,6 @@ class AddLesson(Resource):
 
             return jsonify({"code": 200, "message": "Lesson added successfully"})
         except Exception as e:
-            print("Exception occurred:", e)  # This will print any exception that occurs
             db.session.rollback()
             return {"code": 404, "message": "Failed " + str(e)}
 
@@ -235,22 +243,20 @@ class RemoveLesson(Resource):
         args = remove_lesson_parser.parse_args()
         lesson_id = args.get('lesson_ID')
 
-        print(f"Lesson ID received for deletion: {lesson_id}")
-
         try:
             lesson_to_delete = Lesson.query.get(lesson_id)
             if lesson_to_delete:
                 db.session.delete(lesson_to_delete)
                 db.session.commit()
                 db.session.close()
-                print("Lesson removed successfully")
+                
                 return {"code": 200, "message": "Lesson removed successfully"}, 200
             else:
-                print("Lesson not found")
+                
                 return {"code": 404, "message": "Lesson not found"}, 404
         except Exception as e:
-            db.session.rollback()  # Rollback the changes on error
-            print(f"An error occurred while trying to remove the lesson: {str(e)}")
+            db.session.rollback() 
+            
             return {"code": 500, "message": f"An error occurred while trying to remove the lesson: {str(e)}"}, 500
 
 get_lesson_info = api.parser()
@@ -268,14 +274,14 @@ class GetLessonById(Resource):
 
             lesson = Lesson.query.get(lesson_id)
             if lesson:
-                # Assuming you have a method to format lesson object to JSON
+                
                 lesson_data = {
                     "lesson_ID": lesson.lesson_ID,
                     "rcourse_ID": lesson.rcourse_ID,
                     "lesson_Date": common.format_date_time(lesson.lesson_Date),
                     "lesson_Starttime": lesson.lesson_Starttime.strftime('%H:%M:%S'),
                     "lesson_Endtime": lesson.lesson_Endtime.strftime('%H:%M:%S'),
-                    # Add any other required fields
+                    
                 }
                 db.session.close()
                 return {"code": 200, "lesson": lesson_data}, 200
