@@ -311,13 +311,17 @@ class RunCourse(db.Model):
     reg_Enddate = db.Column(db.Date, nullable=False)
     reg_Starttime = db.Column(Time, nullable=False)
     reg_Endtime = db.Column(Time, nullable=False)
+    feedback_Startdate = db.Column(db.Date, nullable=False)
+    feedback_Enddate = db.Column(db.Date, nullable=False)
+    feedback_Starttime = db.Column(Time, nullable=False)
+    feedback_Endtime = db.Column(Time, nullable=False)
     course_ID = db.Column(db.Integer, db.ForeignKey('course.course_ID'), nullable=False)
     template_ID = db.Column(db.Integer, db.ForeignKey('feedbacktemplate.template_ID'),  nullable=False) 
 
     def __init__(self, run_Name, run_Startdate, run_Enddate, run_Starttime, run_Endtime, instructor_ID,
                  course_Format, course_Venue, runcourse_Status, course_Size, course_Minsize, course_Fee,
-                 class_Duration, reg_Startdate, reg_Enddate, reg_Starttime, reg_Endtime,
-                  course_ID , template_ID):
+                 class_Duration, reg_Startdate, reg_Enddate, reg_Starttime, reg_Endtime, feedback_Startdate, 
+                 feedback_Enddate, feedback_Starttime, feedback_Endtime, course_ID , template_ID):
         self.run_Name = run_Name 
         self.run_Startdate = run_Startdate
         self.run_Enddate = run_Enddate
@@ -335,6 +339,10 @@ class RunCourse(db.Model):
         self.reg_Enddate = reg_Enddate
         self.reg_Starttime = reg_Starttime
         self.reg_Endtime = reg_Endtime
+        self.feedback_Startdate = feedback_Startdate
+        self.feedback_Enddate = feedback_Enddate
+        self.feedback_Starttime = feedback_Starttime
+        self.feedback_Endtime = feedback_Endtime
         self.course_ID = course_ID
         self.template_ID = template_ID     
  

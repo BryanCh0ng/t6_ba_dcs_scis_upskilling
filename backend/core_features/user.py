@@ -269,10 +269,7 @@ class GetUserName(Resource):
             db.session.close()
             if user:
                 user_name = user.user_Name
-                # Split the user's name by space and get the first part
-                user_name_parts = user_name.split()
-                first_name = user_name_parts[0] if user_name_parts else ''
-                return first_name
+                return user_name
             else:
                 return 'User not found'
         else:

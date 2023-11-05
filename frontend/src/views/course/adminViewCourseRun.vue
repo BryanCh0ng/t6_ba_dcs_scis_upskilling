@@ -1,7 +1,7 @@
 <template>
     <div>
 
-    <div class="container col-12 d-flex mb-3 w-100">
+    <div class="container col-12 d-flex mb-3 w-100 pt-4">
       <h5 class="col m-auto">All Run Courses for '{{ course_Name }}'</h5>
       <button class="btn btn-primary" @click="goToCreateRunCourse(courses[0].course_ID)">Create Run Course</button>
     </div>
@@ -42,8 +42,7 @@
               </td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-              <!-- TO CHANGE TO FEEDBACK START DATE -->
-              <td v-if="course.run_Startdate && isBeforeCurrentDate(course.run_Startdate)"><a v-if="course.course_Status != 'Retired'" class="btn btn-info" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
+              <td v-if="course.feedback_Startdate && isBeforeCurrentDate(course.feedback_Startdate)"><a v-if="course.course_Status != 'Retired'" class="btn btn-info" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
               <td v-else><a v-if="course.course_Status != 'Retired'" class="btn btn-info disabled" title="Unable to remove run course due to ongoing/past feedback period'">Apply Feedback Template</a></td>
               <td v-if="course.runcourse_Status=='Ongoing'">
                 <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
