@@ -45,7 +45,7 @@
             <button
               type="button"
               class="btn btn-secondary shadow-sm w-100 mt-2 field cancelbtn"
-              @click="cancelForm"
+              @click="cancelForm" title="Cancel"
             >
               Cancel
             </button>
@@ -55,6 +55,7 @@
               v-if="action == 'approve'"
               type="submit"
               class="btn btn-block shadow-sm w-100 mt-2 field submitbtn"
+              title="Approve Proposed Course"
             >
               Approve Proposed Course
             </button>
@@ -62,6 +63,7 @@
               v-else
               type="submit"
               class="btn btn-block shadow-sm w-100 mt-2 field submitbtn"
+              title="Save"
             >
               Save
             </button>

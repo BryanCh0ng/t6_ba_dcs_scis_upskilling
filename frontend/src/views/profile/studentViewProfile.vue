@@ -29,7 +29,7 @@
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                    <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'registered')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                    <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Name', 'registered')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/></a></th>
                   <th scope="col">
                     <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'registered')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
                   <th scope="col">
@@ -47,7 +47,7 @@
               <tbody>
                 <tr v-for="(registered_course, key) in displayedRegisteredCourses" :key="key">
                   <td>
-                    <course-name-desc :name="registered_course.course_Name" :category="registered_course.coursecat_Name" :description="registered_course.course_Desc"></course-name-desc>
+                    <course-name-desc :name="registered_course.run_Name" :category="registered_course.coursecat_Name" :description="registered_course.course_Desc"></course-name-desc>
                   </td>
                   <td>
                     <course-date-time :date="registered_course.run_Startdate" :time="registered_course.run_Starttime"></course-date-time>
@@ -210,7 +210,7 @@
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                    <a href="" @click.prevent="sort('course_Name', 'completed')" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                    <a href="" @click.prevent="sort('run_Name', 'completed')" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/></a></th>
                   <th scope="col">
                     <a href="" @click.prevent="sort('instructor_Name', 'completed')" class="text-decoration-none text-dark">Instructor Name <sort-icon :sortColumn="sortColumn === 'instructor_Name'" :sortDirection="getSortDirection('instructor_Name')"/></a></th>
                   <th scope="col">Course Details</th>
@@ -220,7 +220,7 @@
               <tbody>
                 <tr v-for="(completed_course, key) in displayedCompletedCourses" :key="key">
                   <td>
-                    <course-name-desc :name="completed_course.course_Name" :category="completed_course.coursecat_Name" :description="completed_course.course_Desc"></course-name-desc>
+                    <course-name-desc :name="completed_course.run_Name" :category="completed_course.coursecat_Name" :description="completed_course.course_Desc"></course-name-desc>
                   </td>
                   <td>
                     {{ completed_course.instructor_Name }}
