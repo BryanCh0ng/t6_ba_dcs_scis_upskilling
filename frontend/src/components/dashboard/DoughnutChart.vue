@@ -101,9 +101,6 @@ export default {
 </script>
 
 <style scoped>
-/*#planet-chart {
-    padding: 10px;
-}*/
 
 #chart-container {
     width: 100%;

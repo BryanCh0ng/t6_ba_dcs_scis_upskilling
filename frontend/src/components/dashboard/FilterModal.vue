@@ -260,7 +260,6 @@ export default {
             try {
                 let response = await RunCourseService.getAllRunCourses();
                 this.formData.runCourses = response.data.course;
-                console.log(response)
             } catch (error) {
                 console.log('Error fetching all run courses: ', error);
                 this.errorMsg.push('Error fetching all run courses');

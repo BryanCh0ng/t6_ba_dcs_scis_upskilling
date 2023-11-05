@@ -129,10 +129,6 @@ export default {
 
 <style scoped>
 
-/*#planet-chart {
-    padding: 10px;
-}*/
-
 #chart-container {
     width: 100%;
     max-width: 350px;

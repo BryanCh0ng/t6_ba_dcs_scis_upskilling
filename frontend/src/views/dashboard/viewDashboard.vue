@@ -49,43 +49,67 @@
       <div class="row">
         <!-- Display Overall Course Sentiment -->
         <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="courseSpecific">
-          <DoughnutChart v-if="sentimentData1.labelArray.length > 0 && sentimentData1.dataArray.length > 0"
-            :datasets="sentimentData1" />
+          <template v-if="sentimentData1.labelArray.length > 0 && sentimentData1.dataArray.length > 0">
+            <DoughnutChart :datasets="sentimentData1" />
+          </template>
+          <template v-else>
+            <NoDataDisplay :displayMessage="filterSelected"/>
+          </template>
           <p><strong>Overall Course Sentiment</strong></p>
         </div>
         <!-- Display Overall Course Positive WordCloud -->
         <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="courseSpecific">
           <!-- Include Word Cloud component here for positive feedback -->
-          <WordChart v-if="positiveCourseWordData.length > 0" :datasets="positiveCourseWordData"
-            :label="'Overall Course Positive WordCloud'" :fit="coursePositive" />
+          <template v-if="positiveCourseWordData.length > 0">
+            <WordChart  :datasets="positiveCourseWordData" :label="'Overall Course Positive WordCloud'" :fit="coursePositive" />
+          </template>
+          <template v-else>
+            <NoDataDisplay :displayMessage="filterSelected"/>
+          </template>
           <p><strong>Overall Course Positive WordCloud</strong></p>
         </div>
         <!-- Display Overall Course Negative WordCloud -->
         <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="courseSpecific">
           <!-- Include Word Cloud component here for positive feedback -->
-          <WordChart v-if="negativeCourseWordData.length > 0" :datasets="negativeCourseWordData"
-            :label="'Overall Course Negative WordCloud'" :fit="courseNegative" />
+          <template v-if="negativeCourseWordData.length > 0">
+            <WordChart  :datasets="negativeCourseWordData" :label="'Overall Course Negative WordCloud'" :fit="courseNegative" />
+          </template>
+          <template v-else>
+            <NoDataDisplay :displayMessage="filterSelected"/>
+          </template>
           <p><strong>Overall Course Negative WordCloud</strong></p>
         </div>
 
         <!-- Display Overall Instructor Sentiment -->
         <div class="col-12 col-md-6 dashboard mb-3 custom-col page-break" v-if="instructorSpecific">
-          <DoughnutChart v-if="sentimentData2.labelArray.length > 0 && sentimentData2.dataArray.length > 0"
-            :datasets="sentimentData2" />
+          <template v-if="sentimentData2.labelArray.length > 0 && sentimentData2.dataArray.length > 0">
+            <DoughnutChart :datasets="sentimentData2" />
+          </template>
+          <template v-else>
+            <NoDataDisplay :displayMessage="filterSelected"/>
+          </template>
           <p><strong>Overall Instructor Sentiment</strong></p>
         </div>
         <!-- Display Overall Instructor Positive WordCloud -->
         <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="instructorSpecific">
           <!-- Include Word Cloud component here for positive feedback -->
-          <WordChart v-if="positiveInstructorWordData.length > 0" :datasets="positiveInstructorWordData"
-            :label="'Overall Instructor Positive WordCloud'" :fit="instructorPositive" />
+          <template v-if="positiveInstructorWordData.length > 0">
+            <WordChart  :datasets="positiveInstructorWordData" :label="'Overall Instructor Positive WordCloud'" :fit="instructorPositive" />
+          </template>
+          <template v-else>
+            <NoDataDisplay :displayMessage="filterSelected"/>
+          </template>
           <p><strong>Overall Instructor Positive WordCloud</strong></p>
         </div>
         <!-- Display Overall Course Negative WordCloud -->
         <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="instructorSpecific">
           <!-- Include Word Cloud component here for negative feedback -->
-          <WordChart v-if="negativeInstructorWordData.length > 0" :datasets="negativeInstructorWordData"
-            :label="'Overall Instructor Negative WordCloud'" :fit="instructorNegative" />
+          <template v-if="negativeInstructorWordData.length > 0">
+            <WordChart  :datasets="negativeInstructorWordData" :label="'Overall Instructor Negative WordCloud'" :fit="instructorNegative" />
+          </template>
+          <template v-else>
+            <NoDataDisplay :displayMessage="filterSelected"/>
+          </template>
           <p><strong>Overall Instructor Negative WordCloud</strong></p>
         </div>
       </div>
@@ -186,6 +210,7 @@ import Papa from 'papaparse';
 import FeedbackService from "@/api/services/FeedbackService.js";
 import html2pdf from 'html2pdf.js';
 import FilterModal from "@/components/dashboard/FilterModal.vue";
+import NoDataDisplay from '@/components/dashboard/NoDataDisplay.vue';
 
 export default {
   name: "ViewDashboard",
@@ -193,7 +218,8 @@ export default {
     DoughnutChart,
     WordChart,
     VueAwesomePaginate,
-    FilterModal
+    FilterModal,
+    NoDataDisplay
   },
   data() {
     return {
@@ -244,7 +270,8 @@ export default {
       coursePositive: true,
       courseNegative: true,
       instructorPositive: true,
-      instructorNegative: true
+      instructorNegative: true,
+      filterSelected: false
     };
   },
   async created() {
@@ -365,7 +392,12 @@ export default {
           this.sentimentData1.dataArray = sentiment_percentages;
           this.sentimentData1.label = "Overall Course Sentiment";
 
-          console.log(this.sentimentData1.dataArray)
+          this.filterSelected = false;
+        } 
+
+        if (response.data.code === 400) {
+          this.sentimentData1.labelArray = [];
+          this.sentimentData1.dataArray = [];
         }
       } catch (error) {
         console.error("Error fetching course sentiment data: ", error);
@@ -381,7 +413,14 @@ export default {
           this.sentimentData2.dataArray = sentiment_percentages;
           this.sentimentData2.label = "Overall Instructor Sentiment";
 
+          this.filterSelected = false;
+
           // console.log(this.sentimentData2.dataArray)
+        }
+
+        if (response.data.code === 400) {
+          this.sentimentData2.labelArray = [];
+          this.sentimentData2.dataArray = [];
         }
 
       } catch (error) {
@@ -410,6 +449,13 @@ export default {
           //console.log(this.positiveCourseWordData)
           this.negativeCourseWordData = negative_word_data;
           //console.log(this.negativeCourseWordData)
+
+          this.filterSelected = false;
+        }
+
+        if (response.data.code === 400){
+          this.positiveCourseWordData = [];
+          this.negativeCourseWordData = [];
         }
       } catch (error) {
         console.error("Error fetching instructor feedbacks: ", error);
@@ -440,6 +486,13 @@ export default {
           //console.log(this.positiveInstructorWordData)
           this.negativeInstructorWordData = negative_word_data;
           //console.log(this.negativeInstructorWordData)
+
+          this.filterSelected = false;
+        }
+
+        if (response.data.code === 400){
+          this.positiveInstructorWordData = [];
+          this.negativeInstructorWordData = [];
         }
       } catch (error) {
         console.error("Error fetching instructor feedbacks: ", error);
@@ -576,6 +629,8 @@ export default {
         this.startDate = startDate;
         this.endDate = endDate;
       }
+
+      this.filterSelected = true;
 
       await this.fetchCourseAverageRating()
       await this.fetchInstructorAverageRating()
