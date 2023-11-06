@@ -338,7 +338,7 @@ const routes = [
         requiresAuth: true
     }, 
   }, 
-  {
+  /*{
     path: '/viewAttendance/:lessonId',
     name: 'viewAttendance',
     component: () => import('../views/attendance/viewAttendance.vue'),
@@ -346,7 +346,7 @@ const routes = [
         title: 'View Attendance',
         requiresAuth: true
     }, 
-  } 
+  }*/
 ]
 
 const router = createRouter({
