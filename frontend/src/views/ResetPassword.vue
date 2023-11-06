@@ -19,7 +19,7 @@
                 <password-field :value="confirmpassword" placeholder="Confirm Password" @update:value="confirmpassword = $event"/>
               </div>
 
-              <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+              <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn" title="Reset Password">
                 Reset Password
               </button>
             </form>

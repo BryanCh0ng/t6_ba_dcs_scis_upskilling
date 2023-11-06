@@ -4,7 +4,7 @@
 
         <div class="container col-12 d-flex mb-3 w-100 pt-4">
           <h5 class="col m-auto">All Feedback Templates</h5>
-          <button class="btn btn-primary" @click="goToCreateFeedbackTemplate">Create Feedback Template</button>
+          <button class="btn btn-primary" @click="goToCreateFeedbackTemplate" title="Create Feedback Template">Create Feedback Template</button>
         </div>
 
         <div v-if="feedback_templates && feedback_templates.length > 0" class="table-responsive bg-white">
