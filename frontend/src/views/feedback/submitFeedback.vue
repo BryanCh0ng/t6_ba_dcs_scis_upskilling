@@ -11,7 +11,7 @@
           <number-field :disabled="disabled" :placeholder="element.answer" v-else-if="element.selectedInputType=='Number Field'"  class="mb-5" :label="element.question" :qnNum="key+1" @input="updateAnswer"></number-field>
           <radio-button-field :disabled="disabled" :sOption="element.answer" v-else-if="element.selectedInputType=='Radio Button'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="key+1" @input="updateAnswer"></radio-button-field>
           <single-select-field :disabled="disabled" :sOption="element.answer" v-else-if="element.selectedInputType=='Single Select'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="key+1"  @input="updateAnswer"></single-select-field>
-          <likert-scale-field :disabled="disabled" :sOption="element.answer" v-else-if="element.selectedInputType=='Likert Scale'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="key+1" @input="updateAnswer"></likert-scale-field> 
+          <likert-scale-field :disabled="disabled" :sOption="element.answer" v-else-if="element.selectedInputType=='Likert Scale'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="key+1" @input="updateAnswer"></likert-scale-field>
         </div>
 
         <div class="form-group row" v-for="(element, key) in common_questions" :key="key">
@@ -184,10 +184,10 @@ export default {
       console.log(data)
       console.log(this.common_questions)
       const isAnyAnswerBlank = this.templateData.some((element) => {
-        return !element.answer.trim();
+        return !element.answer.toString().trim();
       });
       const isCommonAnswerBlank = this.common_questions.some((element) => {
-        return !element.answer.trim();
+        return !element.answer.toString().trim();
       });
       if (!isAnyAnswerBlank && !isCommonAnswerBlank) {
         try{
@@ -233,12 +233,12 @@ export default {
         this.templateData[index]['answer'] = answer.value;
       } else {
         if (answer.value != undefined) {
-          this.common_questions[0]['answer'] = answer.value;
+          this.common_questions[1]['answer'] = answer.value;
         }
       }
     },
     updateCommonLikert(answer) {
-      this.common_questions[1]['answer'] = answer.value;
+      this.common_questions[0]['answer'] = answer.value;
       console.log(this.common_questions);
     }
   },

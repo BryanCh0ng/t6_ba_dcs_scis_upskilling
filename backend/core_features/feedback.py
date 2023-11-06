@@ -24,10 +24,6 @@ class GetTemplate(Resource):
         data = new_student_feedback.get("data")
         common_questions_data = new_student_feedback.get("common_questions_data")
 
-        print(courseID)
-        print(templateID)
-        print(userID)
-
         def submit_common_questions(common_questions_data):
             try:
               for eachdata in common_questions_data:
@@ -276,7 +272,6 @@ class GetRandomReviewsByRCourseId(Resource):
           rcourse_ids = db.session.query(RunCourse.rcourse_ID).filter(RunCourse.course_ID == course_id).all()
           rcourse_id_list = [result[0] for result in rcourse_ids]
 
-
           if rcourse_id_list:
             template_attribute_query = db.session.query(
               TemplateAttribute,
@@ -302,7 +297,7 @@ class GetRandomReviewsByRCourseId(Resource):
               if random_reviews:
                 return {"code": 200, "reviews":[review.json() for review in random_reviews]}, 200
 
-            return {"code": 202, "message": "There are no reviews available currently"}, 202
+          return {"code": 202, "message": "There are no reviews available currently"}, 202
 
       except Exception as e:
         print(e)

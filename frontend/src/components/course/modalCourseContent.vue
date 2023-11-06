@@ -52,17 +52,19 @@
           </div>
         </div>
       </div>
-      <div class="pt-5 row" v-if="feedback_reviews && feedback_reviews.length > 0">
+      <div class="pt-5 row">
         <div class="col-12 d-flex">
           <h5 class="col-6">Feedbacks: </h5>
           <h5>{{ course_rating }}/5 out of {{total_feedbacks}} feedback(s)</h5>
         </div>
-        <div class="col-6" v-for="feedback in feedback_reviews" :key="feedback.feedback_ID">
-            <p>{{ feedback.answer }}</p>
+        <div v-if="feedback_reviews && feedback_reviews.length > 0">
+          <div class="col-6" v-for="feedback in feedback_reviews" :key="feedback.feedback_ID">
+              <p>{{ feedback.answer }}</p>
+          </div>
         </div>
-      </div>
-      <div class="pt-5 row" v-else>
-        <h5 class="text-center">{{ errorMessage }}</h5>
+        <div class="row" v-else>
+          <h5 class="text-center">{{ errorMessage }}</h5>
+        </div>
       </div>
     </div>
   </div>
@@ -131,12 +133,9 @@ export default {
         }
         console.log(this.feedback_reviews)
         console.log(this.errorMessage)
-
-        
-        const rating_response = await DashboardService.getCourseAverageRatings([this.course.course_ID], null, null, null, null, null);
+        const rating_response = await DashboardService.getCourseAverageRatings([this.course.course_ID], null, null, null, null, null)
         if (rating_response.code == 200) {
-          this.course_rating = "Rating: " + rating_response.data.overall_average_rating + "/5, out of " + rating_response.data.total_feedbacks + " feedback(s)";
-          
+          this.course_rating = "Rating: " + rating_response.data.overall_average_rating + "/5, out of " + rating_response.data.total_feedback + " feedback(s)";
         } else {
           this.errorMessage = rating_response.message
         }
