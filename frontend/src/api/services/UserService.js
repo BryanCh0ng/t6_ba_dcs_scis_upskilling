@@ -109,7 +109,6 @@ class UserService extends BaseApiService {
     async getAllCoaches() {
         try {
             let response = await axiosClient.get("/user/get_all_coaches");
-            console.log(response.data.data.coaches)
             return response.data.data.coaches;
 
         } catch (error) {
