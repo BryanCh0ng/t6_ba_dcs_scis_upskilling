@@ -12,21 +12,16 @@ api = Namespace('feedback', description='Feedback related operations')
 
 post_feedback_student = api.parser()
 @api.route("/post_feedback_student" ,methods=["POST", "GET"])
-@api.doc(description="Search if template id exists, if does get template, else create new template")
+@api.doc(description="Submit Student Feedback")
 class GetTemplate(Resource):
     @api.expect(post_feedback_student)
     def post(self):
-        
         new_student_feedback = request.json
         courseID = new_student_feedback.get("rcourse_id")
         templateID = new_student_feedback.get("template_id")
         userID = new_student_feedback.get("user_id")
         data = new_student_feedback.get("data")
         common_questions_data = new_student_feedback.get("common_questions_data")
-
-        print(courseID)
-        print(templateID)
-        print(userID)
 
         def submit_common_questions(common_questions_data):
             try:
@@ -49,8 +44,6 @@ class GetTemplate(Resource):
                 for eachdata in data:
                    AttributeID = eachdata.get("attribute_id")
                    answer = eachdata.get("answer")
-                   print(AttributeID)
-                   print(answer)
                    NewFeedback =Feedback( None, templateID, userID, AttributeID, answer, courseID)
                    db.session.add(NewFeedback)
                    db.session.commit()
@@ -276,7 +269,6 @@ class GetRandomReviewsByRCourseId(Resource):
           rcourse_ids = db.session.query(RunCourse.rcourse_ID).filter(RunCourse.course_ID == course_id).all()
           rcourse_id_list = [result[0] for result in rcourse_ids]
 
-
           if rcourse_id_list:
             template_attribute_query = db.session.query(
               TemplateAttribute,
@@ -302,7 +294,7 @@ class GetRandomReviewsByRCourseId(Resource):
               if random_reviews:
                 return {"code": 200, "reviews":[review.json() for review in random_reviews]}, 200
 
-            return {"code": 202, "message": "There are no reviews available currently"}, 202
+          return {"code": 202, "message": "There are no reviews available currently"}, 202
 
       except Exception as e:
         print(e)

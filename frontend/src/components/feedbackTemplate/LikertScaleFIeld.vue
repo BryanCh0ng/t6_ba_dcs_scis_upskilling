@@ -4,7 +4,7 @@
     <label v-else class="mb-1">{{ label }}</label>
     <ul class='likert'>
       <li v-for="option in options" :key="option.id">
-        <input :disabled="disabled" :checked="sOption === option.option" type="radio" :name="label" :value="option.option"  v-model="selectedOption">
+        <input :disabled="disabled" :checked="sOption == option.position" type="radio" :name="label" :value="option.position"  v-model="selectedOption">
         <label>{{ option.option }}</label>
       </li>
     </ul>
@@ -22,7 +22,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    sOption: String
+    sOption: Number
   },
   data() {
     return {
@@ -31,6 +31,7 @@ export default {
   },
   watch: {
     selectedOption(newValue) {
+      console.log(newValue)
       this.$emit('input', {value: newValue, key: this.qnNum-1});
     }
   }

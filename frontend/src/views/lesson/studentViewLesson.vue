@@ -1,7 +1,7 @@
 <template>
     <div>
       <div class="container col-12 d-flex mb-3 w-100">
-          <h5 class="col m-auto">All Lessons</h5>
+          <h5 class="col m-auto">View My Lessons</h5>
       </div>
 
       <div class="container col-12">
@@ -20,13 +20,12 @@
                 <th scope="col">
                   <a href="" @click.prevent="sort('lesson_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'lesson_Status'" :sortDirection="getSortDirection('lesson_Status')"/></a></th>
                 <th scope="col">Course Details</th>
-                <th scope="col" v-if="userRole != 'Student'">Attendance</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(lesson, key) in displayedLessons" :key="key">
                 <td class="name">
-                  <course-name-desc :name="lesson.run_course.run_Name" :category="lesson.run_course.coursecat_Name" :description="lesson.run_course.course_Desc"></course-name-desc>
+                  <course-name-desc :name="lesson.run_Name" :category="lesson.run_course.coursecat_Name" :description="lesson.run_course.course_Desc"></course-name-desc>
                 </td>
                 <td>{{ lesson.instructor_Name }}</td>
                 <td class="text-nowrap"><course-date-time :date="lesson.lesson_Date"></course-date-time></td>
@@ -34,7 +33,6 @@
                 <td><course-date-time :time="lesson.lesson_Endtime"></course-date-time></td>
                 <td :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }" ><course-status :status="lesson.lesson_Status"></course-status></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(lesson.run_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                <td v-if="userRole != 'Student'" :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }"><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewAttendance(lesson.lesson_ID)">View Attendance</a></td>
               </tr>               
             </tbody>
           </table>
@@ -81,8 +79,7 @@
         itemsPerPage: 10,
         localCurrentPageLessons: 1,
         receivedMessage: '',
-        errorMsge: 'No records found',
-        userRole: ''
+        errorMsge: 'No records found'
       }
     },
     computed: {
@@ -108,10 +105,13 @@
       async loadData() {
         console.log('load')
         try {
-          let response = await LessonService.getAllLessons()
+          const user_ID = await UserService.getUserID();
+          console.log(user_ID)
+          let response = await LessonService.get_lessons_by_user_id(user_ID)
           console.log(response)
           if (response.code == 200) {
             this.lessons = response.lessons
+            console.log(this.lessons)
           } else {
             this.errorMsge = response.message
           }
@@ -138,21 +138,22 @@
           if (sort_response.code == 200) {
             this.lessons = sort_response.data
           }
-      },
-      goToViewAttendance(lesson_id) {
-        this.$router.push({ name: 'viewAttendance', params: {lessonId: lesson_id}});
       }
     },
     async created() {
-      const user_ID = await UserService.getUserID();
-      const role = await UserService.getUserRole(user_ID);
-      this.userRole = role
-      this.loadData();
-      // if (role == 'Student') {
-      //   this.$router.push({ name: 'studentViewCourse' }); 
-      // } else {
-      //   this.loadData();
-      // }
+        const user_ID = await UserService.getUserID();
+        const role = await UserService.getUserRole(user_ID);
+        if (role == "Admin") {
+        this.$router.push({ name: "adminViewCourse" });
+        } else if (role == "Instructor" || role == "Trainer") {
+        this.$router.push({ name: "instructorTrainerViewVotingCampaign" });
+        } else {
+          try {
+              this.loadData();
+          } catch (error) {
+              console.error("Error fetching lesson details:", error);
+          }
+        }
     },
     }
 </script>

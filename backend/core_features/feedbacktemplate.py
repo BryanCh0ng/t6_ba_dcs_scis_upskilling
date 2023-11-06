@@ -532,7 +532,8 @@ class GetFeedbackTemplateCommonQuestions(Resource):
         ).filter(
             TemplateAttribute.template_ID == None
         ).order_by(
-            asc(InputOption.position)
+            asc(InputOption.position),
+            asc(TemplateAttribute.template_Attribute_ID)
         )
         common_questions = query.all()
         db.session.close()

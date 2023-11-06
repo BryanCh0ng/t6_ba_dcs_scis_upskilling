@@ -6,6 +6,7 @@ from allClasses import *
 from sqlalchemy import asc
 from core_features import common
 from sqlalchemy.orm import aliased
+from itertools import groupby
 import json
 
 api = Namespace('lesson', description='Lesson related operations')
@@ -149,7 +150,7 @@ class GetLessonsByRcourseId(Resource):
                 else:
                     return {"code": 400, 'message': "An error has occurred while retrieving run details"}, 400
             except Exception as e:
-                
+                print(str(e))
                 return  {"code": 404, 'message':  "Failed " + str(e)}, 400
 
         try:
@@ -189,7 +190,7 @@ class GetLessonsByRcourseId(Resource):
                 lesson["lesson_Status"] == "Ended",
                 lesson["lesson_Date"],
                 lesson["lesson_Starttime"]
-            ))
+            ), reverse=True)
             return {"code": 200, "lessons": sorted_lessons}, 200
 
         except Exception as e:
@@ -260,30 +261,29 @@ class RemoveLesson(Resource):
             return {"code": 500, "message": f"An error occurred while trying to remove the lesson: {str(e)}"}, 500
 
 get_lesson_info = api.parser()
-get_lesson_info.add_argument('lesson_ID', type=int, required=True, help='ID of the lesson to be removed')
-
+get_lesson_info.add_argument("lesson_ID", help="Enter lesson id")
 @api.route("/get_lesson_by_id")
 @api.doc(description="Get a lesson by its ID")
-@api.param('lesson_id', 'The ID of the lesson')
 class GetLessonById(Resource):
     @api.expect(get_lesson_info)
     def get(self):
         try:
-            args = remove_lesson_parser.parse_args()
+            args = get_lesson_info.parse_args()
             lesson_id = args.get('lesson_ID')
-
-            lesson = Lesson.query.get(lesson_id)
+            lesson = db.session.query(Lesson, RunCourse.course_Venue).join(
+                RunCourse, Lesson.rcourse_ID == RunCourse.rcourse_ID).filter(
+                Lesson.lesson_ID == lesson_id
+            ).first()
+            db.session.close()
             if lesson:
-                
                 lesson_data = {
-                    "lesson_ID": lesson.lesson_ID,
-                    "rcourse_ID": lesson.rcourse_ID,
-                    "lesson_Date": common.format_date_time(lesson.lesson_Date),
-                    "lesson_Starttime": lesson.lesson_Starttime.strftime('%H:%M:%S'),
-                    "lesson_Endtime": lesson.lesson_Endtime.strftime('%H:%M:%S'),
-                    
+                    "lesson_ID": lesson[0].lesson_ID,
+                    "rcourse_ID": lesson[0].rcourse_ID,
+                    "lesson_Date": common.format_date_time(lesson[0].lesson_Date),
+                    "lesson_Starttime": lesson[0].lesson_Starttime.strftime('%H:%M:%S'),
+                    "lesson_Endtime": lesson[0].lesson_Endtime.strftime('%H:%M:%S'),
+                    'course_Venue': lesson[1]
                 }
-                db.session.close()
                 return {"code": 200, "lesson": lesson_data}, 200
             else:
                 return {"code": 404, "message": "Lesson not found"}, 404
@@ -330,3 +330,127 @@ class UpdateLesson(Resource):
         except Exception as e:
             db.session.rollback()
             return {"code": 500, "message": "Failed " + str(e)}, 500
+
+
+get_lessons_by_user_id = api.parser()
+get_lessons_by_user_id.add_argument("user_id", help="Enter user id")
+@api.route("/get_lessons_by_user_id")
+@api.doc(description="Get lessons by user id")
+class GetLessonsByUserId(Resource):
+    @api.expect(get_lessons_by_user_id)
+    def get(self):
+        def get_runcourse_details_lessons(rcourse_id):
+            try: 
+                rc_alias = aliased(RunCourse)
+                user_alias = aliased(User)
+
+                run_course = db.session.query(
+                    Course,
+                    rc_alias,
+                    CourseCategory,
+                    user_alias.user_Name
+                ).select_from(Course).join(rc_alias, Course.course_ID == rc_alias.course_ID).join(
+                    CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
+                ).join(user_alias, rc_alias.instructor_ID == user_alias.user_ID) .filter(
+                    rc_alias.rcourse_ID == rcourse_id).first()
+
+                if run_course:
+                    run_course[1].run_Starttime = run_course[1].run_Starttime.strftime('%H:%M:%S')
+                    run_course[1].run_Endtime = run_course[1].run_Endtime.strftime('%H:%M:%S')
+                    run_course[1].reg_Starttime = run_course[1].reg_Starttime.strftime('%H:%M:%S')
+                    run_course[1].reg_Endtime = run_course[1].reg_Endtime.strftime('%H:%M:%S')
+                    run_course[1].run_Startdate = run_course[1].run_Startdate.strftime('%Y-%m-%d')
+                    run_course[1].run_Enddate = run_course[1].run_Enddate.strftime('%Y-%m-%d')
+                    run_course[1].reg_Startdate = run_course[1].reg_Startdate.strftime('%Y-%m-%d')
+                    run_course[1].reg_Enddate = run_course[1].reg_Enddate.strftime('%Y-%m-%d')
+                    run_course[1].feedback_Startdate = run_course[1].feedback_Startdate.strftime('%Y-%m-%d')
+                    run_course[1].feedback_Enddate = run_course[1].feedback_Enddate.strftime('%Y-%m-%d')
+                    run_course[1].feedback_Starttime = run_course[1].feedback_Starttime.strftime('%H:%M:%S')
+                    run_course[1].feedback_Endtime = run_course[1].feedback_Endtime.strftime('%H:%M:%S')
+                    course_info = {
+                        **run_course[1].json(),
+                        "coursecat_Name": run_course[2].coursecat_Name,
+                        "instructor_Name": run_course[3],
+                        "course_Desc": run_course[0].course_Desc,
+                    }
+                    return {"code": 200, "run_course": course_info}, 200
+                else:
+                    return {"code": 400, 'message': "An error has occurred while retrieving run details"}, 400
+            except Exception as e:
+                return  {"code": 404, 'message':  "Failed " + str(e)}, 400
+    
+        def get_lessons_details_by_rcourse_id(rcourse_id):
+            try:
+                all_lessons = Lesson.query.filter_by(rcourse_ID = rcourse_id).order_by(Lesson.lesson_Date.asc()).all()
+                lessons = []
+                if all_lessons:
+                    for lesson in all_lessons:
+                        rcourse_id = lesson.rcourse_ID
+                        runcourse_response = get_runcourse_details_lessons(rcourse_id)
+                        if runcourse_response[0]['code'] == 200:
+                            status = 'Upcoming'
+                            lesson_datetime = datetime.combine(lesson.lesson_Date, lesson.lesson_Endtime)
+                            if lesson.lesson_Date == datetime.now().date() and datetime.now() <= lesson_datetime:
+                                status = "Ongoing"
+                            elif lesson.lesson_Date < datetime.now().date():
+                                status = "Ended"
+                            lessons.append({
+                                "lesson_ID": lesson.lesson_ID,
+                                "rcourse_ID": lesson.rcourse_ID,
+                                "lesson_Date": lesson.lesson_Date.strftime('%Y-%m-%d'),  
+                                "run_Name": runcourse_response[0]['run_course']['run_Name'],
+                                "lesson_Starttime": lesson.lesson_Starttime.strftime('%H:%M:%S'),
+                                "lesson_Endtime": lesson.lesson_Endtime.strftime('%H:%M:%S'),
+                                "lesson_Status": status,
+                                "instructor_Name": runcourse_response[0]['run_course']['instructor_Name'],
+                                "run_course": runcourse_response[0]['run_course'],
+                            })
+                        else: 
+                            return runcourse_response
+                    return {"code": 200, 'lessons': lessons}, 200
+                else:
+                    return  {"code": 404, 'message':  "No Lessons Found"}, 404
+            except Exception as e:
+                return  {"code": 404, 'message':  "Failed " + str(e)}, 404
+        
+        def group_key(lesson):
+            return (
+                lesson["rcourse_ID"],
+                lesson["lesson_ID"]
+            )
+        
+        def convert_to_datetime(lesson):
+            return datetime.strptime(lesson["lesson_Date"], "%Y-%m-%d")
+
+        try:
+            args = get_lessons_by_user_id.parse_args()
+            user_id = args.get('user_id')
+            session_user_ID = common.getUserID()
+            if user_id != str(session_user_ID):
+                return {"message": "Unathorized Access, No rights to view lessons"}, 404   
+            regList = Registration.query.filter(Registration.user_ID == user_id, Registration.reg_Status == 'Enrolled').all()
+            regList = [reg.json() for reg in regList]
+            lessonList = []
+            for reg in regList:
+                lessons_response = get_lessons_details_by_rcourse_id(reg['rcourse_ID'])
+                if lessons_response[0]['code'] == 200:
+                    lessonList.append(lessons_response[0]['lessons'])
+                else:
+                    return lessons_response
+            flattened_lessons = [item for sublist in lessonList for item in sublist]
+            upcoming_lessons = [lesson for lesson in flattened_lessons if lesson["lesson_Status"] == "Upcoming"]
+            ongoing_lessons = [lesson for lesson in flattened_lessons if lesson["lesson_Status"] == "Ongoing"]
+            ended_lessons = [lesson for lesson in flattened_lessons if lesson["lesson_Status"] == "Ended"]
+
+            upcoming_lessons_sorted = sorted(upcoming_lessons, key=convert_to_datetime)
+            ongoing_lessons_sorted = sorted(ongoing_lessons, key=convert_to_datetime)
+            ended_lessons_sorted = sorted(ended_lessons, key=convert_to_datetime)
+
+            combined_sorted_lessons = upcoming_lessons_sorted + ongoing_lessons_sorted + ended_lessons_sorted
+
+            unique_sorted_lessons = [next(group) for key, group in groupby(combined_sorted_lessons, key=group_key)]
+            return {"code": 200, 'lessons': unique_sorted_lessons}, 200
+
+        except Exception as e:
+            print(str(e))
+            return {"code": 404, "message": "Failed " + str(e)}, 404

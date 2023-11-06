@@ -124,6 +124,7 @@ export default {
 
       if (this.user_role === "Student") {
         items.push({ path: "/studentViewProfile", label: "Profile" });
+        items.push({ path: "/studentViewLesson", label: "My Lessons" });
       } else if (this.user_role === "Instructor" || this.user_role === "Trainer") {
         items.push(
           { path: "/instructorTrainerViewProfile", label: "Profile" },
