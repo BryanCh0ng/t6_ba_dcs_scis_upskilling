@@ -12,16 +12,16 @@ class FeedbackService extends BaseApiService {
         }
     }
 
-    async getStudentFeedbackIncludingAnswersAndTemplate(rcourse_id) {
+    async getRandomReviews(rcourse_id, no_of_reviews) {
         try {
-            const endpoint = `/feedback/get_student_feedback_including_answers_and_template`;
+            const endpoint = `/feedback/get_random_reviews_by_rcourse_id`;
             const params = {
-              rcourse_id: rcourse_id
+                rcourse_id: rcourse_id,
+                no_of_reviews: no_of_reviews
             };
             const response = await axiosClient.get(endpoint, { params });
             console.log(response)
             return response.data;
-
         } catch (error) {
             return this.handleError(error);
         }

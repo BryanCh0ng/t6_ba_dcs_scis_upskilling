@@ -3,20 +3,21 @@ import BaseApiService from "../BaseApiService";
 
 class DashboardService extends BaseApiService {
 
-    async getCourseAverageRatings(course_ID) {
+    async getCourseAverageRatings(course_ID, runcourse_ID) {
         try {
             // console.log(course_ID)
             const response = await axiosClient.get('/dashboard/course_average_ratings', {
                 params: {
                     course_ID: course_ID,
+                    runcourse_ID: runcourse_ID
                 },
             });
-            console.log(response.data)
             return response.data;
         } catch (error) {
-          throw new Error('Error fetching course feedback');
+            throw new Error("Error fetching course feedback");
         }
     }
+
 
     async getInstructorAverageRatings(instructor_ID) {
         try {

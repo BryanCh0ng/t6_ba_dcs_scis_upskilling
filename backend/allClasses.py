@@ -384,19 +384,18 @@ class Lesson(db.Model):
     __tablename__ = 'lesson'
 
     lesson_ID = db.Column(db.Integer, nullable=False, primary_key=True)
-    reg_ID = db.Column(db.Integer, db.ForeignKey('registration.reg_ID'),  nullable=False)
+    rcourse_ID = db.Column(db.Integer, db.ForeignKey('runcourse.rcourse_ID'), nullable=False) 
     lesson_Date = db.Column(db.Date, nullable=False)
-    lesson_Time = db.Column(db.Time, nullable=False) 
+    lesson_Starttime = db.Column(db.Time, nullable=False) 
+    lesson_Endtime = db.Column(db.Time, nullable=False) 
 
 
-
-    def __init__(self, lesson_ID, reg_ID, lesson_Date, lesson_Time):
+    def __init__(self, lesson_ID, rcourse_ID, lesson_Date, lesson_Starttime, lesson_Endtime):
         self.lesson_ID = lesson_ID
-        self.reg_ID = reg_ID
+        self.rcourse_ID = rcourse_ID
         self.lesson_Date = lesson_Date
-        self.lesson_Time = lesson_Time
-
-
+        self.lesson_Starttime = lesson_Starttime
+        self.lesson_Endtime = lesson_Endtime
 
 
     def json(self):
@@ -439,9 +438,11 @@ class Blacklist(db.Model):
 
     blacklist_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     user_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'),  nullable=False)
-    
-    def __init__(self, user_ID ):
+    blacklist_Datetime = db.Column(db.DateTime, nullable=False)
+
+    def __init__(self, user_ID, blacklist_Datetime):
         self.user_ID = user_ID
+        self.blacklist_Datetime = blacklist_Datetime
         
     def json(self):
         columns = self.__mapper__.column_attrs.keys()
