@@ -42,8 +42,7 @@
               </td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-               <!-- TO CHANGE TO FEEDBACK START DATE -->
-              <td v-if="course.run_Startdate && isBeforeCurrentDate(course.run_Startdate)" class="text-nowrap"><a v-if="course.course_Status != 'Retired'" class="btn btn-info text-light" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
+              <td v-if="course.feedback_Startdate && isBeforeCurrentDate(course.feedback_Startdate)" class="text-nowrap"><a v-if="course.course_Status != 'Retired'" class="btn btn-info text-light" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
               <td v-else class="text-nowrap"><a v-if="course.course_Status != 'Retired'" class="btn btn-info disabled text-light" title="Unable to remove run course due to ongoing/past feedback period">Apply Feedback Template</a></td>
               <td>
                 <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(course.rcourse_ID)">View Lessons</a>

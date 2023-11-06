@@ -62,6 +62,9 @@ class GetRunCourse(Resource):
             course.run_Endtime = course.run_Endtime.strftime('%H:%M:%S')
             course.reg_Starttime = course.reg_Starttime.strftime('%H:%M:%S')
             course.reg_Endtime = course.reg_Endtime.strftime('%H:%M:%S')
+            course.feedback_Starttime = course.feedback_Starttime.strftime('%H:%M:%S')
+            course.feedback_Endtime = course.feedback_Endtime.strftime('%H:%M:%S')
+
             return jsonify(
                 {
                     "code": 200,
@@ -150,6 +153,7 @@ class GetRunCourse(Resource):
 
 edit_runcourse = api.parser()
 @api.route("/edit_runcourse/<int:runcourse_id>", methods=["PUT"])
+@api.doc(description="Edit run course")
 class EditRunCourse(Resource):
     @api.expect(edit_runcourse)
     def put(self, runcourse_id):
@@ -214,6 +218,11 @@ class EditRunCourse(Resource):
             runcourse.reg_Starttime = runcourse.reg_Starttime.strftime('%H:%M:%S')
             runcourse.reg_Endtime = runcourse.reg_Endtime.strftime('%H:%M:%S')
 
+            runcourse.feedback_Startdate = runcourse.feedback_Startdate.strftime('%Y-%m-%d')
+            runcourse.feedback_Enddate = runcourse.feedback_Enddate.strftime('%Y-%m-%d')
+            runcourse.feedback_Starttime = runcourse.feedback_Starttime.strftime('%H:%M:%S')
+            runcourse.feedback_Endtime = runcourse.feedback_Endtime.strftime('%H:%M:%S')
+
             return {
                 'message': 'Run course updated successfully',
                 'data': runcourse.json()
@@ -225,6 +234,7 @@ class EditRunCourse(Resource):
                 "message": "Failed to update run course: " + str(e)
             }, 500
 
+create_runcourse = api.parser()
 @api.route("/create_runcourse/<int:course_id>", methods=["POST"])
 @api.doc(description="Create run course")
 class CreateRunCourse(Resource):
@@ -283,6 +293,11 @@ class CreateRunCourse(Resource):
             new_run_course.reg_Starttime = new_run_course.reg_Starttime.strftime('%H:%M:%S')
             new_run_course.reg_Endtime = new_run_course.reg_Endtime.strftime('%H:%M:%S')
 
+            new_run_course.feedback_Startdate = new_run_course.feedback_Startdate.strftime('%Y-%m-%d')
+            new_run_course.feedback_Enddate = new_run_course.feedback_Enddate.strftime('%Y-%m-%d')
+            new_run_course.feedback_Starttime = new_run_course.feedback_Starttime.strftime('%H:%M:%S')
+            new_run_course.feedback_Endtime = new_run_course.feedback_Endtime.strftime('%H:%M:%S')
+
             return {
                 'message': 'Run course created successfully',
                 'data': new_run_course.json()  # Assuming new_run_course.json() returns the required data as a dictionary
@@ -321,9 +336,9 @@ class CourseApplyFeedbackTemplate(Resource):
             if course is None:
                 return jsonify({"message": "run course course not found", "code": 404}), 404
 
-            if datetime.now().date() > course.run_Startdate: #TO CHANGE TO FEEDBACK DATE
+            if datetime.now().date() > course.feedback_Startdate:
                 return jsonify({"message": "run course in ongoing feedback period", "code": 404}), 404
-            elif datetime.now().date() > course.run_Enddate:  #TO CHANGE TO FEEDBACK DATE
+            elif datetime.now().date() > course.feedback_Enddate:
                 return jsonify({"message": "run course in past feedback period", "code": 404}), 404
 
             course.template_ID = templateID
@@ -348,3 +363,114 @@ class GetCourseFormats(Resource):
             return json.loads(json.dumps(distinct_course_formats, default=str)), 200
 
         return json.loads(json.dumps({"message": "No course formats found."})), 404
+
+retrieve_run_course_count = api.parser()
+retrieve_run_course_count.add_argument("course_id", help="Enter course id")
+@api.route("/get_run_course_count_by_course_id")
+@api.doc(description="Get run course count by course id")
+class GetRunCourseCount(Resource):
+    @api.expect(retrieve_run_course_count)
+    def get(self):
+        try: 
+            courseID = retrieve_run_course_count.parse_args().get("course_id")
+            
+            run_course_count = RunCourse.query.filter_by(course_ID=courseID).count()
+
+            course = Course.query.filter_by(course_ID=courseID).first()
+
+            db.session.close()
+
+            if run_course_count >= 0:
+
+                course_name = course.course_Name
+
+                return jsonify(
+                    {
+                        "code": 200,
+                        "data": {
+                            "run_course_count": run_course_count,
+                            "course_name": course_name
+                        }
+                    }
+                )
+            
+            return jsonify(
+                {
+                    "code": 404,
+                    "message": "There are no run courses for this course ID"
+                }
+
+            )
+        
+        except Exception as e:
+            db.session.rollback()
+            return jsonify(
+                {
+                    "code": 500, 
+                    "message": "Failed to retrieve run course count: " + str(e)
+                }
+            )
+
+get_available_instructors = api.parser()
+get_available_instructors.add_argument("rcourse_ID", help="Enter run course ID")
+get_available_instructors.add_argument("run_Startdate", help="Enter run course start date")
+get_available_instructors.add_argument("run_Enddate", help="Enter run course end date")
+get_available_instructors.add_argument("run_Starttime", help="Enter run course start time")
+get_available_instructors.add_argument("run_Endtime", help="Enter run course end time")
+@api.route("/get_available_instructors", methods=["GET"])
+@api.doc(description="Get all the available instructors")
+class GetAvailableInstructors(Resource):
+    def get(self):
+        try: 
+            
+            args = get_available_instructors.parse_args()
+
+            run_course_id = args.get("rcourse_ID", "")
+            start_date = datetime.strptime(args.get('run_Startdate'), '%Y-%m-%d').date()
+            end_date = datetime.strptime(args.get('run_Enddate'), '%Y-%m-%d').date()
+            start_time = datetime.strptime(args.get('run_Starttime'), '%H:%M:%S').time()
+            end_time = datetime.strptime(args.get('run_Endtime'), '%H:%M:%S').time()
+
+            if run_course_id:
+                runs_with_instructors = db.session.query(RunCourse, User).join(User, RunCourse.instructor_ID == User.user_ID).filter(RunCourse.rcourse_ID != run_course_id).all()
+            else: 
+                # Join RunCourse with User table 
+                runs_with_instructors = db.session.query(RunCourse, User).join(User, RunCourse.instructor_ID == User.user_ID).all()
+
+            # List comprehension to filter instructors and create a list of dictionaries
+            available_instructors = [
+                {
+                    "user_ID": user.user_ID,
+                    "user_Name": user.user_Name
+                    # Add other user details as needed
+                }
+                for user in User.query.filter(User.role_Name.in_(['Instructor', 'Trainer'])).all()
+                if user.user_Name not in [
+                    user.user_Name
+                    for run_course, user in runs_with_instructors
+                    if run_course.run_Startdate <= end_date and run_course.run_Enddate >= start_date
+                    and run_course.run_Endtime >= start_time and run_course.run_Starttime <= end_time
+                ]
+            ]
+
+            # Return the list of available instructors in the desired format
+            return jsonify(
+                {   
+                    "code": 200,
+                    "data": {
+                        "available_instructors": available_instructors
+                    }
+                }
+            )
+
+    
+        except Exception as e:
+            db.session.rollback()
+            return jsonify(
+                {
+                    "code": 500, 
+                    "message": "Failed to retrieve available instructors: " + str(e)
+                }
+            )
+
+        
