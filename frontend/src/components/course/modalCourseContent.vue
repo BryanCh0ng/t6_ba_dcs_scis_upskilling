@@ -51,18 +51,18 @@
             Registration Count: <br> <strong>{{ course.registration_count }}</strong>
           </div>
         </div>
-        <div class="pt-5 row" v-if="feedback_reviews && feedback_reviews.length > 0">
-          <div class="col-12 d-flex">
+      </div>
+      <div class="pt-5 row" v-if="feedback_reviews && feedback_reviews.length > 0">
+        <div class="col-12 d-flex">
           <h5 class="col-6">Feedbacks: </h5>
           <h5>{{ course_rating }}</h5>
-          </div>
-          <div class="col-6" v-for="feedback in feedback_reviews" :key="feedback.feedback_ID">
+        </div>
+        <div class="col-6" v-for="feedback in feedback_reviews" :key="feedback.feedback_ID">
             <p>{{ feedback.answer }}</p>
-          </div>
         </div>
-        <div class="pt-5 row" v-else>
-          <h5>{{ errorMessage }}</h5>
-        </div>
+      </div>
+      <div class="pt-5 row" v-else>
+        <h5 class="text-center">{{ errorMessage }}</h5>
       </div>
     </div>
   </div>
@@ -73,7 +73,7 @@ import courseCategoryBadge from './courseCategoryBadge.vue';
 import {convertDate, convertTime} from '@/scripts/common/convertDateTime.js'
 import UserService from "@/api/services/UserService.js";
 import FeedbackService from "@/api/services/FeedbackService.js";
-import DashboardService from "@/api/services/dashboardService.js";
+// import DashboardService from "@/api/services/dashboardService.js";
 
 export default {
   components: {
@@ -121,7 +121,7 @@ export default {
        try {
         console.log(rcourse_id)
         console.log(this.noOfReviews)
-        const response = await FeedbackService.getRandomReviews(rcourse_id, this.noOfReviews)
+        const response = await FeedbackService.getRandomReviews(rcourse_id, null, this.noOfReviews)
         console.log(response)
         if (response.code == 200) {
           this.feedback_reviews = response.reviews
@@ -130,22 +130,38 @@ export default {
         }
         console.log(this.feedback_reviews)
         console.log(this.errorMessage)
-        const rating_response = await DashboardService.getCourseAverageRatings(null, rcourse_id)
-        if (rating_response.code == 200) {
-          this.course_rating = "Rating: " + rating_response.data.overall_average_rating + "/5, out of " + rating_response.data.total_feedback + " feedback(s)";
-        } else {
-          this.errorMessage = rating_response.message
-        }
+        //const rating_response = await DashboardService.getCourseAverageRatings(null, rcourse_id)
+        // if (rating_response.code == 200) {
+        //   this.course_rating = "Rating: " + rating_response.data.overall_average_rating + "/5, out of " + rating_response.data.total_feedback + " feedback(s)";
+        // } else {
+        //   this.errorMessage = rating_response.message
+        // }
       } catch (error) {
-        this.errorMessage = "An error has occurred while attempting to retrieve reviews"
+        console.log(error)
+        this.errorMessage = error.message
       }
       } else {
-        try {
-          const rating_response = await DashboardService.getCourseAverageRatings(this.course.course_ID, null)
-          console.log(rating_response)
-        } catch (error) {
-          this.errorMessage = "An error has occurred while attempting to retrieve ratings"
+       try {
+        console.log(this.noOfReviews)
+        const response = await FeedbackService.getRandomReviews(null, this.course.course_ID, this.noOfReviews)
+        console.log(response)
+        if (response.code == 200) {
+          this.feedback_reviews = response.reviews
+        } else {
+          this.errorMessage = response.message
         }
+        console.log(this.feedback_reviews)
+        console.log(this.errorMessage)
+        // const rating_response = await DashboardService.getCourseAverageRatings(this.course.course_ID, null)
+        // if (rating_response.code == 200) {
+        //   this.course_rating = "Rating: " + rating_response.data.overall_average_rating + "/5, out of " + rating_response.data.total_feedback + " feedback(s)";
+        // } else {
+        //   this.errorMessage = rating_response.message
+        // }
+      } catch (error) {
+        console.log(error)
+        this.errorMessage = error.message
+      }
       }
     }
   },

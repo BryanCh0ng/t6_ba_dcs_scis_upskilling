@@ -254,6 +254,7 @@ class GetStudentFeedbackIncludingAnswersAndTemplate(Resource):
 
 get_random_reviews_by_rcourse_id = api.parser()
 get_random_reviews_by_rcourse_id.add_argument("rcourse_id", help="Enter rcourse id")
+get_random_reviews_by_rcourse_id.add_argument("course_id", help="Enter course id")
 get_random_reviews_by_rcourse_id.add_argument("no_of_reviews", help="Enter No. of Review")
 @api.route("/get_random_reviews_by_rcourse_id")
 @api.doc(description="Get  Random Feedbacks by rcourse id")
@@ -262,33 +263,45 @@ class GetRandomReviewsByRCourseId(Resource):
     def get(self):
       try:
         rcourse_id = get_random_reviews_by_rcourse_id.parse_args().get("rcourse_id")
+        course_id = get_random_reviews_by_rcourse_id.parse_args().get("course_id")
         no_of_reviews = get_random_reviews_by_rcourse_id.parse_args().get("no_of_reviews")
 
-        template_attribute_query = db.session.query(
-          TemplateAttribute,
-        ).filter(
-          TemplateAttribute.question == 'Any Feedbacks for the course',
-          TemplateAttribute.template_ID == None,
-          TemplateAttribute.input_Type == 'Text Field'
-         ).first()
-        
-        if template_attribute_query:
-          template_attribute_id = template_attribute_query.template_Attribute_ID
-          random_reviews = (
-              db.session.query(
-                Feedback,
-              ).filter(
-                Feedback.rcourse_ID == rcourse_id,
-                Feedback.template_Attribute_ID == template_attribute_id
-              )
-              .order_by(db.func.random())
-              .limit(no_of_reviews)
-              .all()
-            )
-          if random_reviews:
-             return {"code": 200, "reviews":[review.json() for review in random_reviews]}, 200
+        if rcourse_id:
+          course_id = db.session.query(RunCourse.course_ID).filter(RunCourse.rcourse_ID == rcourse_id).first()
+          course_id = course_id[0]
 
-        return {"code": 404, "message": "There are no reviews available currently"}, 404
+        if course_id:
+          rcourse_ids = db.session.query(RunCourse.rcourse_ID).filter(RunCourse.course_ID == course_id).all()
+          rcourse_id_list = [result[0] for result in rcourse_ids]
+
+
+          if rcourse_id_list:
+            template_attribute_query = db.session.query(
+              TemplateAttribute,
+            ).filter(
+              TemplateAttribute.question == 'Any Feedbacks for the course',
+              TemplateAttribute.template_ID == None,
+              TemplateAttribute.input_Type == 'Text Field'
+            ).first()
+            
+            if template_attribute_query:
+              template_attribute_id = template_attribute_query.template_Attribute_ID
+              random_reviews = (
+                  db.session.query(
+                    Feedback,
+                  ).filter(
+                    Feedback.rcourse_ID.in_(rcourse_id_list),
+                    Feedback.template_Attribute_ID == template_attribute_id
+                  )
+                  .order_by(db.func.random())
+                  .limit(no_of_reviews)
+                  .all()
+                )
+              if random_reviews:
+                return {"code": 200, "reviews":[review.json() for review in random_reviews]}, 200
+
+            return {"code": 202, "message": "There are no reviews available currently"}, 202
 
       except Exception as e:
+        print(e)
         return {"code": 404, "message": "Failed " + str(e)}, 404
