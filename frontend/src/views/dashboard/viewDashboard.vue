@@ -281,32 +281,37 @@ export default {
     if (role !== 'Admin' && role !== 'Trainer' && role !== 'Instructor') {
       this.$router.push({ name: 'proposeCourse' }); //need to change
     } else {
+      const url = window.location.pathname;
+      const parts = url.split("/"); // Split the URL by "/"
+      const lastPart = parts[parts.length - 1]; // Get the last element of the array
+
       document.title = "Feedback Analysis"; //need to change
+      
       if (window.history.state.back === "/adminViewCourse") {
         this.currentPage = "course";
         this.courseID = this.$route.params.id;
         this.courseIDs.push(parseInt(this.$route.params.id));
         this.courseIDs = JSON.stringify(this.courseIDs);
-        //console.log(this.courseID);
-        //console.log(this.courseIDs)
       } else if (window.history.state.back === "/adminViewRunCourse") {
         this.currentPage = "runcourse";
         this.runcourseID = this.$route.params.id;
         this.runcourseIDs.push(parseInt(this.$route.params.id));
         this.runcourseIDs = JSON.stringify(this.runcourseIDs);
-        //console.log(this.runcourseID);
       } else if (window.history.state.back && window.history.state.back.startsWith("/adminViewCourseRun/")) {
+        this.currentPage = "runcourse";
         this.runcourseID = this.$route.params.id;
         this.runcourseIDs.push(parseInt(this.$route.params.id));
         this.runcourseIDs = JSON.stringify(this.runcourseIDs);
-        //console.log(this.runcourseID);
-        this.currentPage = "runcourse";
       } else if (window.history.state.back === "/adminViewManagement") {
         this.currentPage = "coach";
         this.coachesID = this.$route.params.id;
         this.coachesIDs.push(parseInt(this.$route.params.id));
         this.coachesIDs = JSON.stringify(this.coachesIDs);
-        //console.log(this.runcourseID);
+      } else if ((lastPart === "viewDashboard" && (role === "Trainer" || role === "Instructor"))) {
+        this.currentPage = "coach";
+        this.coachesID = user_ID;
+        this.coachesIDs.push(parseInt(user_ID));
+        this.coachesIDs = JSON.stringify(this.coachesIDs);
       }
       await this.fetchData();
     }
