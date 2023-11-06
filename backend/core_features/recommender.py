@@ -130,6 +130,10 @@ class RecommenderUserRegistration(Resource):
                 datapoint["reg_Endtime"] = format_date_time(rcourse["reg_Endtime"])
                 datapoint["run_Starttime"] = format_date_time(rcourse["run_Starttime"])
                 datapoint["run_Endtime"] = format_date_time(rcourse["run_Endtime"])
+                datapoint["feedback_Startdate"] = format_date_time(rcourse["feedback_Startdate"])
+                datapoint["feedback_Enddate"] = format_date_time(rcourse["feedback_Enddate"])
+                datapoint["feedback_Startime"] = format_date_time(rcourse["feedback_Startime"])
+                datapoint["feedback_Endtime"] = format_date_time(rcourse["feedback_Endtime"])
 
                 course_list.append(datapoint)
 
@@ -278,6 +282,10 @@ class RecommenderCourseRegistration(Resource):
                 datapoint["reg_Endtime"] = format_date_time(rcourse["reg_Endtime"])
                 datapoint["run_Starttime"] = format_date_time(rcourse["run_Starttime"])
                 datapoint["run_Endtime"] = format_date_time(rcourse["run_Endtime"])
+                datapoint["feedback_Startdate"] = format_date_time(rcourse["feedback_Startdate"])
+                datapoint["feedback_Enddate"] = format_date_time(rcourse["feedback_Enddate"])
+                datapoint["feedback_Startime"] = format_date_time(rcourse["feedback_Startime"])
+                datapoint["feedback_Endtime"] = format_date_time(rcourse["feedback_Endtime"])
 
                 course_list.append(datapoint)
 
@@ -596,6 +604,10 @@ class GetTop10CoursesByRegistrationCount(Resource):
                     'reg_Enddate': format_date_time(result[2].reg_Enddate),
                     'reg_Starttime': format_date_time(result[2].reg_Starttime),
                     'reg_Endtime': format_date_time(result[2].reg_Endtime),
+                    'feedback_Startdate': format_date_time(result[2].feedback_Startdate),
+                    'feedback_Enddate': format_date_time(result[2].feedback_Enddate),
+                    'feedback_Starttime': format_date_time(result[2].feedback_Starttime),
+                    'feedback_Endtime': format_date_time(result[2].feedback_Endtime)
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -714,6 +726,10 @@ class GetCourseRegistrationInfo(Resource):
                     "reg_Enddate": result[2].reg_Enddate.strftime('%Y-%m-%d'),
                     "reg_Starttime": result[2].reg_Starttime.strftime('%H:%M:%S'),
                     "reg_Endtime": result[2].reg_Endtime.strftime('%H:%M:%S'),
+                    "feedback_Startdate": result[2].feedback_Startdate.strftime('%Y-%m-%d'),
+                    "feedback_Enddate": result[2].feedback_Enddate.strftime('%Y-%m-%d'),
+                    "feedback_Starttime": result[2].feedback_Starttime.strftime('%H:%M:%S'),
+                    "feedback_Endtime": result[2].feedback_Endtime.strftime('%H:%M:%S')
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}

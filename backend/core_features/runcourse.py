@@ -36,6 +36,8 @@ class GetAllRunCourses(Resource):
                 course.run_Endtime = course.run_Endtime.strftime('%H:%M:%S')
                 course.reg_Starttime = course.reg_Starttime.strftime('%H:%M:%S')
                 course.reg_Endtime = course.reg_Endtime.strftime('%H:%M:%S')  
+                course.feedback_Starttime = course.feedback_Starttime.strftime('%H:%M:%S')  
+                course.feedback_Endtime = course.feedback_Endtime.strftime('%H:%M:%S')
             return jsonify(
                 {
                     "code": 200,

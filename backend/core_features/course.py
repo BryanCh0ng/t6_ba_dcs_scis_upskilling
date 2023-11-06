@@ -342,6 +342,10 @@ class GetUnregisteredActiveCourses(Resource):
                     'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
                     'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
                     'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
+                    'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
+                    'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
+                    'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
+                    'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -466,6 +470,10 @@ class GetCourseRegistrationInfo(Resource):
                     "reg_Enddate": result[2].reg_Enddate.strftime('%Y-%m-%d'),
                     "reg_Starttime": result[2].reg_Starttime.strftime('%H:%M:%S'),
                     "reg_Endtime": result[2].reg_Endtime.strftime('%H:%M:%S'),
+                    "feedback_Startdate": result[2].feedback_Startdate.strftime('%Y-%m-%d'),
+                    "feedback_Enddate": result[2].feedback_Enddate.strftime('%Y-%m-%d'),
+                    "feedback_Starttime": result[2].feedback_Starttime.strftime('%H:%M:%S'),
+                    "feedback_Endtime": result[2].feedback_Endtime.strftime('%H:%M:%S')
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -657,6 +665,10 @@ class GetCompletedCourses(Resource):
                     'reg_Enddate': common.format_date_time(result[1].reg_Enddate),
                     'reg_Starttime': common.format_date_time(result[1].reg_Starttime),
                     'reg_Endtime': common.format_date_time(result[1].reg_Endtime),
+                    'feedback_Startdate': common.format_date_time(result[1].feedback_Startdate),
+                    'feedback_Enddate': common.format_date_time(result[1].feedback_Enddate),
+                    'feedback_Starttime': common.format_date_time(result[1].feedback_Starttime),
+                    'feedback_Endtime': common.format_date_time(result[1].feedback_Endtime)
                 }
 
                 modified_run_course = {**result[1].json(), **run_course_attrs}
@@ -794,6 +806,10 @@ class GetInstructorCourses(Resource):
                     'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
                     'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
                     'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
+                    'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
+                    'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
+                    'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
+                    'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime)
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -921,6 +937,10 @@ class GetInstructorTaughtCourses(Resource):
                     'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
                     'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
                     'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
+                    'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
+                    'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
+                    'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
+                    'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime)
                 }
                 modified_run_course = {**result[2].json(), **run_course_attrs}
 
@@ -1709,6 +1729,10 @@ class GetUserCourses(Resource):
                     'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
                     'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
                     'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
+                    'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
+                    'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
+                    'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
+                    'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime)
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -1777,6 +1801,10 @@ class GetAllCoursesWithRegistrationCount(Resource):
                     'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
                     'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
                     'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
+                    'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
+                    'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
+                    'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
+                    'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime)
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
