@@ -23,8 +23,9 @@
                     :sortDirection="getSortDirection('user_Name')" /></a>
               </th>
               <th scope="col">Email</th>
+              <th scope="col">Blacklist Status</th>
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Status', 'student')" >Status 
+                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Status', 'student')" >Registration Status 
                   <sort-icon :sortColumn="sortColumn === 'reg_Status'" 
                   :sortDirection="getSortDirection('reg_Status')"/></a>
               </th>
@@ -41,6 +42,10 @@
               </td>
               <td class="user_email">
                 {{ user.user_Email }}
+              </td>
+              <td class="blacklist_status">
+                  <span v-if="user.blacklist_Status === 'Blacklisted'" class="text-danger">Blacklisted</span>
+                  <span v-else>Not Blacklisted</span>
               </td>
               <td class="reg_status">
                 {{ user.reg_Status }}
@@ -249,7 +254,6 @@ export default {
       this.$router.push({ name: 'instructorTrainerViewProfile' });
     } else if (role == 'Admin') {
         //document.title = "Create a Run Course";
-        console.log(this.selectAllStudents)
         this.runCourseID = this.$route.params.id;
         this.loadData();
     }

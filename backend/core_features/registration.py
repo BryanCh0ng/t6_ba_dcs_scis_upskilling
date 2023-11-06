@@ -241,24 +241,21 @@ class GetRegistrationByRCourseID(Resource):
     @api.expect(get_registration_by_rcourseid)
     def get(self):
         try: 
-
             user_role = common.getUserRole()
-            if (user_role) != 'Admin':
+            if user_role != 'Admin':
                 return {
-                    "message": "Unathorized Access, Failed to create run course"
+                    "message": "Unauthorized Access, Failed to create run course"
                 }, 404
     
-            
             args = get_registration_by_rcourseid.parse_args()
             rcourse_ID = args.get("rcourse_ID", "")
 
             query = (
-                db.session.query(Registration, User)
+                db.session.query(Registration, User, Blacklist)
                 .join(Registration, User.user_ID == Registration.user_ID)
+                .outerjoin(Blacklist, User.user_ID == Blacklist.user_ID)
                 .filter(Registration.rcourse_ID == rcourse_ID)
             )
-
-            #regList = Registration.query.filter(Registration.rcourse_ID == rcourse_ID).all()
 
             student_name = args.get("student_name", "")
             reg_status = args.get("reg_status", "")
@@ -269,34 +266,23 @@ class GetRegistrationByRCourseID(Resource):
             
             if reg_status:
                 query = query.filter(Registration.reg_Status == reg_status)
-            
 
             filtered_results = query.all()
             db.session.close()
 
-            """
-            if len(regList):
-                return jsonify(
-                    {
-                        "code": 200,
-                        "data": {
-                            "reg_list": [reg.json() for reg in regList]
-                        }
-                    }
-                )
-            """
-
             if filtered_results:
                 data = []
 
-                for registration, user in filtered_results:
+                for registration, user, blacklist in filtered_results:
+                    blacklist_status = "Blacklisted" if blacklist else "Not Blacklisted"
+
                     combined_data = {
                         "user_ID": user.user_ID,
                         "user_Email": user.user_Email,
                         "user_Name": user.user_Name,
                         "reg_ID": registration.reg_ID,
-                        "reg_Status": registration.reg_Status
-                        # Add more attributes from both tables as needed
+                        "reg_Status": registration.reg_Status,
+                        "blacklist_Status": blacklist_status
                     }
 
                     data.append(combined_data)
@@ -319,7 +305,7 @@ class GetRegistrationByRCourseID(Resource):
             return jsonify(
                 {
                     "code": 500,
-                    "message": "Failed to retreive run course registration: " + str(e)
+                    "message": "Failed to retrieve run course registration: " + str(e)
                 }
             )
 
