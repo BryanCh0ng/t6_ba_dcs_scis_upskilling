@@ -35,7 +35,7 @@ def check_registration_close():
 
             if rcourse_endtime <= current_time:
                 coursesize = rcourse["course_Size"]
-                registrations = Registration.query.filter(Registration.rcourse_ID == rcourseid).all()
+                registrations = Registration.query.filter(Registration.rcourse_ID == rcourseid).order_by(Registration.reg_ID).all()
                 registrations_num = len(registrations.json())
 
                 if coursesize >= registrations_num:
@@ -59,8 +59,45 @@ def check_registration_close():
                             return "Failed" + str(e), 500
                         
                 else:
-                    continue        
+                    reg_list = []
+                    blacklist = []
+                    i = 0
 
+                    for registration in registrations:
+                        userid = registration.json()["user_ID"]
+
+                        blacklist_entry = Blacklist.query.filter(Blacklist.user_ID == userid).first()
+
+                        if blacklist_entry:
+                            blacklist.append(registration)
+                            
+                        elif not blacklist_entry and i < coursesize:
+                            reg_list.append(registration)
+                            i += 1
+
+                    if i < coursesize:
+                        for j in range(0, coursesize - i):
+                            reg_list.append(blacklist.pop(0))
+
+                    for reg in reg_list:
+                        try:
+                            setattr(reg, "reg_Status", "Enrolled")
+
+                            db.session.commit()
+                            db.session.close()
+
+                            return jsonify(
+                                {
+                                    "code": 201,
+                                    "data": reg.json(),
+                                    "message": "Registration has been successfully updated!"
+                                }
+                            )
+    
+                        except Exception as e:
+                            db.session.rollback()
+                            return "Failed" + str(e), 500
+                        
 # get_all_registrations()
 get_all_registrations = api.parser()
 get_all_registrations.add_argument("reg_ID", help="Enter registration ID")
@@ -71,7 +108,10 @@ class GetAllRegistrations(Resource):
     def get(self):
         arg = get_all_registrations.parse_args().get("reg_ID")
         reg_ID = arg if arg else ""
-        regList = Registration.query.filter(Registration.reg_ID == reg_ID).all()
+        if reg_ID:
+            regList = Registration.query.filter(Registration.reg_ID == reg_ID).all()
+        else:
+            regList = Registration.query.all()
         db.session.close()
 
         if len(regList):
@@ -245,7 +285,7 @@ class GetRegistrationByRCourseID(Resource):
             user_role = common.getUserRole()
             if (user_role) != 'Admin':
                 return {
-                    "message": "Unathorized Access, Failed to create run course"
+                    "message": "Unathorized Access, Failed to get registration records"
                 }, 404
     
             
