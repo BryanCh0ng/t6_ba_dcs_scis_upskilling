@@ -27,8 +27,6 @@
     <button class="btn btn-secondary rejected-reason text-light font-weight-bold text-nowrap" v-else-if="status == 'rejected-reason'">View Rejected Reason</button>  
     <button @click=voteAction(course.course_ID) class="btn btn-danger unoffered-vote text-light font-weight-bold text-nowrap" v-else-if="status == 'unoffered-vote'">Delete</button>
     <button @click=runCourseAction(course.rcourse_ID) class="btn btn-danger delete-run-course text-light font-weight-bold text-nowrap" v-else-if="status == 'delete-run-course'">Delete</button>
-    <button class="btn btn-info delete-run-course text-light font-weight-bold text-nowrap" v-else-if="status == 'add-edit-lessons'">Add/Edit Lessons</button>
-    <button class="btn btn-info delete-run-course text-light font-weight-bold text-nowrap" v-else-if="status == 'edit-lesson'">Edit Lesson</button>
   </div>
 </template>
   

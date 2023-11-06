@@ -319,34 +319,7 @@ const routes = [
         title: 'Submit Feedback',
         requiresAuth: true
     },
-  },
-  {
-    path: '/viewAllLessons',
-    name: 'viewAllLessons',
-    component: () => import('../views/lesson/viewAllLessons.vue'),
-    meta: {
-        title: 'View All Lessons',
-        requiresAuth: true
-    },
-  }, 
-  {
-    path: '/viewRunCourseLesson/:id',
-    name: 'viewRunCourseLesson',
-    component: () => import('../views/lesson/viewRunCourseLesson.vue'),
-    meta: {
-        title: 'View Run Course Lesson',
-        requiresAuth: true
-    }, 
-  }, 
-  {
-    path: '/viewAttendance/:lessonId',
-    name: 'viewAttendance',
-    component: () => import('../views/attendance/viewAttendance.vue'),
-    meta: {
-        title: 'View Attendance',
-        requiresAuth: true
-    }, 
-  } 
+  }
 ]
 
 const router = createRouter({
