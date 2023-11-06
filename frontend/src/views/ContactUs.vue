@@ -23,6 +23,7 @@
         <button
           type="submit"
           class="btn btn-block shadow-sm w-100 mt-5 field submitbtn"
+          title="Submit"
         >
           Submit
         </button>
@@ -34,7 +35,7 @@
         <p>
           Your message has been successfully sent. We appreciate your feedback!
         </p>
-        <button @click="hideSuccessModal" class="btn btn-secondary close-btn">
+        <button @click="hideSuccessModal" class="btn btn-secondary close-btn" title="Close">
           Close
         </button>
       </div>

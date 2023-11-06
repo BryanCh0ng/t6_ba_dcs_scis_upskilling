@@ -36,6 +36,9 @@ class GetAllRunCourses(Resource):
                 course.run_Endtime = course.run_Endtime.strftime('%H:%M:%S')
                 course.reg_Starttime = course.reg_Starttime.strftime('%H:%M:%S')
                 course.reg_Endtime = course.reg_Endtime.strftime('%H:%M:%S')  
+                course.feedback_Starttime = course.feedback_Starttime.strftime('%H:%M:%S')  
+                course.feedback_Endtime = course.feedback_Endtime.strftime('%H:%M:%S') 
+
             return jsonify(
                 {
                     "code": 200,
@@ -364,6 +367,29 @@ class GetCourseFormats(Resource):
 
         return json.loads(json.dumps({"message": "No course formats found."})), 404
 
+# Run Course Name
+retrieve_runcourse_name = api.parser()
+retrieve_runcourse_name.add_argument("rcourse_id", help="Enter rcourse id")
+
+@api.route("/get_runcourse_name")
+@api.doc(description="Get run course name")
+class GetStudentName(Resource):
+    @api.expect(retrieve_runcourse_name)
+    def get(self):
+        args = retrieve_runcourse_name.parse_args()
+        rcourse_id = args.get("rcourse_id", "")
+
+        runcourse = RunCourse.query.filter_by(rcourse_ID=rcourse_id).first()
+        db.session.close()
+
+        if runcourse:
+            runcourse_name = runcourse.run_Name
+            
+            return jsonify({"code": 200, "data": runcourse_name})
+        else:
+            print('else')
+            return jsonify({"code": 404, "message": "Course not found"})
+            
 retrieve_run_course_count = api.parser()
 retrieve_run_course_count.add_argument("course_id", help="Enter course id")
 @api.route("/get_run_course_count_by_course_id")

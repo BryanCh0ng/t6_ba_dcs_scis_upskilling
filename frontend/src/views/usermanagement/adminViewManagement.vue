@@ -21,7 +21,7 @@
 
       <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Admin Database</h5>
-          <button class="btn btn-primary font-weight-bold text-nowrap" @click="goToAddAdmin">Add Admin</button>
+          <button class="btn btn-primary font-weight-bold text-nowrap" @click="goToAddAdmin" title="Add Admin">Add Admin</button>
       </div>
 
       <div class="container col-12">
@@ -46,7 +46,7 @@
                 </td>
 
                 <td v-if="user.user_ID !== user_ID">
-                  <button class="btn btn-danger font-weight-bold text-nowrap" @click="removeAdmin(user.user_ID)">Remove</button>
+                  <button class="btn btn-danger font-weight-bold text-nowrap" @click="removeAdmin(user.user_ID)" title="Remove Admin">Remove</button>
                 </td>
                 <td v-else></td>
               </tr>
@@ -70,8 +70,8 @@
 
       <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Student Database</h5>
-          <button v-show="showBlacklistButton" class="btn btn-danger me-3 font-weight-bold text-nowrap" @click="blacklist">Blacklist Student</button>
-          <button v-show="showRemoveButton" class="btn btn-danger font-weight-bold text-nowrap" @click="removeFromBlacklist">Remove from Blacklist</button>
+          <button v-show="showBlacklistButton" class="btn btn-danger me-2 font-weight-bold text-nowrap" @click="blacklist" title="Blacklist Student">Blacklist Student</button>
+          <button v-show="showRemoveButton" class="btn btn-danger font-weight-bold text-nowrap" @click="removeFromBlacklist" title="Remove from Blacklist">Remove from Blacklist</button>
       </div>
 
       <div class="container col-12 table-responsive">
@@ -85,8 +85,11 @@
                   <a href="" class="text-decoration-none text-dark" @click.prevent="sort('user_Name', 'student')">Name <sort-icon :sortColumn="sortColumn === 'user_Name'" :sortDirection="getSortDirection('user_Name')"/></a>
                 </th>
                 <th scope="col">Email</th>
-                <th scope="col">Blacklisted</th>
-                <th scope="col">View Course Taken</th>
+                <th scope="col">Status</th>
+                <th scope="col">
+                  <a href="" class="text-decoration-none text-dark" @click.prevent="sort('blacklist_date', 'student')">Date <sort-icon :sortColumn="sortColumn === 'blacklist_date'" :sortDirection="getSortDirection('blacklist_date')"/></a>
+                </th>
+                <th scope="col">View Course Enrolled/Taken</th>
               </tr>
             </thead>
             <tbody>
@@ -105,7 +108,11 @@
                   <span v-if="user.is_blacklisted === true" class="text-danger">Blacklisted</span>
                   <span v-else>Not Blacklisted</span>
                 </td>
-                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewCourses(user.user_ID)">View Course Taken</a></td>
+                <td class="blacklist_Datetime mr-5">
+                  <span v-if="user.blacklist_date === ''">-</span>
+                  <span v-else><course-date :date="user.blacklist_date"></course-date></span>
+                </td>
+                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewCourses(user.user_ID)">View Course Enrolled/Taken</a></td>
               </tr> 
             </tbody>
           </table>
@@ -159,7 +166,7 @@
                     <td class="ratings">
                         {{ instructor_trainer.average_rating }} / 5
                     </td>
-                    <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
+                    <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToInstructorFeedbackAnalysis(instructor_trainer.user_ID)">View Feedback Analysis</a></td>
                     </tr>
                 </tbody>
                 </table>
@@ -193,6 +200,7 @@ import ManagementService from "@/api/services/UserManagementService.js";
 import CommonService from "@/api/services/CommonService.js"
 import UserService from "@/api/services/UserService.js";
 import DefaultModal from "@/components/DefaultModal.vue";
+import courseDate from "@/components/course/courseDate.vue";
 
 export default {
   components: {
@@ -202,7 +210,8 @@ export default {
     DefaultModal,
     SearchFilter,
     StudentSearchFilter,
-    NameSearchFilter
+    NameSearchFilter,
+    courseDate
   },
   data() {
     return {
@@ -359,6 +368,9 @@ export default {
     },
     viewCourses(user_ID) {
       this.$router.push({ name: 'adminViewStudentEnrolledCourse', params: { user_ID } });
+    },
+    goToInstructorFeedbackAnalysis(instructorID) {
+      this.$router.push({ name: 'viewInstructorFeedbackAnalysis', params: {id: instructorID}});
     },
     async handleModalClosed(){
       this.loadData()

@@ -25,7 +25,7 @@
                 <thead>
                     <tr class="text-nowrap">
                     <th scope="col">
-                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'assigned')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Name', 'assigned')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/></a></th>
                     <th scope="col">Venue</th>
                      <th scope="col">
                         <a href="" @click.prevent="sort('run_Startdate', 'assigned')" class="text-decoration-none text-dark">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
@@ -33,13 +33,14 @@
                         <a href="" @click.prevent="sort('run_Enddate', 'assigned')" class="text-decoration-none text-dark">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
                     <th scope="col">Start & End Time</th>
                     <th scope="col">Course Details</th>
+                    <th scope="col">Lessons</th>
                     <th scope="col">Action(s)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(assigned_course, key) in displayedAssignedCourses" :key="key">
                         <td class="name">
-                            <course-name-desc :name="assigned_course.course_Name" :category="assigned_course.coursecat_Name" :description="assigned_course.course_Desc"></course-name-desc>
+                            <course-name-desc :name="assigned_course.run_Name" :category="assigned_course.coursecat_Name" :description="assigned_course.course_Desc"></course-name-desc>
                         </td>
                         <td> {{ assigned_course.course_Venue }} </td>
                         <td class="start_date">
@@ -52,6 +53,9 @@
                           <course-duration :start_time="assigned_course.run_Starttime" :end_time="assigned_course.run_Endtime"></course-duration> 
                         </td>
                         <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(assigned_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
+                        <td>
+                          <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(assigned_course.rcourse_ID)">View Lessons</a>
+                        </td>
                         <td>
                           <course-action status="attendance" :id="assigned_course.course_ID"></course-action>
                         </td>
@@ -149,7 +153,7 @@
                 <thead>
                     <tr class="text-nowrap">
                     <th scope="col">
-                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'conducted')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Name', 'conducted')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/></a></th>
                     <th scope="col">
                       <a href="" @click.prevent="sort('course_Venue', 'conducted')" class="text-decoration-none text-dark">Venue <sort-icon :sortColumn="sortColumn === 'course_Venue'" :sortDirection="getSortDirection('course_Venue')"/></a></th>
                     <th scope="col">
@@ -157,13 +161,14 @@
                     <th scope="col">
                       <a href="" @click.prevent="sort('run_Enddate', 'conducted')" class="text-decoration-none text-dark">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
                     <th scope="col">Course Details</th>
-                    <th scope="col">Action(s)</th>
+                    <th scope="col">Lessons</th>
+                    <th scope="col">Feedback</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(conducted_course, key) in displayedConductedCourses" :key="key">
                     <td class="name">
-                        <course-name-desc :name="conducted_course.course_Name" :category="conducted_course.coursecat_Name" :description="conducted_course.course_Desc"></course-name-desc>
+                        <course-name-desc :name="conducted_course.run_Name" :category="conducted_course.coursecat_Name" :description="conducted_course.course_Desc"></course-name-desc>
                     </td>
                     <td> {{ conducted_course.course_Venue }} </td>
                     <td class="start_date">
@@ -174,8 +179,10 @@
                     </td>
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(conducted_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                     <td>
-                      <course-action status="feedback-analysis" :id="conducted_course.course_ID"></course-action>
+                      <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(course.rcourse_ID)">View Lessons</a>
                     </td>
+                    <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToRunCourseFeedbackAnalysis(conducted_course.rcourse_ID)">View Feedback Analysis</a></td>
+                    
                     </tr>
                 </tbody>
                 </table>
@@ -439,6 +446,9 @@ export default {
     editCourse(courseId) {
       this.$router.push({ name: 'editProposedCourse', params: { courseId } });
     },
+    goToRunCourseFeedbackAnalysis(courseID) {
+      this.$router.push({ name: 'viewRunCourseFeedbackAnalysis', params: {id: courseID}});
+    },
 
     async loadData() {
       try {
@@ -457,6 +467,10 @@ export default {
       } catch (error) {
         console.error("Error fetching course details:", error);
       }
+    },
+
+    viewLessons(courseID) {
+      this.$router.push({ name: 'viewRunCourseLesson', params: {id: courseID}});
     },
 
     async getUserID() {

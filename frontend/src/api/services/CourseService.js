@@ -10,14 +10,14 @@ class CourseService extends BaseApiService {
     //         return this.handleError(error);
     //     }
     // }
-    // async getAllCoursesAdmin() {
-    //     try {
-    //         let courses = await axiosClient.get("/course/get_all_courses_admin");
-    //         return courses.data
-    //     } catch (error) {
-    //         return this.handleError(error);
-    //     }
-    // }
+    async getAllCoursesAdmin() {
+        try {
+            let courses = await axiosClient.get("/course/get_all_courses_admin");
+            return courses.data
+        } catch (error) {
+             return this.handleError(error);
+        }
+    }
     async getCourseById(courseId) {
         try {
             let course = await axiosClient.get("/course/get_course_by_id", { params: { course_id: courseId } });
@@ -477,9 +477,10 @@ class CourseService extends BaseApiService {
         }
     }
 
-    async adminGetUserCourses(user_ID, course_Name, coursecat_ID) {
+    async adminGetStudentEnrolledCourses(user_ID, course_Name, coursecat_ID) {
         try {
-            const endpoint = `/course/user_courses/${user_ID}`;
+            
+            const endpoint = `/course/studentEnrolledCourse/${user_ID}`;
             const params = {
               course_name: course_Name,
               coursecat_id: coursecat_ID

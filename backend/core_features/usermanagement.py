@@ -1,6 +1,7 @@
 from flask import request, jsonify, session
 from core_features import common
 from flask_restx import Namespace, Resource
+from flask_apscheduler import APScheduler
 from allClasses import *
 from flask_mail import Message
 from sqlalchemy.orm import aliased
@@ -14,6 +15,10 @@ app.logger.setLevel(logging.DEBUG)
 api = Namespace('management', description='User Management')
 
 from app import mail, bcrypt
+
+scheduler = APScheduler()
+scheduler.init_app(app)
+scheduler.start()
 
 # All Admin
 retrieve_admin_parser = api.parser()
@@ -93,11 +98,13 @@ class GetAllAdmin(Resource):
         blacklisted = args.get("blacklisted", None)
 
         try:
-            students = User.query.filter_by(role_Name='student').all()
+            students = User.query.filter_by(role_Name='Student').all()
 
             if student_name:
                 students = [
                     user for user in students if student_name.lower() in user.user_Name.lower()]
+                
+                print(students)
 
             # Check if blacklisted is specified and is 'True' (case-insensitive)
             if blacklisted is not None:
@@ -112,14 +119,22 @@ class GetAllAdmin(Resource):
                 student_list = []
 
                 for user in students:
-                    is_blacklisted = Blacklist.query.filter_by(
-                        user_ID=user.user_ID).first() is not None
+                    is_blacklisted = Blacklist.query.filter_by(user_ID=user.user_ID).first() is not None
+
+                    if (not is_blacklisted):
+                        blacklist_datetime = ""
+                    else:
+                        blacklist_data = Blacklist.query.filter_by(user_ID=user.user_ID).first()
+                        blacklist_datetime = common.format_date_time(blacklist_data.blacklist_Datetime)
+
                     student_data = {
                         'user_ID': user.user_ID,
                         'user_Name': user.user_Name,
                         'user_Email': user.user_Email,
-                        'is_blacklisted': is_blacklisted
+                        'is_blacklisted': is_blacklisted,
+                        'blacklist_date': blacklist_datetime
                     }
+
 
                     student_list.append(student_data)
 
@@ -134,11 +149,9 @@ class GetAllAdmin(Resource):
 
 # All Instructors
 retrieve_instructors_trainers = api.parser()
-retrieve_instructors_trainers.add_argument(
-    "instructor_name", help="Enter instructor name")
+retrieve_instructors_trainers.add_argument("instructor_name", help="Enter instructor name")
 retrieve_instructors_trainers.add_argument("role_name", help="Enter role name")
-retrieve_instructors_trainers.add_argument(
-    "organization_name", help="Enter organization")
+retrieve_instructors_trainers.add_argument("organization_name", help="Enter organization")
 
 
 @api.route("/get_all_instructors_and_trainers")
@@ -249,7 +262,6 @@ class GetAllInstructorsAndTrainers(Resource):
 retrieve_student_name = api.parser()
 retrieve_student_name.add_argument("user_id", help="Enter user id")
 
-
 @api.route("/get_student_name")
 @api.doc(description="Get student name")
 class GetStudentName(Resource):
@@ -263,7 +275,6 @@ class GetStudentName(Resource):
         user_name = user.user_Name
 
         return jsonify({"code": 200, "data": user_name})
-
 
 # Blacklist Student
 retrieve_blacklist_student_id = api.parser()
@@ -298,7 +309,7 @@ class BlacklistStudent(Resource):
 
                 # Create new blacklist entries for each user
                 for user_id in user_ids:
-                    blacklist_entry = Blacklist(user_ID=user_id)
+                    blacklist_entry = Blacklist(user_ID=user_id, blacklist_Datetime=datetime.now())
                     db.session.add(blacklist_entry)
 
                 db.session.commit()
@@ -310,11 +321,64 @@ class BlacklistStudent(Resource):
         except Exception as e:
             return "Failed. " + str(e), 500
 
+# Automate blacklist
+@scheduler.task('interval', id='check_and_blacklist_users', seconds=3600, misfire_grace_time=900) 
+# Define the function to check and blacklist users
+def check_and_blacklist_users():
+    try:
+        # Get a list of all users
+        users = db.session.query(User).all()
+
+        for user in users:
+            user_ID = user.user_ID
+
+            # Get a list of all run courses for the user
+            run_courses = db.session.query(RunCourse).join(
+                Registration, Registration.rcourse_ID == RunCourse.rcourse_ID
+            ).filter(
+                Registration.user_ID == user_ID,
+                Registration.reg_Status == "Enrolled"
+            ).all()
+
+            for run_course in run_courses:
+                
+                lessons = db.session.query(Lesson).filter(Lesson.rcourse_ID == run_course.rcourse_ID).all()
+                total_lessons = len(lessons)
+
+                attendance_records = db.session.query(AttendanceRecord).filter(
+                    AttendanceRecord.user_ID == user_ID,
+                    AttendanceRecord.lesson_ID.in_([lesson.lesson_ID for lesson in lessons])
+                ).all()
+
+                valid_reason_keywords = ["sick", "doctor appointment", "medical leave", "family emergency", "mc", "personal reasons", "hospitalized"]
+
+                missed_lessons_without_valid_reason = 0
+
+                for record in attendance_records:
+                    if record.status == 'Absent':
+                        if not record.reason or record.reason.strip().lower not in valid_reason_keywords:
+                            missed_lessons_without_valid_reason += 1
+            
+            if total_lessons > 0:
+                attendance_rate = (total_lessons - missed_lessons_without_valid_reason) / total_lessons * 100
+
+                # Check if the attendance rate is below 70%
+                if attendance_rate <= 70:
+                    # Check if the user is already blacklisted
+                    existing_blacklist = Blacklist.query.filter_by(user_ID=user_ID).first()
+                    if not existing_blacklist:
+                        # Add the user to the blacklist
+                        blacklist_entry = Blacklist(user_ID=user_ID, blacklist_Datetime=datetime.now())
+                        db.session.add(blacklist_entry)
+                        db.session.commit()
+
+        db.session.close()
+    except Exception as e:
+        print(f"Error while checking and blacklisting users: {str(e)}")
 
 retrieve_blacklist_remove = api.parser()
 retrieve_blacklist_remove.add_argument(
     "user_ids", type=int, action="append", required=True, help="Enter user IDs as a list")
-
 
 @api.route('/remove_from_blacklist', methods=['POST'])
 @api.doc(description="Remove Students from Blacklist")

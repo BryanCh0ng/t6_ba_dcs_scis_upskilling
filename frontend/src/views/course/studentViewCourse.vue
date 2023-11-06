@@ -19,8 +19,8 @@
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                    <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'run')">Course Name / Description
-                      <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/>
+                    <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Name', 'run')">Course Name / Description
+                      <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/>
                     </a>
                   </th>
                   <th scope="col">
@@ -39,13 +39,14 @@
                     </a>
                   </th>
                   <th scope="col">Course Details</th>
+                  <th scope="col">Lessons</th>
                   <th scope="col">Action(s)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(course, key) in displayedRunCourses" :key="key">
                   <td class="name">
-                    <course-name-desc :name="course.course_Name" :category="course.coursecat_Name" :description="course.course_Desc"></course-name-desc>
+                    <course-name-desc :name="course.run_Name" :category="course.coursecat_Name" :description="course.course_Desc"></course-name-desc>
                   </td>
                   <td class="start_date">
                     <course-date-time :date="course.run_Startdate" :time="course.run_Starttime"></course-date-time>
@@ -60,7 +61,10 @@
                     <a class="text-nowrap text-dark text-decoration-underline view-course-details" @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a>
                   </td>
                   <td>
-                    <course-action @action-and-message-updated="handleActionData" :status="course.course_Status" :course="course"></course-action>
+                    <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(course.rcourse_ID)">View Lessons</a>
+                  </td>
+                  <td>
+                    <course-action @action-and-message-updated="handleActionData" :status="course.runcourse_Status" :course="course"></course-action>
                   </td>
                 </tr>
               </tbody>
@@ -317,6 +321,10 @@ export default {
         console.error("Error fetching user ID:", error);
         this.user_ID = null;
       }
+    },
+
+    viewLessons(courseID) {
+      this.$router.push({ name: 'viewRunCourseLesson', params: {id: courseID}});
     },
   },
   async created() {

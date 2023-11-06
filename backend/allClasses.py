@@ -249,6 +249,8 @@ class InputOption(db.Model):
     position = db.Column(db.Integer,  nullable=False)
     textlabel = db.Column(db.String(255), nullable=False) 
 
+
+
     def __init__(self, template_Attribute_ID, position, textlabel ):
         self.template_Attribute_ID = template_Attribute_ID
         self.position = position
@@ -383,15 +385,13 @@ class Registration(db.Model):
 class Lesson(db.Model):
     __tablename__ = 'lesson'
 
-    lesson_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    lesson_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     rcourse_ID = db.Column(db.Integer, db.ForeignKey('runcourse.rcourse_ID'), nullable=False) 
     lesson_Date = db.Column(db.Date, nullable=False)
     lesson_Starttime = db.Column(db.Time, nullable=False) 
     lesson_Endtime = db.Column(db.Time, nullable=False) 
 
-
-    def __init__(self, lesson_ID, rcourse_ID, lesson_Date, lesson_Starttime, lesson_Endtime):
-        self.lesson_ID = lesson_ID
+    def __init__(self, rcourse_ID, lesson_Date, lesson_Starttime, lesson_Endtime):
         self.rcourse_ID = rcourse_ID
         self.lesson_Date = lesson_Date
         self.lesson_Starttime = lesson_Starttime
@@ -406,7 +406,7 @@ class Lesson(db.Model):
         return result
     
 ##################  Attendence Record Class Creation ##################
-class AttendenceRecord(db.Model):
+class AttendanceRecord(db.Model):
     __tablename__ = 'attendancerecord'
 
     attrecord_ID = db.Column(db.Integer, nullable=False, primary_key=True)
@@ -414,15 +414,16 @@ class AttendenceRecord(db.Model):
     status = db.Column(db.String(15), nullable=False)
     reason = db.Column(db.String(255), nullable=False)
     attrecord_Status = db.Column(db.String(20), nullable=False) 
+    user_ID = db.Column(db.Integer, db.ForeignKey('user.user_ID'), nullable=False)
 
 
-
-    def __init__(self, attrecord_ID, lesson_ID, status, reason, attrecord_Status):
+    def __init__(self, attrecord_ID, lesson_ID, status, reason, attrecord_Status, user_ID):
         self.attrecord_ID = attrecord_ID
         self.lesson_ID = lesson_ID
         self.status = status
         self.reason = reason
         self.attrecord_Status = attrecord_Status
+        self.user_ID = user_ID
 
 
     def json(self):

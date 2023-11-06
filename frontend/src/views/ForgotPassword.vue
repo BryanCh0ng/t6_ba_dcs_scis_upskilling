@@ -15,7 +15,7 @@
             <form @submit.prevent="onSubmit">
               <input-field v-model="email" type="email" placeholder="Email Address"/>
 
-              <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+              <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn" title="Request password reset link">
                 Request reset link
               </button>
               <p class="text-center mt-2">

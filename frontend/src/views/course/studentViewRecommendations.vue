@@ -17,7 +17,7 @@
                 <thead>
                   <tr class="text-nowrap">
                     <th scope="col">
-                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'register_top')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                        <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Name', 'register_top')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/></a></th>
                     <th scope="col">
                         <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'register_top')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
                     <th scope="col">
@@ -25,13 +25,14 @@
                     <th scope="col">
                         <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'register_top')">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
                     <th scope="col">Course Details</th>
+                    <th scope="col">Lessons</th>
                     <th scope="col">Action(s)</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(top_pick, key) in displayedTopPicksRegister" :key="key">
                     <td class="name">
-                      <course-name-desc :name="top_pick.course_Name" :category="top_pick.coursecat_Name" :description="top_pick.course_Desc"></course-name-desc>
+                      <course-name-desc :name="top_pick.run_Name" :category="top_pick.coursecat_Name" :description="top_pick.course_Desc"></course-name-desc>
                     </td>
                     <td class="start_date">
                       <course-date-time :date="top_pick.run_Startdate" :time="top_pick.run_Starttime"></course-date-time>
@@ -42,9 +43,11 @@
                     <td class="closing_date">
                       <course-date-time :date="top_pick.reg_Enddate" :time="top_pick.reg_Endtime"></course-date-time>
                     </td>
-                    
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(top_pick)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                    <td><course-action @action-and-message-updated="handleActionData" :status="top_pick.course_Status" :course="top_pick"></course-action></td>
+                    <td>
+                      <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(top_pick.rcourse_ID)">View Lessons</a>
+                    </td>
+                    <td><course-action @action-and-message-updated="handleActionData" :status="top_pick.runcourse_Status" :course="top_pick"></course-action></td>
                   </tr>
                 </tbody>
               </table>
@@ -58,26 +61,27 @@
       
         <div class="pt-5 container col-12 table-responsive" v-if="showRegisterOthers">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
-          <div v-if="reg_courses_others && reg_courses_others.length > 0"> 
+          <div v-if="registation_justforyou && registation_justforyou.length > 0"> 
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'register_others')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Name', 'registation_justforyou')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/></a></th>
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'register_others')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'registation_justforyou')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
                   <th scope="col">
-                      <a href="" class="register_otherstext-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'run')">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
+                      <a href="" class="register_others text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'registation_justforyou')">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'register_others')">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'registation_justforyou')">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
                   <th scope="col">Course Details</th>
+                  <th scope="col">Lessons</th>
                   <th scope="col">Action(s)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(reg_course, key) in displayedRegCourseOthers" :key="key">
                   <td class="name">
-                    <course-name-desc :name="reg_course.course_Name" :category="reg_course.coursecat_Name" :description="reg_course.course_Desc"></course-name-desc>
+                    <course-name-desc :name="reg_course.run_Name" :category="reg_course.coursecat_Name" :description="reg_course.course_Desc"></course-name-desc>
                   </td>
                   <td class="start_date">
                     <course-date-time :date="reg_course.run_Startdate" :time="reg_course.run_Starttime"></course-date-time>
@@ -89,42 +93,46 @@
                     <course-date-time :date="reg_course.reg_Enddate" :time="reg_course.reg_Endtime"></course-date-time>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(reg_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action @action-and-message-updated="handleActionData" :status="reg_course.course_Status" :course="reg_course"></course-action></td>
+                  <td>
+                    <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(reg_course.rcourse_ID)">View Lessons</a>
+                  </td>
+                  <td><course-action @action-and-message-updated="handleActionData" :status="reg_course.runcourse_Status" :course="reg_course"></course-action></td>
                   
                 </tr>
               </tbody>
             </table>
           </div>
-          <div v-else-if="reg_courses_others=[]" class="text-center pt-2 pb-5">
+          <div v-else-if="registation_justforyou=[]" class="text-center pt-2 pb-5">
               <p>Currently, there are no recommendations for you.</p>
               <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentPageRegCourseOthers" v-if="reg_courses_others.length/itemsPerPage > 0" :totalItems="reg_courses_others.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseOthers" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-model="localCurrentPageRegCourseOthers" v-if="registation_justforyou.length/itemsPerPage > 0" :totalItems="registation_justforyou.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseOthers" class="justify-content-center pagination-container"/>
       </div>
 
       <div class="pt-5 container col-12 table-responsive" v-if="showRegisterJustForYou">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
-          <div v-if="reg_courses_for_you && reg_courses_for_you.length > 0"> 
+          <div v-if="registration_others && registration_others.length > 0"> 
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'register_you')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Name', 'registration_others')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/></a></th>
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'register_you')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'registration_others')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'register_you')">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'registration_others')">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'register_you')">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'registration_others')">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
                   <th scope="col">Course Details</th>
+                  <th scope="col">Lessons</th>
                   <th scope="col">Action(s)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(reg_course, key) in displayedRegCourseForYou" :key="key">
                   <td class="name">
-                    <course-name-desc :name="reg_course.course_Name" :category="reg_course.coursecat_Name" :description="reg_course.course_Desc"></course-name-desc>
+                    <course-name-desc :name="reg_course.run_Name" :category="reg_course.coursecat_Name" :description="reg_course.course_Desc"></course-name-desc>
                   </td>
                   <td class="start_date">
                     <course-date-time :date="reg_course.run_Startdate" :time="reg_course.run_Starttime"></course-date-time>
@@ -136,17 +144,20 @@
                     <course-date-time :date="reg_course.reg_Enddate" :time="reg_course.reg_Endtime"></course-date-time>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(reg_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><course-action @action-and-message-updated="handleActionData" :status="reg_course.course_Status" :course="reg_course"></course-action></td>
+                  <td>
+                    <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(reg_course.rcourse_ID)">View Lessons</a>
+                  </td>
+                  <td><course-action @action-and-message-updated="handleActionData" :status="reg_course.runcourse_Status" :course="reg_course"></course-action></td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <div v-else-if="reg_courses_for_you=[]" class="text-center pt-2 pb-5">
+          <div v-else-if="registration_others=[]" class="text-center pt-2 pb-5">
             <p>Currently, there are no recommendations for you.</p>
             <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentPageRegCourseForYou" v-if="reg_courses_for_you.length/itemsPerPage > 0" :totalItems="reg_courses_for_you.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseForYou" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-model="localCurrentPageRegCourseForYou" v-if="registration_others.length/itemsPerPage > 0" :totalItems="registration_others.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseForYou" class="justify-content-center pagination-container"/>
         
 
 
@@ -184,12 +195,12 @@
         
           <div class="pt-5 container col-12 table-responsive" v-if="showInterestOthers">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
-          <div v-if="interest_others && interest_others.length > 0"> 
+          <div v-if="interests_justforyou && interests_justforyou.length > 0"> 
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'interest_others')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="sortDirection"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'interests_justforyou')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="sortDirection"/></a></th>
                   <th scope="col">Course Details</th>
                   <th scope="col">Action(s)</th>
                 </tr>
@@ -205,21 +216,21 @@
               </tbody>
             </table>
           </div>
-          <div v-else-if="interest_others=[]" class="text-center pt-2 pb-5">
+          <div v-else-if="interests_justforyou=[]" class="text-center pt-2 pb-5">
             <p>Currently, there are no recommendations for you.</p>
             <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentInterestOthers" v-if="interest_others.length/itemsPerPage > 0" :totalItems="interest_others.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeInterestOthers" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-model="localCurrentInterestOthers" v-if="interests_justforyou.length/itemsPerPage > 0" :totalItems="interests_justforyou.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeInterestOthers" class="justify-content-center pagination-container"/>
       
         <div class="pt-5 container col-12 table-responsive" v-if="showInterestJustForYou">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1> 
-          <div v-if="interest_courses && interest_courses.length > 0"> 
+          <div v-if="interests_others && interests_others.length > 0"> 
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'interest_you')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="sortDirection"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'interests_others')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="sortDirection"/></a></th>
                   <th scope="col">Course Details</th>
                   <th scope="col">Action(s)</th>
                 </tr>
@@ -235,12 +246,12 @@
               </tbody>
             </table>
           </div>
-          <div v-else-if="interest_courses=[]" class="text-center pt-2 pb-5">
+          <div v-else-if="interests_others=[]" class="text-center pt-2 pb-5">
             <p>Currently, there are no recommendations for you.</p>
             <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentInterestCourses" v-if="interest_courses.length/itemsPerPage > 0" :totalItems="interest_courses.length" :items-per-page="itemsPerPage" @page-change="handlePageTopInterestCourses" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-model="localCurrentInterestCourses" v-if="interests_others.length/itemsPerPage > 0" :totalItems="interests_others.length" :items-per-page="itemsPerPage" @page-change="handlePageTopInterestCourses" class="justify-content-center pagination-container"/>
 
       </div>
 
@@ -284,10 +295,10 @@ export default {
   },
   data() {
     return {
-      reg_courses_for_you: [],
-      reg_courses_others: [],
-      interest_courses: [],
-      interest_others: [],
+      registration_others: [],
+      registation_justforyou: [],
+      interests_others: [],
+      interests_justforyou: [],
       top_register_picks: [],
       top_interest_picks: [],
       sortColumn: '',
@@ -353,10 +364,10 @@ export default {
       }
     },
     async sortCourse(action) {
-      if (action == 'register_you') {
-        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.reg_courses_for_you)
+      if (action == 'registration_others') {
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.registration_others)
          if (sort_response.code == 200) {
-          this.reg_courses_for_you = sort_response.data
+          this.registration_others = sort_response.data
          }
       }
       if (action == 'register_top') {
@@ -365,17 +376,17 @@ export default {
           this.top_register_picks = sort_response.data
          }
       }
-      if (action == 'register_others') {
-        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.reg_courses_others)
+      if (action == 'registation_justforyou') {
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.registation_justforyou)
          if (sort_response.code == 200) {
-          this.reg_courses_others = sort_response.data
+          this.registation_justforyou = sort_response.data
          }
       }
 
-      if (action == 'interest_you') {
-        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.interest_courses)
+      if (action == 'interests_others') {
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.interests_others)
          if (sort_response.code == 200) {
-          this.interest_courses = sort_response.data
+          this.interests_others = sort_response.data
          }
       }
       if (action == 'interest_top') {
@@ -384,10 +395,10 @@ export default {
           this.top_interest_picks = sort_response.data
          }
       }
-      if (action == 'interest_others') {
-        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.interest_others)
+      if (action == 'interests_justforyou') {
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.interests_justforyou)
          if (sort_response.code == 200) {
-          this.interest_others = sort_response.data
+          this.interests_justforyou = sort_response.data
          }
       }
     },
@@ -426,8 +437,8 @@ export default {
       if (user_register.code != 202 || user_register.length === 0) {
         this.showRegisterJustForYou = false
       }
-      this.reg_courses_for_you = user_register.data.course_list
-      if (this.reg_courses_for_you.length === 0) {
+      this.registration_others = user_register.data.course_list
+      if (this.registration_others.length === 0) {
         this.showRegisterJustForYou = false
       }
 
@@ -437,8 +448,8 @@ export default {
       } else {
         let course_register = await Recommender.getCourseSimilarityRegistration(course_list_req.data)
         // console.log(course_register)
-        this.reg_courses_others = course_register.data.course_list
-        if (this.reg_courses_others.length === 0) {
+        this.registation_justforyou = course_register.data.course_list
+        if (this.registation_justforyou.length === 0) {
           this.showRegisterOthers= false
         }
       }
@@ -447,8 +458,8 @@ export default {
       if (user_register.length === 0) {
           this.showInterestJustForYou= false
       } else {
-        this.interest_courses = user_interest.data.course_list
-        if (this.interest_courses.length === 0) {
+        this.interests_others = user_interest.data.course_list
+        if (this.interests_others.length === 0) {
           this.showInterestJustForYou= false
         }
       }
@@ -463,35 +474,38 @@ export default {
         if (course_interest.code != 202 || course_interest.length === 0) {
           this.showInterestOthers = false
         } else {
-          this.interest_others = course_interest.data.course_list
-          if (this.interest_others.length === 0) {
+          this.interests_justforyou = course_interest.data.course_list
+          if (this.interests_justforyou.length === 0) {
             this.showInterestOthers = false
           }
         }
       }
 
-    }
+    },
+    viewLessons(courseID) {
+      this.$router.push({ name: 'viewRunCourseLesson', params: {id: courseID}});
+    },
   },
   computed: {
     displayedRegCourseForYou() {
       const startIndex = (this.localCurrentPageRegCourseForYou - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
-      return this.reg_courses_for_you.slice(startIndex, endIndex);
+      return this.registration_others.slice(startIndex, endIndex);
     },
     displayedRegCourseOthers() {
       const startIndex = (this.localCurrentPageRegCourseOthers - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
-      return this.reg_courses_others.slice(startIndex, endIndex);
+      return this.registation_justforyou.slice(startIndex, endIndex);
     },
     displayedInterestOthers() {
       const startIndex = (this.localCurrentInterestOthers - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
-      return this.interest_others.slice(startIndex, endIndex);
+      return this.interests_justforyou.slice(startIndex, endIndex);
     },
     displayedInterestCourses() {
       const startIndex = (this.localCurrentInterestCourses - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
-      return this.interest_courses.slice(startIndex, endIndex);
+      return this.interests_others.slice(startIndex, endIndex);
     },
     displayedTopPicksRegister() {
       const startIndex = (this.localCurrentPageTopPickRegister - 1) * this.itemsPerPage;
@@ -504,8 +518,8 @@ export default {
       return this.top_interest_picks.slice(startIndex, endIndex);
     },
     shouldShowTopRegisterPicks() {
-      const isRegCoursesForYouEmpty = this.reg_courses_for_you.length === 0;
-      const isRegCoursesOthersEmpty = this.reg_courses_others.length === 0;
+      const isRegCoursesForYouEmpty = this.registration_others.length === 0;
+      const isRegCoursesOthersEmpty = this.registation_justforyou.length === 0;
 
       return (
         this.top_register_picks &&
@@ -514,8 +528,8 @@ export default {
       );
     },
     shouldShowTopInterestPicks() {
-      const isInterestCoursesForYouEmpty = this.interest_courses.length === 0;
-      const isInterestCoursesOthersEmpty = this.interest_others.length === 0;
+      const isInterestCoursesForYouEmpty = this.interests_others.length === 0;
+      const isInterestCoursesOthersEmpty = this.interests_justforyou.length === 0;
 
       return (
         this.top_interest_picks &&
