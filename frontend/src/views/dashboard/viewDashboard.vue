@@ -11,10 +11,10 @@
       <div class="container col-12 d-flex mt-3 mb-3 w-100 justify-content-between">
         <div class="d-flex">
           <button class="btn btn-primary font-weight-bold" title="Toggle" @click="toggleViewMode">Toggle View</button>
-          <button v-if="currentPage !== 'runcourse'" class="btn btn-primary font-weight-bold ms-2" title="Filter"
-            @click="openModal">Filter</button>
         </div>
         <div class="d-flex">
+          <button v-if="currentPage !== 'runcourse'" class="btn btn-primary font-weight-bold me-2" title="Filter"
+            @click="openModal">Filter</button>
           <button v-if="currentViewMode === 'analysis'" class="btn btn-primary font-weight-bold" title="Export to PDF"
             @click="exportToPDF">Export Analysis to PDF</button>
           <button v-if="currentViewMode === 'feedback'" class="btn btn-primary font-weight-bold" title="Export to CSV"
@@ -53,7 +53,7 @@
             <DoughnutChart :datasets="sentimentData1" />
           </template>
           <template v-else>
-            <NoDataDisplay :displayMessage="filterSelected"/>
+            <NoDataDisplay :displayMessage="filterSelected" />
           </template>
           <p><strong>Overall Course Sentiment</strong></p>
         </div>
@@ -61,10 +61,11 @@
         <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="courseSpecific">
           <!-- Include Word Cloud component here for positive feedback -->
           <template v-if="positiveCourseWordData.length > 0">
-            <WordChart  :datasets="positiveCourseWordData" :label="'Overall Course Positive WordCloud'" :fit="coursePositive" />
+            <WordChart :datasets="positiveCourseWordData" :label="'Overall Course Positive WordCloud'"
+              :fit="coursePositive" />
           </template>
           <template v-else>
-            <NoDataDisplay :displayMessage="filterSelected"/>
+            <NoDataDisplay :displayMessage="filterSelected" />
           </template>
           <p><strong>Overall Course Positive WordCloud</strong></p>
         </div>
@@ -72,10 +73,11 @@
         <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="courseSpecific">
           <!-- Include Word Cloud component here for positive feedback -->
           <template v-if="negativeCourseWordData.length > 0">
-            <WordChart  :datasets="negativeCourseWordData" :label="'Overall Course Negative WordCloud'" :fit="courseNegative" />
+            <WordChart :datasets="negativeCourseWordData" :label="'Overall Course Negative WordCloud'"
+              :fit="courseNegative" />
           </template>
           <template v-else>
-            <NoDataDisplay :displayMessage="filterSelected"/>
+            <NoDataDisplay :displayMessage="filterSelected" />
           </template>
           <p><strong>Overall Course Negative WordCloud</strong></p>
         </div>
@@ -86,7 +88,7 @@
             <DoughnutChart :datasets="sentimentData2" />
           </template>
           <template v-else>
-            <NoDataDisplay :displayMessage="filterSelected"/>
+            <NoDataDisplay :displayMessage="filterSelected" />
           </template>
           <p><strong>Overall Instructor Sentiment</strong></p>
         </div>
@@ -94,10 +96,11 @@
         <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="instructorSpecific">
           <!-- Include Word Cloud component here for positive feedback -->
           <template v-if="positiveInstructorWordData.length > 0">
-            <WordChart  :datasets="positiveInstructorWordData" :label="'Overall Instructor Positive WordCloud'" :fit="instructorPositive" />
+            <WordChart :datasets="positiveInstructorWordData" :label="'Overall Instructor Positive WordCloud'"
+              :fit="instructorPositive" />
           </template>
           <template v-else>
-            <NoDataDisplay :displayMessage="filterSelected"/>
+            <NoDataDisplay :displayMessage="filterSelected" />
           </template>
           <p><strong>Overall Instructor Positive WordCloud</strong></p>
         </div>
@@ -105,10 +108,11 @@
         <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="instructorSpecific">
           <!-- Include Word Cloud component here for negative feedback -->
           <template v-if="negativeInstructorWordData.length > 0">
-            <WordChart  :datasets="negativeInstructorWordData" :label="'Overall Instructor Negative WordCloud'" :fit="instructorNegative" />
+            <WordChart :datasets="negativeInstructorWordData" :label="'Overall Instructor Negative WordCloud'"
+              :fit="instructorNegative" />
           </template>
           <template v-else>
-            <NoDataDisplay :displayMessage="filterSelected"/>
+            <NoDataDisplay :displayMessage="filterSelected" />
           </template>
           <p><strong>Overall Instructor Negative WordCloud</strong></p>
         </div>
@@ -164,27 +168,32 @@
           <table class="table bg-white">
             <thead>
               <tr>
-                <th scope="col" v-for="(question, index) in questions" :key="index" class="table-column text-nowrap">
+                <th scope="col">#</th>
+                <th scope="col" v-for="(question, index) in header" :key="index" class="table-column text-nowrap">
                   <div class="question-container">
-                    {{ question.question }}
+                    {{ question }}
                   </div>
                 </th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(answers, index) in displayedCourses" :key="index">
-                <td v-for="(answer, aIndex) in answers" :key="aIndex">{{ answer }}</td>
+              <tr v-for="(answerSet, index) in displayedCourses" :key="index">
+                <th scope="row">{{ (localCurrentPageCourses - 1) * itemsPerPage + index + 1 }}</th>
+                <td v-for="(answer, rowIndex) in answerSet" :key="rowIndex">
+                  {{ answer }}
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <div v-else-if="courseID === null && runcourseID === null">
+        <!--<div v-else-if="courseID === null && runcourseID === null">
           <p class="text-center">Please filter to view the respective feedback records. </p>
-        </div>
+        </div>-->
 
         <div v-else-if="feedbackData = []">
           <p class="text-center">No records found</p>
+          <p v-if="filterSelected" class="text-center">Please make a different filter selection</p>
         </div>
 
       </div>
@@ -286,7 +295,7 @@ export default {
       const lastPart = parts[parts.length - 1]; // Get the last element of the array
 
       document.title = "Feedback Analysis"; //need to change
-      
+
       if (window.history.state.back === "/adminViewCourse") {
         this.currentPage = "course";
         this.courseID = this.$route.params.id;
@@ -317,14 +326,21 @@ export default {
     }
   },
   methods: {
+    //Total Feedbacks 
+    async fetchTotalFeedbacks() {
+      try {
+        const response = await DashboardService.getTotalFeedbacks(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
+        this.totalNoOfFeedback = response.data.total_feedbacks;
+      } catch (error) {
+        console.error('Error fetching total number of feedbacks: ', error);
+      }
+    },
     // Course Average Rating
     async fetchCourseAverageRating() {
       try {
         const response = await DashboardService.getCourseAverageRatings(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
-        console.log(response)
         this.courseAverageRating = response.data.overall_average_rating;
-        this.totalNoOfFeedback = response.data.total_feedbacks;
-        // console.log(this.courseAverageRating)
+        //this.totalNoOfFeedback = response.data.total_feedbacks;
       } catch (error) {
         console.error('Error fetching overall average course ratings: ', error);
       }
@@ -333,9 +349,7 @@ export default {
     async fetchInstructorAverageRating() {
       try {
         const response = await DashboardService.getInstructorAverageRatings(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
-        // console.log(response)
         this.instructorAverageRating = response.data.overall_average_rating;
-        // console.log(this.instructorAverageRating)
       } catch (error) {
         console.error('Error fetching overall average instructor ratings: ', error);
       }
@@ -386,6 +400,7 @@ export default {
         console.error('Error fetching instructorSuggestionsTopics:', error);
       }
     },
+    //Overall Course Sentiment
     async fetchCourseSentimentData() {
       try {
         const response = await DashboardService.getCourseSentimentData(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
@@ -398,7 +413,7 @@ export default {
           this.sentimentData1.label = "Overall Course Sentiment";
 
           this.filterSelected = false;
-        } 
+        }
 
         if (response.data.code === 400) {
           this.sentimentData1.labelArray = [];
@@ -408,6 +423,7 @@ export default {
         console.error("Error fetching course sentiment data: ", error);
       }
     },
+    //Overall Instructor Sentiment
     async fetchInstructorSentimentData() {
       try {
         const response = await DashboardService.getInstructorSentimentData(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
@@ -432,6 +448,7 @@ export default {
         console.error("Error fetching instructor sentiment data: ", error);
       }
     },
+    //Overall Course Positive and Negative WordCloud
     async fetchCourseWordcloudData() {
       try {
         const response = await DashboardService.getCourseWordcloudData(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
@@ -458,7 +475,7 @@ export default {
           this.filterSelected = false;
         }
 
-        if (response.data.code === 400){
+        if (response.data.code === 400) {
           this.positiveCourseWordData = [];
           this.negativeCourseWordData = [];
         }
@@ -466,10 +483,11 @@ export default {
         console.error("Error fetching instructor feedbacks: ", error);
       }
     },
+    //Overall Instructor Positive and Negative WordCloud
     async fetchInstructorWordcloudData() {
       try {
         const response = await DashboardService.getInstructorWordcloudData(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
-        console.log(response.data)
+        //console.log(response.data)
         if (response.data.code === 200) {
           const { positive_word_data, negative_word_data } = response.data;
 
@@ -478,8 +496,6 @@ export default {
           } else {
             this.instructorPositive = true;
           }
-
-          //console.log(this.instructorPositive)
 
           if (response.data.negative_word_data.length <= 35) {
             this.instructorNegative = false;
@@ -495,7 +511,7 @@ export default {
           this.filterSelected = false;
         }
 
-        if (response.data.code === 400){
+        if (response.data.code === 400) {
           this.positiveInstructorWordData = [];
           this.negativeInstructorWordData = [];
         }
@@ -517,10 +533,21 @@ export default {
     },
     async fetchCourseFeedbackData() {
       try {
-        const feedbackForCourse = await FeedbackService.getFeedbackForRunCourse(this.courseID, this.runcourseID);
-        if (feedbackForCourse.code == 200) {
-          this.questions = feedbackForCourse.questions
-          this.feedbackData = feedbackForCourse.data.map(item => item.answers);
+        const feedbackForCourse = await FeedbackService.getFeedback(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
+        if (feedbackForCourse.data.code == 200) {
+          this.header = feedbackForCourse.data.header
+          this.feedbackData = feedbackForCourse.data.answers;
+
+          // Log the length of each element in feedbackData
+          this.feedbackData.forEach(answerSet => {
+            console.log('Length of answerSet:', answerSet.length);
+          });
+
+          this.filterSelected = false;
+        }
+
+        if (feedbackForCourse.data.code == 400) {
+          this.feedbackData = [];
         }
 
       } catch (error) {
@@ -638,6 +665,7 @@ export default {
 
       this.filterSelected = true;
 
+      /*await this.fetchTotalFeedbacks();
       await this.fetchCourseAverageRating()
       await this.fetchInstructorAverageRating()
       await this.fetchCourseSentimentData()
@@ -651,7 +679,8 @@ export default {
       await this.fetchCourseName()
       await this.fetchRunCourseName()
       await this.fetchInstructorName()
-      await this.fetchCourseFeedbackData()
+      await this.fetchCourseFeedbackData()*/
+      this.fetchData();
 
     },
     handleModalClosed(value) {
@@ -660,6 +689,7 @@ export default {
     async fetchData() {
       // Create an array of promises to fetch data
       const dataPromises = [
+        this.fetchTotalFeedbacks(),
         this.fetchCourseAverageRating(),
         this.fetchInstructorAverageRating(),
         this.fetchCourseDoneWellTopics(),
@@ -683,7 +713,7 @@ export default {
 
       // Wait for all promises to resolve
       await Promise.all(dataPromises);
-    }
+    },
   },
   computed: {
     displayedCourses() {
