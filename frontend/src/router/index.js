@@ -259,15 +259,15 @@ const routes = [
     }
   },
   // Need to add authentication
-  {
-    path: '/viewDashboard',
-    name: 'viewDashboard',
-    component: () => import('../views/dashboard/viewDashboard.vue'),
-    meta: {
-        title: 'Admin View Dashboard',
-        requiresAuth: true
-    }
-  },
+  // {
+  //   path: '/viewDashboard',
+  //   name: 'viewDashboard',
+  //   component: () => import('../views/dashboard/viewDashboard.vue'),
+  //   meta: {
+  //       title: 'Admin View Dashboard',
+  //       requiresAuth: true
+  //   }
+  // },
   {
     path: '/viewCourseFeedbackAnalysis/:id',
     name: 'viewCourseFeedbackAnalysis',
@@ -374,16 +374,16 @@ const routes = [
         title: 'Edit Run Course Lesson',
         requiresAuth: true
     }, 
-  }
-  // {
-  //   path: '/viewAttendance/:lessonId',
-  //   name: 'viewAttendance',
-  //   component: () => import('../views/attendance/viewAttendance.vue'),
-  //   meta: {
-  //       title: 'View Attendance',
-  //       requiresAuth: true
-  //   }, 
-  // } 
+  },
+  {
+    path: '/viewAttendance/:lessonId',
+    name: 'viewAttendance',
+    component: () => import('../views/attendance/viewAttendance.vue'),
+    meta: {
+        title: 'View Attendance',
+        requiresAuth: true
+    }, 
+  } 
 ]
 
 const router = createRouter({
