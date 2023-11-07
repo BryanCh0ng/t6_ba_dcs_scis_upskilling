@@ -207,11 +207,13 @@ export default {
     async logout() {
       try {
         const response = await UserService.logout()
-        console.log(response)
-        this.user_role = "";
-        this.user_ID = null;
-        this.user_name = "";
-        this.router.push('/')
+        if (response.code === 200) {
+          this.user_role = "";
+          this.user_ID = null;
+          this.user_name = "";
+          this.router.push('/')
+        }
+        
       } catch (error) {
         console.error('Error logging out:', error);
     }

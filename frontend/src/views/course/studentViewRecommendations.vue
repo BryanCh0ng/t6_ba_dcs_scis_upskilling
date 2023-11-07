@@ -61,18 +61,18 @@
       
         <div class="pt-5 container col-12 table-responsive" v-if="showRegisterOthers">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
-          <div v-if="registation_justforyou && registation_justforyou.length > 0"> 
+          <div v-if="registration_justforyou && registration_justforyou.length > 0"> 
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Name', 'registation_justforyou')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Name', 'registration_justforyou')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/></a></th>
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'registation_justforyou')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'registration_justforyou')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
                   <th scope="col">
-                      <a href="" class="register_others text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'registation_justforyou')">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
+                      <a href="" class="register_others text-decoration-none text-dark" @click.prevent="sort('run_Enddate', 'registration_justforyou')">Course End Date <sort-icon :sortColumn="sortColumn === 'run_Enddate'" :sortDirection="getSortDirection('run_Enddate')"/></a></th>
                   <th scope="col">
-                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'registation_justforyou')">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
+                      <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Enddate', 'registration_justforyou')">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
                   <th scope="col">Course Details</th>
                   <th scope="col">Lessons</th>
                   <th scope="col">Action(s)</th>
@@ -102,15 +102,14 @@
               </tbody>
             </table>
           </div>
-          <div v-else-if="registation_justforyou=[]" class="text-center pt-2 pb-5">
+          <div v-else-if="registration_justforyou=[]" class="text-center pt-2 pb-5">
               <p>Currently, there are no recommendations for you.</p>
               <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentPageRegCourseOthers" v-if="registation_justforyou.length/itemsPerPage > 0" :totalItems="registation_justforyou.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseOthers" class="justify-content-center pagination-container"/>
-      </div>
+        <vue-awesome-paginate v-model="localCurrentPageRegCourseOthers" v-if="registration_justforyou.length/itemsPerPage > 0 && showRegisterOthers" :totalItems="registration_justforyou.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseOthers" class="justify-content-center pagination-container"/>
 
-      <div class="pt-5 container col-12 table-responsive" v-if="showRegisterJustForYou">
+        <div class="pt-5 container col-12 table-responsive" v-if="showRegisterJustForYou">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
           <div v-if="registration_others && registration_others.length > 0"> 
             <table class="table bg-white">
@@ -157,9 +156,8 @@
             <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentPageRegCourseForYou" v-if="registration_others.length/itemsPerPage > 0" :totalItems="registration_others.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseForYou" class="justify-content-center pagination-container"/>
-        
-
+        <vue-awesome-paginate v-model="localCurrentPageRegCourseForYou" v-if="registration_others.length/itemsPerPage > 0 && showRegisterJustForYou" :totalItems="registration_others.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseForYou" class="justify-content-center pagination-container"/>
+      </div>
 
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'express_interest' }">
         <div class="pt-5 container col-12 table-responsive" v-if="shouldShowTopInterestPicks">
@@ -221,7 +219,7 @@
             <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentInterestOthers" v-if="interests_justforyou.length/itemsPerPage > 0" :totalItems="interests_justforyou.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeInterestOthers" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-model="localCurrentInterestOthers" v-if="interests_justforyou.length/itemsPerPage > 0 && showInterestOthers" :totalItems="interests_justforyou.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeInterestOthers" class="justify-content-center pagination-container"/>
       
         <div class="pt-5 container col-12 table-responsive" v-if="showInterestJustForYou">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1> 
@@ -251,7 +249,7 @@
             <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentInterestCourses" v-if="interests_others.length/itemsPerPage > 0" :totalItems="interests_others.length" :items-per-page="itemsPerPage" @page-change="handlePageTopInterestCourses" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-model="localCurrentInterestCourses" v-if="interests_others.length/itemsPerPage > 0 && showInterestJustForYou" :totalItems="interests_others.length" :items-per-page="itemsPerPage" @page-change="handlePageTopInterestCourses" class="justify-content-center pagination-container"/>
 
       </div>
 
@@ -296,7 +294,7 @@ export default {
   data() {
     return {
       registration_others: [],
-      registation_justforyou: [],
+      registration_justforyou: [],
       interests_others: [],
       interests_justforyou: [],
       top_register_picks: [],
@@ -313,6 +311,7 @@ export default {
       localCurrentPageTopPickInterest: 1,
       activeTab: 'for_registration',
       user_ID: 1,
+      hideTopRegisterPicks: true,
       showRegisterJustForYou: true,
       showRegisterOthers: true,
       showInterestJustForYou: true,
@@ -376,10 +375,10 @@ export default {
           this.top_register_picks = sort_response.data
          }
       }
-      if (action == 'registation_justforyou') {
-        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.registation_justforyou)
+      if (action == 'registration_justforyou') {
+        let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.registration_justforyou)
          if (sort_response.code == 200) {
-          this.registation_justforyou = sort_response.data
+          this.registration_justforyou = sort_response.data
          }
       }
 
@@ -434,12 +433,13 @@ export default {
       this.top_interest_picks = top_interest_pick.data
 
       let user_register = await Recommender.getUserSimilarityRegistration(this.user_ID)
-      if (user_register.code != 202 || user_register.length === 0) {
+      if (user_register.code != 200 || user_register.length === 0) {
         this.showRegisterJustForYou = false
-      }
-      this.registration_others = user_register.data.course_list
-      if (this.registration_others.length === 0) {
-        this.showRegisterJustForYou = false
+      } else {
+        this.registration_others = user_register.data.course_list
+        if (this.registration_others.length === 0) {
+          this.showRegisterJustForYou = false
+        }
       }
 
       let course_list_req = await Recommender.getUserRegisteredCourses(this.user_ID)
@@ -447,11 +447,15 @@ export default {
         this.showRegisterOthers= false
       } else {
         let course_register = await Recommender.getCourseSimilarityRegistration(course_list_req.data)
-        // console.log(course_register)
-        this.registation_justforyou = course_register.data.course_list
-        if (this.registation_justforyou.length === 0) {
+        
+        if (course_register.code != 200 || course_register.length === 0) {
+          this.showRegisterOthers= false
+        } 
+        this.registration_justforyou = course_register.data.course_list
+        if (this.registration_justforyou.length === 0) {
           this.showRegisterOthers= false
         }
+        
       }
             
       let user_interest = await Recommender.getUserSimilarityInterest(this.user_ID)
@@ -470,8 +474,7 @@ export default {
         this.showInterestOthers = false
       } else {
         let course_interest = await Recommender.getCourseSimilarityInterest(interest_list_req.data)
-        // console.log(course_interest)
-        if (course_interest.code != 202 || course_interest.length === 0) {
+        if (course_interest.code != 200 || course_interest.length === 0) {
           this.showInterestOthers = false
         } else {
           this.interests_justforyou = course_interest.data.course_list
@@ -481,6 +484,39 @@ export default {
         }
       }
 
+    },
+    updateRegistration() {
+      
+      const areArraysEqual = (
+        Array.isArray(this.registration_others) &&
+        Array.isArray(this.registration_justforyou) &&
+        this.registration_others.length === this.registration_justforyou.length &&
+        this.registration_others.every((course1) =>
+          this.registration_justforyou.some((course2) => course1.rcourse_ID === course2.rcourse_ID)
+        )
+      );
+
+      if (areArraysEqual && (this.registration_others.length !== 0 && this.registration_justforyou.length !== 0)) {
+        this.showRegisterOthers = true; // Hide Register Others
+        this.showRegisterJustForYou = false; // show Register JustForYou
+        this.registration_others = [];
+      }
+    },
+    updateInterest() {
+      const areArraysEqual = (
+        Array.isArray(this.interests_others) &&
+        Array.isArray(this.interests_justforyou) &&
+        this.interests_others.length === this.interests_justforyou.length &&
+        this.interests_others.every((course1) =>
+          this.interests_justforyou.some((course2) => course1.course_ID === course2.course_ID)
+        )
+      );
+
+      if (areArraysEqual && (this.interests_others.length !== 0 && this.interests_justforyou.length !== 0)) {
+        this.showInterestOthers = true; // Hide Register Others
+        this.showInterestJustForYou = false; // show Register JustForYou
+        this.interests_others = [];
+      }
     },
     viewLessons(courseID) {
       this.$router.push({ name: 'viewRunCourseLesson', params: {id: courseID}});
@@ -495,7 +531,7 @@ export default {
     displayedRegCourseOthers() {
       const startIndex = (this.localCurrentPageRegCourseOthers - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
-      return this.registation_justforyou.slice(startIndex, endIndex);
+      return this.registration_justforyou.slice(startIndex, endIndex);
     },
     displayedInterestOthers() {
       const startIndex = (this.localCurrentInterestOthers - 1) * this.itemsPerPage;
@@ -518,25 +554,21 @@ export default {
       return this.top_interest_picks.slice(startIndex, endIndex);
     },
     shouldShowTopRegisterPicks() {
-      const isRegCoursesForYouEmpty = this.registration_others.length === 0;
-      const isRegCoursesOthersEmpty = this.registation_justforyou.length === 0;
+      this.updateRegistration();
 
-      return (
-        this.top_register_picks &&
-        this.top_register_picks.length > 0 &&
-        (isRegCoursesForYouEmpty || isRegCoursesOthersEmpty)
-      );
+      const isRegCoursesForYouEmpty = this.registration_others.length === 0;
+      const isRegCoursesOthersEmpty = this.registration_justforyou.length === 0;
+
+      return (this.top_register_picks && this.top_register_picks.length > 0 && (isRegCoursesForYouEmpty || isRegCoursesOthersEmpty));
     },
     shouldShowTopInterestPicks() {
+      this. updateInterest();
+
       const isInterestCoursesForYouEmpty = this.interests_others.length === 0;
       const isInterestCoursesOthersEmpty = this.interests_justforyou.length === 0;
 
-      return (
-        this.top_interest_picks &&
-        this.top_interest_picks.length > 0 &&
-        (isInterestCoursesForYouEmpty || isInterestCoursesOthersEmpty)
-      );
-    }
+      return (this.top_interest_picks && this.top_interest_picks.length > 0 && (isInterestCoursesForYouEmpty || isInterestCoursesOthersEmpty));
+    },
   },
   async created() {
     const user_ID = await UserService.getUserID();
