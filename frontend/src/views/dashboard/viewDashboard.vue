@@ -557,27 +557,33 @@ export default {
       this.$emit('page-change', newPage);
     },
     exportToCSV() {
-      // Prepare the CSV data with questions as the first row
-      const csvData = [this.questions.map(question => question.question)];
+      const csvData = [];
+
+      csvData.push(this.header);
+      console.log(csvData)
 
       // Add the data rows
       csvData.push(...this.feedbackData.map(row => row.map(cell => cell.toString())));
+      console.log(csvData)
 
       // Create a CSV string using Papaparse
       const csv = Papa.unparse(csvData);
 
       // Create a Blob and download link
       const blob = new Blob([csv], { type: 'text/csv' });
+      console.log(blob)
 
       // Set the file name to the course name
-      let courseName;
-      if (this.courseID) {
-        courseName = this.courseName;
+      let startOfFileName;
+      if (this.courseName) {
+        startOfFileName = this.courseName;
+      } else if (this.runcourseName) {
+        startOfFileName = this.runcourseName;
       } else {
-        courseName = this.runcourseName;
+        startOfFileName = "Overall";
       }
 
-      const fileName = `${courseName}_feedback_data.csv`;
+      const fileName = `${startOfFileName}_feedback_data.csv`;
 
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
