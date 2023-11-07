@@ -21,7 +21,6 @@
             @click="exportToCSV">Export Feedback to CSV</button>
         </div>
       </div>
-
     </div>
 
     <div class="container text-center analysis-view" v-if="currentViewMode === 'analysis'" ref="analysisView">
@@ -59,7 +58,6 @@
         </div>
         <!-- Display Overall Course Positive WordCloud -->
         <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="courseSpecific">
-          <!-- Include Word Cloud component here for positive feedback -->
           <template v-if="positiveCourseWordData.length > 0">
             <WordChart :datasets="positiveCourseWordData" :label="'Overall Course Positive WordCloud'"
               :fit="coursePositive" />
@@ -71,7 +69,6 @@
         </div>
         <!-- Display Overall Course Negative WordCloud -->
         <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="courseSpecific">
-          <!-- Include Word Cloud component here for positive feedback -->
           <template v-if="negativeCourseWordData.length > 0">
             <WordChart :datasets="negativeCourseWordData" :label="'Overall Course Negative WordCloud'"
               :fit="courseNegative" />
@@ -94,7 +91,6 @@
         </div>
         <!-- Display Overall Instructor Positive WordCloud -->
         <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="instructorSpecific">
-          <!-- Include Word Cloud component here for positive feedback -->
           <template v-if="positiveInstructorWordData.length > 0">
             <WordChart :datasets="positiveInstructorWordData" :label="'Overall Instructor Positive WordCloud'"
               :fit="instructorPositive" />
@@ -106,7 +102,6 @@
         </div>
         <!-- Display Overall Course Negative WordCloud -->
         <div class="col-12 col-md-6 dashboard pt-2 mb-3 custom-col page-break" v-if="instructorSpecific">
-          <!-- Include Word Cloud component here for negative feedback -->
           <template v-if="negativeInstructorWordData.length > 0">
             <WordChart :datasets="negativeInstructorWordData" :label="'Overall Instructor Negative WordCloud'"
               :fit="instructorNegative" />
@@ -197,26 +192,27 @@
         </div>
 
       </div>
+
       <vue-awesome-paginate v-if="feedbackData.length / itemsPerPage > 0" v-model="localCurrentPageCourses"
         :totalItems="feedbackData.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeCourses"
         class="justify-content-center pagination-container" />
 
     </div>
-    <FilterModal :visible="showAlert" :currentPage="currentPage" @modal-closed="handleModalClosed"
-      @apply-filters="updateVisualizations" />
+
+    <FilterModal :visible="showAlert" :currentPage="currentPage" @modal-closed="handleModalClosed" @apply-filters="updateVisualizations" />
   </div>
 </template>
 
 <script>
-import DashboardService from '@/api/services/dashboardService';
-import DoughnutChart from "@/components/dashboard/DoughnutChart.vue";
-import WordChart from "@/components/dashboard/WordChart.vue"
 import UserService from "@/api/services/UserService.js";
 import CourseService from "@/api/services/CourseService.js";
 import RunCourseService from "@/api/services/runCourseService.js";
-import { VueAwesomePaginate } from 'vue-awesome-paginate';
+import DashboardService from '@/api/services/dashboardService';
+import DoughnutChart from "@/components/dashboard/DoughnutChart.vue";
+import WordChart from "@/components/dashboard/WordChart.vue"
 import Papa from 'papaparse';
 import FeedbackService from "@/api/services/FeedbackService.js";
+import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import html2pdf from 'html2pdf.js';
 import FilterModal from "@/components/dashboard/FilterModal.vue";
 import NoDataDisplay from '@/components/dashboard/NoDataDisplay.vue';
@@ -232,30 +228,24 @@ export default {
   },
   data() {
     return {
+      instructorSpecific: true,
+      courseSpecific: true,
       currentPage: "",
       courseID: null,
       courseIDs: [],
       runcourseID: null,
       runcourseIDs: [],
-      coursecatIDs: [],
       coachesID: null,
       coachesIDs: [],
-      startDate: null,
-      endDate: null,
       courseName: "",
       runcourseName: "",
       instructorName: "",
-      instructorSpecific: true,
-      courseSpecific: true,
+      coursecatIDs: [],
+      startDate: null,
+      endDate: null,
       totalNoOfFeedback: null,
       courseAverageRating: null,
       instructorAverageRating: null,
-      overallCourseWordData: [],
-      positiveCourseWordData: [],
-      negativeCourseWordData: [],
-      overallInstructorWordData: [],
-      positiveInstructorWordData: [],
-      negativeInstructorWordData: [],
       courseDoneWellTopics: [],
       courseSuggestionsTopics: [],
       instructorDoneWellTopics: [],
@@ -265,30 +255,34 @@ export default {
         dataArray: [],
         label: ""
       },
+      filterSelected: false,
       sentimentData2: {
         labelArray: [],
         dataArray: [],
         label: ""
       },
-      questions: [],
-      feedbackData: [],
-      itemsPerPage: 10,
-      localCurrentPageCourses: 1,
-      currentViewMode: 'analysis',
-      showAlert: false,
       coursePositive: true,
       courseNegative: true,
+      positiveCourseWordData: [],
+      negativeCourseWordData: [],
       instructorPositive: true,
       instructorNegative: true,
-      filterSelected: false
+      positiveInstructorWordData: [],
+      negativeInstructorWordData: [],
+      currentViewMode: 'analysis',
+      header: [],
+      feedbackData: [],
+      localCurrentPageCourses: 1,
+      showAlert: false,
+      itemsPerPage: 10
     };
   },
   async created() {
     const user_ID = await UserService.getUserID();
     const role = await UserService.getUserRole(user_ID);
-    //console.log(role)
+
     if (role !== 'Admin' && role !== 'Trainer' && role !== 'Instructor') {
-      this.$router.push({ name: 'proposeCourse' }); //need to change
+      this.$router.push({ name: 'studentViewCourse' }); //need to change
     } else {
       const url = window.location.pathname;
       const parts = url.split("/"); // Split the URL by "/"
@@ -326,6 +320,18 @@ export default {
     }
   },
   methods: {
+    async fetchCourseName() {
+      const coursename = await CourseService.getCourseName(this.courseID)
+      this.courseName = coursename.data
+    },
+    async fetchRunCourseName() {
+      const runcoursename = await RunCourseService.getRunCourseName(this.runcourseID)
+      this.runcourseName = runcoursename.data
+    },
+    async fetchInstructorName() {
+      const instructorname = await UserService.getUserName(this.coachesID)
+      this.instructorName = instructorname
+    },
     //Total Feedbacks 
     async fetchTotalFeedbacks() {
       try {
@@ -519,18 +525,10 @@ export default {
         console.error("Error fetching instructor feedbacks: ", error);
       }
     },
-    async fetchCourseName() {
-      const coursename = await CourseService.getCourseName(this.courseID)
-      this.courseName = coursename.data
+    toggleViewMode() {
+      this.currentViewMode = this.currentViewMode === 'analysis' ? 'feedback' : 'analysis';
     },
-    async fetchRunCourseName() {
-      const runcoursename = await RunCourseService.getRunCourseName(this.runcourseID)
-      this.runcourseName = runcoursename.data
-    },
-    async fetchInstructorName() {
-      const instructorname = await UserService.getUserName(this.coachesID)
-      this.instructorName = instructorname
-    },
+    //All Feedback Records
     async fetchCourseFeedbackData() {
       try {
         const feedbackForCourse = await FeedbackService.getFeedback(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
@@ -539,9 +537,9 @@ export default {
           this.feedbackData = feedbackForCourse.data.answers;
 
           // Log the length of each element in feedbackData
-          this.feedbackData.forEach(answerSet => {
+          /*this.feedbackData.forEach(answerSet => {
             console.log('Length of answerSet:', answerSet.length);
-          });
+          });*/
 
           this.filterSelected = false;
         }
@@ -554,7 +552,6 @@ export default {
         console.error(error);
       }
     },
-
     handlePageChangeCourses(newPage) {
       this.localCurrentPageCourses = newPage;
       this.$emit('page-change', newPage);
@@ -621,67 +618,8 @@ export default {
         console.error("Error exporting to PDF:", error);
       }
     },
-    toggleViewMode() {
-      this.currentViewMode = this.currentViewMode === 'analysis' ? 'feedback' : 'analysis';
-    },
     openModal() {
       this.showAlert = !this.showAlert;
-    },
-    formatDateToYYYYMMDD(dateObj) {
-      const parsedYear = dateObj.getFullYear();
-      const parsedMonth = dateObj.getMonth() + 1;
-      const parsedDay = dateObj.getDate();
-      return `${parsedYear}-${parsedMonth}-${parsedDay}`;
-    },
-    async updateVisualizations(filters) {
-
-      const {
-        courses,
-        coursecats,
-        runcourses,
-        coaches,
-        startDate,
-        endDate
-      } = filters;
-
-      if (this.currentPage !== "course") {
-        this.courseIDs = JSON.stringify(courses)
-      }
-
-      if (this.currentPage !== "coach") {
-        this.coachesIDs = JSON.stringify(coaches)
-      }
-
-      this.coursecatIDs = JSON.stringify(coursecats)
-      this.runcourseIDs = JSON.stringify(runcourses)
-
-      if (startDate && endDate) {
-        this.startDate = this.formatDateToYYYYMMDD(startDate);
-        this.endDate = this.formatDateToYYYYMMDD(endDate);
-      } else {
-        this.startDate = startDate;
-        this.endDate = endDate;
-      }
-
-      this.filterSelected = true;
-
-      /*await this.fetchTotalFeedbacks();
-      await this.fetchCourseAverageRating()
-      await this.fetchInstructorAverageRating()
-      await this.fetchCourseSentimentData()
-      await this.fetchInstructorSentimentData()
-      await this.fetchCourseWordcloudData()
-      await this.fetchInstructorWordcloudData()
-      await this.fetchCourseDoneWellTopics()
-      await this.fetchCourseImproveTopics()
-      await this.fetchInstructorDoneWellTopics()
-      await this.fetchInstructorImproveTopics()
-      await this.fetchCourseName()
-      await this.fetchRunCourseName()
-      await this.fetchInstructorName()
-      await this.fetchCourseFeedbackData()*/
-      this.fetchData();
-
     },
     handleModalClosed(value) {
       this.showAlert = value;
@@ -713,6 +651,45 @@ export default {
 
       // Wait for all promises to resolve
       await Promise.all(dataPromises);
+    },
+    formatDateToYYYYMMDD(dateObj) {
+      const parsedYear = dateObj.getFullYear();
+      const parsedMonth = dateObj.getMonth() + 1;
+      const parsedDay = dateObj.getDate();
+      return `${parsedYear}-${parsedMonth}-${parsedDay}`;
+    },
+    async updateVisualizations(filters) {
+      const {
+        courses,
+        coursecats,
+        runcourses,
+        coaches,
+        startDate,
+        endDate
+      } = filters;
+
+      if (this.currentPage !== "course") {
+        this.courseIDs = JSON.stringify(courses)
+      }
+
+      if (this.currentPage !== "coach") {
+        this.coachesIDs = JSON.stringify(coaches)
+      }
+
+      this.coursecatIDs = JSON.stringify(coursecats)
+      this.runcourseIDs = JSON.stringify(runcourses)
+
+      if (startDate && endDate) {
+        this.startDate = this.formatDateToYYYYMMDD(startDate);
+        this.endDate = this.formatDateToYYYYMMDD(endDate);
+      } else {
+        this.startDate = startDate;
+        this.endDate = endDate;
+      }
+
+      this.filterSelected = true;
+
+      this.fetchData();
     },
   },
   computed: {
