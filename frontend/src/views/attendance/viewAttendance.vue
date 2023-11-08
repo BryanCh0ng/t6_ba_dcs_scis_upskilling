@@ -77,7 +77,7 @@
           <p>No records found</p>
         </div>
       </div>
-      <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" />
+      <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed"/>
     </div>
 </template>
   
@@ -204,8 +204,6 @@
         this.action = value;
       },
       async submitAttendance() {
-        console.log(this.reasonInput)
-        console.log(this.action)
         const instructor_id = this.attendances[0].instructor_ID;
         const user_ID = await UserService.getUserID();
         if (this.selectedStudents.length == 0) {
@@ -213,7 +211,12 @@
           this.message = 'Please select at least 1 student to submit attendance.';
           this.buttonType = "danger";
           this.showAlert = !this.showAlert;
-        } else if (this.action == 'Others' && this.reasonInput == '') {
+        } else if (this.action == null) {
+          this.title = 'Submit Attendance Failed';
+          this.message = 'Please select if student(s) are present, absent, or late before submitting attendance';
+          this.buttonType = "danger";
+          this.showAlert = !this.showAlert;
+        } else if (this.selectedAbsentReason == 'Others' && this.reasonInput == '') {
           this.title = 'Submit Attendance Failed';
           this.message = 'Please include absent reason';
           this.buttonType = "danger";
@@ -223,20 +226,16 @@
           this.message = 'Unable to mark attendance as user logged in is not instructor of this lesson.';
           this.buttonType = "danger";
           this.showAlert = !this.showAlert;
-        } else if (this.action == null) {
-          this.title = 'Submit Attendance Failed';
-          this.message = 'Please select if student(s) are present, absent, or late before submitting attendance';
-          this.buttonType = "danger";
-          this.showAlert = !this.showAlert;
-        } else { 
+        }  else { 
           const lessonId = this.$route.params.lessonId;
-          console.log(this.selectedStudents)
           try {
             let submit_attendance_response = await AttendanceService.updateAttendanceByLessonId(lessonId, this.selectedStudents, this.action, this.selectedAbsentReason, this.reasonInput)
+            console.log(submit_attendance_response)
             if (submit_attendance_response.code == 200) {
               this.title = 'Submit Attendance Success';
               this.message = submit_attendance_response.message
               this.buttonType = "success";
+              this.showAlert = !this.showAlert;
             } else {
               this.title = 'Submit Attendance Failed';
               this.message = submit_attendance_response.message
@@ -257,7 +256,10 @@
         } else {
           this.othersSelected = false;
         }
-      }
+      },
+      handleModalClosed(value) {
+        this.showAlert = value;
+      },
     },
     async created() {
       const user_ID = await UserService.getUserID();
