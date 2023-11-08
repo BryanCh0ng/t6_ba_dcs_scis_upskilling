@@ -27,7 +27,7 @@ class GetAttendanceByLessonId(Resource):
         attendance_record_alias = aliased(AttendanceRecord, name="attendance_record_alias")
 
         attendance_record_query = (
-            db.session.query(attendance_record_alias, User.user_Name, User.user_Email, RunCourse.run_Name, registration_alias)
+            db.session.query(attendance_record_alias, User.user_Name, User.user_Email, RunCourse.run_Name, registration_alias, RunCourse.instructor_ID)
             .join(User, registration_alias.user_ID == User.user_ID)
             .join(Lesson, Lesson.rcourse_ID == registration_alias.rcourse_ID)
             .outerjoin(attendance_record_alias, (attendance_record_alias.user_ID == registration_alias.user_ID) & (attendance_record_alias.lesson_ID == lesson_id))
@@ -42,7 +42,7 @@ class GetAttendanceByLessonId(Resource):
         attendances = []
         db.session.close()
         if attendance_record_query:
-            for attendance, user_name, user_email, run_name, registration in attendance_record_query:
+            for attendance, user_name, user_email, run_name, registration, instructor_id in attendance_record_query:
                 if attendance is not None:
                     attendances.append({
                         'status': attendance.status,
@@ -51,7 +51,8 @@ class GetAttendanceByLessonId(Resource):
                         'user_ID': registration.user_ID, 
                         'user_Name': user_name,
                         'user_Email': user_email,
-                        'run_Name': run_name
+                        'run_Name': run_name,
+                        'instructor_ID': instructor_id
                         })
                 else:
                     attendances.append({
@@ -61,7 +62,8 @@ class GetAttendanceByLessonId(Resource):
                         'user_ID': registration.user_ID, 
                         'user_Name': user_name,
                         'user_Email': user_email,
-                        'run_Name': run_name
+                        'run_Name': run_name,
+                        'instructor_ID': instructor_id
                     })
             return {"code": 200, "attendances": attendances}, 200
         else:
@@ -116,35 +118,120 @@ class GetAttendanceByLessonId(Resource):
 
             attendances[tuple(rcourse.items())].append(lesson_attendance_list)
 
-    
-        # for runcourse, lesson, attendace_record in db_query:
-        #     runcourse.run_Startdate = common.format_date_time(runcourse.run_Startdate)
-        #     runcourse.run_Enddate = common.format_date_time(runcourse.run_Enddate)
-        #     runcourse.run_Starttime = common.format_date_time(runcourse.run_Starttime)
-        #     runcourse.run_Endtime = common.format_date_time(runcourse.run_Endtime)
-        #     runcourse.reg_Startdate = common.format_date_time(runcourse.reg_Startdate)
-        #     runcourse.reg_Enddate = common.format_date_time(runcourse.reg_Enddate)
-        #     runcourse.reg_Starttime = common.format_date_time(runcourse.reg_Starttime)
-        #     runcourse.reg_Endtime = common.format_date_time(runcourse.reg_Endtime)
-        #     runcourse.feedback_Startdate = common.format_date_time(runcourse.feedback_Startdate)
-        #     runcourse.feedback_Enddate = common.format_date_time(runcourse.feedback_Enddate)
-        #     runcourse.feedback_Starttime = common.format_date_time(runcourse.feedback_Starttime)
-        #     runcourse.feedback_Endtime = common.format_date_time(runcourse.feedback_Endtime)
-        #     lesson.lesson_Starttime = common.format_date_time(lesson.lesson_Starttime)
-        #     lesson.lesson_Endtime = common.format_date_time(lesson.lesson_Endtime)
-        #     lesson.lesson_Date = common.format_date_time(lesson.lesson_Endtime)
-        #     # lesson.lesson_Starttime = lesson.lesson_Starttime.strftime('%H:%M:%S')
-        #     # lesson.lesson_Endtime = lesson.lesson_Endtime.strftime('%H:%M:%S')
-        #     attendances.append({
-        #         "runcourse": runcourse.json(),
-        #         "lesson": lesson.json(),
-        #         "attendance_record": attendace_record.json()
-        #     })
-        # print(attendances)
-        
         if attendances:
             return {"code": 200, "data": attendances}, 200
         else:
             return {"code": 400, "message": "There is no attendance record for this lesson"}, 400
       except Exception as e:
           return {"code": 404, "message": "Failed " + str(e)}, 404
+
+
+update_attendance_by_lesson_id = api.parser()
+update_attendance_by_lesson_id.add_argument("lesson_id", help="Enter lesson id")
+update_attendance_by_lesson_id.add_argument("student_ids", help="Enter student ids")
+update_attendance_by_lesson_id.add_argument("action", help="Enter action")
+update_attendance_by_lesson_id.add_argument("absentReason", help="Enter absent reason")
+update_attendance_by_lesson_id.add_argument("reasonInput", help="Enter reason input")
+@api.route("/update_attendance_by_lesson_id", methods=["POST"])
+@api.doc(description="Update Attendance by Lesson Id")
+class updateAttendanceByLessonId(Resource):
+    @api.expect(update_attendance_by_lesson_id)
+    def post(self):
+        user_role = common.getUserRole()
+        if (user_role) == 'Student':
+          return {"message": "Unauthorized Access, Failed to mark attendance"}, 404
+
+        args = update_attendance_by_lesson_id.parse_args()
+        lesson_id = args.get("lesson_id", "")
+        student_ids = request.json.get("student_ids", [])
+        action = args.get("action", "")
+        absentReason = args.get("absentReason", "")
+        reasonInput = args.get("reasonInput", "")
+
+        def get_lesson_by_lesson_id(lesson_id):
+            try:
+                lesson = db.session.query(Lesson, RunCourse.course_Venue, RunCourse.instructor_ID).join(
+                    RunCourse, Lesson.rcourse_ID == RunCourse.rcourse_ID).filter(
+                    Lesson.lesson_ID == lesson_id
+                ).first()
+                db.session.close()
+                if lesson:
+                    lesson_data = {
+                        "lesson_ID": lesson[0].lesson_ID,
+                        "rcourse_ID": lesson[0].rcourse_ID,
+                        "lesson_Date": common.format_date_time(lesson[0].lesson_Date),
+                        "lesson_Starttime": lesson[0].lesson_Starttime.strftime('%H:%M:%S'),
+                        "lesson_Endtime": lesson[0].lesson_Endtime.strftime('%H:%M:%S'),
+                        'course_Venue': lesson[1],
+                        'instructor_ID': lesson[2]
+                    }
+                    return {"code": 200, "lesson": lesson_data}
+                else:
+                    return {"code": 404, "message": "Lesson not found"}, 404
+            except Exception as e:
+                return {"code": 500, "message": "Failed " + str(e)}, 500
+            
+        def add_update_attendance(lesson_id, student_id, action, absentReason, reasonInput):
+            try:
+                attendance_record_query = db.session.query(AttendanceRecord).filter(
+                        AttendanceRecord.user_ID == student_id,
+                        AttendanceRecord.lesson_ID == lesson_id
+                    ).first()
+                if attendance_record_query:
+                    update_data = {
+                        'status': action,
+                        'attrecord_Status': 'Submitted',
+                        'reason': absentReason,
+                    }
+                    if (absentReason == 'Others'):
+                        update_data = {
+                            'status': action,
+                            'attrecord_Status': 'Submitted',
+                            'reason': reasonInput,
+                        }
+                    AttendanceRecord.query.filter_by(user_ID=student_id, lesson_ID=lesson_id).update(update_data)
+                    db.session.commit()
+                    return True
+                else:
+                    reason = reasonInput if absentReason == 'Others' else absentReason
+                    new_attendance_record = AttendanceRecord(None, lesson_ID = lesson_id, status=action, attrecord_Status='Submited', reason=reason, user_ID=student_id)
+                    db.session.add(new_attendance_record)
+                    db.session.commit()
+                    return True
+            except Exception as e:
+                db.session.rollback()
+                return False
+
+        try:
+            lesson_response = get_lesson_by_lesson_id(lesson_id)
+            if lesson_response['code'] == 200:
+                lesson = lesson_response['lesson']
+                lesson_date = datetime.strptime(lesson['lesson_Date'], "%Y-%m-%d")
+                current_time = datetime.now()
+                hours, minutes, seconds = map(int, lesson['lesson_Starttime'].split(':'))
+                lesson_date_time = lesson_date.replace(hour=hours, minute=minutes, second=seconds)
+                has_passed = lesson_date_time <= current_time
+                if (has_passed == False):
+                    return {"code": 404, "message": "Unable to mark attendance as is not during lesson datetime"}, 404
+                elif (lesson['instructor_ID'] != common.getUserID()):
+                    return {"code": 404, "message": "Unable to mark attendance as user logged in is not instructor of this lesson."}, 404
+                elif len(student_ids) == 0:
+                    return {"code": 404, "message": "Please select at least 1 student to submit attendance."}, 404
+                elif action == None:
+                    return {"code": 404, "message": "Please select if student(s) are present, absent, or late before submitting attendance"}, 404
+                elif action == 'Others' and reasonInput == '':
+                    return {"code": 404, "message": "Please include absent reason"}, 404
+                else:
+                    for student_id in student_ids:
+                        result = add_update_attendance(lesson_id, student_id, action, absentReason, reasonInput)
+                        if (result == False):
+                            db.session.rollback()
+                            return {"code": 404, "message": "An error has occured while submitting attendance"}, 404
+                    return {"code": 200, "message": "Successfully Submitted Attendance"}, 200
+            else:
+                db.session.rollback()
+                return lesson_response
+        except Exception as e:
+            print(str(e))
+            db.session.rollback()
+            return jsonify({"code": 500, "message": "Failed " + str(e)}), 500

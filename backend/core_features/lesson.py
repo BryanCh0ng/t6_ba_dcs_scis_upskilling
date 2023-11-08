@@ -269,7 +269,6 @@ class GetLessonById(Resource):
         try:
             args = get_lesson_info.parse_args()
             lesson_id = args.get('lesson_ID')
-            # lesson = Lesson.query.get(lesson_id)
             lesson = db.session.query(Lesson, RunCourse.course_Venue).join(
                 RunCourse, Lesson.rcourse_ID == RunCourse.rcourse_ID).filter(
                 Lesson.lesson_ID == lesson_id
