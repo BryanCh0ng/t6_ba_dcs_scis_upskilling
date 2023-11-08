@@ -57,6 +57,32 @@ class RegistrationService extends BaseApiService {
         }
     }
 
+    async enrollStudent(reg_IDs) {
+        try {
+            const response = await axiosClient.post("/registration/enroll_student", {
+                reg_IDs: reg_IDs
+            });
+        
+            return response;
+    
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }    
+
+    async dropStudent(reg_IDs) {
+        try {
+            const response = await axiosClient.post("/registration/drop_student", {
+                reg_IDs: reg_IDs
+            });
+        
+            return response;
+    
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }  
+
 }
 
 export default new RegistrationService();

@@ -382,3 +382,144 @@ class dropRegisteredCourse(Resource):
             db.session.rollback()
             return {"message": "Failed to drop the course: " + str(e)}, 500
 
+enroll_student = api.parser()
+enroll_student.add_argument("reg_IDs", help="Enter registration ID")
+@api.route("/enroll_student", methods=["POST"])
+@api.doc(description="Enroll student into a run course")
+class EnrollStudent(Resource):
+    @api.expect(enroll_student)
+    def post(self):
+        args = enroll_student.parse_args()
+        reg_IDs_json = args.get("reg_IDs", "")
+       
+        try:
+            if reg_IDs_json and reg_IDs_json != '[]':
+            
+                reg_IDs = json.loads(reg_IDs_json)
+
+                if len(reg_IDs) > 0:
+                    total_enrolled = 0
+                    invalid_reg_status = 0
+                    invalid_regID = 0
+
+                    for regID in reg_IDs:
+                        student = Registration.query.filter_by(reg_ID=regID).first()
+
+                        if student:
+                            if student.reg_Status == "Pending":
+                                student.reg_Status = "Enrolled"
+                                db.session.commit()
+                                total_enrolled += 1
+                            else:
+                                invalid_reg_status += 1
+                        else:
+                            invalid_regID += 1
+
+                    if total_enrolled > 0:
+                        return jsonify(
+                            {
+                                "code": 200,
+                                "message": "Student(s) enrolled successfully"
+                            }
+                        )
+                    elif invalid_reg_status > 0:
+                        return jsonify(
+                            {
+                                "code": 400,
+                                "message": "Cannot enroll student(s) with status that does not equals to 'Pending'"
+                            }
+                        )
+                    elif invalid_regID > 0:
+                        return jsonify(
+                            {
+                                "code": 404,
+                                "message": "Invalid registration ID(s)"
+                            }
+                        )
+
+            return jsonify(
+                {
+                    "code": 400,
+                    "message": "No student is selected"
+                }
+            )
+  
+        except Exception as e:
+            #print("Error:", str(e))
+            return jsonify(
+                {
+                    "code": 500,
+                    "message": "Failed to enroll student(s): " + str(e)
+                }
+            )
+
+drop_student = api.parser()
+drop_student.add_argument("reg_IDs", help="Enter registration ID")
+@api.route("/drop_student", methods=["POST"])
+@api.doc(description="Drop enrolled student from a run course")
+class DropStudent(Resource):
+    @api.expect(drop_student)
+    def post(self):
+        args = drop_student.parse_args()
+        reg_IDs_json = args.get("reg_IDs", "")
+       
+        try:
+            if reg_IDs_json and reg_IDs_json != '[]':
+              
+                reg_IDs = json.loads(reg_IDs_json)
+
+                if len(reg_IDs) > 0:
+                    total_dropped = 0
+                    invalid_reg_status = 0
+                    invalid_regID = 0
+
+                    for regID in reg_IDs:
+                        student = Registration.query.filter_by(reg_ID=regID).first()
+
+                        if student:
+                            if student.reg_Status == "Enrolled":
+                                student.reg_Status = "Dropped"
+                                db.session.commit()
+                                total_dropped += 1
+                            else:
+                                invalid_reg_status += 1
+                        else:
+                            invalid_regID += 1
+
+                    if total_dropped > 0:
+                        return jsonify(
+                            {
+                                "code": 200,
+                                "message": "Dropped enrolled student(s) successfully"
+                            }
+                        )
+                    elif invalid_reg_status > 0:
+                        return jsonify(
+                            {
+                                "code": 400,
+                                "message": "Cannot drop student(s) with status that does not equals to 'Enrolled'"
+                            }
+                        )
+                    elif invalid_regID > 0:
+                        return jsonify(
+                            {
+                                "code": 404,
+                                "message": "Invalid registration ID(s)"
+                            }
+                        )
+
+            return jsonify(
+                {
+                    "code": 400,
+                    "message": "No student is selected"
+                }
+            )
+  
+        except Exception as e:
+            #print("Error:", str(e))
+            return jsonify(
+                {
+                    "code": 500,
+                    "message": "Failed to drop enrolled student(s): " + str(e)
+                }
+            )

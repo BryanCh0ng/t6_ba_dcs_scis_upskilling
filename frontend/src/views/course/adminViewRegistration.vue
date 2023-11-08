@@ -4,9 +4,16 @@
       @search-complete="handleSearchStudent" />
 
     <div class="container col-12 d-flex mb-3 w-100">
-      <h5 class="col m-auto">All Registration Status for '{{this.runCourseName}}'</h5>
-      <button class="btn btn-primary font-weight-bold text-nowrap"
-        @click="enrolStudent">Enrol Student</button>
+      <h5 class="col m-auto">All Registration Status for '{{ this.runCourseName }}'</h5>
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Action
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" @click="enrolStudent">Enroll Student</a></li>
+          <li><a class="dropdown-item" @click="dropStudent">Drop Student</a></li>
+        </ul>
+      </div>
     </div>
 
     <div class="container col-12 table-responsive">
@@ -15,7 +22,8 @@
           <thead>
             <tr class="text-nowrap">
               <th scope="col">
-                <input type="checkbox" v-if="hasPendingRecords" v-model="selectAllStudents" @change="selectAllStudentsChanged" />
+                <input type="checkbox" v-if="hasActionableRecords" v-model="selectAllStudents"
+                  @change="selectAllStudentsChanged" />
               </th>
               <th scope="col">
                 <a href="" class="text-decoration-none text-dark" @click.prevent="sort('user_Name', 'student')">Name
@@ -25,17 +33,19 @@
               <th scope="col">Email</th>
               <th scope="col">Blacklist Status</th>
               <th scope="col">
-                <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Status', 'student')" >Registration Status 
-                  <sort-icon :sortColumn="sortColumn === 'reg_Status'" 
-                  :sortDirection="getSortDirection('reg_Status')"/></a>
+                <a href="" class="text-decoration-none text-dark"
+                  @click.prevent="sort('reg_Status', 'student')">Registration Status
+                  <sort-icon :sortColumn="sortColumn === 'reg_Status'"
+                    :sortDirection="getSortDirection('reg_Status')" /></a>
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(user, key) in displayedStudent" :key="key">
+            <tr v-for="user in displayedStudent" :key="user.reg_ID">
               <td class="user_checkbox">
                 <!-- Bind checkbox to the selectedUserIDs array -->
-                <input v-if="user.reg_Status === 'Pending'" type="checkbox" :value="user.reg_ID" :checked="selectedRegIDs.includes(user.reg_ID)" @change="selectUser(key)" />
+                <input v-if="user.reg_Status === 'Pending' || user.reg_Status === 'Enrolled'" type="checkbox"
+                  :value="user.reg_ID" :checked="selectedRegIDs.includes(user.reg_ID)" @change="selectUser(user)" />
               </td>
               <td class="user_name">
                 {{ user.user_Name }}
@@ -44,8 +54,8 @@
                 {{ user.user_Email }}
               </td>
               <td class="blacklist_status">
-                  <span v-if="user.blacklist_Status === 'Blacklisted'" class="text-danger">Blacklisted</span>
-                  <span v-else>Not Blacklisted</span>
+                <span v-if="user.blacklist_Status === 'Blacklisted'" class="text-danger">Blacklisted</span>
+                <span v-else>Not Blacklisted</span>
               </td>
               <td class="reg_status">
                 {{ user.reg_Status }}
@@ -62,7 +72,8 @@
       :totalItems="student.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeStudents"
       class="justify-content-center pagination-container" />
 
-    <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
+    <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType"
+      @modal-closed="handleModalClosed" />
   </div>
 </template>
 
@@ -85,30 +96,67 @@ export default {
   },
   data() {
     return {
+      statusOption: ['Pending', 'Enrolled', 'Not Enrolled', 'Dropped'],
       user_ID: null,
       runCourseID: null,
-      statusOption: ['Pending', 'Enrolled', 'Not Enrolled', 'Dropped'],
+      localCurrentPageStudent: 1,
+      itemsPerPage: 10,
+      student: [],
+      name: "",
+      status: "",
       runCourseName: "",
       errorMsg: [],
-      student: [],
-      //Modal 
       title: "",
       message: "",
       buttonType: "",
       showAlert: false,
-      name: "",
-      status: "", 
-      sortColumn: '',
-      sortDirection: 'asc',
-      localCurrentPageStudent: 1,
-      itemsPerPage: 10,
       selectAllStudents: false,
       selectedRegIDs: [],
-      dataToUpdate: {},
-      regID: null
+      sortColumn: '',
+      sortDirection: 'asc'
+    }
+  },
+  async created() {
+    const user_ID = await UserService.getUserID();
+    this.user_ID = user_ID;
+    const role = await UserService.getUserRole(user_ID);
+
+    if (role == 'Student') {
+      this.$router.push({ name: 'studentViewCourse' });
+    } else if (role == 'Instructor' || role == 'Trainer') {
+      this.$router.push({ name: 'instructorTrainerViewProfile' }); //Need to change
+    } else if (role == 'Admin') {
+      document.title = "";
+      this.runCourseID = this.$route.params.id;
+      await this.loadData();
+    }
+  },
+  computed: {
+    displayedStudent() {
+      const startIndex = (this.localCurrentPageStudent - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      return this.student.slice(startIndex, endIndex);
+    },
+    hasActionableRecords() {
+      return this.student.some(user => user.reg_Status === 'Pending' || user.reg_Status === 'Enrolled');
     }
   },
   methods: {
+    async searchStudentInfo(user_Name, reg_Status) {
+      try {
+        this.name = user_Name
+        this.status = reg_Status
+        let response = await RegistrationService.getRegistrationByRunCourseID(this.runCourseID, this.name, this.status)
+        this.student = response.data;
+        return this.student;
+      } catch (error) {
+        console.error("Error fetching info:", error);
+        throw error;
+      }
+    },
+    async handleSearchStudent(searchResults) {
+      this.student = searchResults;
+    },
     async fetchRunCourseName() {
       try {
         let response = await RunCourseService.getRunCourseById(this.runCourseID)
@@ -138,20 +186,18 @@ export default {
         this.showAlert = !this.showAlert;
       }
     },
-    async searchStudentInfo(user_Name, reg_Status) {
-      try {
-        this.name = user_Name
-        this.status = reg_Status
-        let response = await RegistrationService.getRegistrationByRunCourseID(this.runCourseID, this.name, this.status)
-        this.student = response.data;
-        return this.student;
-      } catch (error) {
-        console.error("Error fetching info:", error);
-        throw error;
+    handleModalClosed(value) {
+      this.showAlert = value;
+
+      if (!this.showAlert && this.buttonType === "success") {
+        this.loadData();
       }
-    },
-    async handleSearchStudent(searchResults) {
-      this.student = searchResults;
+
+      //Clear the select all checkbox
+      this.selectAllStudents = false;
+
+      //Clear selected checkbox or checkboxes
+      this.selectedRegIDs = [];
     },
     sort(column, action) {
       if (this.sortColumn === column) {
@@ -170,9 +216,9 @@ export default {
     async sortCourse(action) {
       if (action == 'student') {
         let sort_response = await CommonService.sortRecords(this.sortColumn, this.sortDirection, this.student)
-          if (sort_response.code == 200) {
-            this.student = sort_response.data
-          }
+        if (sort_response.code == 200) {
+          this.student = sort_response.data
+        }
       }
     },
     selectAllStudentsChanged() {
@@ -180,7 +226,7 @@ export default {
         if (this.selectAllStudents) {
           // Select all users
           this.selectedRegIDs = this.student
-            .filter(user => user.reg_Status === 'Pending')
+            .filter(user => user.reg_Status === 'Pending' || user.reg_Status === "Enrolled")
             .map(user => user.reg_ID);
         } else {
           // Deselect all users
@@ -188,11 +234,11 @@ export default {
         }
       }, 0);
     },
-    selectUser(key){
-      const regID = this.student[key].reg_ID;
+    selectUser(user) {
+      const regID = user.reg_ID;
 
       if (this.selectedRegIDs.includes(regID)) {
-      // User is already selected, so unselect them
+        // User is already selected, so unselect them
         const index = this.selectedRegIDs.indexOf(regID);
         if (index !== -1) {
           this.selectedRegIDs.splice(index, 1);
@@ -202,60 +248,57 @@ export default {
         this.selectedRegIDs.push(regID);
       }
     },
-    async enrolStudent(){
-      const selectedData = [];
-      for (let i = 0; i < this.selectedRegIDs.length; i++) {
-          selectedData.push(this.selectedRegIDs[i]);
-      }
-      
-      this.dataToUpdate["reg_Status"] = "Enrolled";
+    async enrolStudent() {
+      try {
+        this.selectedRegIDs = JSON.stringify(this.selectedRegIDs)
+        let response = await RegistrationService.enrollStudent(this.selectedRegIDs)
 
-      for(let j = 0; j < selectedData.length; j++){
-        try {
-          let response = await RegistrationService.updateRegistration(selectedData[j], this.dataToUpdate)
-          console.log(response);
-        } catch (error) {
-          console.error("Error updating the registration: ", error);
+        if (response.data.code === 200) {
+          this.title = "Run Course Enrollement Successful";
+          this.message = response.data.message;
+          this.buttonType = "success";
+        } else if (response.data.code === 400 || response.data.code === 404) {
+          this.title = "Run Course Enrollement Failed";
+          this.message = response.data.message;
+          this.buttonType = "danger";
+        } else if (response.data.code === 500) {
+          this.title = "Run Course Enrollement Failed";
+          this.message = response.data.message.split(":")[0] + ": Something went wrong.";
+          this.buttonType = "danger";
+          console.log(response.data.message);
         }
+
+        this.showAlert = !this.showAlert;
+
+      } catch (error) {
+        console.error("Error enrolling student(s): ", error);
       }
-
-      this.title = "Enrollement Successful";
-      this.message = "The student(s) have been successfully enrolled";
-      this.buttonType = "success";
-      this.showAlert = !this.showAlert;
-
     },
-    handleModalClosed(value) {
-      this.showAlert = value;
+    async dropStudent() {
+      try {
+        this.selectedRegIDs = JSON.stringify(this.selectedRegIDs)
+        let response = await RegistrationService.dropStudent(this.selectedRegIDs)
 
-      if (!this.showAlert && this.buttonType === "success") {
-        this.loadData();
+        if (response.data.code === 200) {
+          this.title = "Dropped Enrolled Student(s) Successfully";
+          this.message = response.data.message
+          this.buttonType = "success";
+        } else if (response.data.code === 400 || response.data.code === 404) {
+          this.title = "Dropped Enrolled Student(s) Failed";
+          this.message = response.data.message
+          this.buttonType = "danger";
+        } else if (response.data.code === 500) {
+          this.title = "Dropped Enrolled Student(s) Failed";
+          this.message = response.data.message.split(":")[0] + ": Something went wrong.";
+          this.buttonType = "danger";
+          console.log(response.data.message);
+        }
+
+        this.showAlert = !this.showAlert;
+
+      } catch (error) {
+        console.error("Error enrolling student(s): ", error);
       }
-    }, 
-  },
-  computed: {
-    displayedStudent() {
-      const startIndex = (this.localCurrentPageStudent - 1) * this.itemsPerPage;
-      const endIndex = startIndex + this.itemsPerPage;
-      return this.student.slice(startIndex, endIndex);
-    },
-    hasPendingRecords() {
-      return this.student.some(user => user.reg_Status === 'Pending');
-    }
-  },
-  async created() {
-    const user_ID = await UserService.getUserID();
-    this.user_ID = user_ID;
-    const role = await UserService.getUserRole(user_ID);
-
-    if (role == 'Student') {
-      this.$router.push({ name: 'studentViewProfile' });
-    } else if (role == 'Instructor' || role == 'Trainer') {
-      this.$router.push({ name: 'instructorTrainerViewProfile' });
-    } else if (role == 'Admin') {
-        //document.title = "Create a Run Course";
-        this.runCourseID = this.$route.params.id;
-        this.loadData();
     }
   }
 };
