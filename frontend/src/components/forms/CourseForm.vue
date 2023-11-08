@@ -319,7 +319,7 @@ export default {
 
             if (!this.v$.$invalid) {
 
-                // console.log('Form has no validation errors');
+                console.log('Form has no validation errors');
 
                 try {
 
