@@ -59,7 +59,7 @@
         </div>
         <vue-awesome-paginate v-model="localCurrentPageTopPickRegister" v-if="top_register_picks.length/itemsPerPage > 0 && shouldShowTopRegisterPicks" :totalItems="top_register_picks.length" :items-per-page="itemsPerPage" @page-change="handlePageTopRegisterCourses" class="justify-content-center pagination-container"/>
       
-        <div class="pt-5 container col-12 table-responsive" v-if="showRegisterOthers">
+        <div class="pt-5 container col-12 table-responsive" v-if="showRegistrationJustForYou">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
           <div v-if="registration_justforyou && registration_justforyou.length > 0"> 
             <table class="table bg-white">
@@ -107,9 +107,9 @@
               <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentPageRegCourseOthers" v-if="registration_justforyou.length/itemsPerPage > 0 && showRegisterOthers" :totalItems="registration_justforyou.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseOthers" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-model="localCurrentPageRegCourseOthers" v-if="registration_justforyou.length/itemsPerPage > 0 && showRegistrationJustForYou" :totalItems="registration_justforyou.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseOthers" class="justify-content-center pagination-container"/>
 
-        <div class="pt-5 container col-12 table-responsive" v-if="showRegisterJustForYou">
+        <div class="pt-5 container col-12 table-responsive" v-if="showRegistratonOthers">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
           <div v-if="registration_others && registration_others.length > 0"> 
             <table class="table bg-white">
@@ -156,7 +156,7 @@
             <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentPageRegCourseForYou" v-if="registration_others.length/itemsPerPage > 0 && showRegisterJustForYou" :totalItems="registration_others.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseForYou" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-model="localCurrentPageRegCourseForYou" v-if="registration_others.length/itemsPerPage > 0 && showRegistratonOthers" :totalItems="registration_others.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseForYou" class="justify-content-center pagination-container"/>
       </div>
 
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'express_interest' }">
@@ -191,7 +191,7 @@
         <vue-awesome-paginate v-model="localCurrentPageTopPickInterest" v-if="top_interest_picks.length/itemsPerPage > 0 && shouldShowTopInterestPicks" :totalItems="top_interest_picks.length" :items-per-page="itemsPerPage" @page-change="handlePageTopInterestCourses" class="justify-content-center pagination-container"/>
           
         
-          <div class="pt-5 container col-12 table-responsive" v-if="showInterestOthers">
+          <div class="pt-5 container col-12 table-responsive" v-if="showInterestsJustForYou">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
           <div v-if="interests_justforyou && interests_justforyou.length > 0"> 
             <table class="table bg-white">
@@ -219,9 +219,9 @@
             <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentInterestOthers" v-if="interests_justforyou.length/itemsPerPage > 0 && showInterestOthers" :totalItems="interests_justforyou.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeInterestOthers" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-model="localCurrentInterestOthers" v-if="interests_justforyou.length/itemsPerPage > 0 && showInterestsJustForYou" :totalItems="interests_justforyou.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeInterestOthers" class="justify-content-center pagination-container"/>
       
-        <div class="pt-5 container col-12 table-responsive" v-if="showInterestJustForYou">
+        <div class="pt-5 container col-12 table-responsive" v-if="showInterestsOthers">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1> 
           <div v-if="interests_others && interests_others.length > 0"> 
             <table class="table bg-white">
@@ -249,7 +249,7 @@
             <router-link :to="{ name: 'studentViewCourse' }" class="btn btn-edit">Browse Course</router-link>
           </div>
         </div>
-        <vue-awesome-paginate v-model="localCurrentInterestCourses" v-if="interests_others.length/itemsPerPage > 0 && showInterestJustForYou" :totalItems="interests_others.length" :items-per-page="itemsPerPage" @page-change="handlePageTopInterestCourses" class="justify-content-center pagination-container"/>
+        <vue-awesome-paginate v-model="localCurrentInterestCourses" v-if="interests_others.length/itemsPerPage > 0 && showInterestsOthers" :totalItems="interests_others.length" :items-per-page="itemsPerPage" @page-change="handlePageTopInterestCourses" class="justify-content-center pagination-container"/>
 
       </div>
 
@@ -262,9 +262,7 @@
           <modal-after-action :course="actionCourse" @model-after-action-close="modalAfterActionClose" :message="receivedMessage" @close-modal="closeModal" />
         </div>
       </div>
-
     </div>
-    
   </div>
 </template>
       
@@ -312,10 +310,10 @@ export default {
       activeTab: 'for_registration',
       user_ID: 1,
       hideTopRegisterPicks: true,
-      showRegisterJustForYou: true,
-      showRegisterOthers: true,
-      showInterestJustForYou: true,
-      showInterestOthers: true,
+      showRegistratonOthers: true,
+      showRegistrationJustForYou: true,
+      showInterestsOthers: true,
+      showInterestsJustForYou: true,
       receivedMessage: '',
       actionCourse: {},
     }
@@ -425,97 +423,97 @@ export default {
       this.localCurrentPageTopPickInterest = newPage;
       this.$emit('page-change', newPage);
     },
-    async loadData() {
-      let top_register_pick = await Recommender.getTopPicksForRegistration(this.user_ID)
-      this.top_register_picks = top_register_pick.data
-
-      let top_interest_pick = await Recommender.getTopPicksForVoting(this.user_ID)
-      this.top_interest_picks = top_interest_pick.data
-
-      let user_register = await Recommender.getUserSimilarityRegistration(this.user_ID)
-      if (user_register.code != 200 || user_register.length === 0) {
-        this.showRegisterJustForYou = false
-      } else {
-        this.registration_others = user_register.data.course_list
-        if (this.registration_others.length === 0) {
-          this.showRegisterJustForYou = false
-        }
-      }
-
-      let course_list_req = await Recommender.getUserRegisteredCourses(this.user_ID)
-      if (course_list_req.message === "No matching course registration information found") {
-        this.showRegisterOthers= false
-      } else {
-        let course_register = await Recommender.getCourseSimilarityRegistration(course_list_req.data)
-        
-        if (course_register.code != 200 || course_register.length === 0) {
-          this.showRegisterOthers= false
-        } 
-        this.registration_justforyou = course_register.data.course_list
-        if (this.registration_justforyou.length === 0) {
-          this.showRegisterOthers= false
-        }
-        
-      }
-            
-      let user_interest = await Recommender.getUserSimilarityInterest(this.user_ID)
-      if (user_register.length === 0) {
-          this.showInterestJustForYou= false
-      } else {
-        this.interests_others = user_interest.data.course_list
-        if (this.interests_others.length === 0) {
-          this.showInterestJustForYou= false
-        }
-      }
-      
-      let interest_list_req = await CourseService.searchCourseVoteInfo(this.user_ID, null, null, null)
-      // console.log(interest_list_req)
-      if (interest_list_req.message === "No matching course interest information found") {
-        this.showInterestOthers = false
-      } else {
-        let course_interest = await Recommender.getCourseSimilarityInterest(interest_list_req.data)
-        if (course_interest.code != 200 || course_interest.length === 0) {
-          this.showInterestOthers = false
-        } else {
-          this.interests_justforyou = course_interest.data.course_list
-          if (this.interests_justforyou.length === 0) {
-            this.showInterestOthers = false
-          }
-        }
-      }
-
+    async fetchTopPicksForRegistration() {
+      const topRegisterPick = await Recommender.getTopPicksForRegistration(this.user_ID);
+      this.top_register_picks = topRegisterPick.data;
     },
-    updateRegistration() {
-      
-      const areArraysEqual = (
-        Array.isArray(this.registration_others) &&
-        Array.isArray(this.registration_justforyou) &&
-        this.registration_others.length === this.registration_justforyou.length &&
-        this.registration_others.every((course1) =>
-          this.registration_justforyou.some((course2) => course1.rcourse_ID === course2.rcourse_ID)
+    async fetchTopPicksForVoting() {
+      const topInterestPick = await Recommender.getTopPicksForVoting(this.user_ID);
+      this.top_interest_picks = topInterestPick.data;
+    },
+    async fetchUserSimilarityRegistration() {
+      const userRegister = await Recommender.getUserSimilarityRegistration(this.user_ID);
+      if ( userRegister.code === 200 && userRegister.length !== 0) {
+        this.showRegistratonOthers = true
+        this.registration_others = userRegister.data.course_list
+      } else {
+        this.showRegistratonOthers = false
+      }
+    },
+    async fetchUserRegisteredCourses() {
+      const courseListReq = await Recommender.getUserRegisteredCourses(this.user_ID);
+      if (courseListReq.code === 404) {
+        this.showRegistrationJustForYou = false;
+      } else {
+        const courseRegister = await Recommender.getCourseSimilarityRegistration(courseListReq.data);
+        console.log(courseRegister)
+        if (courseRegister.code === 200 && courseRegister.length !== 0) {
+          this.showRegistrationJustForYou = true
+          this.registration_justforyou = courseRegister.data.course_list
+        } else {
+          this.showRegistrationJustForYou = false
+        }
+      }
+    },
+    async fetchUserSimilarityInterest() {
+      const userInterest = await Recommender.getUserSimilarityInterest(this.user_ID);
+      this.showInterestsOthers = userInterest.length !== 0;
+      this.interests_others = this.showInterestsOthers ? userInterest.data.course_list : [];
+    },
+    async fetchInterestListRequest() {
+      const interestListReq = await CourseService.searchCourseVoteInfo(this.user_ID, null, null, null);
+      if (interestListReq.message === "No matching course interest information found") {
+        this.showInterestsJustForYou = false;
+      } else {
+        const courseInterest = await Recommender.getCourseSimilarityInterest(interestListReq.data);
+        this.showInterestsJustForYou = courseInterest.code === 200 && courseInterest.length !== 0;
+        this.interests_justforyou = this.showInterestsJustForYou ? courseInterest.data.course_list : [];
+      }
+    },
+    async loadData() {
+      await this.fetchTopPicksForRegistration();
+      await this.fetchTopPicksForVoting();
+      await this.fetchUserSimilarityRegistration();
+      await this.fetchUserRegisteredCourses();
+      await this.fetchUserSimilarityInterest();
+      await this.fetchInterestListRequest();
+    },
+    areCourseArraysEqual(arr1, arr2, idProperty) {
+      return (
+        Array.isArray(arr1) &&
+        Array.isArray(arr2) &&
+        arr1.length === arr2.length &&
+        arr1.every(course1 =>
+          arr2.some(course2 => course1[idProperty] === course2[idProperty])
         )
       );
+    },
+    updateRegistration() {
+      const areArraysEqual = this.areCourseArraysEqual(this.registration_others, this.registration_justforyou,'rcourse_ID');
 
-      if (areArraysEqual && (this.registration_others.length !== 0 && this.registration_justforyou.length !== 0)) {
-        this.showRegisterOthers = true; // Hide Register Others
-        this.showRegisterJustForYou = false; // show Register JustForYou
-        this.registration_others = [];
+      if (areArraysEqual && this.registration_others.length > 0) {
+        this.showRegistrationJustForYou = true; 
+        this.showRegistratonOthers = false;     
+        this.registration_others = [];      
+      }
+
+      if (this.registration_justforyou.length === 0 && this.registration_others.length === 0) {
+         this.showRegistrationJustForYou = false; 
+          this.showRegistratonOthers = false; 
       }
     },
     updateInterest() {
-      const areArraysEqual = (
-        Array.isArray(this.interests_others) &&
-        Array.isArray(this.interests_justforyou) &&
-        this.interests_others.length === this.interests_justforyou.length &&
-        this.interests_others.every((course1) =>
-          this.interests_justforyou.some((course2) => course1.course_ID === course2.course_ID)
-        )
-      );
+      const areArraysEqual = this.areCourseArraysEqual(this.interests_others, this.interests_justforyou, 'course_ID');
 
-      if (areArraysEqual && (this.interests_others.length !== 0 && this.interests_justforyou.length !== 0)) {
-        this.showInterestOthers = true; // Hide Register Others
-        this.showInterestJustForYou = false; // show Register JustForYou
-        this.interests_others = [];
+      if (areArraysEqual && this.interests_others.length > 0) {
+        this.showInterestsJustForYou = true; 
+        this.showInterestsOthers = false;    
+        this.interests_others = [];  
+      }
+
+      if (this.interests_justforyou.length === 0 && this.interests_others.length === 0) {
+         this.showInterestsJustForYou = false; 
+          this.showInterestsOthers = false; 
       }
     },
     viewLessons(courseID) {
@@ -559,7 +557,11 @@ export default {
       const isRegCoursesForYouEmpty = this.registration_others.length === 0;
       const isRegCoursesOthersEmpty = this.registration_justforyou.length === 0;
 
-      return (this.top_register_picks && this.top_register_picks.length > 0 && (isRegCoursesForYouEmpty || isRegCoursesOthersEmpty));
+      if (this.top_register_picks && this.top_register_picks.length > 0 && (isRegCoursesForYouEmpty || isRegCoursesOthersEmpty)) {
+        return true
+      } else {
+        return false
+      }
     },
     shouldShowTopInterestPicks() {
       this. updateInterest();
@@ -567,7 +569,11 @@ export default {
       const isInterestCoursesForYouEmpty = this.interests_others.length === 0;
       const isInterestCoursesOthersEmpty = this.interests_justforyou.length === 0;
 
-      return (this.top_interest_picks && this.top_interest_picks.length > 0 && (isInterestCoursesForYouEmpty || isInterestCoursesOthersEmpty));
+      if (this.top_interest_picks && this.top_interest_picks.length > 0 && (isInterestCoursesForYouEmpty || isInterestCoursesOthersEmpty)) {
+        return true
+      } else {
+        return false
+      }
     },
   },
   async created() {

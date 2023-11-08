@@ -560,18 +560,15 @@ export default {
       const csvData = [];
 
       csvData.push(this.header);
-      console.log(csvData)
 
       // Add the data rows
       csvData.push(...this.feedbackData.map(row => row.map(cell => cell.toString())));
-      console.log(csvData)
 
       // Create a CSV string using Papaparse
       const csv = Papa.unparse(csvData);
 
       // Create a Blob and download link
       const blob = new Blob([csv], { type: 'text/csv' });
-      console.log(blob)
 
       // Set the file name to the course name
       let startOfFileName;
@@ -618,7 +615,6 @@ export default {
 
         const pdf = html2pdf().from(container).set(options).outputPdf();
 
-        console.log("PDF generation successful.");
         pdf.save();
       } catch (error) {
         console.error("Error exporting to PDF:", error);
