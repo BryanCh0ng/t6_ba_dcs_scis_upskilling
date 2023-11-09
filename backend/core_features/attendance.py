@@ -243,7 +243,7 @@ class updateAttendanceByLessonId(Resource):
 
 
 # Automate update student attendance
-@scheduler.task('interval', id='check_and_update_student_attendance', seconds=1, misfire_grace_time=30) 
+@scheduler.task('interval', id='check_and_update_student_attendance', seconds=120, misfire_grace_time=30)
 def check_and_update_student_attendance():
     with app.app_context():
         try:
@@ -265,8 +265,9 @@ def check_and_update_student_attendance():
                         .order_by(User.user_Name.asc())
                         .all()
                     )
+
+                    print("attendance_record_query",attendance_record_query)
                     attendances = []
-                    db.session.close()
                     if attendance_record_query:
                         for attendance, user_name, user_email, run_name, registration, instructor_id in attendance_record_query:
                             if attendance is None:
@@ -300,21 +301,27 @@ def check_and_update_student_attendance():
                         db.session.commit()
                         return True
                 except Exception as e:
-                    db.session.rollback()
                     return False
 
 
             today = datetime.now().date()
-            lessons = session.query(Lesson).filter(Lesson.lesson_date < today).all()
+            print("today", today)
+            lessons = db.session.query(Lesson).filter(Lesson.lesson_Date < today).all()
+            print("lesson", lessons)
             if lessons:
                 for lesson in lessons:
-                    attendance_response = get_attendance_list_from_lesson_id(lesson['lesson_ID'])
-                    print(attendance_response)
-                    if attendance_response["code"] == 200:
-                        attendances = attendance_response["attendances"]
+                    print(lesson.lesson_ID)
+                    attendance_response = get_attendance_list_from_lesson_id(lesson.lesson_ID)
+                    print("attendance_response",attendance_response)
+                    
+                    if attendance_response[0]["code"] == 200:
+                        attendances = attendance_response[0]["attendances"]
+                        print(attendances)
                         for attendance in attendances:
-                            update_attendance_response = add_update_attendance(lesson['lesson_ID'], attendance['user_ID'])
-                            print(update_attendance_response)
+                            print(f"DEBUG: attendance = {attendance}")  # Add this debug print
+                            update_attendance_response = add_update_attendance(lesson.lesson_ID, attendance['user_ID'])
+                            print("update_attendance_response", update_attendance_response)
+
                     print(lesson.lesson_ID)         
                 
             db.session.close()
