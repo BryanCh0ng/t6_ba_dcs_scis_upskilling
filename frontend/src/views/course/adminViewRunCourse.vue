@@ -19,9 +19,10 @@
                 <a href="" @click.prevent="sort('reg_Enddate')" class="text-decoration-none text-dark">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
               <th scope="col">
                 <a href="" @click.prevent="sort('runcourse_Status')" class="text-decoration-none text-dark">Run Status <sort-icon :sortColumn="sortColumn === 'runcourse_Status'" :sortDirection="getSortDirection('runcourse_Status')"/></a></th>
-              <th scope="col">Feedback</th>
               <th scope="col">Course Details</th>
               <th scope="col">Lessons</th>
+              <th scope="col">Registrations</th>
+              <th scope="col">Feedback</th>
               <th scope="col">Feedback Template</th>
               <th scope="col">Action(s)</th>
             </tr>
@@ -40,9 +41,10 @@
               <td class="pl-0 border-top">
                 <course-status :status="course.runcourse_Status"></course-status>
               </td>
-              <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToRunCourseFeedbackAnalysis(course.rcourse_ID)">View Feedback Analysis</a></td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-              <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(course.rcourse_ID)">View Lessons</a></td>
+              <td><a class="text-nowrap text-dark text-decoration-underline view-lessons" @click="viewLessons(course.rcourse_ID)">View Lessons</a></td>
+              <td><a class="text-nowrap text-dark text-decoration-underline view-registrations" @click="viewRegistrations(course.rcourse_ID)">View Registrations</a></td>
+              <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToRunCourseFeedbackAnalysis(course.rcourse_ID)">View Feedback Analysis</a></td>
               <td v-if="course.feedback_Startdate && isBeforeCurrentDate(course.feedback_Startdate)" class="text-nowrap"><a v-if="course.course_Status != 'Retired'" class="btn btn-info text-light" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
               <td v-else class="text-nowrap"><a v-if="course.course_Status != 'Retired'" class="btn btn-info disabled text-light" title="Unable to remove run course due to ongoing/past feedback period">Apply Feedback Template</a></td>
               <td v-if="course.runcourse_Status=='Ongoing'">
@@ -224,6 +226,9 @@ export default {
     },
     viewLessons(courseID) {
       this.$router.push({ name: 'viewRunCourseLesson', params: {id: courseID}});
+    },
+    viewRegistrations(runcourseID) {
+      this.$router.push({ name: 'adminViewRegistration', params: {id: runcourseID}});
     },
     closeFeedbackTemplateModal() {
       this.modalOpenFeedbackTemplate = false;

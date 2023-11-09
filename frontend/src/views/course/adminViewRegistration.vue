@@ -126,7 +126,7 @@ export default {
     } else if (role == 'Instructor' || role == 'Trainer') {
       this.$router.push({ name: 'instructorTrainerViewProfile' }); //Need to change
     } else if (role == 'Admin') {
-      document.title = "";
+      document.title = ""; //Need to change 
       this.runCourseID = this.$route.params.id;
       await this.loadData();
     }
