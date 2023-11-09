@@ -67,7 +67,6 @@ import UserService from "@/api/services/UserService.js";
 import courseDateTime from "@/components/course/courseDateTime.vue";
 import courseAction from '@/components/course/courseAction.vue';
 import DefaultModal from "@/components/DefaultModal.vue";
-import UserService from "@/api/services/UserService.js";
 import courseStatus from '../../components/course/courseStatus.vue';
 
 // Utility function to show a success message
@@ -93,7 +92,7 @@ export default {
     courseDateTime,
     courseAction,
     DefaultModal,
-    courseStatus
+    courseStatus,
   },
   data() {
     return {
@@ -104,12 +103,11 @@ export default {
       itemsPerPage: 10,
       localCurrentPageLessons: 1,
       errorMsge: 'No records found',
-      userRole: '',
+      userRole: "",
       title: "",
       message: "",
       buttonType: "",
       showAlert: false,
-      userRole: ""
     }
   },
   computed: {
@@ -197,7 +195,6 @@ export default {
       } catch (error) {
         showUnsuccessMessage(this)
         this.message = error.message;
-        
       }
     },
     async handleModalClosed(value) {
@@ -209,6 +206,7 @@ export default {
     const user_ID = await UserService.getUserID();
     const role = await UserService.getUserRole(user_ID);
     this.userRole = role;
+    console.log(this.userRole)
     this.loadData()
     // if (role == 'Student') {
     //   this.$router.push({ name: 'studentViewCourse' }); 

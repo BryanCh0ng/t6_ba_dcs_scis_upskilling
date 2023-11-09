@@ -22,6 +22,9 @@ get_all_lessons.add_argument("lesson_Status", help="Enter status name")
 class GetAllLessons(Resource):
     @api.expect(get_all_lessons)
     def get(self):
+        def convert_to_datetime(lesson):
+            return datetime.strptime(lesson["lesson_Date"], "%Y-%m-%d")
+
         args = get_all_lessons.parse_args()
         runcourse_name = args.get('runcourse_Name')
         instructor_Name  = args.get('instructor_Name')
@@ -131,7 +134,16 @@ class GetAllLessons(Resource):
                 lesson["lesson_Date"],
                 lesson["lesson_Starttime"]
             ), reverse=True)
-            return {"code": 200, "lessons": sorted_lessons}, 200
+            upcoming_lessons = [lesson for lesson in sorted_lessons if lesson["lesson_Status"] == "Upcoming"]
+            ongoing_lessons = [lesson for lesson in sorted_lessons if lesson["lesson_Status"] == "Ongoing"]
+            ended_lessons = [lesson for lesson in sorted_lessons if lesson["lesson_Status"] == "Ended"]
+
+            upcoming_lessons_sorted = sorted(upcoming_lessons, key=convert_to_datetime)
+            ongoing_lessons_sorted = sorted(ongoing_lessons, key=convert_to_datetime)
+            ended_lessons_sorted = sorted(ended_lessons, key=convert_to_datetime)
+
+            combined_sorted_lessons = upcoming_lessons_sorted + ongoing_lessons_sorted + ended_lessons_sorted
+            return {"code": 200, "lessons": combined_sorted_lessons}, 200
 
         except Exception as e:
             return {"code": 404, "message": "Failed " + str(e)}, 404
@@ -144,6 +156,9 @@ get_lessons_by_rcourse_id.add_argument("runcourse_id", help="Enter rcourse id")
 class GetLessonsByRcourseId(Resource):
     @api.expect(get_lessons_by_rcourse_id)
     def get(self):
+
+        def convert_to_datetime(lesson):
+            return datetime.strptime(lesson["lesson_Date"], "%Y-%m-%d")
         
         def get_runcourse_details(rcourse_id):
             try: 
@@ -191,8 +206,8 @@ class GetLessonsByRcourseId(Resource):
 
         try:
             rcourse_id = get_lessons_by_rcourse_id.parse_args().get("runcourse_id")
-            all_lessons = Lesson.query.filter_by(rcourse_ID = rcourse_id).all()
-            
+            all_lessons = Lesson.query.filter_by(rcourse_ID=rcourse_id).all()
+
             lessons = []
             if all_lessons:
                 for lesson in all_lessons:
@@ -228,7 +243,16 @@ class GetLessonsByRcourseId(Resource):
                 lesson["lesson_Date"],
                 lesson["lesson_Starttime"]
             ), reverse=True)
-            return {"code": 200, "lessons": sorted_lessons}, 200
+            upcoming_lessons = [lesson for lesson in sorted_lessons if lesson["lesson_Status"] == "Upcoming"]
+            ongoing_lessons = [lesson for lesson in sorted_lessons if lesson["lesson_Status"] == "Ongoing"]
+            ended_lessons = [lesson for lesson in sorted_lessons if lesson["lesson_Status"] == "Ended"]
+
+            upcoming_lessons_sorted = sorted(upcoming_lessons, key=convert_to_datetime)
+            ongoing_lessons_sorted = sorted(ongoing_lessons, key=convert_to_datetime)
+            ended_lessons_sorted = sorted(ended_lessons, key=convert_to_datetime)
+
+            combined_sorted_lessons = upcoming_lessons_sorted + ongoing_lessons_sorted + ended_lessons_sorted
+            return {"code": 200, "lessons": combined_sorted_lessons}, 200
 
         except Exception as e:
                 return {"code": 404, "message": "Failed " + str(e)}, 404

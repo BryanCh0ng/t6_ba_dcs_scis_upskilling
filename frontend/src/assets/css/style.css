@@ -184,3 +184,7 @@ button:disabled, .btn.disabled {
   flex-wrap: nowrap;
   gap:8px;
 }
+
+.bg-light-blue {
+  background-color: #0dcaf0 !important;
+}

@@ -217,7 +217,8 @@ class updateAttendanceByLessonId(Resource):
                 current_time = datetime.now()
                 hours, minutes, seconds = map(int, lesson['lesson_Starttime'].split(':'))
                 lesson_date_time = lesson_date.replace(hour=hours, minute=minutes, second=seconds)
-                has_passed = lesson_date_time <= current_time
+                is_same_day = lesson_date.date() == current_time.date()
+                has_passed = lesson_date_time <= current_time if is_same_day else False
                 if (has_passed == False):
                     return {"code": 404, "message": "Unable to mark attendance as is not during lesson datetime"}, 404
                 elif (lesson['instructor_ID'] != common.getUserID()):
@@ -307,13 +308,7 @@ def check_and_update_student_attendance():
                         for attendance in attendances:
                             update_attendance_response = add_update_attendance(lesson.lesson_ID, attendance['user_ID'])
                             print("update_attendance_response", update_attendance_response)     
-    
-            # msg = Message('Welcome to Upskilling Engagement System',
-            #       sender='upskilling.engagement@outlook.com',
-            #       recipients=["jieyin18@gmail.com"])
-            # msg.html = "<p>Please click the link to verify your email and finish creating your account. </p>"
-            # mail = current_app.extensions.get('mail')
-            # mail.send(msg)
+                    
             print('Automate update student attendance done')
             return jsonify({ "code": 201, "message": "Attendance has been successfully updated!"} )   
 

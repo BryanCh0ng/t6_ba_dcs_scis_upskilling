@@ -16,6 +16,7 @@
             <thead>
               <tr class="text-nowrap">
                 <th><input v-if="allowAction" type="checkbox" v-model="checkboxAll" @change="checkAll" /></th>
+                <th></th>
                 <th scope="col">
                   <a href="" @click.prevent="sort('user_ID')" class="text-decoration-none text-dark">Student ID <sort-icon :sortColumn="sortColumn === 'user_ID'" :sortDirection="getSortDirection('user_ID')"/></a></th>
                 <th scope="col">
@@ -33,6 +34,7 @@
                 <td class="attendance_checkbox">
                   <input v-if="allowAction" type="checkbox" :value="attendance.user_ID" :checked="selectedStudents.includes(attendance.user_ID)" @change="selectAttendance(key)" />
                 </td>
+                <td>{{ key }}</td>
                 <td>{{ attendance.user_ID }}</td>
                 <td>{{ attendance.user_Name }}</td>
                 <td>{{ attendance.user_Email }}</td>
@@ -108,7 +110,7 @@
         checkboxAll: false,
         selectedStudents: [],
         action: null,
-        selectedAbsentReason: 'Medical Leave',
+        selectedAbsentReason: '',
         othersSelected: false,
         reasonInput: '',
         title: "",
@@ -187,7 +189,8 @@
         const [hours, minutes, seconds] = lessonTime.split(':').map(Number);
         const targetDateTime = new Date(selectedDate);
         targetDateTime.setHours(hours, minutes, seconds);
-        return targetDateTime <= currentTime;
+        const isSameDay = selectedDate.getTime() === currentTime.getTime(); 
+        return isSameDay && targetDateTime <= currentTime;
       },
       convertDate,
       convertTime,
@@ -242,10 +245,12 @@
               this.title = 'Submit Attendance Failed';
               this.message = submit_attendance_response.message
               this.buttonType = "danger";
+              this.showAlert = !this.showAlert;
             }
           } catch (error) {
             this.message = 'Submit Attendance Failed';
             this.buttonType = "danger";
+            this.showAlert = !this.showAlert;
           }
         }
       },
@@ -261,6 +266,10 @@
       },
       handleModalClosed(value) {
         this.showAlert = value;
+        if(this.title == 'Submit Attendance Success') {
+          this.loadData();
+        }
+        console.log(value)
       },
     },
     async created() {
