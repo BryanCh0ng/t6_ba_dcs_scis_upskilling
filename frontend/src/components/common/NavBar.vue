@@ -102,6 +102,7 @@ export default {
           links.push(
             { path: "/adminViewCourse", label: "Course DB" },
             { path: "/adminViewRunCourse", label: "Run Course DB" },
+            { path: "/viewAllLessons", label: "Lesson DB" },
             { path: "/adminViewVoteCourse", label: "Voting Campaign DB" },
             { path: "/adminViewProposedCourse", label: "Proposed Course DB" },
             { path: "/createCourse", label: "Create Course" }
@@ -127,13 +128,12 @@ export default {
       } else if (this.user_role === "Instructor" || this.user_role === "Trainer") {
         items.push(
           { path: "/instructorTrainerViewProfile", label: "Profile" },
-          { label: "Blacklist" }, // rmb to add path
           { path: "/viewDashboard", label: "Dashboard" }
         );
       } else if (this.user_role === "Admin") {
         items.push(
           { path: "/adminViewManagement", label: "User Management" },
-          { path: "/adminViewFeedbackTemplate", label: "Feedback Template" }, // rmb to add path
+          { path: "/adminViewFeedbackTemplate", label: "Feedback Template" },
           { path: "/viewDashboard", label: "Dashboard" }
         );
       }

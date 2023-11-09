@@ -11,11 +11,21 @@ import json
 api = Namespace('lesson', description='Lesson related operations')
 
 get_all_lessons = api.parser()
+get_all_lessons.add_argument("runcourse_Name", help="Enter run course name")
+get_all_lessons.add_argument("instructor_Name", help="Enter instructor name")
+get_all_lessons.add_argument("coursecat_id", help="Enter run course category id")
+get_all_lessons.add_argument("lesson_Status", help="Enter status name")
+
 @api.route("/get_all_lessons")
 @api.doc(description="Get all lessons")
 class GetAllLessons(Resource):
     @api.expect(get_all_lessons)
     def get(self):
+        args = get_all_lessons.parse_args()
+        runcourse_name = args.get('runcourse_Name')
+        instructor_Name  = args.get('instructor_Name')
+        coursecat_id = args.get('coursecat_id')
+        lesson_status  = args.get('lesson_Status')
 
         def get_runcourse_details(rcourse_id):
             try: 
@@ -59,7 +69,33 @@ class GetAllLessons(Resource):
                 return  {"code": 404, 'message':  "Failed " + str(e)}, 400
 
         try:
-            all_lessons = Lesson.query.all()
+            all_lessons = Lesson.query.join(RunCourse, Lesson.rcourse_ID == RunCourse.rcourse_ID).join(Course, RunCourse.course_ID == Course.course_ID).join(User, User.user_ID == RunCourse.instructor_ID)
+
+            if all_lessons:
+                # Apply filters based on provided arguments
+                if runcourse_name:
+                    all_lessons = all_lessons.filter(RunCourse.run_Name.contains(runcourse_name))
+
+                if instructor_Name:
+                    all_lessons = all_lessons.filter(User.user_Name.contains(instructor_Name))
+
+                if coursecat_id:
+                    all_lessons = all_lessons.filter(Course.coursecat_ID == coursecat_id)
+
+                if lesson_status:
+                    if lesson_status == "Upcoming":
+                        all_lessons = all_lessons.filter(Lesson.lesson_Date >= datetime.now().date())
+                    elif lesson_status == "Ongoing":
+                        all_lessons = all_lessons.filter(
+                            Lesson.lesson_Date == datetime.now().date(),
+                            Lesson.lesson_Starttime <= datetime.now().time(),
+                            Lesson.lesson_Endtime >= datetime.now().time()
+                        )
+                    elif lesson_status == "Ended":
+                        all_lessons = all_lessons.filter(Lesson.lesson_Date < datetime.now().date())
+                
+                all_lessons = all_lessons.all()
+
             lessons = []
             if all_lessons:
                 for lesson in all_lessons:
@@ -97,7 +133,7 @@ class GetAllLessons(Resource):
             return {"code": 200, "lessons": sorted_lessons}, 200
 
         except Exception as e:
-                return {"code": 404, "message": "Failed " + str(e)}, 404
+            return {"code": 404, "message": "Failed " + str(e)}, 404
         
 
 get_lessons_by_rcourse_id = api.parser()
@@ -155,6 +191,7 @@ class GetLessonsByRcourseId(Resource):
         try:
             rcourse_id = get_lessons_by_rcourse_id.parse_args().get("runcourse_id")
             all_lessons = Lesson.query.filter_by(rcourse_ID = rcourse_id).all()
+            
             lessons = []
             if all_lessons:
                 for lesson in all_lessons:

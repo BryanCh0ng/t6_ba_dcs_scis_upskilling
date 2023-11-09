@@ -258,16 +258,15 @@ const routes = [
         requiresAuth: true
     }
   },
-  // Need to add authentication
-  // {
-  //   path: '/viewDashboard',
-  //   name: 'viewDashboard',
-  //   component: () => import('../views/dashboard/viewDashboard.vue'),
-  //   meta: {
-  //       title: 'Admin View Dashboard',
-  //       requiresAuth: true
-  //   }
-  // },
+  {
+    path: '/viewDashboard',
+    name: 'viewDashboard',
+    component: () => import('../views/dashboard/viewDashboard.vue'),
+    meta: {
+        title: 'Admin View Dashboard',
+        requiresAuth: true
+    }
+  },
   {
     path: '/viewCourseFeedbackAnalysis/:id',
     name: 'viewCourseFeedbackAnalysis',

@@ -89,6 +89,7 @@ function showSuccessMessage(vm) {
   vm.message = "You have successfully add lesson(s) for the run course.";
   vm.showAlert = true;
   vm.buttonType = "success";
+  vm.modalType = "SuccessMessage"
 }
 
 function showUnsuccessMessage(vm, customTitle, customMessage) {
@@ -301,7 +302,7 @@ export default {
             
             if (this.modalType === "UnsuccessMessage") {
                 this.showAlert = false;
-            } else {
+            } else if (this.modalType === "SuccessMessage") {
                 this.$router.go(-1);
             }
         }

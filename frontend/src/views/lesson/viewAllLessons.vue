@@ -1,5 +1,12 @@
 <template>
     <div>
+
+      <search-filter
+      :status-options="statusOptions"
+      :search-api="searchAllLesson" 
+      @search-complete="handleSearchComplete"
+      class="pt-4"/>
+
       <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Lessons</h5>
       </div>
@@ -62,6 +69,7 @@
   import courseDateTime from "@/components/course/courseDateTime.vue";
   import UserService from "@/api/services/UserService.js";
   import courseStatus from '../../components/course/courseStatus.vue';
+  import SearchFilter from '@/components/search/AllLessonSearchFilter.vue';
   
   export default {
     components: {
@@ -70,7 +78,8 @@
       VueAwesomePaginate,
       courseNameDesc,
       courseDateTime,
-      courseStatus
+      courseStatus,
+      SearchFilter
     },
     data() {
       return {
@@ -82,7 +91,12 @@
         localCurrentPageLessons: 1,
         receivedMessage: '',
         errorMsge: 'No records found',
-        userRole: ''
+        userRole: '',
+        statusOptions: ["Ongoing", "Upcoming", "Ended"],
+        search_run_course_name: null,
+        search_instructor_name: null,
+        search_course_category: null,
+        search_status: null,
       }
     },
     computed: {
@@ -105,10 +119,14 @@
         this.localCurrentPageLessons = newPage;
         this.$emit('page-change', newPage);
       },
-      async loadData() {
-        console.log('load')
+      async searchAllLesson(runCourseName, instructorName, courseCategory, lessonStatus) {
+        this.search_run_course_name = runCourseName
+        this.search_instructor_name = instructorName
+        this.search_course_category = courseCategory
+        this.search_status = lessonStatus
+
         try {
-          let response = await LessonService.getAllLessons()
+          let response = await LessonService.getAllLessons(this.search_run_course_name, this.search_instructor_name, this.search_course_category, this.search_status)
           console.log(response)
           if (response.code == 200) {
             this.lessons = response.lessons
@@ -118,6 +136,9 @@
         } catch (error) {
           console.error("Error fetching lesson details:", error);
         }
+      },
+      async loadData() {
+        await this.searchAllLesson()
       },
       sort(column) {
         if (this.sortColumn === column) {
