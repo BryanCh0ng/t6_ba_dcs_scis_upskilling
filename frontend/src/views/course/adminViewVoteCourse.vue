@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ul class="nav nav-pills justify-content-center pt-4">
+    <ul class="nav nav-pills justify-content-center pt-5">
       <li class="nav-item">
         <a class="nav-link" :class="{ 'active': activeTab === 'allvote' }" @click="activeTab = 'allvote'">Voting Campaign Courses</a>
       </li> 
@@ -49,15 +49,18 @@
                       <course-status v-if="vote_status" :status="vote_status[vote_course.vote_Status]"></course-status>
                     </td>
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(vote_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                    <div v-if="vote_course && vote_course.vote_Status === 'Ongoing'">
-                      <td><course-action status="Close" @action-and-message-updated="handleActionData" :course="vote_course"></course-action></td>
-                    </div>
-
-                    <div v-else-if="vote_course && vote_course.vote_Status === 'Closed'">
-                      <td ><course-action status="promote_to_course" @action-and-message-updated="handleActionData" :course="vote_course"></course-action></td>
-                      <td><course-action @action-and-message-updated="handleActionData" status="unoffered-vote" :course="vote_course"></course-action></td>
-                    </div>
-                    <div v-else></div>
+                    <td v-if="vote_course && vote_course.vote_Status === 'Ongoing'">
+                      <div class="action-buttons">
+                        <course-action status="Close" @action-and-message-updated="handleActionData" :course="vote_course"></course-action>
+                      </div>
+                    </td>
+                    <td v-else-if="vote_course && vote_course.vote_Status === 'Closed'">
+                      <div class="action-buttons">
+                        <course-action status="promote_to_course" @action-and-message-updated="handleActionData" :course="vote_course"></course-action>
+                        <course-action @action-and-message-updated="handleActionData" status="unoffered-vote" :course="vote_course"></course-action>
+                      </div>
+                    </td>
+                    <td v-else></td>
                   </tr>
                   </tbody>
                 </table>

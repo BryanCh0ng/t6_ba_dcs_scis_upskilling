@@ -1,7 +1,7 @@
 <template>
-    <div>
+  <div>
 
-    <div class="container col-12 d-flex mb-3 w-100 pt-4">
+    <div class="container col-12 d-flex mb-3 w-100 pt-5">
       <h5 class="col m-auto">All Run Courses for '{{ course_Name }}'</h5>
       <button class="btn btn-primary" @click="goToCreateRunCourse(courses[0].course_ID)" title="Create Run Course">Create Run Course</button>
     </div>

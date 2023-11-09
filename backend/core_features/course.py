@@ -8,6 +8,7 @@ from sqlalchemy import func, and_, exists, not_, select
 from datetime import datetime, date, time
 import logging
 app.logger.setLevel(logging.DEBUG)
+import traceback
 
 api = Namespace('course', description='Course related operations')
 
@@ -126,17 +127,23 @@ class DeleteCourse(Resource):
                 return {"message": "Unathorized Access, Failed to delete run course"}, 404 
 
             rcourse_ID = delete_runcourse.parse_args().get("rcourse_ID")
-            # app.logger.debug(rcourse_ID)
+
+            current_date = datetime.now().date()
 
             runCourse = RunCourse.query.filter_by(rcourse_ID=rcourse_ID).first()            
-            if(runCourse):
+            if runCourse and runCourse.run_Startdate > current_date:
                     try:
+                        lessons_to_delete = Lesson.query.filter_by(rcourse_ID=rcourse_ID).all()
+                        for lesson in lessons_to_delete:
+                            db.session.delete(lesson)
+
                         db.session.delete(runCourse)              
                         db.session.commit()
                         db.session.close()                 
-                        return json.loads(json.dumps({"message":"Run Course has successfully deleted"})), 200
+                        return json.loads(json.dumps({"message":"Run Course and the associated lessons have been successfully deleted."})), 200
                     except Exception as e:
-                        return "Foreign key dependencies exist, cannot delete. " + str(e), 408
+                        return json.loads(json.dumps({"message":"Run Course has unsuccessfully deleted"})), 408
+                    
 
             return json.loads(json.dumps({"Message": "There is no such run course"}, default=str)), 404
 
@@ -245,7 +252,7 @@ class EditCourse(Resource):
                 # Check if the course name already exists in the database
                 #existing_course = Course.query.filter_by(course_Name=new_course_name).first()
 
-                if existing_course:
+                if existing_course and existing_course.course_ID != course_id:
                     return {
                         "message": "Course name already exists"
                     }, 409  # Conflict

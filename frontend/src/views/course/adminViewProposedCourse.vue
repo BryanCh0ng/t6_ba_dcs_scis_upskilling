@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ul class="nav nav-pills justify-content-center pt-4">
+    <ul class="nav nav-pills justify-content-center pt-5">
       <li class="nav-item">
         <a class="nav-link" :class="{ 'active': activeTab === 'submitted' }" @click="activeTab = 'submitted'">Submitted</a>
       </li> 
@@ -42,11 +42,12 @@
                     {{ pending_course.submitted_by }}
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(pending_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <div>
-                    <td><course-action status="pending_approve" :id="pending_course.course_ID" @click="editCourse(pending_course.course_ID, 'approve')"></course-action></td>
-                  <td><course-action status="pending_reject" :id="pending_course.course_ID" @click="openReject(pending_course)" data-bs-toggle="modal" data-bs-target="#rejected_modal"></course-action></td>
-                  </div>
-                  
+                  <td>
+                    <div class="action-buttons">
+                      <course-action status="pending_approve" :id="pending_course.course_ID" @click="editCourse(pending_course.course_ID, 'approve')"></course-action>
+                      <course-action status="pending_reject" :id="pending_course.course_ID" @click="openReject(pending_course)" data-bs-toggle="modal" data-bs-target="#rejected_modal"></course-action>
+                    </div>
+                  </td>                  
                 </tr>
               </tbody>
             </table>

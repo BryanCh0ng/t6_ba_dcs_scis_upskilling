@@ -2,7 +2,7 @@
   <div>
     <search-filter
       :search-api="searchStudentCourse"
-      @search-complete="handlePageChange"
+      @search-complete="handlePageChange" class="pt-1"
     />
 
     <div class="container col-12">

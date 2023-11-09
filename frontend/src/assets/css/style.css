@@ -173,3 +173,13 @@ button:disabled, .btn.disabled {
 .text-grey-important {
   color: grey !important;
 }
+
+.action-buttons {
+  display: flex;
+  flex-wrap: nowrap;
+  gap:8px;
+}
+
+/* th.actions, td.actions {
+  width: 15%; 
+} */

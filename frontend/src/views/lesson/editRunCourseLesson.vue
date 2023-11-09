@@ -1,6 +1,6 @@
 <template>
   <div id="editLesson">
-    <div class="container mt-5">
+    <div class="container pt-5">
       <h2 class="text-center mb-4">Edit Lesson for {{ runcourse_Name }}</h2>
       <h5 class="text-center mb-4">From {{ convertDate(runcourse_Startdate) }} ({{ convertTime(runcourse_Starttime) }} - {{ convertTime(runcourse_Endtime) }}) to {{ convertDate(runcourse_Enddate) }} ({{ convertTime(runcourse_Starttime) }} - {{ convertTime(runcourse_Endtime) }})</h5>
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container col-12 d-flex mb-3 w-100">
+    <div class="container pt-5 col-12 d-flex mb-3 w-100">
         <h5 v-if="lessons && lessons.length > 0" class="col m-auto">All Lessons for {{ lessons[0].run_Name }} </h5>
         <h5 v-else>All Lessons</h5>
         <button v-if="userRole === 'Admin' && lessons && lessons.length > 0 && !isEndDatePassed(lessons[0].run_course.run_Enddate)" class="btn btn-primary" @click="goToCreateLesson(lessons.rcourse_ID)">Add Lesson(s)</button>
@@ -21,7 +21,7 @@
               <th scope="col">
                 <a href="" @click.prevent="sort('lesson_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'lesson_Status'" :sortDirection="getSortDirection('lesson_Status')"/></a></th>
               <th scope="col" v-if="userRole !== 'Student'">Attendance</th>
-              <th scope="col" v-if="userRole !== 'Admin'" class="actions">Action(s)</th>
+              <th scope="col" v-if="userRole === 'Admin'" class="actions">Action(s)</th>
             </tr>
           </thead>
           <tbody>
@@ -32,13 +32,13 @@
               <td><course-date-time :time="lesson.lesson_Endtime"></course-date-time></td>
               <td :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }" ><course-status :status="lesson.lesson_Status"></course-status></td>
               <td v-if="userRole != 'Student'" :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }"><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewAttendance(lesson.lesson_ID)">View Attendance</a></td>
-              <td v-if="userRole !== 'Admin' && lesson.lesson_Status=='Upcoming'" class="actions">
+              <td v-if="userRole === 'Admin' && lesson.lesson_Status=='Upcoming'" class="actions">
                 <div class="action-buttons">
                   <course-action status="edit-lesson" @click="editLesson(lesson.lesson_ID)"></course-action>
                   <course-action status="remove-lesson" @click="removeLesson(lesson.lesson_ID)"></course-action>
                 </div>
               </td>
-              <td v-if="userRole !== 'Admin'"></td>
+              <td v-if="userRole === 'Admin'"></td>
             </tr>               
           </tbody>
         </table>
@@ -221,15 +221,5 @@ export default {
 <style>
 @import '../../assets/css/course.css';
 @import '../../assets/css/paginate.css';
-
-.action-buttons {
-  display: flex;
-  flex-wrap: nowrap;
-  gap:8px;
-}
-
-th.actions, td.actions {
-  width: 15%; 
-}
 
 </style>

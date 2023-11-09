@@ -5,7 +5,7 @@
       :status-options="statusOptions"
       :search-api="searchAllLesson" 
       @search-complete="handleSearchComplete"
-      class="pt-4"/>
+      class="pt-5"/>
 
       <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Lessons</h5>

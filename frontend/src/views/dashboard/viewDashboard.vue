@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container text-center">
+    <div class="container text-center pt-5">
       <h2 v-if="currentViewMode === 'analysis'">Feedback Analysis</h2>
       <h2 v-else>All Feedback Records</h2>
       <h4 class="mb-5 text-secondary" v-if="currentPage === 'course'">For {{ courseName }}</h4>

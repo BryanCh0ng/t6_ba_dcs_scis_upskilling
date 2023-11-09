@@ -1,6 +1,6 @@
 <template>
     <div>
-      <div class="container col-12 d-flex mb-3 w-100">
+      <div class="container pt-5 col-12 d-flex mb-3 w-100">
         <div v-if="attendances && attendances.length > 0">
             <h5 class="col m-auto">Attendance List for {{ attendances[0].run_Name }}</h5>
             <h6 class="col m-auto text-grey">Date: {{ convertDate(lesson.lesson_Date) }} | Time: {{ convertTime(lesson.lesson_Starttime) }} to {{ convertTime(lesson.lesson_Endtime) }} | Venue: {{ lesson.course_Venue }} | Class Size: {{ this.attendances.length }}</h6>
