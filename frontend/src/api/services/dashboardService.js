@@ -2,14 +2,38 @@ import { axiosClient } from "../axiosClient";
 import BaseApiService from "../BaseApiService";
 
 class DashboardService extends BaseApiService {
-    async getCourseAverageRatings(course_ID, runcourse_ID) {
+    async getTotalFeedbacks(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             // console.log(course_ID)
+            // console.log(runcourse_ID)
+            const response = await axiosClient.get('/dashboard/total_no_of_feedbacks', {
+                params: {
+                    course_ID: course_ID,
+                    coursecat_ID: coursecat_ID,
+                    rcourse_ID: rcourse_ID,
+                    instructor_ID: instructor_ID,
+                    run_Startdate: run_Startdate,
+                    run_Enddate: run_Enddate
+                },
+            });
+            return response.data;
+        } catch (error) {
+            return this.handleError(error)
+        }
+    }
+
+    async getCourseAverageRatings(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
+        try {
+            console.log(course_ID)
             // console.log(runcourse_ID)
             const response = await axiosClient.get('/dashboard/course_average_ratings', {
                 params: {
                     course_ID: course_ID,
-                    runcourse_ID: runcourse_ID
+                    coursecat_ID: coursecat_ID,
+                    rcourse_ID: rcourse_ID,
+                    instructor_ID: instructor_ID,
+                    run_Startdate: run_Startdate,
+                    run_Enddate: run_Enddate
                 },
             });
             return response.data;
@@ -18,12 +42,16 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getInstructorAverageRatings(course_ID, runcourse_ID) {
+    async getInstructorAverageRatings(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             const response = await axiosClient.get('/dashboard/instructor_average_ratings', {
                 params: {
                     course_ID: course_ID,
-                    runcourse_ID: runcourse_ID
+                    coursecat_ID: coursecat_ID,
+                    rcourse_ID: rcourse_ID,
+                    instructor_ID: instructor_ID,
+                    run_Startdate: run_Startdate,
+                    run_Enddate: run_Enddate
                 },
             });
             return response.data;
@@ -32,13 +60,17 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getCourseDoneWellFeedback(course_ID, runcourse_ID) {
+    async getCourseDoneWellFeedback(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             // console.log(course_ID)
             const response = await axiosClient.get('/dashboard/feedback_course_done_well_specific', {
                 params: {
                     course_ID: course_ID,
-                    runcourse_ID: runcourse_ID
+                    coursecat_ID: coursecat_ID,
+                    rcourse_ID: rcourse_ID,
+                    instructor_ID: instructor_ID,
+                    run_Startdate: run_Startdate,
+                    run_Enddate: run_Enddate
                 },
             });
             return response.data;
@@ -47,13 +79,17 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getCourseImproveFeedback(course_ID, runcourse_ID) {
+    async getCourseImproveFeedback(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             // console.log(course_ID)
             const response = await axiosClient.get('/dashboard/feedback_course_improve_specific', {
                 params: {
                     course_ID: course_ID,
-                    runcourse_ID: runcourse_ID
+                    coursecat_ID: coursecat_ID,
+                    rcourse_ID: rcourse_ID,
+                    instructor_ID: instructor_ID,
+                    run_Startdate: run_Startdate,
+                    run_Enddate: run_Enddate
                 },
             });
             return response.data;
@@ -62,13 +98,17 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getInstructorDoneWellFeedback(course_ID, runcourse_ID) {
+    async getInstructorDoneWellFeedback(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             // console.log(course_ID)
             const response = await axiosClient.get('/dashboard/feedback_instructor_done_well_specific', {
                 params: {
                     course_ID: course_ID,
-                    runcourse_ID: runcourse_ID
+                    coursecat_ID: coursecat_ID,
+                    rcourse_ID: rcourse_ID,
+                    instructor_ID: instructor_ID,
+                    run_Startdate: run_Startdate,
+                    run_Enddate: run_Enddate
                 },
             });
             return response.data;
@@ -77,13 +117,17 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getInstructorImproveFeedback(course_ID, runcourse_ID) {
+    async getInstructorImproveFeedback(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             // console.log(course_ID)
             const response = await axiosClient.get('/dashboard/feedback_instructor_improve_specific', {
                 params: {
                     course_ID: course_ID,
-                    runcourse_ID: runcourse_ID
+                    coursecat_ID: coursecat_ID,
+                    rcourse_ID: rcourse_ID,
+                    instructor_ID: instructor_ID,
+                    run_Startdate: run_Startdate,
+                    run_Enddate: run_Enddate
                 },
             });
             return response.data;
@@ -92,42 +136,18 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getRunCourseImproveFeedback(runcourse_ID) {
+    
+    async getCourseSentimentData(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
-            // console.log(course_ID)
-            const response = await axiosClient.get('/dashboard/feedback_runcourse_improve_specific', {
-                params: {
-                    runcourse_ID: runcourse_ID,
-                },
-            });
-            return response.data;
-        } catch (error) {
-          throw new Error('Error fetching course feedback');
-        }
-    }
-
-    async getRunCourseInstructorImproveFeedback(runcourse_ID) {
-        try {
-            // console.log(course_ID)
-            const response = await axiosClient.get('/dashboard/feedback_runcourse_improve_specific', {
-                params: {
-                    runcourse_ID: runcourse_ID,
-                },
-            });
-            return response.data;
-        } catch (error) {
-          throw new Error('Error fetching course feedback');
-        }
-    }
-    async getCourseSentimentData(course_ID, rcourse_ID) {
-        try {
-            // console.log(course_ID)
-            // console.log(rcourse_ID)
             let response = await axiosClient.get("/dashboard/course_sentiment_data",
                 {
                     params: {
                         course_ID: course_ID,
-                        rcourse_ID: rcourse_ID
+                        coursecat_ID: coursecat_ID,
+                        rcourse_ID: rcourse_ID,
+                        instructor_ID: instructor_ID,
+                        run_Startdate: run_Startdate,
+                        run_Enddate: run_Enddate
                     },
                 }
             );
@@ -137,13 +157,17 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getInstructorSentimentData(course_ID, rcourse_ID) {
+    async getInstructorSentimentData(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             let response = await axiosClient.get("/dashboard/instructor_sentiment_data",
                 {
                     params: {
                         course_ID: course_ID,
-                        rcourse_ID: rcourse_ID
+                        coursecat_ID: coursecat_ID,
+                        rcourse_ID: rcourse_ID,
+                        instructor_ID: instructor_ID,
+                        run_Startdate: run_Startdate,
+                        run_Enddate: run_Enddate
                     },
                 }
             );
@@ -153,13 +177,17 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getCourseWordcloudData(course_ID, rcourse_ID) {
+    async getCourseWordcloudData(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             let response = await axiosClient.get("/dashboard/course_wordcloud_data",
                 {
                     params: {
                         course_ID: course_ID,
-                        rcourse_ID: rcourse_ID
+                        coursecat_ID: coursecat_ID,
+                        rcourse_ID: rcourse_ID,
+                        instructor_ID: instructor_ID,
+                        run_Startdate: run_Startdate,
+                        run_Enddate: run_Enddate
                     },
                 }
             );
@@ -169,13 +197,17 @@ class DashboardService extends BaseApiService {
         }
     }
 
-    async getInstructorWordcloudData(course_ID, rcourse_ID) {
+    async getInstructorWordcloudData(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             let response = await axiosClient.get("/dashboard/instructor_wordcloud_data",
                 {
                     params: {
                         course_ID: course_ID,
-                        rcourse_ID: rcourse_ID
+                        coursecat_ID: coursecat_ID,
+                        rcourse_ID: rcourse_ID,
+                        instructor_ID: instructor_ID,
+                        run_Startdate: run_Startdate,
+                        run_Enddate: run_Enddate
                     },
                 }
             )

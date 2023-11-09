@@ -166,7 +166,7 @@
                     <td class="ratings">
                         {{ instructor_trainer.average_rating }} / 5
                     </td>
-                    <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
+                    <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToInstructorFeedbackAnalysis(instructor_trainer.user_ID)">View Feedback Analysis</a></td>
                     </tr>
                 </tbody>
                 </table>
@@ -368,6 +368,9 @@ export default {
     },
     viewCourses(user_ID) {
       this.$router.push({ name: 'adminViewStudentEnrolledCourse', params: { user_ID } });
+    },
+    goToInstructorFeedbackAnalysis(instructorID) {
+      this.$router.push({ name: 'viewInstructorFeedbackAnalysis', params: {id: instructorID}});
     },
     async handleModalClosed(){
       this.loadData()

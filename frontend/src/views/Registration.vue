@@ -89,8 +89,10 @@ export default {
     async sendRegLink() {
       try {
         const response = await UserService.verifyEmail(this.email)
-        this.showSuccessModal = true;
-        console.log(response);
+        if (response.code === 200) {
+          this.showSuccessModal = true;
+        }
+        
       } catch (error) {
         this.errorMessage = "Sent Registration failed. Please check your credentials.";
         console.log("Sent Registration Link error:", error.message);

@@ -114,17 +114,6 @@ export default {
       // Trigger Vuelidate validation
       this.v$.$touch();
 
-      // Display the current form data for debugging
-      // console.log("Form Data:", {
-      //   role: this.role,
-      //   fullName: this.fullName,
-      //   email: this.email,
-      //   password: this.password,
-      //   confirmpassword: this.confirmpassword,
-      //   organizationName: this.organizationName,
-      //   alumni: this.alumni,
-      // });
-
       // Reset error message
       this.errorMessage = "";
 
@@ -183,17 +172,9 @@ export default {
             organizationName: this.organizationName,
             alumni: this.alumni,
         }
-        console.log(userData)
+        
         const response = await UserService.register(userData)
-        // const response = await axiosClient.post("/user/register", {
-        //   role: this.role,
-        //   fullName: this.fullName,
-        //   email: this.email,
-        //   password: this.password,
-        //   confirmpassword: this.confirmpassword,
-        //   organizationName: this.organizationName,
-        //   alumni: this.alumni,
-        // });
+        
         console.log(response)
         this.showSuccessModal = true;
       } catch (error) {

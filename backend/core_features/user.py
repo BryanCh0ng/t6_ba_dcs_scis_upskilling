@@ -52,13 +52,13 @@ class Login(Resource):
                     session['user_ID'] = user.user_ID
                     # app.logger.info("In flask:", session['user_ID'])
                     
-                    return json.loads(json.dumps({"message":"Login successful"})), 200
+                    return json.loads(json.dumps({"code": 200, "message":"Login successful"})), 200
                 
                 else:
-                    return json.loads(json.dumps({"Message": "Invalid username or password"}, default=str)), 404
+                    return json.loads(json.dumps({"code": 404, "Message": "Invalid username or password"}, default=str)), 404
 
             else:
-                return json.loads(json.dumps({"Message": "Email does not exist"}, default=str)), 404
+                return json.loads(json.dumps({"code": 404, "Message": "Email does not exist"}, default=str)), 404
 
         except Exception as e:
             db.session.rollback()
@@ -83,12 +83,12 @@ class VerifyEmail(Resource):
             user = User.query.filter_by(user_Email=email).first()
             if user:
                 db.session.close()
-                return json.loads(json.dumps({"Message": "You already have an account with us."}, default=str)), 404
+                return json.loads(json.dumps({"code": 404, "Message": "You already have an account with us."}, default=str)), 404
             
             else:
                 self.send_email(email)
                 db.session.close()
-                return json.loads(json.dumps({"message":"Verification email sent"})), 200
+                return json.loads(json.dumps({"code": 200, "message":"Verification email sent"})), 200
 
         except Exception as e:
             db.session.rollback()
@@ -133,21 +133,21 @@ class Register(Resource):
 
         # check if password is valid
         if password != repassword:
-            return json.loads(json.dumps({"Message": "Password is not the same"}, default=str)), 404
+            return json.loads(json.dumps({"code": 404, "message": "Password is not the same"}, default=str)), 404
         elif len(password) < 8:
-            return json.loads(json.dumps({"Message": "Password needs to be at least 8 characters"}, default=str)), 404
+            return json.loads(json.dumps({"code": 404, "message": "Password needs to be at least 8 characters"}, default=str)), 404
         elif not any(char.islower() for char in password):
-            return json.loads(json.dumps({"Message": "Password needs at least one lowercase letter"}, default=str)), 404
+            return json.loads(json.dumps({"code": 404, "message": "Password needs at least one lowercase letter"}, default=str)), 404
         elif not any(char.isupper() for char in password):
-            return json.loads(json.dumps({"Message": "Password needs at least one uppercase letter"}, default=str)), 404
+            return json.loads(json.dumps({"code": 404, "message": "Password needs at least one uppercase letter"}, default=str)), 404
         elif not any(char.isdigit() for char in password):
-            return json.loads(json.dumps({"Message": "Password needs at least one number"}, default=str)), 404
+            return json.loads(json.dumps({"code": 404, "message": "Password needs at least one number"}, default=str)), 404
         elif password.isalnum():
-            return json.loads(json.dumps({"Message": "Password needs at least one special character"}, default=str)), 404
+            return json.loads(json.dumps({"code": 404, "message": "Password needs at least one special character"}, default=str)), 404
         
         # check if user alr in db (user reclick link)
         if User.query.filter_by(user_Email=data['email']).first():
-            return json.loads(json.dumps({"Message": "Email already exists"}, default=str)), 404
+            return json.loads(json.dumps({"code": 404, "message": "Email already exists"}, default=str)), 404
         
         # hash password
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
@@ -193,12 +193,12 @@ class ForgotPassword(Resource):
             user = User.query.filter_by(user_Email=email).first()
             if not user:
                 db.session.close()
-                return json.loads(json.dumps({"Message": "Email does not exist"}, default=str)), 404
+                return json.loads(json.dumps({"code": 404, "message": "Email does not exist"}, default=str)), 404
             
             else:
                 self.send_email(email)
                 db.session.close()
-                return json.loads(json.dumps({"message":"Email sent"})), 200
+                return json.loads(json.dumps({"code": 200, "message":"Email sent"})), 200
 
         except Exception as e:
             db.session.rollback()
@@ -234,7 +234,7 @@ class ResetPassword(Resource):
 
         try:
             if password != confirmpassword:
-                return json.loads(json.dumps({"Message": "Password and confirm password does not match"}, default=str)), 404
+                return json.loads(json.dumps({"code": 404, "message": "Password and confirm password does not match"}, default=str)), 404
             
             else:
                 user = User.query.filter_by(user_Email=email).first()
@@ -242,7 +242,7 @@ class ResetPassword(Resource):
                 setattr(user, 'user_Password', hashed_password)
                 db.session.commit()
                 db.session.close()
-                return json.loads(json.dumps({"Message": "Password updated"}, default=str)), 200
+                return json.loads(json.dumps({"code": 200, "message": "Password updated"}, default=str)), 200
 
         except Exception as e:
             db.session.rollback()
@@ -298,10 +298,10 @@ class Logout(Resource):
             #return redirect(url_for('logout_page'))
             session.clear()
 
-            return json.loads(json.dumps({"message": "Logged out successfully"})), 200
+            return json.loads(json.dumps({"code": 200, "message": "Logged out successfully"})), 200
         else:  
             
-            return json.loads(json.dumps({"message": "Logged out not successful"})), 400
+            return json.loads(json.dumps({"code": 400, "message": "Logged out not successful"})), 400
         
 get_all_coaches = api.parser()
 @api.route("/get_all_coaches")
@@ -331,4 +331,4 @@ class GetInstructor(Resource):
         if coach:
             return json.loads(json.dumps(coach.json())), 200
 
-        return json.loads(json.dumps({"message": "There is no such instructor or trainer"})), 404
+        return json.loads(json.dumps({"code": 404, "message": "There is no such instructor or trainer"})), 404

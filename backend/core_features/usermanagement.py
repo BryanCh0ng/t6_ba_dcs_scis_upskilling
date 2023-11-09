@@ -14,11 +14,11 @@ app.logger.setLevel(logging.DEBUG)
 
 api = Namespace('management', description='User Management')
 
-from app import mail, bcrypt
-
 scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
+
+from app import mail, bcrypt
 
 # All Admin
 retrieve_admin_parser = api.parser()
@@ -78,6 +78,7 @@ class GetAllAdmin(Resource):
                 return jsonify({"code": 404, "message": "No admin users found."})
         except Exception as e:
             return jsonify({"code": 500, "message": "Error occurred while fetching admin users.", "error": str(e)})
+
 # All Students
 retrieve_student_parser = api.parser()
 retrieve_student_parser.add_argument("student_name", help="Enter student name")
@@ -85,8 +86,6 @@ retrieve_student_parser.add_argument(
     "blacklisted", help="Filter by blacklisted status")
 
 # Define the API route for getting all student users
-
-
 @api.route("/get_all_student")
 @api.doc(description="Get all student users")
 class GetAllAdmin(Resource):
@@ -149,11 +148,9 @@ class GetAllAdmin(Resource):
 
 # All Instructors
 retrieve_instructors_trainers = api.parser()
-retrieve_instructors_trainers.add_argument(
-    "instructor_name", help="Enter instructor name")
+retrieve_instructors_trainers.add_argument("instructor_name", help="Enter instructor name")
 retrieve_instructors_trainers.add_argument("role_name", help="Enter role name")
-retrieve_instructors_trainers.add_argument(
-    "organization_name", help="Enter organization")
+retrieve_instructors_trainers.add_argument("organization_name", help="Enter organization")
 
 
 @api.route("/get_all_instructors_and_trainers")
@@ -264,7 +261,6 @@ class GetAllInstructorsAndTrainers(Resource):
 retrieve_student_name = api.parser()
 retrieve_student_name.add_argument("user_id", help="Enter user id")
 
-
 @api.route("/get_student_name")
 @api.doc(description="Get student name")
 class GetStudentName(Resource):
@@ -283,7 +279,6 @@ class GetStudentName(Resource):
 retrieve_blacklist_student_id = api.parser()
 retrieve_blacklist_student_id.add_argument(
     "user_ids", type=int, action="append", required=True, help="Enter user ids as a list")
-
 
 @api.route('/blacklist', methods=['POST'])
 @api.doc(description="Blacklist Student")
@@ -325,59 +320,66 @@ class BlacklistStudent(Resource):
             return "Failed. " + str(e), 500
 
 # Automate blacklist
-@scheduler.task('interval', id='check_and_blacklist_users', seconds=3600, misfire_grace_time=900) 
+@scheduler.task('interval', id='check_and_blacklist_users', seconds=86400, misfire_grace_time=900) 
 # Define the function to check and blacklist users
 def check_and_blacklist_users():
-    try:
-        # Get a list of all users
-        users = db.session.query(User).all()
+    with app.app_context():
+        try:
+            # Get a list of all users
+            users = db.session.query(User).all()
 
-        for user in users:
-            user_ID = user.user_ID
+            current_date = datetime.now().date()
 
-            # Get a list of all run courses for the user
-            run_courses = db.session.query(RunCourse).join(
-                Registration, Registration.rcourse_ID == RunCourse.rcourse_ID
-            ).filter(
-                Registration.user_ID == user_ID,
-                Registration.reg_Status == "Enrolled"
-            ).all()
+            for user in users:
+                user_ID = user.user_ID
 
-            for run_course in run_courses:
-                
-                lessons = db.session.query(Lesson).filter(Lesson.rcourse_ID == run_course.rcourse_ID).all()
-                total_lessons = len(lessons)
-
-                attendance_records = db.session.query(AttendanceRecord).filter(
-                    AttendanceRecord.user_ID == user_ID,
-                    AttendanceRecord.lesson_ID.in_([lesson.lesson_ID for lesson in lessons])
+                # Get a list of all run courses for the user
+                run_courses = db.session.query(RunCourse).join(
+                    Registration, Registration.rcourse_ID == RunCourse.rcourse_ID
+                ).filter(
+                    Registration.user_ID == user_ID,
+                    Registration.reg_Status == "Enrolled",
+                    RunCourse.run_Startdate <= current_date
                 ).all()
 
-                valid_reason_keywords = ["sick", "doctor appointment", "medical leave", "family emergency", "mc", "personal reasons", "hospitalized"]
+                for run_course in run_courses:
+                    
+                    lessons = db.session.query(Lesson).filter(Lesson.rcourse_ID == run_course.rcourse_ID).all()
+                    total_lessons = len(lessons)
 
-                missed_lessons_without_valid_reason = 0
+                    attendance_records = db.session.query(AttendanceRecord).filter(
+                        AttendanceRecord.user_ID == user_ID,
+                        AttendanceRecord.lesson_ID.in_([lesson.lesson_ID for lesson in lessons])
+                    ).all()
 
-                for record in attendance_records:
-                    if record.status == 'Absent':
-                        if not record.reason or record.reason.strip().lower not in valid_reason_keywords:
-                            missed_lessons_without_valid_reason += 1
-            
-            if total_lessons > 0:
-                attendance_rate = (total_lessons - missed_lessons_without_valid_reason) / total_lessons * 100
+                    valid_reason_keywords = ["sick", "doctor appointment", "medical leave", "family emergency", "mc", "personal reasons", "hospitalized"]
 
-                # Check if the attendance rate is below 70%
-                if attendance_rate <= 70:
-                    # Check if the user is already blacklisted
-                    existing_blacklist = Blacklist.query.filter_by(user_ID=user_ID).first()
-                    if not existing_blacklist:
-                        # Add the user to the blacklist
-                        blacklist_entry = Blacklist(user_ID=user_ID, blacklist_Datetime=datetime.now())
-                        db.session.add(blacklist_entry)
-                        db.session.commit()
+                    missed_lessons_without_valid_reason = 0
 
-        db.session.close()
-    except Exception as e:
-        print(f"Error while checking and blacklisting users: {str(e)}")
+                    for record in attendance_records:
+                        if record.status == 'Absent':
+                            if not record.reason or record.reason.strip().lower not in valid_reason_keywords:
+                                missed_lessons_without_valid_reason += 1
+                
+                if total_lessons > 0:
+                    attendance_rate = (total_lessons - missed_lessons_without_valid_reason) / total_lessons * 100
+                    # print(attendance_rate)
+                    # Check if the attendance rate is below 70%
+                    if attendance_rate <= 70:
+                        # Check if the user is already blacklisted
+                        existing_blacklist = Blacklist.query.filter_by(user_ID=user_ID).first()
+                        if not existing_blacklist:
+                            # Add the user to the blacklist
+                            blacklist_entry = Blacklist(user_ID=user_ID, blacklist_Datetime=datetime.now())
+                            db.session.add(blacklist_entry)
+                            db.session.commit()
+                
+            db.session.close()
+            return jsonify({ "code": 201, "message": "Blacklist has been successfully updated!"} )   
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error while checking and blacklisting users: {str(e)}")
 
 retrieve_blacklist_remove = api.parser()
 retrieve_blacklist_remove.add_argument(

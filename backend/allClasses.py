@@ -385,14 +385,13 @@ class Registration(db.Model):
 class Lesson(db.Model):
     __tablename__ = 'lesson'
 
-    lesson_ID = db.Column(db.Integer, nullable=False, primary_key=True)
+    lesson_ID = db.Column(db.Integer, nullable=False, primary_key=True, autoincrement=True)
     rcourse_ID = db.Column(db.Integer, db.ForeignKey('runcourse.rcourse_ID'), nullable=False) 
     lesson_Date = db.Column(db.Date, nullable=False)
     lesson_Starttime = db.Column(db.Time, nullable=False) 
     lesson_Endtime = db.Column(db.Time, nullable=False) 
 
-    def __init__(self, lesson_ID, rcourse_ID, lesson_Date, lesson_Starttime, lesson_Endtime):
-        self.lesson_ID = lesson_ID
+    def __init__(self, rcourse_ID, lesson_Date, lesson_Starttime, lesson_Endtime):
         self.rcourse_ID = rcourse_ID
         self.lesson_Date = lesson_Date
         self.lesson_Starttime = lesson_Starttime

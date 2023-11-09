@@ -4,7 +4,7 @@
     <label v-else class="mb-1">{{ label }}</label>
     <select class="form-control" :value="sOption" v-model="selectedOption" :id="id">
       <option value="" disabled selected>{{ label }}</option>
-      <option :disabled="disabled" v-for="option in options" :key="option.id" :value="option.option">{{ option.option }}</option>
+      <option :disabled="disabled" v-for="option in options" :key="option.id" :value="option.position">{{ option.option }}</option>
     </select>
   </div>
 </template>

@@ -21,8 +21,8 @@
                 <a href="" @click.prevent="sort('runcourse_Status')" class="text-decoration-none text-dark">Run Status <sort-icon :sortColumn="sortColumn === 'runcourse_Status'" :sortDirection="getSortDirection('runcourse_Status')"/></a></th>
               <th scope="col">Feedback</th>
               <th scope="col">Course Details</th>
-              <th scope="col">Feedback Template</th>
               <th scope="col">Lessons</th>
+              <th scope="col">Feedback Template</th>
               <th scope="col">Action(s)</th>
             </tr>
           </thead>
@@ -42,11 +42,9 @@
               </td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToRunCourseFeedbackAnalysis(course.rcourse_ID)">View Feedback Analysis</a></td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
+              <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(course.rcourse_ID)">View Lessons</a></td>
               <td v-if="course.feedback_Startdate && isBeforeCurrentDate(course.feedback_Startdate)" class="text-nowrap"><a v-if="course.course_Status != 'Retired'" class="btn btn-info text-light" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
               <td v-else class="text-nowrap"><a v-if="course.course_Status != 'Retired'" class="btn btn-info disabled text-light" title="Unable to remove run course due to ongoing/past feedback period">Apply Feedback Template</a></td>
-              <td>
-                <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(course.rcourse_ID)">View Lessons</a>
-              </td>
               <td v-if="course.runcourse_Status=='Ongoing'">
                 <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
               </td>

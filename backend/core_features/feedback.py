@@ -24,10 +24,6 @@ class GetTemplate(Resource):
         data = new_student_feedback.get("data")
         common_questions_data = new_student_feedback.get("common_questions_data")
 
-        print(courseID)
-        print(templateID)
-        print(userID)
-
         def submit_common_questions(common_questions_data):
             try:
               for eachdata in common_questions_data:
@@ -253,6 +249,60 @@ class GetStudentFeedbackIncludingAnswersAndTemplate(Resource):
         print(str(e))
         return {"code": 404, "message": "Failed" + str(e)}, 404
 
+
+get_random_reviews_by_rcourse_id = api.parser()
+get_random_reviews_by_rcourse_id.add_argument("rcourse_id", help="Enter rcourse id")
+get_random_reviews_by_rcourse_id.add_argument("course_id", help="Enter course id")
+get_random_reviews_by_rcourse_id.add_argument("no_of_reviews", help="Enter No. of Review")
+@api.route("/get_random_reviews_by_rcourse_id")
+@api.doc(description="Get  Random Feedbacks by rcourse id")
+class GetRandomReviewsByRCourseId(Resource):
+    @api.expect(get_random_reviews_by_rcourse_id)
+    def get(self):
+      try:
+        rcourse_id = get_random_reviews_by_rcourse_id.parse_args().get("rcourse_id")
+        course_id = get_random_reviews_by_rcourse_id.parse_args().get("course_id")
+        no_of_reviews = get_random_reviews_by_rcourse_id.parse_args().get("no_of_reviews")
+
+        if rcourse_id:
+          course_id = db.session.query(RunCourse.course_ID).filter(RunCourse.rcourse_ID == rcourse_id).first()
+          course_id = course_id[0]
+
+        if course_id:
+          rcourse_ids = db.session.query(RunCourse.rcourse_ID).filter(RunCourse.course_ID == course_id).all()
+          rcourse_id_list = [result[0] for result in rcourse_ids]
+
+          if rcourse_id_list:
+            template_attribute_query = db.session.query(
+              TemplateAttribute,
+            ).filter(
+              TemplateAttribute.question == 'Any Feedbacks for the course',
+              TemplateAttribute.template_ID == None,
+              TemplateAttribute.input_Type == 'Text Field'
+            ).first()
+            
+            if template_attribute_query:
+              template_attribute_id = template_attribute_query.template_Attribute_ID
+              random_reviews = (
+                  db.session.query(
+                    Feedback,
+                  ).filter(
+                    Feedback.rcourse_ID.in_(rcourse_id_list),
+                    Feedback.template_Attribute_ID == template_attribute_id
+                  )
+                  .order_by(db.func.random())
+                  .limit(no_of_reviews)
+                  .all()
+                )
+              if random_reviews:
+                return {"code": 200, "reviews":[review.json() for review in random_reviews]}, 200
+
+          return {"code": 202, "message": "There are no reviews available currently"}, 202
+
+      except Exception as e:
+        print(e)
+        return {"code": 404, "message": "Failed " + str(e)}, 404
+      
 # For specific run course 
 retrieve_runcourse_id = api.parser()
 retrieve_runcourse_id.add_argument("course_ID", help="Enter course_ID")
@@ -267,108 +317,85 @@ class RunCourseFeedback(Resource):
             args = retrieve_runcourse_id.parse_args()
             course_ID = args.get("course_ID", "")
             runcourse_ID = args.get("runcourse_ID", "")
+            
+            feedback_dict = {}
+            unique_questions = {}
 
             if course_ID:
-              # Check if the run course exists
-              course = Course.query.get(course_ID)
-              if course is None:
-                return jsonify({'message': 'Course not found.', 'code': 404})
+                # Check if the course exists
+                course = Course.query.get(course_ID)
+                if course is None:
+                    return jsonify({'message': 'Course not found.', 'code': 404})
+                
+                # Retrieve the associated course's name
+                course_name = course.course_Name
+                
+                # Query feedback for run courses associated with the course
+                run_courses = RunCourse.query.filter_by(course_ID=course_ID).all()
+                feedback = Feedback.query.filter(Feedback.rcourse_ID.in_([run_course.rcourse_ID for run_course in run_courses])).all()
 
-              course_name = course.course_Name
+            elif runcourse_ID:
+                # Check if the run course exists
+                runcourse = RunCourse.query.get(runcourse_ID)
+                if runcourse is None:
+                    return jsonify({'message': 'Run course not found.', 'code': 404})
 
-              run_courses = RunCourse.query.filter_by(course_ID=course_ID).all()
-              run_course_ids = [run_course.rcourse_ID for run_course in run_courses]
+                # Retrieve the associated run course's name
+                run_name = runcourse.run_Name
+                
+                # Query feedback for the specified run course
+                feedback = Feedback.query.filter_by(rcourse_ID=runcourse_ID).all()
 
-              feedback = Feedback.query.filter(Feedback.rcourse_ID.in_(run_course_ids)).all()
-              if feedback:
-                  feedback_dict = {}
-                  unique_questions = {}
+            else:
+                return jsonify({'message': 'No course or run course ID provided.', 'code': 400})
 
-                  for entry in feedback:
-                      submitted_by = entry.submitted_By
-                      answers = entry.answer
-                      template_attribute_id = entry.template_Attribute_ID
+            if feedback:
+                for entry in feedback:
+                    submitted_by = entry.submitted_By
+                    answers = entry.answer
+                    template_attribute_id = entry.template_Attribute_ID
 
-                      # Retrieve the associated question for this feedback entry
-                      question = TemplateAttribute.query.get(template_attribute_id).question
+                    # Retrieve the associated question for this feedback entry
+                    question = TemplateAttribute.query.get(template_attribute_id).question
 
-                      # Collect the question in the dictionary of unique questions
-                      unique_questions[template_attribute_id] = question
+                    # Collect the question in the dictionary of unique questions
+                    unique_questions[template_attribute_id] = question
 
-                      if submitted_by not in feedback_dict:
-                          feedback_dict[submitted_by] = {
-                              'submitted_By': submitted_by,
-                              'answers': [],
-                              'course_name': course_name
-                          }
+                    if submitted_by not in feedback_dict:
+                        if course_ID:
+                            feedback_dict[submitted_by] = {
+                                'submitted_By': submitted_by,
+                                'answers': [],
+                                'course_name': course_name
+                            }
+                        elif runcourse_ID:
+                            feedback_dict[submitted_by] = {
+                                'submitted_By': submitted_by,
+                                'runcourse_ID': runcourse_ID,
+                                'run_name': run_name,
+                                'answers': [],
+                            }
 
-                      feedback_dict[submitted_by]['answers'].append(answers)
+                    feedback_dict[submitted_by]['answers'].append(answers)
 
-                  # Convert the dictionary of unique questions to a list of dictionaries
-                  unique_questions_list = [{"template_attribute_id": k, "question": v} for k, v in unique_questions.items()]
+                # Convert the dictionary of unique questions to a list of dictionaries
+                unique_questions_list = [{"template_attribute_id": k, "question": v} for k, v in unique_questions.items()]
 
-                  # Convert the dictionary values to a list
-                  feedback_list = list(feedback_dict.values())
+                # Convert the dictionary values to a list
+                feedback_list = list(feedback_dict.values())
 
-                  db.session.close()
+                db.session.close()
 
-                  return jsonify({'data': feedback_list, 'questions': unique_questions_list, 'code': 200})
+                #print(unique_questions_list)
+                #print(feedback_list)
 
-              else:
-                  return jsonify({'message': 'No feedback found for this course.', 'code': 404})
+                return jsonify({'data': feedback_list, 'questions': unique_questions_list, 'code': 200})
 
-            if runcourse_ID:
-              # Check if the run course exists
-              runcourse = RunCourse.query.get(runcourse_ID)
-              if runcourse is None:
-                  return jsonify({'message': 'Run course not found.', 'code': 404})
-
-              # Retrieve the associated course's name by querying the Course table
-            
-
-              run_name = runcourse.run_Name
-
-              feedback = Feedback.query.filter_by(rcourse_ID=runcourse_ID).all()
-              if feedback:
-                  feedback_dict = {}
-                  unique_questions = {}
-
-                  for entry in feedback:
-                      submitted_by = entry.submitted_By
-                      answers = entry.answer
-                      template_attribute_id = entry.template_Attribute_ID
-
-                      # Retrieve the associated question for this feedback entry
-                      question = TemplateAttribute.query.get(template_attribute_id).question
-
-                      # Collect the question in the dictionary of unique questions
-                      unique_questions[template_attribute_id] = question
-
-                      if submitted_by not in feedback_dict:
-                          feedback_dict[submitted_by] = {
-                              'submitted_By': submitted_by,
-                              'runcourse_ID': runcourse_ID,
-                              'run_name': run_name,
-                              'answers': [],
-                          }
-
-                      feedback_dict[submitted_by]['answers'].append(answers)
-
-                  # Convert the dictionary of unique questions to a list of dictionaries
-                  unique_questions_list = [{"template_attribute_id": k, "question": v} for k, v in unique_questions.items()]
-
-                  # Convert the dictionary values to a list
-                  feedback_list = list(feedback_dict.values())
-
-                  db.session.close()
-
-                  return jsonify({'data': feedback_list, 'questions': unique_questions_list, 'code': 200})
-
-              else:
-                  return jsonify({'message': 'No feedback found for this runcourse.', 'code': 404})
+            else:
+                return jsonify({'message': 'No feedback found for this course or run course.', 'code': 404})
+              
         except Exception as e:
             return jsonify({"message": "Failed " + str(e), "code": 500})
-        
 
 # For specific course and instructor 
 retrieve_course_instructor = api.parser()
@@ -469,3 +496,117 @@ class RunCourseFeedback(Resource):
         except Exception as e:
             return jsonify({"message": "Failed " + str(e), "code": 500})
 
+#Get all feedback 
+get_feedback = api.parser()
+
+get_feedback.add_argument("course_ID", help="Enter course ID")
+get_feedback.add_argument("coursecat_ID", help="Enter course category ID")
+get_feedback.add_argument("rcourse_ID", help="Enter run course ID")
+get_feedback.add_argument("instructor_ID", help="Enter instructor ID")
+get_feedback.add_argument("run_Startdate", help="Enter run start date")
+get_feedback.add_argument("run_Enddate", help="Enter run end date")
+
+@api.route("/get_feedback")
+@api.doc(description="Get feedback")
+class GetFeedback(Resource):
+    @api.expect(get_feedback)
+    def get(self):
+        try: 
+            # Parse the course_ID from the request arguments
+            args = get_feedback.parse_args()
+            courseID = args.get("course_ID", "")
+            coursecatID = args.get("coursecat_ID", "")
+            rcourseID = args.get("rcourse_ID", "")
+            instructorID = args.get("instructor_ID", "")
+            start_date = args.get('run_Startdate', "")
+            end_date = args.get("run_Enddate", "")
+
+            formatted_start_date = None
+            formatted_end_date = None
+
+            query = (
+                db.session.query(Course, RunCourse, Feedback, TemplateAttribute, CourseCategory, User)
+                .join(RunCourse, Course.course_ID == RunCourse.course_ID)  
+                .join(Feedback, RunCourse.rcourse_ID == Feedback.rcourse_ID)  
+                .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)  
+                .join(CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID)  
+                .join(User, RunCourse.instructor_ID == User.user_ID)
+                .filter(or_(func.lower(TemplateAttribute.question).like("%instructor%"), func.lower(TemplateAttribute.question).like("%course%")))
+                .filter(or_(TemplateAttribute.input_Type == "Text Field", TemplateAttribute.input_Type == "Likert Scale"))
+            )
+
+            if courseID and courseID != "[]":
+                courseID = json.loads(courseID)
+                query = query.filter(RunCourse.course_ID.in_(courseID))
+
+            if coursecatID and coursecatID != "[]":
+                coursecatID = json.loads(coursecatID)
+                query = query.filter(Course.coursecat_ID.in_(coursecatID))
+
+            if rcourseID and rcourseID != "[]":
+                rcourseID = json.loads(rcourseID)
+                query = query.filter(Feedback.rcourse_ID.in_(rcourseID))
+
+            if instructorID and instructorID != "[]":
+                instructorID = json.loads(instructorID)
+                query = query.filter(RunCourse.instructor_ID.in_(instructorID))
+
+            if start_date:
+                formatted_start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+
+            if end_date:
+                formatted_end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+
+            if formatted_start_date and formatted_end_date: 
+                query = query.filter(RunCourse.run_Startdate >= formatted_start_date, RunCourse.run_Enddate <= formatted_end_date)
+
+            # Fetch the results
+            filtered_results = query.all()
+            db.session.close()
+                        
+            if filtered_results:
+                # Define the header variable (an array of selected fields including coursecat_Name)
+                header = ["Course Name", "Course Category", "Run Name", "Run Start Date", "Run End Date", "Instructor Name", "Question", "Answer"]
+
+                # Create a 2D array containing data for selected fields from filtered_results
+                answers = []
+                for result in filtered_results:
+                    # Format startdate and enddate to dd/mm/yyyy
+                    start_date_formatted = result.RunCourse.run_Startdate.strftime('%d/%m/%Y')
+                    end_date_formatted = result.RunCourse.run_Enddate.strftime('%d/%m/%Y')
+
+                    answer_row = [
+                        result.Course.course_Name,
+                        result.CourseCategory.coursecat_Name,
+                        result.RunCourse.run_Name,
+                        start_date_formatted,
+                        end_date_formatted,
+                        result.User.user_Name,
+                        result.TemplateAttribute.question,
+                        result.Feedback.answer
+                    ]
+                    answers.append(answer_row)
+
+                return jsonify(
+                    {
+                        "code": 200,
+                        "header": header,
+                        "answers": answers
+                    }
+                )
+
+            return jsonify(
+                {
+                    "code": 400,
+                    "message": "No course feedbacks found"
+                }
+            )
+
+        except Exception as e:
+            print("Error:", str(e))
+            return jsonify(
+                {
+                    "code": 500,
+                    "message": "Failed to retrieve course feedbacks: " + str(e)
+                }
+            )

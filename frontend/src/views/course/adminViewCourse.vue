@@ -165,7 +165,6 @@
         }
       },
       modalAfterActionClose() {
-        console.log('test')
         this.loadData();
       },
       sort(column) {

@@ -27,6 +27,22 @@ class FeedbackService extends BaseApiService {
         }
     }
 
+    async getRandomReviews(rcourse_id, course_id, no_of_reviews) {
+        try {
+            const endpoint = `/feedback/get_random_reviews_by_rcourse_id`;
+            const params = {
+                rcourse_id: rcourse_id,
+                course_id: course_id,
+                no_of_reviews: no_of_reviews
+            };
+            const response = await axiosClient.get(endpoint, { params });
+            console.log(response)
+            return response.data;
+        } catch (error) {
+            return this.handleError(error);
+        }
+    }
+
     async getFeedbackForRunCourse(course_ID, runcourse_ID) {
         try {
             // console.log(course_ID)
@@ -56,7 +72,25 @@ class FeedbackService extends BaseApiService {
         }
     }
 
-    
+    async getFeedback(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
+        try {
+            let response = await axiosClient.get("/feedback/get_feedback",
+                {
+                    params: {
+                        course_ID: course_ID,
+                        coursecat_ID: coursecat_ID,
+                        rcourse_ID: rcourse_ID,
+                        instructor_ID: instructor_ID,
+                        run_Startdate: run_Startdate,
+                        run_Enddate: run_Enddate
+                    },
+                }
+            );
+            return response 
+        } catch(error) {
+            return this.handleError(error)
+        }
+    }
     
 }
 

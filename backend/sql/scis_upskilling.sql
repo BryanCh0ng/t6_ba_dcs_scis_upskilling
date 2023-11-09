@@ -214,7 +214,7 @@ INSERT INTO course VALUES
         (15, 'Intro to Drupal & Drupal Certification', "This program is designed to familiarize you with the versatile Drupal content management system and guide you towards becoming a certified Drupal professional. Explore the core concepts of Drupal, from content creation and management to site customization and theming. Delve into modules, understanding how they enhance functionality. Gain practical insights into user roles, permissions, and security settings. As you progress, you'll be prepared to pursue Drupal certification, validating your expertise in Drupal development and administration. With hands-on projects and real-world scenarios, you'll develop the skills needed to create, manage, and maintain robust Drupal-powered websites.", 1, "Active"),
         (16, 'Acquia Certified Site Builder', "This course is your pathway to becoming an expert in building and managing websites using the Acquia platform. Dive into Acquia's tools and technologies, learning to create, customize, and maintain websites efficiently. Explore website architecture, content creation, and customization. Gain hands-on experience with themes, modules, and extensions, tailoring websites to specific needs. Dive into site configuration, user management, and performance optimization. By mastering the Acquia platform, you'll be well-prepared to earn the coveted 'Acquia Certified Site Builder' certification.", 1, "Active"),
         (17, 'Analysing data made easy with SAP Analytics Cloud', " This program is designed to empower you with the skills and knowledge to effortlessly analyze and visualize data using SAP Analytics Cloud. Discover the intuitive features of SAP Analytics Cloud, from data connection and preparation to creating interactive dashboards and reports. Learn to perform ad-hoc analysis, explore data trends, and generate actionable insights. Delve into predictive analytics and machine learning capabilities, enhancing your ability to make informed decisions. Through hands-on exercises and real-world scenarios, you'll become proficient in harnessing the power of SAP Analytics Cloud.", 1, "Inactive"),
-        (18, 'Stress Management with Technology', "In this course, we explore innovative ways to leverage technology for effective stress management. Discover a range of digital tools and techniques designed to reduce stress, improve well-being, and enhance your overall quality of life.", 1, "Inactive"),
+        (18, 'Stress Management with Technology', "In this course, we explore innovative ways to leverage technology for effective stress management. Discover a range of digital tools and techniques designed to reduce stress, improve well-being, and enhance your overall quality of life.", 1, "Active"),
         (19, 'Information Systems Management Fundamentals', "Explore the fundamental principles of managing information systems in modern organizations. Learn about system analysis, design, implementation, and maintenance. Understand how information systems align with business objectives and support decision-making processes. Dive into topics like database management, cybersecurity, and emerging technologies, equipping you to excel in overseeing effective and secure information systems.", 1, "Active"),
         (20, 'E-Commerce and Digital Business', "Uncover the dynamics of electronic commerce and digital business models. Examine the strategies and technologies behind successful online businesses. Learn about e-commerce platforms, payment gateways, digital marketing, and customer relationship management. Understand the challenges and opportunities in the digital marketplace, equipping you to thrive in the evolving world of online commerce.", 1, "Active"),
         (21, 'Business Intelligence and Analytic', "Delve into the world of business intelligence and analytics in this course. Learn how to gather, process, and analyze data to extract valuable insights for strategic decision-making. Explore data visualization techniques, predictive modeling, and data-driven storytelling. Gain hands-on experience with tools like Tableau and Power BI, enhancing your ability to turn raw data into actionable business intelligence.", 1, "Active"),
@@ -630,7 +630,7 @@ INSERT INTO runcourse VALUES
     (7, 'Constitutional Law - Run 1' ,'2023-11-01', '2023-11-25', '17:00:00', '19:00:00', 42, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 35, 10, 0, 2, '2023-10-02', '2023-10-07', '10:00:00', '10:00:00', '2023-11-26', '2023-11-27', '08:00:00', '12:00:00', 1, 27),
     (8, 'Cost Accounting - Run 1' ,'2023-11-20', '2023-12-10', '13:00:00', '15:30:00', 43, 'online', 'Zoom', 'Ongoing', 25, 15, 0, 2, '2023-10-20', '2023-10-25', '10:00:00', '10:00:00', '2023-12-11', '2023-12-13', '09:00:00', '09:00:00', 1, 28),
     (9, 'Analysing data made easy with SAP Analytics Cloud - Run 1' ,'2023-12-05', '2023-12-20', '10:00:00', '11:00:00', 44, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 30, 20, 0, 1, '2023-11-10', '2023-11-15', '10:00:00', '10:00:00', '2023-12-21', '2023-12-28', '08:00:00', '08:00:00', 1, 17),
-    (10, 'Information Systems Management Fundamentals - Run 1' ,'2023-10-01', '2023-10-02', '10:00:00', '11:00:00', 19, 'online', 'Zoom', 'Closed', 30, 20, 0, 1, '2023-09-03', '2023-09-08', '10:00:00', '10:00:00', '2023-10-03', '2023-10-05', '17:00:00', '17:00:00', 1, 19),
+    (10, 'Information Systems Management Fundamentals - Run 1' ,'2023-10-01', '2023-10-02', '10:00:00', '11:00:00', 46, 'online', 'Zoom', 'Closed', 30, 20, 0, 1, '2023-09-03', '2023-09-08', '10:00:00', '10:00:00', '2023-10-03', '2023-10-05', '17:00:00', '17:00:00', 1, 19),
     (11, 'Stress Management with Technology - Run 1' ,'2024-01-10', '2024-02-28', '09:00:00', '12:00:00', 20, 'face-to-face', 'SCIS SR 2-3', 'Ongoing', 40, 25, 50, 2, '2023-10-15', '2023-11-25', '10:00:00', '10:00:00', '2024-02-28', '2024-02-28', '08:00:00', '23:59:00', 1, 18),
     (12, 'Python Programming for Data Analysis - Run 1' ,'2023-12-05', '2023-12-25', '14:00:00', '16:00:00', 3, 'face-to-face', 'SCIS SR 3-3', 'Ongoing', 25, 15, 0, 2, '2023-10-15', '2023-11-20', '10:00:00', '10:00:00', '2023-12-26', '2023-12-31', '12:00:00', '12:00:00', 1, 5),
     (13, 'Blockchain and Smart Contracts - Run 1' ,'2023-11-25', '2023-12-15', '16:00:00', '18:00:00', 5, 'face-to-face', 'SCIS SR 2-4', 'Ongoing', 35, 20, 0, 2, '2023-10-15', '2023-11-10', '10:00:00', '10:00:00', '2023-12-16', '2023-12-23', '08:00:00', '08:00:00', 1, 10),
@@ -638,7 +638,6 @@ INSERT INTO runcourse VALUES
     (15, 'Intro to Digital Marketing - Run 1' ,'2023-12-10', '2024-02-02', '09:30:00', '11:30:00', 41, 'face-to-face', 'SCIS SR 2-3', 'Ongoing', 40, 30, 0, 2, '2023-10-15', '2023-11-15', '10:00:00', '10:00:00', '2024-02-03', '2023-02-10', '14:00:00', '14:00:00', 1, 14),
     (16, 'Intro to Drupal & Drupal Certification - Run 1' ,'2023-12-15', '2024-01-19', '14:00:00', '16:00:00', 42, 'face-to-face', 'SCIS SR 2-3', 'Ongoing', 25, 15, 0, 2, '2023-10-15', '2023-11-10', '10:00:00', '10:00:00', '2024-01-20', '2024-01-21', '12:00:00', '12:00:00', 1, 15);
  
-
 DROP TABLE IF EXISTS `feedback`;
 CREATE TABLE IF NOT EXISTS `feedback`(
 	feedback_id int NOT NULL AUTO_INCREMENT,
@@ -2089,18 +2088,20 @@ INSERT INTO feedback VALUES
     (1318, 1, 52, 9, '5', 10),
     (1319, 1, 52, 10, '', 10),
     (1320, 1, 52, 11, 'Can summarise some things to help with understanding', 10),
+    (1321, 1, 53, 13, 'Sometimes the same example/scenario would be used, maybe give more examples.', 10),
     -- user_id 53
-    (1321, 1, 53, 1, '4', 10),
-    (1322, 1, 53, 2, '5', 10),
-    (1323, 1, 53, 3, '3', 10),
-    (1324, 1, 53, 4, 'group project', 10),
-    (1325, 1, 53, 5, 'revision lessons', 10),
-    (1326, 1, 53, 6, '2', 10),
-    (1327, 1, 53, 7, '1', 10),
-    (1328, 1, 53, 8, '4', 10),
-    (1329, 1, 53, 9, '5', 10),
-    (1330, 1, 53, 10, 'Engaging', 10),
-    (1331, 1, 53, 11, 'Sometimes the same example/scenario would be used, maybe give more examples.', 10);
+    (1322, 1, 53, 1, '4', 10),
+    (1323, 1, 53, 2, '5', 10),
+    (1324, 1, 53, 3, '3', 10),
+    (1325, 1, 53, 4, 'group project', 10),
+    (1326, 1, 53, 5, 'revision lessons', 10),
+    (1327, 1, 53, 6, '2', 10),
+    (1328, 1, 53, 7, '1', 10),
+    (1329, 1, 53, 8, '4', 10),
+    (1330, 1, 53, 9, '5', 10),
+    (1331, 1, 53, 10, 'Engaging', 10),
+    (1332, 1, 53, 11, 'Sometimes the same example/scenario would be used, maybe give more examples.', 10),
+    (1333, 1, 53, 13, 'Sometimes the same example/scenario would be used, maybe give more examples.', 10);
     
 DROP TABLE IF EXISTS `registration`;
 CREATE TABLE IF NOT EXISTS `registration`(
@@ -2236,7 +2237,14 @@ INSERT INTO registration VALUES
     (119, 10, 50, 'Enrolled'),
     (120, 10, 51, 'Enrolled'),
     (121, 10, 52, 'Enrolled'),
-    (122, 10, 53, 'Enrolled');
+    (122, 10, 53, 'Enrolled'),
+    (123, 12, 56, 'Pending'),
+    (124, 11, 56, 'Dropped'),
+    (125, 11, 1, 'Enrolled'),
+    (126, 10, 1, 'Enrolled'),
+    (127, 11, 1, 'Enrolled'),
+    (128, 12, 1, 'Enrolled'),
+    (129, 13, 1, 'Enrolled');
 
 
 DROP TABLE IF EXISTS `lesson`;

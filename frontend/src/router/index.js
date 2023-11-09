@@ -258,7 +258,6 @@ const routes = [
         requiresAuth: true
     }
   },
-  // Need to add authentication
   {
     path: '/viewDashboard',
     name: 'viewDashboard',
@@ -283,6 +282,15 @@ const routes = [
     component: () => import('../views/dashboard/viewDashboard.vue'),
     meta: {
         title: 'Admin View Feedback Analysis of a Particular Run Course',
+        requiresAuth: true
+    }
+  },
+  {
+    path: '/viewInstructorFeedbackAnalysis/:id',
+    name: 'viewInstructorFeedbackAnalysis',
+    component: () => import('../views/dashboard/viewDashboard.vue'),
+    meta: {
+        title: 'Admin View Feedback Analysis of a Particular Instructor',
         requiresAuth: true
     }
   },
@@ -357,15 +365,33 @@ const routes = [
         requiresAuth: true
     }, 
   }, 
-  // {
-  //   path: '/viewAttendance/:lessonId',
-  //   name: 'viewAttendance',
-  //   component: () => import('../views/attendance/viewAttendance.vue'),
-  //   meta: {
-  //       title: 'View Attendance',
-  //       requiresAuth: true
-  //   }, 
-  // } 
+  {
+    path: '/createRunCourseLesson/:id',
+    name: 'createRunCourseLesson',
+    component: () => import('../views/lesson/adminCreateRunCourseLesson.vue'),
+    meta: {
+        title: 'Create Run Course Lesson',
+        requiresAuth: true
+    }, 
+  },
+  {
+    path: '/editRunCourseLesson/:id',
+    name: 'editRunCourseLesson',
+    component: () => import('../views/lesson/editRunCourseLesson.vue'),
+    meta: {
+        title: 'Edit Run Course Lesson',
+        requiresAuth: true
+    }, 
+  },
+  {
+    path: '/viewAttendance/:lessonId',
+    name: 'viewAttendance',
+    component: () => import('../views/attendance/viewAttendance.vue'),
+    meta: {
+        title: 'View Attendance',
+        requiresAuth: true
+    }, 
+  } 
 ]
 
 const router = createRouter({

@@ -1,6 +1,6 @@
 <template>
     <div id="chart-container">
-        <canvas :id="'chart-' + chartId" width="350" height="250"></canvas>
+        <canvas :id="'chart-' + uniqueChartId" width="350" height="250"></canvas>
     </div>
 </template>
   
@@ -14,21 +14,26 @@ export default {
         datasets: {
             type: Array,
             required: true
-        },
-        chartId: {
-            type: Number,
-            required: true
         }
     },
-    mounted() {
-        this.$nextTick(() => {
-            const ctx = document.getElementById('chart-' + this.chartId);
-            Chart.register(ChartDataLabels);
+    data() {
+        return {
+            uniqueChartId: `${Date.now()}-${Math.floor(Math.random() * 10000)}` // Generate a unique chartId
+        };
+    },
+    methods: {
+        createChart() {
+            const canvas = document.getElementById('chart-' + this.uniqueChartId);
+            if (canvas) {
+                // Destroy the existing chart if it exists
+                const existingChart = Chart.getChart(canvas);
+                if (existingChart) {
+                    existingChart.destroy();
+                }
+            }
 
-            // Change default options for ALL charts
-            /*Chart.defaults.set('plugins.datalabels', {
-                color: '#FE777B'
-            });*/
+            const ctx = canvas.getContext('2d');
+            Chart.register(ChartDataLabels);
 
             new Chart(ctx, {
                 type: 'doughnut',
@@ -56,18 +61,18 @@ export default {
                         datalabels: {
                             display: true,
                             color: 'white',
-                            formatter: function(value) {
+                            formatter: function (value) {
                                 return value + '%';
                             }
                         },
                         tooltip: {
                             callbacks: {
-                                label: function(context) {
+                                label: function (context) {
                                     let label = context.dataset.label || '';
                                     if (label) {
                                         label += ': ';
                                     }
-                                    
+
                                     const value = context.parsed;
                                     label += value + '%';
                                     return label;
@@ -77,31 +82,45 @@ export default {
                     }
                 }
             });
-        });
-    }
+        }
+    },
+    mounted() {
+        this.createChart();
+    },
+    watch: {
+        datasets: {
+            deep: true,
+            handler(newData) {
+                this.createChart();
+                console.log("Received updated datasets:", newData);
+                // You can also call a method to update the chart here if needed
+            }
+        }
+    },
 }
 </script>
 
 <style scoped>
-
-/*#planet-chart {
-    padding: 10px;
-}*/
 
 #chart-container {
     width: 100%;
     max-width: 350px;
     height: auto;
     position: relative;
-    margin: 10px auto 0; /* Adjust top margin to reduce the gap */
-    overflow: hidden; /* Hide any chart content overflowing the div */
+    margin: 10px auto 0;
+    /* Adjust top margin to reduce the gap */
+    overflow: hidden;
+    /* Hide any chart content overflowing the div */
 }
 
 #chart {
-    width: 100%; /* Set the chart width to 100% of the container */
-    height: auto; /* Allow the chart height to adjust proportionally */
-    max-width: 100%; /* Ensure the chart doesn't exceed the container's width */
-    max-height: 100%; /* Ensure the chart doesn't exceed the container's height */
+    width: 100%;
+    /* Set the chart width to 100% of the container */
+    height: auto;
+    /* Allow the chart height to adjust proportionally */
+    max-width: 100%;
+    /* Ensure the chart doesn't exceed the container's width */
+    max-height: 100%;
+    /* Ensure the chart doesn't exceed the container's height */
 }
-
 </style>
