@@ -29,14 +29,14 @@ def open_close_registration():
     current_time = datetime.now().strftime("%H:%M:%S")
 
     for runCourse in runCourseList:
-        startDate = runCourse["reg_Startdate"]
-        startTime = runCourse["reg_Starttime"]
+        startDate = runCourse.reg_Startdate
+        startTime = runCourse.reg_Starttime
 
         if current_date == startDate:
             if current_time >= startTime:
                 try:
                     setattr(runCourse, "runcourse_Status", "Ongoing")
-                    db.commit()
+                    db.session.commit()
 
                     return json.loads(json.dumps({"message": 'Success', "code": 200}, default=str))
                 

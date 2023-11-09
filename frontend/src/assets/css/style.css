@@ -66,6 +66,11 @@ body {
   background-color: #11a633 !important;
 }
 
+.btn-info, .btn-info:hover, .btn-info:focus{
+  background-color: teal;
+  border-color: teal;
+}
+
 /* --------------------------- MODAL ----------------------------------- */
 .modal-backdrop {
   position: fixed;
@@ -154,7 +159,7 @@ body {
 }
 
 .bg-blue {
-  background-color: blue;
+  background-color: steelblue;
 }
 
 .bg-crimson {
@@ -179,7 +184,3 @@ button:disabled, .btn.disabled {
   flex-wrap: nowrap;
   gap:8px;
 }
-
-/* th.actions, td.actions {
-  width: 15%; 
-} */

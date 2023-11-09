@@ -320,7 +320,7 @@ class BlacklistStudent(Resource):
             return "Failed. " + str(e), 500
 
 # Automate blacklist
-@scheduler.task('interval', id='check_and_blacklist_users', seconds=86400, misfire_grace_time=900) 
+@scheduler.task('cron', id='check_and_blacklist_users', hour=0, minute=0, misfire_grace_time=900) 
 # Define the function to check and blacklist users
 def check_and_blacklist_users():
     with app.app_context():

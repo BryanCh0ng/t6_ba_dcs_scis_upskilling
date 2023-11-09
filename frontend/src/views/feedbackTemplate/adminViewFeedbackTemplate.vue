@@ -28,7 +28,7 @@
                 </td>
                 <td>
                   <div class="action-buttons">
-                    <button class="btn btn-info apply_to_course text-light font-weight-bold text-nowrap" @click="openModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#apply_feedback_template_modal">Apply to Course Run(s)</button>
+                    <button class="btn btn-info apply_to_course text-light font-weight-bold text-nowrap" title="Apply Feedback Template to Course Run(s)" @click="openModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#apply_feedback_template_modal">Apply to Course Run(s)</button>
                     <button v-if="!feedback_template.existingFeedback" class="btn btn-edit edit text-light font-weight-bold text-nowrap" @click="goToEditFeedbackTemplate(feedback_template.template_ID)">Edit</button>
                     <button v-else class="btn btn-edit edit text-light font-weight-bold text-nowrap disabled" title="Unable to edit feedback template due to ongoing/past feedback period">Edit</button>
                     <button v-if="!feedback_template.existingFeedback" class="btn btn-danger delete text-light font-weight-bold text-nowrap" @click="openDeleteModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#delete_feedback_template_modal">Delete</button>

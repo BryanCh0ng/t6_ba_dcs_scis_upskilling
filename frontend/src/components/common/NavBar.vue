@@ -6,7 +6,7 @@
           <img src="../../assets/smulogo.png" title="smu logo" class="navlogo" />
           <span class="system-name">
             <span class="vertical-line"></span>
-            Upskilling Engagement <br />System
+            Upskilling <br/>Engagement <br/>System
           </span>
         </a>
         <button
@@ -249,7 +249,7 @@ export default {
 }
 
 .navbar li + li {
-  margin-left: 20px;
+  margin-left: 15px;
 }
 
 .navbar a,
@@ -288,20 +288,20 @@ export default {
 }
 
 .navlogo {
-  width: 180px;
+  width: 160px;
 }
 
 .system-name {
-  font-size: 16px;
+  font-size: 15px;
   display: flex;
   align-items: center;
-  margin-left: 10px;
+  margin-left: 5px;
   font-weight: bold;
 }
 
 .vertical-line {
   border-left: 1px solid #151c55;
-  height: 40px;
+  height: 50px;
   margin-right: 10px;
 }
 
@@ -389,11 +389,6 @@ export default {
   cursor: pointer;
 }
 
-@media (max-width: 1399px) {
-  .dropdown {
-    top: 5px;
-  }
-}
 
 @media (max-width: 768px) {
   .dropdown {
@@ -426,11 +421,9 @@ export default {
   .navbar-collapse{
     border:0px;
   }
-
 }
 
 @media (max-width: 510px) {
-  
   .system-name {
     display: none;
   }
