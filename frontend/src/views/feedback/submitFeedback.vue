@@ -80,36 +80,52 @@ export default {
     }
   },
   methods: {
+    isWithinFeedbackPeriod(start_date, start_time, end_date, end_time) {
+      const feedbackStartDate = new Date(`${start_date} ${start_time}`);
+      const feedbackEndDate = new Date(`${end_date} ${end_time}`);
+      const currentDateTime = new Date();
+      return currentDateTime >= feedbackStartDate && currentDateTime <= feedbackEndDate;
+    },
     async loadData() {
       try {
         const course_id = this.$route.params.id;
         this.course = await RunCourseService.getRunCourseById(course_id);
-        console.log(this.course)
-        this.haveError = false
-        const response = await FeedbackTemplateService.getTemplateById(this.course.template_ID)
-        console.log(response)
-        if (response.code == 200) {
+        const withinFeedbackPeriod = this.isWithinFeedbackPeriod(this.course.feedback_Startdate, this.course.feedback_Starttime, this.course.feedback_Enddate, this.course.feedback_Endtime)
+        if (!withinFeedbackPeriod) {
+          this.disabled = true;
+          this.showAlert = true;
+          this.haveError = true
+          this.title = "Submit Feedback Fail";
+          this.message = "Feedback not yet open for submission";
+          this.buttonType = "danger"
+        } else {
+          console.log(this.course)
           this.haveError = false
-          this.templateData = response.data.template.data
-          for (let i = 0; i < this.templateData.length; i++) {
-            this.templateData[i]['answer'] = '';
+          const response = await FeedbackTemplateService.getTemplateById(this.course.template_ID)
+          console.log(response)
+          if (response.code == 200) {
+            this.haveError = false
+            this.templateData = response.data.template.data
+            for (let i = 0; i < this.templateData.length; i++) {
+              this.templateData[i]['answer'] = '';
+            }
+          } else {
+            this.disabled = true;
+            this.haveError = true
+            this.errorMsge = response.message
           }
-        } else {
-          this.disabled = true;
-          this.haveError = true
-          this.errorMsge = response.message
-        }
-        const common_response = await FeedbackTemplateService.getFeedbackTemplateCommonQuestions()
-        console.log(common_response)
-        if (common_response.code == 200){
-          this.common_questions = common_response.common_questions
-          for (let i = 0; i < this.common_questions.length; i++) {
-            this.common_questions[i]['answer'] = '';
+          const common_response = await FeedbackTemplateService.getFeedbackTemplateCommonQuestions()
+          console.log(common_response)
+          if (common_response.code == 200){
+            this.common_questions = common_response.common_questions
+            for (let i = 0; i < this.common_questions.length; i++) {
+              this.common_questions[i]['answer'] = '';
+            }
+          } else {
+            this.disabled = true;
+            this.haveError = true
+            this.errorMsge = common_response.common_questions;
           }
-        } else {
-          this.disabled = true;
-          this.haveError = true
-          this.errorMsge = common_response.common_questions;
         }
       } catch (error) {
         console.log(error) 

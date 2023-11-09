@@ -169,3 +169,7 @@ button:disabled, .btn.disabled {
   display: block;
   pointer-events: auto !important;
 }
+
+.text-grey-important {
+  color: grey !important;
+}

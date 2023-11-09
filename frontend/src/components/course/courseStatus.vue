@@ -31,7 +31,7 @@
             case 'Ongoing':
                 return 'mt-1 pt-2 pb-2 badge text-light bg-medium-sea-green';
             case 'Active':
-                return 'mt-1 pt-2 pb-2 badge text-light bg-medium-sea-green';
+            return 'mt-1 pt-2 pb-2 badge text-light bg-medium-sea-green';
             case 'Retired':
                 return 'mt-1 pt-2 pb-2 badge text-light bg-secondary';
             case 'Open for voting':
@@ -40,6 +40,12 @@
                 return 'mt-1 pt-2 pb-2 badge text-light bg-medium-sea-green';
             case 'Inactive':
                 return 'mt-1 pt-2 pb-2 badge text-light bg-crimson';
+            case 'Present':
+                return 'mt-1 pt-2 pb-2 badge text-light bg-medium-sea-green';
+            case 'Absent':
+                return 'mt-1 pt-2 pb-2 badge text-light bg-crimson';
+            case 'Upcoming':
+                return 'mt-1 pt-2 pb-2 badge text-light bg-blue';
             default:
                 return 'mt-1 pt-2 pb-2 badge text-light bg-secondary';
             } 

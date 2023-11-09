@@ -20,6 +20,7 @@
               <th scope="col">End Time</th>
               <th scope="col">
                 <a href="" @click.prevent="sort('lesson_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'lesson_Status'" :sortDirection="getSortDirection('lesson_Status')"/></a></th>
+              <th scope="col" v-if="userRole != 'Student'">Attendance</th>
               <th scope="col" class="actions">Action(s)</th>
             </tr>
           </thead>
@@ -29,7 +30,8 @@
               <td class="text-nowrap"><course-date-time :date="lesson.lesson_Date"></course-date-time></td>
               <td><course-date-time :time="lesson.lesson_Starttime"></course-date-time></td>
               <td><course-date-time :time="lesson.lesson_Endtime"></course-date-time></td>
-              <td>{{ lesson.lesson_Status }}</td>
+              <td :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }" ><course-status :status="lesson.lesson_Status"></course-status></td>
+              <td v-if="userRole != 'Student'" :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }"><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewAttendance(lesson.lesson_ID)">View Attendance</a></td>
               <td v-if="lesson.lesson_Status=='Upcoming'" class="actions">
                 <div class="action-buttons">
                   <course-action status="edit-lesson" @click="editLesson(lesson.lesson_ID)"></course-action>
@@ -64,6 +66,8 @@ import LessonService from "@/api/services/LessonService.js";
 import courseDateTime from "@/components/course/courseDateTime.vue";
 import courseAction from '@/components/course/courseAction.vue';
 import DefaultModal from "@/components/DefaultModal.vue";
+import UserService from "@/api/services/UserService.js";
+import courseStatus from '../../components/course/courseStatus.vue';
 
 // Utility function to show a success message
 function showSuccessMessage(vm) {
@@ -87,7 +91,8 @@ export default {
     VueAwesomePaginate,
     courseDateTime,
     courseAction,
-    DefaultModal
+    DefaultModal,
+    courseStatus
   },
   data() {
     return {
@@ -98,7 +103,7 @@ export default {
       itemsPerPage: 10,
       localCurrentPageLessons: 1,
       errorMsge: 'No records found',
-      // Modal
+      userRole: '',
       title: "",
       message: "",
       buttonType: "",
@@ -170,6 +175,9 @@ export default {
     editLesson(lessonId) {
       this.$router.push({ name: 'editRunCourseLesson', params: { id: lessonId }});
     },
+    goToViewAttendance(lessonId) {
+      this.$router.push({ name: 'viewAttendance', params: {lessonId: lessonId}});
+    },
     isEndDatePassed(endDate) {
       const today = new Date();
       const runEndDate = new Date(endDate);
@@ -196,13 +204,22 @@ export default {
     }
   },
   async created() {
-    this.loadData();
+    const user_ID = await UserService.getUserID();
+    const role = await UserService.getUserRole(user_ID);
+    this.userRole = role;
+    this.loadData()
+    // if (role == 'Student') {
+    //   this.$router.push({ name: 'studentViewCourse' }); 
+    // } else {
+    //   this.loadData();
+    // }
   },
   
   }
 </script>
 
 <style>
+@import '../../assets/css/course.css';
 @import '../../assets/css/paginate.css';
 
 .action-buttons {

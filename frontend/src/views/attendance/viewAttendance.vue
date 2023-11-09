@@ -36,7 +36,7 @@
                 <td>{{ attendance.user_ID }}</td>
                 <td>{{ attendance.user_Name }}</td>
                 <td>{{ attendance.user_Email }}</td>
-                <td>{{ attendance.status }}</td>
+                <td><course-status :status="attendance.status"></course-status></td>
                 <td>{{ attendance.reason }}</td>
               </tr>               
             </tbody>
@@ -89,10 +89,12 @@
   import LessonService from "@/api/services/LessonService.js";
   import {convertDate, convertTime} from '@/scripts/common/convertDateTime.js';
   import DefaultModal from "@/components/DefaultModal.vue";
+  import courseStatus from '../../components/course/courseStatus.vue';
 
   export default {
     components: {
       sortIcon,
+      courseStatus,
       DefaultModal
     },
     data() {
@@ -113,7 +115,7 @@
         message: "",
         buttonType: "",
         showAlert: false,
-        allowAction: false
+        allowAction: false,
       }
     },
     methods: {
