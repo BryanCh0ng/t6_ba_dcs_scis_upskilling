@@ -7,8 +7,13 @@ from sqlalchemy import asc
 from core_features import common
 import json
 from sqlalchemy.orm import aliased
+from flask_apscheduler import APScheduler
 
 api = Namespace('attendance', description='Attendance related operations')
+
+scheduler = APScheduler()
+scheduler.init_app(app)
+scheduler.start()
 
 get_attendance_by_lesson_id = api.parser()
 get_attendance_by_lesson_id.add_argument("lesson_id", help="Enter lesson id")
@@ -72,58 +77,58 @@ class GetAttendanceByLessonId(Resource):
           return {"code": 404, "message": "Failed " + str(e)}, 404
 
 
-get_attendances_by_trainer_instructor_id = api.parser()
-get_attendances_by_trainer_instructor_id.add_argument("trainer_instructor_id", help="Enter trainer/instructor id")
-@api.route("/get_attendance_by_trainer_instructor_id")
-@api.doc(description="Get attendance by trainer instructor id")
-class GetAttendanceByLessonId(Resource):
-    @api.expect(get_attendances_by_trainer_instructor_id)
-    def get(self):
-      try:
-        user_role = common.getUserRole()
-        if (user_role) == 'Student':
-            return {"code": 400, "message": "Unathorized Access, Failed to get attendance record"}, 404
+# get_attendances_by_trainer_instructor_id = api.parser()
+# get_attendances_by_trainer_instructor_id.add_argument("trainer_instructor_id", help="Enter trainer/instructor id")
+# @api.route("/get_attendance_by_trainer_instructor_id")
+# @api.doc(description="Get attendance by trainer instructor id")
+# class GetAttendanceByLessonId(Resource):
+#     @api.expect(get_attendances_by_trainer_instructor_id)
+#     def get(self):
+#       try:
+#         user_role = common.getUserRole()
+#         if (user_role) == 'Student':
+#             return {"code": 400, "message": "Unathorized Access, Failed to get attendance record"}, 404
 
-        trainer_instructor_id = get_attendances_by_trainer_instructor_id.parse_args().get("trainer_instructor_id")
+#         trainer_instructor_id = get_attendances_by_trainer_instructor_id.parse_args().get("trainer_instructor_id")
 
         
-        runcourse_query = (
-           db.session.query(RunCourse).filter(RunCourse.instructor_ID == trainer_instructor_id).all()
-        )
+#         runcourse_query = (
+#            db.session.query(RunCourse).filter(RunCourse.instructor_ID == trainer_instructor_id).all()
+#         )
 
-        rcourses = [rcourse.json() for rcourse in runcourse_query]
+#         rcourses = [rcourse.json() for rcourse in runcourse_query]
 
-        attendances = {}
-        for rcourse in rcourses:
-            db_query = (
-                db.session.query(Lesson, AttendanceRecord)
-                .join(RunCourse, Lesson.rcourse_ID == RunCourse.rcourse_ID)
-                .join(AttendanceRecord, Lesson.lesson_ID == AttendanceRecord.lesson_ID)
-                .filter(RunCourse.rcourse_ID == rcourse['rcourse_ID'])
-                .all()
-            )
+#         attendances = {}
+#         for rcourse in rcourses:
+#             db_query = (
+#                 db.session.query(Lesson, AttendanceRecord)
+#                 .join(RunCourse, Lesson.rcourse_ID == RunCourse.rcourse_ID)
+#                 .join(AttendanceRecord, Lesson.lesson_ID == AttendanceRecord.lesson_ID)
+#                 .filter(RunCourse.rcourse_ID == rcourse['rcourse_ID'])
+#                 .all()
+#             )
 
-            lesson_attendance = {}
-            for lesson, attendance_record in db_query:
-                if lesson not in lesson_attendance:
-                    lesson_attendance[lesson] = []
-                lesson_attendance[lesson].append(attendance_record)
+#             lesson_attendance = {}
+#             for lesson, attendance_record in db_query:
+#                 if lesson not in lesson_attendance:
+#                     lesson_attendance[lesson] = []
+#                 lesson_attendance[lesson].append(attendance_record)
 
-            # Convert the dictionary to a list of key-value tuples
-            lesson_attendance_list = list(lesson_attendance.items())
+#             # Convert the dictionary to a list of key-value tuples
+#             lesson_attendance_list = list(lesson_attendance.items())
 
-            print(lesson_attendance_list)
-            if rcourse not in attendances:
-                attendances[tuple(rcourse.items())] = []
+#             print(lesson_attendance_list)
+#             if rcourse not in attendances:
+#                 attendances[tuple(rcourse.items())] = []
 
-            attendances[tuple(rcourse.items())].append(lesson_attendance_list)
+#             attendances[tuple(rcourse.items())].append(lesson_attendance_list)
 
-        if attendances:
-            return {"code": 200, "data": attendances}, 200
-        else:
-            return {"code": 400, "message": "There is no attendance record for this lesson"}, 400
-      except Exception as e:
-          return {"code": 404, "message": "Failed " + str(e)}, 404
+#         if attendances:
+#             return {"code": 200, "data": attendances}, 200
+#         else:
+#             return {"code": 400, "message": "There is no attendance record for this lesson"}, 400
+#       except Exception as e:
+#           return {"code": 404, "message": "Failed " + str(e)}, 404
 
 
 update_attendance_by_lesson_id = api.parser()
@@ -235,3 +240,87 @@ class updateAttendanceByLessonId(Resource):
             print(str(e))
             db.session.rollback()
             return jsonify({"code": 500, "message": "Failed " + str(e)}), 500
+
+
+# Automate update student attendance
+@scheduler.task('interval', id='check_and_update_student_attendance', seconds=1, misfire_grace_time=30) 
+def check_and_update_student_attendance():
+    with app.app_context():
+        try:
+            def get_attendance_list_from_lesson_id(lesson_id):
+                try:
+                    registration_alias = aliased(Registration, name="registration_alias")
+                    attendance_record_alias = aliased(AttendanceRecord, name="attendance_record_alias")
+
+                    attendance_record_query = (
+                        db.session.query(attendance_record_alias, User.user_Name, User.user_Email, RunCourse.run_Name, registration_alias, RunCourse.instructor_ID)
+                        .join(User, registration_alias.user_ID == User.user_ID)
+                        .join(Lesson, Lesson.rcourse_ID == registration_alias.rcourse_ID)
+                        .outerjoin(attendance_record_alias, (attendance_record_alias.user_ID == registration_alias.user_ID) & (attendance_record_alias.lesson_ID == lesson_id))
+                        .join(RunCourse, RunCourse.rcourse_ID == Lesson.rcourse_ID)
+                        .filter(
+                            registration_alias.reg_Status == 'Enrolled',
+                            Lesson.lesson_ID == lesson_id
+                        )
+                        .order_by(User.user_Name.asc())
+                        .all()
+                    )
+                    attendances = []
+                    db.session.close()
+                    if attendance_record_query:
+                        for attendance, user_name, user_email, run_name, registration, instructor_id in attendance_record_query:
+                            if attendance is None:
+                                attendances.append({
+                                    'status': 'Pending',
+                                    'reason': '',
+                                    'attrecord_Status': 'Pending',
+                                    'user_ID': registration.user_ID, 
+                                    'user_Name': user_name,
+                                    'user_Email': user_email,
+                                    'run_Name': run_name,
+                                    'instructor_ID': instructor_id
+                                })
+                        return {"code": 200, "attendances": attendances}, 200
+                    else:
+                        return {"code": 400, "message": "There is no attendance record for this lesson"}, 400
+                except Exception as e:
+                    return {"code": 404, "message": "Failed " + str(e)}, 404
+            
+            def add_update_attendance(lesson_id, student_id):
+                try:
+                    attendance_record_query = db.session.query(AttendanceRecord).filter(
+                            AttendanceRecord.user_ID == student_id,
+                            AttendanceRecord.lesson_ID == lesson_id
+                        ).first()
+                    if attendance_record_query:
+                        return True
+                    else:
+                        new_attendance_record = AttendanceRecord(None, lesson_ID = lesson_id, status='Absent', attrecord_Status='Submited', reason='Attendance not submitted on lesson day', user_ID=student_id)
+                        db.session.add(new_attendance_record)
+                        db.session.commit()
+                        return True
+                except Exception as e:
+                    db.session.rollback()
+                    return False
+
+
+            today = datetime.now().date()
+            lessons = session.query(Lesson).filter(Lesson.lesson_date < today).all()
+            if lessons:
+                for lesson in lessons:
+                    attendance_response = get_attendance_list_from_lesson_id(lesson['lesson_ID'])
+                    print(attendance_response)
+                    if attendance_response["code"] == 200:
+                        attendances = attendance_response["attendances"]
+                        for attendance in attendances:
+                            update_attendance_response = add_update_attendance(lesson['lesson_ID'], attendance['user_ID'])
+                            print(update_attendance_response)
+                    print(lesson.lesson_ID)         
+                
+            db.session.close()
+            return jsonify({ "code": 201, "message": "Attendance has been successfully updated!"} )   
+
+        except Exception as e:
+            db.session.rollback()
+            print(str(e))
+            print(f"Error while update student attendance: {str(e)}")

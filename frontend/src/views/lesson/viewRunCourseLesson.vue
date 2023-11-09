@@ -32,7 +32,7 @@
               <td><course-date-time :time="lesson.lesson_Endtime"></course-date-time></td>
               <td :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }" ><course-status :status="lesson.lesson_Status"></course-status></td>
               <td v-if="userRole != 'Student'" :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }"><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewAttendance(lesson.lesson_ID)">View Attendance</a></td>
-              <td v-if="lesson.lesson_Status=='Upcoming'" class="actions">
+              <td v-if="lesson.lesson_Status=='Upcoming' && userRole == 'Admin'" class="actions">
                 <div class="action-buttons">
                   <course-action status="edit-lesson" @click="editLesson(lesson.lesson_ID)"></course-action>
                   <course-action status="remove-lesson" @click="removeLesson(lesson.lesson_ID)"></course-action>

@@ -12,11 +12,10 @@ api = Namespace('feedback', description='Feedback related operations')
 
 post_feedback_student = api.parser()
 @api.route("/post_feedback_student" ,methods=["POST", "GET"])
-@api.doc(description="Search if template id exists, if does get template, else create new template")
+@api.doc(description="Submit Student Feedback")
 class GetTemplate(Resource):
     @api.expect(post_feedback_student)
     def post(self):
-        
         new_student_feedback = request.json
         courseID = new_student_feedback.get("rcourse_id")
         templateID = new_student_feedback.get("template_id")
@@ -45,8 +44,6 @@ class GetTemplate(Resource):
                 for eachdata in data:
                    AttributeID = eachdata.get("attribute_id")
                    answer = eachdata.get("answer")
-                   print(AttributeID)
-                   print(answer)
                    NewFeedback =Feedback( None, templateID, userID, AttributeID, answer, courseID)
                    db.session.add(NewFeedback)
                    db.session.commit()
