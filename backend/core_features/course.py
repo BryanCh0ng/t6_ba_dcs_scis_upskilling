@@ -1684,16 +1684,15 @@ class AdminUpdateRunCourse(Resource):
             db.session.rollback()
             return jsonify({"message": f"Failed to update course: {str(e)}", "code": 500})
 
-combined_search_parser = api.parser()
-combined_search_parser.add_argument("course_name", help="Enter course name", location="args")
-combined_search_parser.add_argument("coursecat_id", help="Enter course category id", location="args")
-
+student_enrolled_courses_with_attendance = api.parser()
+student_enrolled_courses_with_attendance.add_argument("course_name", help="Enter course name", location="args")
+student_enrolled_courses_with_attendance.add_argument("coursecat_id", help="Enter course category id", location="args")
 @api.route("/studentEnrolledCourse/<int:user_ID>")
 class GetUserCourses(Resource):
-    @api.expect(combined_search_parser)
+    @api.expect(student_enrolled_courses_with_attendance)
     def get(self, user_ID):
         try:
-            args = combined_search_parser.parse_args()
+            args = student_enrolled_courses_with_attendance.parse_args()
             course_name = args.get("course_name")
             coursecat_id = args.get("coursecat_id")
 
