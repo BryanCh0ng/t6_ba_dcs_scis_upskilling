@@ -20,9 +20,9 @@
                   <a href="" @click.prevent="sort('course_Name')" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                 <th scope="col">
                   <a href="" @click.prevent="sort('course_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'course_Status'" :sortDirection="getSortDirection('course_Status')"/></a></th>
-                <th scope="col">Feedback</th>
                 <th scope="col">Course Details</th>
                 <th scope="col">Course Run(s)</th>
+                <th scope="col">Feedback</th>
                 <th scope="col">Action(s)</th>
               </tr>
             </thead>
@@ -34,9 +34,9 @@
                 <td class="pl-0 border-top">
                     <course-status :status="course.course_Status"></course-status>
                 </td>
-                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToCourseFeedbackAnalysis(course.course_ID)">View Feedback Analysis</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewCourseRun(course.course_ID)">View Runs</a></td>
+                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToCourseFeedbackAnalysis(course.course_ID)">View Feedback Analysis</a></td>
                 <div>
                   <td v-if="course.course_Status === 'Active'"><course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
                   <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
