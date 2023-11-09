@@ -86,8 +86,6 @@ retrieve_student_parser.add_argument(
     "blacklisted", help="Filter by blacklisted status")
 
 # Define the API route for getting all student users
-
-
 @api.route("/get_all_student")
 @api.doc(description="Get all student users")
 class GetAllAdmin(Resource):
@@ -330,8 +328,7 @@ def check_and_blacklist_users():
             # Get a list of all users
             users = db.session.query(User).all()
 
-            # current_date = datetime.now()
-            # print(current_date.date())
+            current_date = datetime.now().date()
 
             for user in users:
                 user_ID = user.user_ID
@@ -341,7 +338,8 @@ def check_and_blacklist_users():
                     Registration, Registration.rcourse_ID == RunCourse.rcourse_ID
                 ).filter(
                     Registration.user_ID == user_ID,
-                    Registration.reg_Status == "Enrolled"
+                    Registration.reg_Status == "Enrolled",
+                    RunCourse.run_Startdate <= current_date
                 ).all()
 
                 for run_course in run_courses:

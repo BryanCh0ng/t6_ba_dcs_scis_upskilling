@@ -355,7 +355,7 @@ export default {
 
 .dropdown {
   position: relative;
-  top: 12px;
+  top: 15px;
 }
 
 .dropdown-content {
@@ -387,6 +387,12 @@ export default {
 .dropdown-content li {
   padding: 2px 14px;
   cursor: pointer;
+}
+
+@media (max-width: 1399px) {
+  .dropdown {
+    top: 5px;
+  }
 }
 
 @media (max-width: 768px) {
