@@ -35,7 +35,7 @@
             case 'Retired':
                 return 'mt-1 pt-2 pb-2 badge text-light bg-secondary';
             case 'Open for voting':
-                return 'mt-1 pt-2 pb-2 badge text-light bg-medium-sea-green';
+                return 'mt-1 pt-2 pb-2 badge text-light bg-blue';
             case 'Offered for students to register':
                 return 'mt-1 pt-2 pb-2 badge text-light bg-medium-sea-green';
             case 'Inactive':

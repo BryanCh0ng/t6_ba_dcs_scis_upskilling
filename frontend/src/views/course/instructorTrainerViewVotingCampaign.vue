@@ -2,7 +2,7 @@
   <div>
     <search-filter
       :search-api="searchAllOngoingVoteCourse" 
-      @search-complete="handleSearchComplete" />
+      @search-complete="handleSearchComplete" class="pt-2"/>
 
     <div class="container col-12">
       <h5 class="pb-3">Courses Available for Students to Indicate Interest</h5>

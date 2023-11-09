@@ -26,6 +26,7 @@
     <button class="btn btn-success view-feedback text-light font-weight-bold text-nowrap" v-else-if="status == 'view-feedback'" title="View Feedback">View Feedback</button>  
     <button class="btn btn-secondary rejected-reason text-light font-weight-bold text-nowrap" v-else-if="status == 'rejected-reason'" title="View Rejected Reason">View Rejected Reason</button>  
     <button @click=voteAction(course.course_ID) class="btn btn-danger unoffered-vote text-light font-weight-bold text-nowrap" v-else-if="status == 'unoffered-vote'" title="Delete">Delete</button>
+    <button @click=runCourseAction(course.rcourse_ID) class="btn btn-danger delete-run-course text-light font-weight-bold text-nowrap" v-else-if="status == 'delete-run-course'">Delete</button>
     <button class="btn btn-danger delete-lesson text-light font-weight-bold text-nowrap" v-else-if="status == 'remove-lesson'" title="Remove Lesson">Remove Lesson</button>
     <button class="btn btn-edit edit text-light font-weight-bold text-nowrap" v-else-if="status == 'edit-lesson'" title="Edit Lesson">Edit Lesson</button>   
   </div>

@@ -60,7 +60,7 @@
         </div>
       </div>
       <div class="pt-5 row">
-        <div class="col-12 d-flex" v-if="showRatings">
+        <div class="col-12 d-flex">
           <h5 class="col-6">{{ course_rating }}</h5>
         </div>
         <div class="col-12 d-flex">
@@ -103,8 +103,7 @@ export default {
       errorMessage: '',
       feedback_reviews: {},
       course_rating: "",
-      total_feedbacks: "",
-      showRatings: true
+      total_feedbacks: ""
     };
   },
   computed: {

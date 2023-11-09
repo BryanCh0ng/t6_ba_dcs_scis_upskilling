@@ -1,6 +1,6 @@
 <template>
   <div id="searchfilter">
-    <div class="container mb-5">
+    <div class="container mt-5 mb-5">
       <form>
         <div class="row">
           <div class="col-md">
@@ -16,7 +16,7 @@
           </div>
           <div class="col-md col-lg-3">
             <div class="d-flex justify-content-between">
-              <button @click="resetFilter" class="btn" id="resetbtn" button="type">Clear</button>
+              <button @click="resetFilter" class="btn" id="resetbtn" button="type">Reset</button>
               <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
             </div>
           </div>

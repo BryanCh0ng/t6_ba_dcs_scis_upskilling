@@ -92,7 +92,8 @@ class runCourseService extends BaseApiService {
     } catch (error) {
         return this.handleError(error);
     }
-}
+  }
+  
   async getRunCourseCountByCourseId(courseId) {
     try {
       let run_course_count = await axiosClient.get("/runcourse/get_run_course_count_by_course_id", { params: { course_id: courseId } });

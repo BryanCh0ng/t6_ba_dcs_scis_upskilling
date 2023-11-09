@@ -4,7 +4,7 @@
         :status-options="statusOptions"
         :search-api="searchAllCourseAdmin" 
         @search-complete="handleSearchComplete" 
-        :default-status="'Active'" class="pt-4"/>
+        :default-status="'Active'" class="pt-5"/>
 
       <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Courses</h5>
@@ -20,9 +20,9 @@
                   <a href="" @click.prevent="sort('course_Name')" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                 <th scope="col">
                   <a href="" @click.prevent="sort('course_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'course_Status'" :sortDirection="getSortDirection('course_Status')"/></a></th>
-                <th scope="col">Feedback</th>
                 <th scope="col">Course Details</th>
                 <th scope="col">Course Run(s)</th>
+                <th scope="col">Feedback</th>
                 <th scope="col">Action(s)</th>
               </tr>
             </thead>
@@ -34,16 +34,24 @@
                 <td class="pl-0 border-top">
                     <course-status :status="course.course_Status"></course-status>
                 </td>
-                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToCourseFeedbackAnalysis(course.course_ID)">View Feedback Analysis</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewCourseRun(course.course_ID)">View Runs</a></td>
-                <div>
-                  <td v-if="course.course_Status === 'Active'"><course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-                  <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-                  <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action></td>
-                  <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course" @click="goToCreateRunCourseWithId(course.course_ID)"></course-action></td>
-                  <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Retire" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-                </div>
+                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToCourseFeedbackAnalysis(course.course_ID)">View Feedback Analysis</a></td>
+                <td v-if="course.course_Status === 'Active'" class="actions">
+                  <div class="action-buttons">
+                    <course-action v-if="course.course_Status === 'Active'" status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action>
+                    <course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action>
+                    <course-action status="create_run" :course="course" @click="goToCreateRunCourseWithId(course.course_ID)"></course-action>
+                  </div>
+                </td>
+                <td v-else-if="course.course_Status === 'Inactive'" class="actions">
+                  <div class="action-buttons">
+                    <course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action>
+                    <course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action>
+                    <course-action status="Retire" @action-and-message-updated="handleActionData" :course="course"></course-action>
+                  </div>
+                </td>
+                <td v-else></td>
               </tr>               
             </tbody>
           </table>

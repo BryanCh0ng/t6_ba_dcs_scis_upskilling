@@ -1,10 +1,13 @@
 <template>
-    <div id="searchfitler">
-        <div class="container mt-5 mb-5">
+    <div id="allLessonsSearchFilter">
+        <div class="container mb-5">
             <form>
                 <div class="row">
                     <div class="col-md">
-                        <input v-model="courseName" type="text" placeholder="Course Name" class="form-control border-0 shadow-sm px-4 field mb-3"/>
+                        <input v-model="courseName" type="text" placeholder="Run Course Name" class="form-control border-0 shadow-sm px-4 field mb-3"/>
+                    </div>
+                    <div class="col-md">
+                        <input v-model="instructorName" type="text" placeholder="Instructor Name" class="form-control border-0 shadow-sm px-4 field mb-3"/>
                     </div>
                     <div class="col-md">
                         <dropdown-field
@@ -13,9 +16,16 @@
                         <option v-for="option in categoryDropdownOptions" :key="option.coursecat_ID" :value="option.coursecat_ID">{{ option.coursecat_Name }}</option>
                         </dropdown-field>
                     </div>
-                    <div class="col-md col-lg-3">
+                    <div class="col-md">
+                        <dropdown-field
+                        v-model="status"
+                        :default-placeholder="'Status'">
+                        <option v-for="option in statusDropdownOptions" :key="option" :value="option">{{ option }}</option>
+                        </dropdown-field>
+                    </div>
+                    <div class="col-md">
                         <div class="d-flex justify-content-between">
-                            <button @click="resetFilter" class="btn" id="resetbtn" button="type">Reset</button>
+                            <button @click="resetFilter" class="btn" id="resetbtn" type="button">Reset</button>
                             <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
                         </div>
                     </div>
@@ -27,7 +37,6 @@
 
 <script>
 import DropdownField from "../DropdownField.vue";
-// import CourseService from "@/api/services/CourseService.js"
 import CourseCategoryService from "@/api/services/CourseCategoryService.js"
 
 export default({
@@ -35,29 +44,29 @@ export default({
     data() {
         return {
             courseName: "",
+            instructorName: "",
             category: "",
+            status: "",
+            placeholder: "Course Name",
             categoryDropdownOptions: [],
+            statusDropdownOptions: [],
         };
+    },
+    props: {
+        statusOptions: Array, 
+        searchApi: Function,
     },
     components: {
         DropdownField,
     },
     async mounted() {
-        // await this.getAllCourses();
-        // await this.searchFilterCourses();
         await this.fetchCategoryDropdownOptions();
-    },
-    props: {
-        searchApi: Function,
+        this.statusDropdownOptions = this.statusOptions;
     },
     methods: {
-        // async getAllCourses() {
-        //     let response = await CourseService.getAllCourses();
-        //     this.courseList = response.data.course;
-        // },
         async fetchCategoryDropdownOptions() {
             try {
-                const categoryOptions = await CourseCategoryService.getAllCourseCategory(); // Use the CourseCategoryService
+                const categoryOptions = await CourseCategoryService.getAllCourseCategory();
                 this.categoryDropdownOptions = categoryOptions;
             } catch (error) {
                 console.error('Error fetching category dropdown options:', error);
@@ -65,25 +74,30 @@ export default({
         },
         resetFilter() {
             this.courseName = "";
+            this.instructorName = "";
             this.category = "";
+            this.status = "";
+            this.placeholder="Course Name"
 
             this.searchFilter();
         },
         async searchFilter() {
             try {
                 const course_Name = this.courseName;
+                const instructor_Name = this.instructorName;
                 const coursecat_ID = this.category;
-                console.log(coursecat_ID)
+                const status = this.status;
 
                 let searchResults;
-
-                searchResults = await this.searchApi(course_Name, coursecat_ID);
-
+                
+                searchResults = await this.searchApi(course_Name, instructor_Name, coursecat_ID, status);
+                
+                // Emit the search-complete event to the parent component
                 this.$emit("search-complete", searchResults);
             } catch (error) {
                 console.log("Error fetching info:", error);
             }
-            
+
         }
     }
 })

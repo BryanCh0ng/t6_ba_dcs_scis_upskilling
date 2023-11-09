@@ -2,15 +2,25 @@ import { axiosClient } from "../axiosClient";
 import BaseApiService from "../BaseApiService";
 
 class LessonService extends BaseApiService {
-    async getAllLessons() {
+    async getAllLessons(runcourse_Name, instructor_Name, coursecat_id, lesson_Status) {
+        console.log(runcourse_Name);
+        console.log(coursecat_id);
+        console.log(instructor_Name);
+        console.log(lesson_Status);
         try {
-            let response = await axiosClient.get("/lesson/get_all_lessons")
-            // console.log(response)
-            return response.data
+            let response = await axiosClient.get("/lesson/get_all_lessons", {
+                params: {
+                    runcourse_Name: runcourse_Name,
+                    instructor_Name: instructor_Name,
+                    coursecat_id: coursecat_id,
+                    lesson_Status: lesson_Status
+                }
+            });
+            return response.data;
         } catch (error) {
-            return this.handleError(error)
+            return this.handleError(error);
         }
-    } 
+    }
 
     async getRunCourseById(runcourseId) {
       try {

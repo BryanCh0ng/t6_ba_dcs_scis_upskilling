@@ -1,6 +1,6 @@
 <template>
     <div id="createLesson">
-        <div class="container mt-5">
+        <div class="container pt-5">
             <h2 class="text-center mb-4">Add lesson(s) for {{ runcourse_Name }}</h2>
             <h5 class="text-center mb-4">From {{ convertDate(runcourse_Startdate) }} ({{ convertTime(runcourse_Starttime) }} - {{ convertTime(runcourse_Endtime) }}) to {{ convertDate(runcourse_Enddate) }} ({{ convertTime(runcourse_Starttime) }} - {{ convertTime(runcourse_Endtime) }})</h5>
             
@@ -89,6 +89,7 @@ function showSuccessMessage(vm) {
   vm.message = "You have successfully add lesson(s) for the run course.";
   vm.showAlert = true;
   vm.buttonType = "success";
+  vm.modalType = "SuccessMessage"
 }
 
 function showUnsuccessMessage(vm, customTitle, customMessage) {
@@ -301,7 +302,7 @@ export default {
             
             if (this.modalType === "UnsuccessMessage") {
                 this.showAlert = false;
-            } else {
+            } else if (this.modalType === "SuccessMessage") {
                 this.$router.go(-1);
             }
         }

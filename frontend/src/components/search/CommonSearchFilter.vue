@@ -23,7 +23,7 @@
                     </div>
                     <div class="col-md">
                         <div class="d-flex justify-content-between">
-                            <button @click="resetFilter" class="btn" id="resetbtn" type="button">Clear All</button>
+                            <button @click="resetFilter" class="btn" id="resetbtn" type="button">Reset</button>
                             <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
                         </div>
                     </div>

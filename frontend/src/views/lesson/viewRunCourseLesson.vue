@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="container col-12 d-flex mb-3 w-100">
+    <div class="container pt-5 col-12 d-flex mb-3 w-100">
         <h5 v-if="lessons && lessons.length > 0" class="col m-auto">All Lessons for {{ lessons[0].run_Name }} </h5>
         <h5 v-else>All Lessons</h5>
-        <button v-if="lessons && lessons.length > 0 && !isEndDatePassed(lessons[0].run_course.run_Enddate)" class="btn btn-primary" @click="goToCreateLesson(lessons.rcourse_ID)">Add Lesson(s)</button>
+        <button v-if="userRole === 'Admin' && lessons && lessons.length > 0 && !isEndDatePassed(lessons[0].run_course.run_Enddate)" class="btn btn-primary" @click="goToCreateLesson(lessons.rcourse_ID)">Add Lesson(s)</button>
     </div>
 
     <div class="container col-12 ">
@@ -38,7 +38,7 @@
                   <course-action status="remove-lesson" @click="removeLesson(lesson.lesson_ID)"></course-action>
                 </div>
               </td>
-              <td v-else></td>
+              <td v-if="userRole === 'Admin'"></td>
             </tr>               
           </tbody>
         </table>
@@ -63,6 +63,7 @@ import modalCourseContent from '@/components/course/modalCourseContent.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import CommonService from "@/api/services/CommonService.js";
 import LessonService from "@/api/services/LessonService.js";
+import UserService from "@/api/services/UserService.js";
 import courseDateTime from "@/components/course/courseDateTime.vue";
 import courseAction from '@/components/course/courseAction.vue';
 import DefaultModal from "@/components/DefaultModal.vue";
@@ -108,6 +109,7 @@ export default {
       message: "",
       buttonType: "",
       showAlert: false,
+      userRole: ""
     }
   },
   computed: {
@@ -201,7 +203,7 @@ export default {
     async handleModalClosed(value) {
       this.showAlert = value;
       this.loadData();   
-    }
+    },
   },
   async created() {
     const user_ID = await UserService.getUserID();
@@ -221,15 +223,5 @@ export default {
 <style>
 @import '../../assets/css/course.css';
 @import '../../assets/css/paginate.css';
-
-.action-buttons {
-  display: flex;
-  flex-wrap: nowrap;
-  gap:8px;
-}
-
-th.actions, td.actions {
-  width: 15%; 
-}
 
 </style>
