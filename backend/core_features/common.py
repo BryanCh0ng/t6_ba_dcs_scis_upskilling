@@ -62,7 +62,6 @@ def getUserRole(user_ID=None):
     
 def getUserID():
     user_ID = session.get('user_ID')
-    print(user_ID)
     if user_ID:
         id = User.query.filter_by(user_ID=user_ID).first().user_ID
         db.session.close()

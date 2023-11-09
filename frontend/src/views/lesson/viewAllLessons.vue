@@ -20,19 +20,21 @@
                 <th scope="col">
                   <a href="" @click.prevent="sort('lesson_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'lesson_Status'" :sortDirection="getSortDirection('lesson_Status')"/></a></th>
                 <th scope="col">Course Details</th>
+                <th scope="col" v-if="userRole != 'Student'">Attendance</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(lesson, key) in displayedLessons" :key="key">
-              <td class="name">
+                <td class="name">
                   <course-name-desc :name="lesson.run_course.run_Name" :category="lesson.run_course.coursecat_Name" :description="lesson.run_course.course_Desc"></course-name-desc>
                 </td>
                 <td>{{ lesson.instructor_Name }}</td>
                 <td class="text-nowrap"><course-date-time :date="lesson.lesson_Date"></course-date-time></td>
                 <td><course-date-time :time="lesson.lesson_Starttime"></course-date-time></td>
                 <td><course-date-time :time="lesson.lesson_Endtime"></course-date-time></td>
-                <td>{{ lesson.lesson_Status }}</td>
+                <td :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }" ><course-status :status="lesson.lesson_Status"></course-status></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(lesson.run_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
+                <td v-if="userRole != 'Student'" :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }"><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewAttendance(lesson.lesson_ID)">View Attendance</a></td>
               </tr>               
             </tbody>
           </table>
@@ -58,7 +60,8 @@
   import CommonService from "@/api/services/CommonService.js";
   import LessonService from "@/api/services/LessonService.js";
   import courseDateTime from "@/components/course/courseDateTime.vue";
-  
+  import UserService from "@/api/services/UserService.js";
+  import courseStatus from '../../components/course/courseStatus.vue';
   
   export default {
     components: {
@@ -66,7 +69,8 @@
       modalCourseContent,
       VueAwesomePaginate,
       courseNameDesc,
-      courseDateTime
+      courseDateTime,
+      courseStatus
     },
     data() {
       return {
@@ -77,7 +81,8 @@
         itemsPerPage: 10,
         localCurrentPageLessons: 1,
         receivedMessage: '',
-        errorMsge: 'No records found'
+        errorMsge: 'No records found',
+        userRole: ''
       }
     },
     computed: {
@@ -133,14 +138,26 @@
           if (sort_response.code == 200) {
             this.lessons = sort_response.data
           }
+      },
+      goToViewAttendance(lesson_id) {
+        this.$router.push({ name: 'viewAttendance', params: {lessonId: lesson_id}});
       }
     },
     async created() {
+      const user_ID = await UserService.getUserID();
+      const role = await UserService.getUserRole(user_ID);
+      this.userRole = role
       this.loadData();
+      // if (role == 'Student') {
+      //   this.$router.push({ name: 'studentViewCourse' }); 
+      // } else {
+      //   this.loadData();
+      // }
     },
     }
 </script>
   
 <style>
+  @import '../../assets/css/course.css';
   @import '../../assets/css/paginate.css';
 </style>

@@ -6,9 +6,9 @@
         <input
         type="radio"
         :name="label"
-        :value="option.option"
+        :value="option.position"
         :disabled="disabled"
-        :checked="sOption === option.option"
+        :checked="sOption == option.position"
         v-model="selectedOption"
       />{{ option.option }}
       </div>

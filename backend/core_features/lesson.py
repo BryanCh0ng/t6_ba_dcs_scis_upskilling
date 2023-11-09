@@ -260,30 +260,29 @@ class RemoveLesson(Resource):
             return {"code": 500, "message": f"An error occurred while trying to remove the lesson: {str(e)}"}, 500
 
 get_lesson_info = api.parser()
-get_lesson_info.add_argument('lesson_ID', type=int, required=True, help='ID of the lesson to be removed')
-
+get_lesson_info.add_argument("lesson_ID", help="Enter lesson id")
 @api.route("/get_lesson_by_id")
 @api.doc(description="Get a lesson by its ID")
-@api.param('lesson_id', 'The ID of the lesson')
 class GetLessonById(Resource):
     @api.expect(get_lesson_info)
     def get(self):
         try:
-            args = remove_lesson_parser.parse_args()
+            args = get_lesson_info.parse_args()
             lesson_id = args.get('lesson_ID')
-
-            lesson = Lesson.query.get(lesson_id)
+            lesson = db.session.query(Lesson, RunCourse.course_Venue).join(
+                RunCourse, Lesson.rcourse_ID == RunCourse.rcourse_ID).filter(
+                Lesson.lesson_ID == lesson_id
+            ).first()
+            db.session.close()
             if lesson:
-                
                 lesson_data = {
-                    "lesson_ID": lesson.lesson_ID,
-                    "rcourse_ID": lesson.rcourse_ID,
-                    "lesson_Date": common.format_date_time(lesson.lesson_Date),
-                    "lesson_Starttime": lesson.lesson_Starttime.strftime('%H:%M:%S'),
-                    "lesson_Endtime": lesson.lesson_Endtime.strftime('%H:%M:%S'),
-                    
+                    "lesson_ID": lesson[0].lesson_ID,
+                    "rcourse_ID": lesson[0].rcourse_ID,
+                    "lesson_Date": common.format_date_time(lesson[0].lesson_Date),
+                    "lesson_Starttime": lesson[0].lesson_Starttime.strftime('%H:%M:%S'),
+                    "lesson_Endtime": lesson[0].lesson_Endtime.strftime('%H:%M:%S'),
+                    'course_Venue': lesson[1]
                 }
-                db.session.close()
                 return {"code": 200, "lesson": lesson_data}, 200
             else:
                 return {"code": 404, "message": "Lesson not found"}, 404
