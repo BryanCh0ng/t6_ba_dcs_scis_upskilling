@@ -17,8 +17,8 @@
               <tr class="text-nowrap">
                 <th><input v-if="allowAction" type="checkbox" v-model="checkboxAll" @change="checkAll" /></th>
                 <th></th>
-                <th scope="col">
-                  <a href="" @click.prevent="sort('user_ID')" class="text-decoration-none text-dark">Student ID <sort-icon :sortColumn="sortColumn === 'user_ID'" :sortDirection="getSortDirection('user_ID')"/></a></th>
+                <!-- <th scope="col">
+                  <a href="" @click.prevent="sort('user_ID')" class="text-decoration-none text-dark">Student ID <sort-icon :sortColumn="sortColumn === 'user_ID'" :sortDirection="getSortDirection('user_ID')"/></a></th> -->
                 <th scope="col">
                   <a href="" @click.prevent="sort('user_Name')" class="text-decoration-none text-dark">Student Name <sort-icon :sortColumn="sortColumn === 'user_Name'" :sortDirection="getSortDirection('user_Name')"/></a></th>
                 <th scope="col">
@@ -35,7 +35,7 @@
                   <input v-if="allowAction" type="checkbox" :value="attendance.user_ID" :checked="selectedStudents.includes(attendance.user_ID)" @change="selectAttendance(key)" />
                 </td>
                 <td>{{ key }}</td>
-                <td>{{ attendance.user_ID }}</td>
+                <!-- <td>{{ attendance.user_ID }}</td> -->
                 <td>{{ attendance.user_Name }}</td>
                 <td>{{ attendance.user_Email }}</td>
                 <td><course-status :status="attendance.status"></course-status></td>
@@ -49,7 +49,7 @@
             </div>
             <div class="row pt-lg-0 pt-3 col-lg-5 mt-4 d-flex justify-content-evenly">
               <div class="row col-12">
-                <button class="m-1 col btn attendance-btn btn-outline-success text-dark" :class="{ 'btn-success text-white': action === 'Present' }"  @click="setAttendance('Present')">Present</button>
+                <button class="m-1 col btn attendance-btn btn-outline-success text-dark" :class="{ 'bg-medium-sea-green text-white': action === 'Present' }"  @click="setAttendance('Present')">Present</button>
                 <button class="m-1 col btn attendance-btn btn-outline-warning text-dark" :class="{ 'btn-warning text-white': action === 'Late' }" @click="setAttendance('Late')">Late</button>
                 <button class="m-1 col btn attendance-btn btn-outline-danger text-dark"  :class="{ 'btn-danger text-white': action === 'Absent' }"  @click="setAttendance('Absent')">Absent</button>
               </div>
@@ -189,7 +189,7 @@
         const [hours, minutes, seconds] = lessonTime.split(':').map(Number);
         const targetDateTime = new Date(selectedDate);
         targetDateTime.setHours(hours, minutes, seconds);
-        const isSameDay = selectedDate.getTime() === currentTime.getTime(); 
+        const isSameDay = selectedDate.toDateString() === currentTime.toDateString();
         return isSameDay && targetDateTime <= currentTime;
       },
       convertDate,
