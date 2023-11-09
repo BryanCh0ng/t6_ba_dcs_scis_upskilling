@@ -3,7 +3,7 @@
     <div class="container col-12 d-flex mb-3 w-100">
         <h5 v-if="lessons && lessons.length > 0" class="col m-auto">All Lessons for {{ lessons[0].run_Name }} </h5>
         <h5 v-else>All Lessons</h5>
-        <button v-if="lessons && lessons.length > 0 && !isEndDatePassed(lessons[0].run_course.run_Enddate)" class="btn btn-primary" @click="goToCreateLesson(lessons.rcourse_ID)">Add Lesson(s)</button>
+        <button v-if="roleName === 'Admin' && lessons && lessons.length > 0 && !isEndDatePassed(lessons[0].run_course.run_Enddate)" class="btn btn-primary" @click="goToCreateLesson(lessons.rcourse_ID)">Add Lesson(s)</button>
     </div>
 
     <div class="container col-12 ">
@@ -20,7 +20,7 @@
               <th scope="col">End Time</th>
               <th scope="col">
                 <a href="" @click.prevent="sort('lesson_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'lesson_Status'" :sortDirection="getSortDirection('lesson_Status')"/></a></th>
-              <th scope="col" class="actions">Action(s)</th>
+              <th scope="col" class="actions" v-if="roleName === 'Admin'">Action(s)</th>
             </tr>
           </thead>
           <tbody>
@@ -30,7 +30,7 @@
               <td><course-date-time :time="lesson.lesson_Starttime"></course-date-time></td>
               <td><course-date-time :time="lesson.lesson_Endtime"></course-date-time></td>
               <td>{{ lesson.lesson_Status }}</td>
-              <td v-if="lesson.lesson_Status=='Upcoming'" class="actions">
+              <td v-if="roleName === 'Admin' &&lesson.lesson_Status==='Upcoming'" class="actions">
                 <div class="action-buttons">
                   <course-action status="edit-lesson" @click="editLesson(lesson.lesson_ID)"></course-action>
                   <course-action status="remove-lesson" @click="removeLesson(lesson.lesson_ID)"></course-action>
@@ -61,6 +61,7 @@ import modalCourseContent from '@/components/course/modalCourseContent.vue';
 import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import CommonService from "@/api/services/CommonService.js";
 import LessonService from "@/api/services/LessonService.js";
+import UserService from "@/api/services/UserService.js";
 import courseDateTime from "@/components/course/courseDateTime.vue";
 import courseAction from '@/components/course/courseAction.vue';
 import DefaultModal from "@/components/DefaultModal.vue";
@@ -103,6 +104,7 @@ export default {
       message: "",
       buttonType: "",
       showAlert: false,
+      roleName: ""
     }
   },
   computed: {
@@ -193,10 +195,13 @@ export default {
     async handleModalClosed(value) {
       this.showAlert = value;
       this.loadData();   
-    }
+    },
   },
   async created() {
     this.loadData();
+
+    const user_ID = await UserService.getUserID();
+    this.roleName = await UserService.getUserRole(user_ID);
   },
   
   }
