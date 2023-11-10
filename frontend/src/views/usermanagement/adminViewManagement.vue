@@ -373,7 +373,7 @@ export default {
       this.$router.push({ name: 'viewInstructorFeedbackAnalysis', params: {id: instructorID}});
     },
     async handleModalClosed(){
-      this.loadData()
+      window.location.reload();
       this.selectedUserIDs = []
       this.showModal = false
       this.modalMessage=""
