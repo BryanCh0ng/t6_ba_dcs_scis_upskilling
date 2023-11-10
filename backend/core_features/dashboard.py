@@ -77,8 +77,8 @@ class TotalFeedbacks(Resource):
                 .join(RunCourse, Course.course_ID == RunCourse.course_ID)  # Join Course and RunCourse using course_id
                 .join(Feedback, RunCourse.rcourse_ID == Feedback.rcourse_ID)  # Join RunCourse and Feedback using rcourse_id
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)  # Join Feedback and TemplateAttribute using attribute_id
-                .filter(or_(func.lower(TemplateAttribute.question).like("%instructor%"), func.lower(TemplateAttribute.question).like("%course%")))
-                .filter(or_(TemplateAttribute.input_Type == "Text Field", TemplateAttribute.input_Type == "Likert Scale"))
+                #.filter(or_(func.lower(TemplateAttribute.question).like("%instructor%"), func.lower(TemplateAttribute.question).like("%course%")))
+                #.filter(or_(TemplateAttribute.input_Type == "Text Field", TemplateAttribute.input_Type == "Likert Scale"))
             )
 
             if courseID and courseID != "[]":
@@ -109,9 +109,11 @@ class TotalFeedbacks(Resource):
             if formatted_start_date and formatted_end_date: 
                 query = query.filter(RunCourse.run_Startdate >= formatted_start_date, RunCourse.run_Enddate <= formatted_end_date)
 
+            query = query.group_by(Feedback.rcourse_ID, Feedback.submitted_By)
+
             feedbacks = query.all()
 
-            total_feedbacks = len(feedbacks) 
+            total_feedbacks = len(feedbacks)
 
             db.session.close()
 
