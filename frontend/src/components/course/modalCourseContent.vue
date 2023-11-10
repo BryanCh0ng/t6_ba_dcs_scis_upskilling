@@ -100,7 +100,7 @@ export default {
   data() {
     return {
       noOfReviews: this.no_of_reviews,
-      errorMessage: '',
+      errorMessage: "",
       feedback_reviews: {},
       course_rating: "",
       total_feedbacks: ""
@@ -128,6 +128,10 @@ export default {
       }
     },
     async getReviews() {
+      this.feedback_reviews = {};
+      this.course_rating = "";
+      this.total_feedbacks = "";
+      this.errorMessage = "";
       if (this.isRunCourse) {
        try {
         const response = await FeedbackService.getRandomReviews(this.course.rcourse_ID, null, this.noOfReviews)

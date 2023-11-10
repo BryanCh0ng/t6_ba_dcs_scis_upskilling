@@ -400,6 +400,15 @@ const routes = [
         title: 'Student View Lesson',
         requiresAuth: true
     }, 
+  },
+  {
+    path: '/instructorTrainerViewLesson',
+    name: 'instructorTrainerViewLesson',
+    component: () => import('../views/lesson/instructorTrainerViewLesson.vue'),
+    meta: {
+        title: 'Instructor Trainer View Lesson',
+        requiresAuth: true
+    }, 
   }  
 ]
 

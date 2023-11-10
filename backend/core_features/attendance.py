@@ -7,14 +7,9 @@ from sqlalchemy import asc
 from core_features import common
 import json
 from sqlalchemy.orm import aliased
-from flask_apscheduler import APScheduler
 
 
 api = Namespace('attendance', description='Attendance related operations')
-
-scheduler = APScheduler()
-scheduler.init_app(app)
-scheduler.start()
 
 
 get_attendance_by_lesson_id = api.parser()
@@ -26,10 +21,22 @@ class GetAttendanceByLessonId(Resource):
     def get(self):
       try:
         user_role = common.getUserRole()
+        session_user_ID = common.getUserID()
+        lesson_id = get_attendance_by_lesson_id.parse_args().get("lesson_id")
         if (user_role) == 'Student':
             return {"code": 400, "message": "Unathorized Access, Failed to get attendance record"}, 404
-
-        lesson_id = get_attendance_by_lesson_id.parse_args().get("lesson_id")
+        
+        if user_role == 'Trainer' or user_role == 'Instructor':
+            instructor_id_query = (
+                db.session.query(RunCourse.instructor_ID).join(Lesson, Lesson.rcourse_ID == RunCourse.rcourse_ID)
+                .filter(
+                    Lesson.lesson_ID == lesson_id
+                ).first()
+            )
+            instructor_id = instructor_id_query[0] if instructor_id_query else None
+            if (instructor_id != session_user_ID):
+                return {"code": 400, "message": "Unathorized Access, Failed to get attendance record"}, 404
+ 
         registration_alias = aliased(Registration, name="registration_alias")
         attendance_record_alias = aliased(AttendanceRecord, name="attendance_record_alias")
 
@@ -245,74 +252,4 @@ class updateAttendanceByLessonId(Resource):
             return jsonify({"code": 500, "message": "Failed " + str(e)}), 500
 
 
-# Automate update student attendance 
-# @scheduler.task('interval', id='check_and_update_student_attendance', seconds=1, misfire_grace_time=30)
-@scheduler.task('cron', id='check_and_update_student_attendance', hour=0, minute=0, misfire_grace_time=900)
-def check_and_update_student_attendance():
-    with app.app_context():
-        try:
-            def get_attendance_list_from_lesson_id(lesson_id):
-                try:
-                    registration_alias = aliased(Registration, name="registration_alias")
-                    attendance_record_alias = aliased(AttendanceRecord, name="attendance_record_alias")
 
-                    attendance_record_query = (
-                        db.session.query(attendance_record_alias, registration_alias)
-                        .join(Lesson, Lesson.rcourse_ID == registration_alias.rcourse_ID)
-                        .outerjoin(attendance_record_alias, (attendance_record_alias.user_ID == registration_alias.user_ID) & (attendance_record_alias.lesson_ID == lesson_id))
-                        .filter(
-                            registration_alias.reg_Status == 'Enrolled',
-                            Lesson.lesson_ID == lesson_id
-                        )
-                        .all()
-                    )
-
-                    attendances = []
-                    if attendance_record_query:
-                        for attendance, registration in attendance_record_query:
-                            if attendance is None:
-                                attendances.append({
-                                    'user_ID': registration.user_ID, 
-                                })
-                        return {"code": 200, "attendances": attendances}, 200
-                    else:
-                        return {"code": 400, "message": "There is no attendance record for this lesson"}, 400
-                except Exception as e:
-                    return {"code": 404, "message": "Failed " + str(e)}, 404
-            
-            def add_update_attendance(lesson_id, student_id):
-                try:
-                    attendance_record_query = db.session.query(AttendanceRecord).filter(
-                            AttendanceRecord.user_ID == student_id,
-                            AttendanceRecord.lesson_ID == lesson_id
-                        ).first()
-                    if attendance_record_query:
-                        return True
-                    else:
-                        new_attendance_record = AttendanceRecord(None, lesson_ID = lesson_id, status='Absent', attrecord_Status='Submited', reason='Attendance not submitted on lesson day', user_ID=student_id)
-                        db.session.add(new_attendance_record)
-                        db.session.commit()
-                        return True
-                except Exception as e:
-                    return False
-                
-
-
-            today = datetime.now().date()
-            lessons = db.session.query(Lesson).filter(Lesson.lesson_Date < today).all()
-            if lessons:
-                for lesson in lessons:
-                    attendance_response = get_attendance_list_from_lesson_id(lesson.lesson_ID)
-                    if attendance_response[0]["code"] == 200:
-                        attendances = attendance_response[0]["attendances"]
-                        for attendance in attendances:
-                            update_attendance_response = add_update_attendance(lesson.lesson_ID, attendance['user_ID'])
-                            print("update_attendance_response", update_attendance_response)     
-                    
-            print('Automate update student attendance done')
-            return jsonify({ "code": 201, "message": "Attendance has been successfully updated!"} )   
-
-        except Exception as e:
-            db.session.rollback()
-            print(str(e))
-            print(f"Error while update student attendance: {str(e)}")

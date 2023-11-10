@@ -31,7 +31,8 @@
               <td><course-date-time :time="lesson.lesson_Starttime"></course-date-time></td>
               <td><course-date-time :time="lesson.lesson_Endtime"></course-date-time></td>
               <td :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }" ><course-status :status="lesson.lesson_Status"></course-status></td>
-              <td v-if="userRole != 'Student'" :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }"><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewAttendance(lesson.lesson_ID)">View Attendance</a></td>
+              <td v-if="userRole == 'Admin'" :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }"><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewAttendance(lesson.lesson_ID)">View Attendance</a></td>
+              <td v-else-if="userRole == 'Trainer' && lesson.isTrainerForLesson" :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }"><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewAttendance(lesson.lesson_ID)">View Attendance</a></td>
               <td v-if="lesson.lesson_Status=='Upcoming' && userRole == 'Admin'" class="actions">
                 <div class="action-buttons">
                   <course-action status="edit-lesson" @click="editLesson(lesson.lesson_ID)"></course-action>
@@ -135,7 +136,7 @@ export default {
         const { id: course_ID } = this.$route.params;
         this.course_ID = course_ID
         let response = await LessonService.getRunCourseById(course_ID)
-        // console.log(response)
+        console.log(response)
         if (response.code == 200) {
           this.lessons = response.lessons
         } else {

@@ -50,7 +50,6 @@
             <div class="row pt-lg-0 pt-3 col-lg-5 mt-4 d-flex justify-content-evenly">
               <div class="row col-12">
                 <button class="m-1 col btn attendance-btn btn-outline-success text-dark" :class="{ 'bg-medium-sea-green text-white': action === 'Present' }"  @click="setAttendance('Present')">Present</button>
-                <button class="m-1 col btn attendance-btn btn-outline-warning text-dark" :class="{ 'btn-warning text-white': action === 'Late' }" @click="setAttendance('Late')">Late</button>
                 <button class="m-1 col btn attendance-btn btn-outline-danger text-dark"  :class="{ 'btn-danger text-white': action === 'Absent' }"  @click="setAttendance('Absent')">Absent</button>
               </div>
             </div>
@@ -63,7 +62,7 @@
           </div>
           <div class="row pb-4 bg-white mb-5" v-if="action === 'Absent' && allowAction">
             <div class="col-12 d-flex justify-content-center">
-              <select class="form-control-lg mt-2" v-model="selectedAbsentReason" @change="handleselectAbsentReason">
+              <select class="w-50 form-control-lg mt-2" v-model="selectedAbsentReason" @change="handleselectAbsentReason">
                 <option value="Medical Leave">Medical Leave</option>
                 <option value="Family Matters">Family Matters</option>
                 <option value="Personal Reason">Personal Reasons</option>
@@ -142,7 +141,7 @@
           console.log(lesson_response)
           if (lesson_response.code == 200) {
             this.lesson = lesson_response.lesson;
-            if (!this.hasLessonStarted(this.lesson.lesson_Date, this.lesson.lesson_Starttime)) {
+            if (!this.hasLessonStarted(this.lesson.lesson_Date, this.lesson.lesson_Starttime) && this.message != 'Unable to mark attendance as user logged in is not instructor of this lesson.') {
               this.message = 'Unable to mark attendance as is not during lesson datetime';
               this.buttonType = "danger";
               this.showAlert = !this.showAlert;
@@ -150,6 +149,10 @@
             }
           }
         } catch (error) {
+          this.title = 'View Attendance Failed';
+          this.message = error.response.data.message;
+          this.buttonType = "danger";
+          this.showAlert = !this.showAlert;
           console.error("Error fetching attendance records", error);
         }
       },
@@ -218,7 +221,7 @@
           this.showAlert = !this.showAlert;
         } else if (this.action == null) {
           this.title = 'Submit Attendance Failed';
-          this.message = 'Please select if student(s) are present, absent, or late before submitting attendance';
+          this.message = 'Please select if student(s) are present or absent before submitting attendance';
           this.buttonType = "danger";
           this.showAlert = !this.showAlert;
         } else if (this.selectedAbsentReason == 'Others' && this.reasonInput == '') {
@@ -248,7 +251,7 @@
               this.showAlert = !this.showAlert;
             }
           } catch (error) {
-            this.message = 'Submit Attendance Failed';
+            this.message = error.response.data.message;
             this.buttonType = "danger";
             this.showAlert = !this.showAlert;
           }

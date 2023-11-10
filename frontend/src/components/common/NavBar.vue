@@ -94,7 +94,7 @@ export default {
           this.user_role === "Trainer"
         ) {
           links.push(
-            { path: "/viewAllLessons", label: "Lessons" },
+            { path: "/viewAllLessons", label: "All Lessons" },
             { path: "/instructorTrainerViewVotingCampaign", label: "Voting Campaign" },
             { path: "/proposeCourse", label: "Propose Course" },
             { path: "/contactUs", label: "Contact Us" },
@@ -130,6 +130,7 @@ export default {
       } else if (this.user_role === "Instructor" || this.user_role === "Trainer") {
         items.push(
           { path: "/instructorTrainerViewProfile", label: "Profile" },
+          { path: "/instructorTrainerViewLesson", label: "My Lessons" },
           { path: "/viewDashboard", label: "Dashboard" }
         );
       } else if (this.user_role === "Admin") {

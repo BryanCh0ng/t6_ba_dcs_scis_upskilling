@@ -20,6 +20,7 @@
                 <th scope="col">
                   <a href="" @click.prevent="sort('lesson_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'lesson_Status'" :sortDirection="getSortDirection('lesson_Status')"/></a></th>
                 <th scope="col">Course Details</th>
+                <th scope="col">Attendance</th>
               </tr>
             </thead>
             <tbody>
@@ -33,6 +34,7 @@
                 <td><course-date-time :time="lesson.lesson_Endtime"></course-date-time></td>
                 <td :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }" ><course-status :status="lesson.lesson_Status"></course-status></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(lesson.run_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
+                <td :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }"><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewAttendance(lesson.lesson_ID)">View Attendance</a></td>
               </tr>               
             </tbody>
           </table>
@@ -79,7 +81,8 @@
         itemsPerPage: 10,
         localCurrentPageLessons: 1,
         receivedMessage: '',
-        errorMsge: 'No records found'
+        errorMsge: 'No records found',
+        userRole: "",
       }
     },
     computed: {
@@ -107,7 +110,7 @@
         try {
           const user_ID = await UserService.getUserID();
           console.log(user_ID)
-          let response = await LessonService.getLessonsByStudentId(user_ID)
+          let response = await LessonService.getLessonsByInstructorId(user_ID)
           console.log(response)
           if (response.code == 200) {
             this.lessons = response.lessons
@@ -138,15 +141,20 @@
           if (sort_response.code == 200) {
             this.lessons = sort_response.data
           }
-      }
+      },
+      goToViewAttendance(lesson_id) {
+        this.$router.push({ name: 'viewAttendance', params: {lessonId: lesson_id}});
+      },
     },
     async created() {
         const user_ID = await UserService.getUserID();
         const role = await UserService.getUserRole(user_ID);
+        this.userRole = role
+        console.log(this.userRole)
         if (role == "Admin") {
         this.$router.push({ name: "adminViewCourse" });
-        } else if (role == "Instructor" || role == "Trainer") {
-        this.$router.push({ name: "instructorTrainerViewVotingCampaign" });
+        } else if (role == "Student") {
+        this.$router.push({ name: "studentViewCourse" });
         } else {
           try {
               this.loadData();
