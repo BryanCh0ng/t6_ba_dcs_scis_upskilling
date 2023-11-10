@@ -39,7 +39,7 @@
                 <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToCourseFeedbackAnalysis(course.course_ID)">View Feedback Analysis</a></td>
                 <td v-if="course.course_Status === 'Active'" class="actions">
                   <div class="action-buttons">
-                    <course-action v-if="course.course_Status === 'Active'" status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action>
+                    <course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action>
                     <course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action>
                     <course-action status="create_run" :course="course" @click="goToCreateRunCourseWithId(course.course_ID)"></course-action>
                   </div>

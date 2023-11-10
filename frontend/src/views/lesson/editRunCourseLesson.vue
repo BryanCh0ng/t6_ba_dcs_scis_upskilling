@@ -81,6 +81,7 @@ function showSuccessMessage(vm) {
   vm.message = "You have successfully updated the lesson information.";
   vm.showAlert = true;
   vm.buttonType = "success";
+  vm.modalType = "SuccessMessage";
 }
 
 function showUnsuccessMessage(vm, customTitle, customMessage) {
@@ -88,7 +89,7 @@ function showUnsuccessMessage(vm, customTitle, customMessage) {
     vm.message = customMessage;
     vm.showAlert = true;
     vm.buttonType = "danger";
-    vm.modalType = "UnsuccessMessage"
+    vm.modalType = "UnsuccessMessage";
 }
 
 export default {
@@ -278,7 +279,7 @@ export default {
             this.showAlert = value;
             if (this.modalType === "UnsuccessMessage") {
                 this.showAlert = false;
-            } else {
+            } else if (this.modalType === "SuccessMessage") {
                 this.$router.go(-1);
             }
         }
