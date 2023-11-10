@@ -72,7 +72,25 @@ class FeedbackService extends BaseApiService {
         }
     }
 
-    
+    async getFeedback(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
+        try {
+            let response = await axiosClient.get("/feedback/get_feedback",
+                {
+                    params: {
+                        course_ID: course_ID,
+                        coursecat_ID: coursecat_ID,
+                        rcourse_ID: rcourse_ID,
+                        instructor_ID: instructor_ID,
+                        run_Startdate: run_Startdate,
+                        run_Enddate: run_Enddate
+                    },
+                }
+            );
+            return response 
+        } catch(error) {
+            return this.handleError(error)
+        }
+    }
     
 }
 

@@ -1,6 +1,6 @@
 <template>
   <div id="editProposedCourse">
-    <div class="container mt-5">
+    <div class="container pt-5">
       <h2 v-if="action == 'approve'" class="text-center mb-4">
         Edit Course (Proposed Course Approved)
       </h2>

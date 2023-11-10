@@ -6,7 +6,7 @@
           <img src="../../assets/smulogo.png" title="smu logo" class="navlogo" />
           <span class="system-name">
             <span class="vertical-line"></span>
-            Upskilling Engagement <br />System
+            Upskilling <br/>Engagement <br/>System
           </span>
         </a>
         <button
@@ -94,6 +94,7 @@ export default {
           this.user_role === "Trainer"
         ) {
           links.push(
+            { path: "/viewAllLessons", label: "All Lessons" },
             { path: "/instructorTrainerViewVotingCampaign", label: "Voting Campaign" },
             { path: "/proposeCourse", label: "Propose Course" },
             { path: "/contactUs", label: "Contact Us" },
@@ -102,6 +103,7 @@ export default {
           links.push(
             { path: "/adminViewCourse", label: "Course DB" },
             { path: "/adminViewRunCourse", label: "Run Course DB" },
+            { path: "/viewAllLessons", label: "Lesson DB" },
             { path: "/adminViewVoteCourse", label: "Voting Campaign DB" },
             { path: "/adminViewProposedCourse", label: "Proposed Course DB" },
             { path: "/createCourse", label: "Create Course" }
@@ -124,16 +126,17 @@ export default {
 
       if (this.user_role === "Student") {
         items.push({ path: "/studentViewProfile", label: "Profile" });
+        items.push({ path: "/studentViewLesson", label: "My Lessons" });
       } else if (this.user_role === "Instructor" || this.user_role === "Trainer") {
         items.push(
           { path: "/instructorTrainerViewProfile", label: "Profile" },
-          { label: "Blacklist" }, // rmb to add path
+          { path: "/instructorTrainerViewLesson", label: "My Lessons" },
           { path: "/viewDashboard", label: "Dashboard" }
         );
       } else if (this.user_role === "Admin") {
         items.push(
           { path: "/adminViewManagement", label: "User Management" },
-          { path: "/adminViewFeedbackTemplate", label: "Feedback Template" }, // rmb to add path
+          { path: "/adminViewFeedbackTemplate", label: "Feedback Template" },
           { path: "/viewDashboard", label: "Dashboard" }
         );
       }
@@ -207,11 +210,13 @@ export default {
     async logout() {
       try {
         const response = await UserService.logout()
-        console.log(response)
-        this.user_role = "";
-        this.user_ID = null;
-        this.user_name = "";
-        this.router.push('/')
+        if (response.code === 200) {
+          this.user_role = "";
+          this.user_ID = null;
+          this.user_name = "";
+          this.router.push('/')
+        }
+        
       } catch (error) {
         console.error('Error logging out:', error);
     }
@@ -247,7 +252,7 @@ export default {
 }
 
 .navbar li + li {
-  margin-left: 20px;
+  margin-left: 15px;
 }
 
 .navbar a,
@@ -286,20 +291,20 @@ export default {
 }
 
 .navlogo {
-  width: 180px;
+  width: 160px;
 }
 
 .system-name {
-  font-size: 16px;
+  font-size: 15px;
   display: flex;
   align-items: center;
-  margin-left: 10px;
+  margin-left: 5px;
   font-weight: bold;
 }
 
 .vertical-line {
   border-left: 1px solid #151c55;
-  height: 40px;
+  height: 50px;
   margin-right: 10px;
 }
 
@@ -353,7 +358,7 @@ export default {
 
 .dropdown {
   position: relative;
-  top: 12px;
+  top: 15px;
 }
 
 .dropdown-content {
@@ -387,6 +392,7 @@ export default {
   cursor: pointer;
 }
 
+
 @media (max-width: 768px) {
   .dropdown {
     bottom: 120%;
@@ -418,11 +424,9 @@ export default {
   .navbar-collapse{
     border:0px;
   }
-
 }
 
 @media (max-width: 510px) {
-  
   .system-name {
     display: none;
   }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ul class="nav nav-pills justify-content-center pt-4">
+    <ul class="nav nav-pills justify-content-center pt-5">
       <li class="nav-item">
         <a class="nav-link" :class="{ 'active': activeTab === 'registered' }" @click="activeTab = 'registered'">Registered</a>
       </li>
@@ -40,6 +40,7 @@
                   <th scope="col">
                     <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Status', 'registered')">Status <sort-icon :sortColumn="sortColumn === 'reg_Status'" :sortDirection="getSortDirection('reg_Status')"/></a></th>
                   <th scope="col">Course Details</th>
+                  <th scope="col">Lesson(s)</th>
                   <th scope="col">Action(s)</th>
                 </tr>
               </thead>
@@ -62,12 +63,14 @@
                     <course-status :status="registered_course.reg_Status"></course-status>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(registered_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
+                  <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(registered_course.rcourse_ID)">View Lessons</a></td>
                   <td v-if="(registered_course.reg_Status === 'Enrolled' || registered_course.reg_Status === 'Pending') && isClosingDateValid(registered_course.reg_Enddate)">
                       <course-action status="registered_drop" @action-and-message-updated="handleActionData" :course="registered_course"></course-action>
                   </td>
                   <td v-else-if="(registered_course.reg_Status === 'Dropped') && isClosingDateValid(registered_course.reg_Enddate)">
                       <course-action @action-and-message-updated="handleActionData" :status="registered_course.runcourse_Status" :course="registered_course"></course-action>
                   </td>
+                  <td v-else></td>
                 </tr>
               </tbody>
 
@@ -120,6 +123,7 @@
                   <td v-if="interested_course.vote_Status == 'Ongoing'">
                       <course-action @action-and-message-updated="handleActionData" status="say-pass" :course="interested_course"></course-action>
                   </td>
+                  <td v-else></td>
                 </tr>
               </tbody>
             </table>
@@ -173,13 +177,18 @@
                     <course-status :status="proposed_course.pcourse_Status"></course-status>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <div v-if="proposed_course.pcourse_Status == 'Pending'">
-                    <td><course-action status="Edit" :id="proposed_course.course_ID" @click="editCourse(proposed_course.course_ID)"></course-action></td>
-                    <td><course-action @action-and-message-updated="handleActionData" status="remove-proposal" :course="proposed_course"></course-action></td>
-                  </div>
-                  <div v-else-if="proposed_course.pcourse_Status == 'Rejected'">
-                    <td><course-action status="rejected-reason" @click="openRejectedCourseModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#rejected_course_modal"></course-action></td>
-                  </div>
+                  <td v-if="proposed_course.pcourse_Status == 'Pending'">
+                    <div class="action-buttons">
+                      <course-action status="Edit" :id="proposed_course.course_ID" @click="editCourse(proposed_course.course_ID)"></course-action>
+                      <course-action @action-and-message-updated="handleActionData" status="remove-proposal" :course="proposed_course"></course-action>
+                    </div>
+                  </td>
+                  <td v-if="proposed_course.pcourse_Status == 'Rejected'">
+                    <div class="action-buttons">
+                      <course-action status="rejected-reason" @click="openRejectedCourseModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#rejected_course_modal"></course-action>
+                    </div>
+                  </td>
+                  <td v-else></td>
                 </tr>
               </tbody>
             </table>
@@ -226,11 +235,13 @@
                     {{ completed_course.instructor_Name }}
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(completed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <div v-if="completed_course.feedback_submitted == true">
-                    <td><course-action status="view-feedback" @click="view_submit_feedback(completed_course.rcourse_ID)" :id="completed_course.course_ID"></course-action></td>
-                  </div>
+                  <td v-if="completed_course.feedback_submitted == true">
+                    <div class="action-buttons">
+                      <course-action status="view-feedback" @click="view_submit_feedback(completed_course.rcourse_ID)" :id="completed_course.course_ID"></course-action>
+                    </div>
+                  </td>
                   <div v-else>
-                    <td><course-action status="provide-feedback" @click="view_submit_feedback(completed_course.rcourse_ID)" :id="completed_course.course_ID"></course-action></td>
+                    <course-action status="provide-feedback" @click="view_submit_feedback(completed_course.rcourse_ID)" :id="completed_course.course_ID"></course-action>
                   </div>
                 </tr>
               </tbody>
@@ -604,7 +615,10 @@ export default {
     view_submit_feedback(id) {
       console.log(id)
       this.$router.push({ name: 'submitFeedback', params: {id}})
-    }
+    },
+    viewLessons(courseID) {
+      this.$router.push({ name: 'viewRunCourseLesson', params: {id: courseID}});
+    },
   },
   computed: {
     displayedRegisteredCourses() {

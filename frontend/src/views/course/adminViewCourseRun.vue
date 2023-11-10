@@ -1,7 +1,7 @@
 <template>
-    <div>
+  <div>
 
-    <div class="container col-12 d-flex mb-3 w-100 pt-4">
+    <div class="container col-12 d-flex mb-3 w-100 pt-5">
       <h5 class="col m-auto">All Run Courses for '{{ course_Name }}'</h5>
       <button class="btn btn-primary" @click="goToCreateRunCourse(courses[0].course_ID)" title="Create Run Course">Create Run Course</button>
     </div>
@@ -20,9 +20,10 @@
                 <a href="" @click.prevent="sort('reg_Enddate')" class="text-decoration-none text-dark">Closing Date <sort-icon :sortColumn="sortColumn === 'reg_Enddate'" :sortDirection="getSortDirection('reg_Enddate')"/></a></th>
               <th scope="col">
                 <a href="" @click.prevent="sort('runcourse_Status')" class="text-decoration-none text-dark">Run Status <sort-icon :sortColumn="sortColumn === 'runcourse_Status'" :sortDirection="getSortDirection('runcourse_Status')"/></a></th>
-              <th scope="col">Feedback</th>
               <th scope="col">Course Details</th>
-              <th scope="col">Lessons</th>
+              <th scope="col">Lesson(s)</th>
+              <th scope="col">Registration(s)</th>
+              <th scope="col">Feedback</th>
               <th scope="col">Feedback Template</th>
               <th scope="col">Action(s)</th>
             </tr>
@@ -41,11 +42,12 @@
               <td class="pl-0 border-top">
                 <course-status :status="course.runcourse_Status"></course-status>
               </td>
-              <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToRunCourseFeedbackAnalysis(course.rcourse_ID)">View Feedback Analysis</a></td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-              <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(course.rcourse_ID)">View Lessons</a></td>
-              <td v-if="course.feedback_Startdate && isBeforeCurrentDate(course.feedback_Startdate)"><a v-if="course.course_Status != 'Retired'" class="btn btn-info" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
-              <td v-else><a v-if="course.course_Status != 'Retired'" class="btn btn-info disabled" title="Unable to remove run course due to ongoing/past feedback period'">Apply Feedback Template</a></td>
+              <td><a class="text-nowrap text-dark text-decoration-underline view-lessons" @click="viewLessons(course.rcourse_ID)">View Lessons</a></td>
+              <td><a class="text-nowrap text-dark text-decoration-underline view-registrations" @click="viewRegistrations(course.rcourse_ID)">View Registrations</a></td>
+              <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToRunCourseFeedbackAnalysis(course.rcourse_ID)">View Feedback Analysis</a></td>
+              <td v-if="course.feedback_Startdate && isBeforeCurrentDate(course.feedback_Startdate)"><a v-if="course.course_Status != 'Retired'" class="btn bg-light-blue" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
+              <td v-else><a v-if="course.course_Status != 'Retired'" class="btn bg-light-blue disabled" title="Unable to remove run course due to ongoing/past feedback period'">Apply Feedback Template</a></td>
               <td v-if="course.runcourse_Status=='Ongoing'">
                 <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
               </td>
@@ -221,13 +223,15 @@
       goToRunCourseFeedbackAnalysis(courseID) {
         this.$router.push({ name: 'viewRunCourseFeedbackAnalysis', params: {id: courseID}});
       },
-      
       isBeforeRunCourseDate(runRegStartDate){
         const currentDate = new Date();
         return new Date(runRegStartDate) > currentDate;
       },
       viewLessons(courseID) {
         this.$router.push({ name: 'viewRunCourseLesson', params: {id: courseID}});
+      },
+      viewRegistrations(runcourseID) {
+        this.$router.push({ name: 'adminViewRegistration', params: {id: runcourseID}});
       },
       addEditLessons(courseID) {
         this.$router.push({ name: 'addEditLessons', params: {id: courseID}});

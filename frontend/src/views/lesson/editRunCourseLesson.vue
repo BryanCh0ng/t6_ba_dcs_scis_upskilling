@@ -1,6 +1,6 @@
 <template>
   <div id="editLesson">
-    <div class="container mt-5">
+    <div class="container pt-5">
       <h2 class="text-center mb-4">Edit Lesson for {{ runcourse_Name }}</h2>
       <h5 class="text-center mb-4">From {{ convertDate(runcourse_Startdate) }} ({{ convertTime(runcourse_Starttime) }} - {{ convertTime(runcourse_Endtime) }}) to {{ convertDate(runcourse_Enddate) }} ({{ convertTime(runcourse_Starttime) }} - {{ convertTime(runcourse_Endtime) }})</h5>
 
@@ -81,6 +81,7 @@ function showSuccessMessage(vm) {
   vm.message = "You have successfully updated the lesson information.";
   vm.showAlert = true;
   vm.buttonType = "success";
+  vm.modalType = "SuccessMessage";
 }
 
 function showUnsuccessMessage(vm, customTitle, customMessage) {
@@ -88,7 +89,7 @@ function showUnsuccessMessage(vm, customTitle, customMessage) {
     vm.message = customMessage;
     vm.showAlert = true;
     vm.buttonType = "danger";
-    vm.modalType = "UnsuccessMessage"
+    vm.modalType = "UnsuccessMessage";
 }
 
 export default {
@@ -278,7 +279,7 @@ export default {
             this.showAlert = value;
             if (this.modalType === "UnsuccessMessage") {
                 this.showAlert = false;
-            } else {
+            } else if (this.modalType === "SuccessMessage") {
                 this.$router.go(-1);
             }
         }

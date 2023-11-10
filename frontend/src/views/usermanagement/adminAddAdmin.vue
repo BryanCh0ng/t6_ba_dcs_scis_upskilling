@@ -1,6 +1,6 @@
 <template>
     <div id="addadmin">
-        <div class="container mt-5 pt-4">
+        <div class="container mt-5 pt-5">
 
             <h2 class="text-center">Add Admin</h2>
 

@@ -258,16 +258,15 @@ const routes = [
         requiresAuth: true
     }
   },
-  // Need to add authentication
-  // {
-  //   path: '/viewDashboard',
-  //   name: 'viewDashboard',
-  //   component: () => import('../views/dashboard/viewDashboard.vue'),
-  //   meta: {
-  //       title: 'Admin View Dashboard',
-  //       requiresAuth: true
-  //   }
-  // },
+  {
+    path: '/viewDashboard',
+    name: 'viewDashboard',
+    component: () => import('../views/dashboard/viewDashboard.vue'),
+    meta: {
+        title: 'Admin View Dashboard',
+        requiresAuth: true
+    }
+  },
   {
     path: '/viewCourseFeedbackAnalysis/:id',
     name: 'viewCourseFeedbackAnalysis',
@@ -340,6 +339,15 @@ const routes = [
     },
   },
   {
+    path: '/adminViewRegistration/:id',
+    name: 'adminViewRegistration',
+    component: () => import('../views/course/adminViewRegistration.vue'),
+    meta: {
+        title: 'Admin View Student Registration',
+        requiresAuth: true
+    },
+  },
+  {
     path: '/viewAllLessons',
     name: 'viewAllLessons',
     component: () => import('../views/lesson/viewAllLessons.vue'),
@@ -390,6 +398,15 @@ const routes = [
     component: () => import('../views/lesson/studentViewLesson.vue'),
     meta: {
         title: 'Student View Lesson',
+        requiresAuth: true
+    }, 
+  },
+  {
+    path: '/instructorTrainerViewLesson',
+    name: 'instructorTrainerViewLesson',
+    component: () => import('../views/lesson/instructorTrainerViewLesson.vue'),
+    meta: {
+        title: 'Instructor Trainer View Lesson',
         requiresAuth: true
     }, 
   }  

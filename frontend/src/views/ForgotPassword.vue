@@ -76,9 +76,6 @@ export default {
 
       this.errorMessage = ""; // Reset error message
 
-      console.log("Form Data:", {
-        email: this.email,
-      });
 
       // Check for empty fields
       if (!this.email) {
@@ -99,9 +96,10 @@ export default {
         // Will need to update the flask api endpoint
         // Send login request
         const response = await UserService.forgotPassword(this.email)
-
-        this.showSuccessModal = true;
-        console.log(response)
+        if (response.code === 200) {
+          this.showSuccessModal = true;
+        }
+        
       } catch (error) {
         this.errorMessage = "Sent reset link failed. Please check your credentials.";
         console.log("Reset error:", error.request.response);

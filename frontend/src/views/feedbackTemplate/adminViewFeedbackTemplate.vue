@@ -2,9 +2,9 @@
     <div>
       <div class="container col-12">
 
-        <div class="container col-12 d-flex mb-3 w-100 pt-4">
+        <div class="container col-12 d-flex mb-3 w-100 pt-5">
           <h5 class="col m-auto">All Feedback Templates</h5>
-          <button class="btn btn-primary" @click="goToCreateFeedbackTemplate" title="Create Feedback Template">Create Feedback Template</button>
+          <button class="btn btn-primary font-weight-bold" @click="goToCreateFeedbackTemplate" title="Create Feedback Template">Create Feedback Template</button>
         </div>
 
         <div v-if="feedback_templates && feedback_templates.length > 0" class="table-responsive bg-white">
@@ -26,12 +26,14 @@
                 <td>
                   {{ convertDate(feedback_template.created_On) }}
                 </td>
-                <td class="d-flex">
-                  <div><button class="btn btn-info apply_to_course text-light font-weight-bold text-nowrap" @click="openModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#apply_feedback_template_modal">Apply to Course Run(s)</button></div>
-                  <div v-if="!feedback_template.existingFeedback"><button class="m-4 mt-0 mb-0 btn btn-edit edit text-light font-weight-bold text-nowrap" @click="goToEditFeedbackTemplate(feedback_template.template_ID)">Edit</button></div>
-                  <div v-else><button class="m-4 mt-0 mb-0 btn btn-edit edit text-light font-weight-bold text-nowrap disabled" title="Unable to edit feedback template due to ongoing/past feedback period">Edit</button></div>
-                  <div v-if="!feedback_template.existingFeedback"><button class="btn btn-danger delete text-light font-weight-bold text-nowrap" @click="openDeleteModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#delete_feedback_template_modal">Delete</button></div>
-                  <div v-else><button class="btn btn-danger text-light font-weight-bold text-nowrap disabled" title="Unable to delete feedback template due to ongoing/past feedback period">Delete</button></div>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn btn-info apply_to_course text-light font-weight-bold text-nowrap" title="Apply Feedback Template to Course Run(s)" @click="openModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#apply_feedback_template_modal">Apply to Course Run(s)</button>
+                    <button v-if="!feedback_template.existingFeedback" class="btn btn-edit edit text-light font-weight-bold text-nowrap" @click="goToEditFeedbackTemplate(feedback_template.template_ID)">Edit</button>
+                    <button v-else class="btn btn-edit edit text-light font-weight-bold text-nowrap disabled" title="Unable to edit feedback template due to ongoing/past feedback period">Edit</button>
+                    <button v-if="!feedback_template.existingFeedback" class="btn btn-danger delete text-light font-weight-bold text-nowrap" @click="openDeleteModal(feedback_template)" data-bs-toggle="modal" data-bs-target="#delete_feedback_template_modal">Delete</button>
+                    <button v-else class="btn btn-danger text-light font-weight-bold text-nowrap disabled" title="Unable to delete feedback template due to ongoing/past feedback period">Delete</button>
+                  </div>
                 </td>
               </tr>               
             </tbody>

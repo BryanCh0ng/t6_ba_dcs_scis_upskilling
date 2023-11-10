@@ -1,13 +1,7 @@
 <template>
     <div>
-      <search-filter
-      :status-options="statusOptions"
-      :search-api="searchAllLesson" 
-      @search-complete="handleSearchComplete"
-      class="pt-5"/>
-
       <div class="container col-12 d-flex mb-3 w-100">
-          <h5 class="col m-auto">All Lessons</h5>
+          <h5 class="col m-auto">View My Lessons</h5>
       </div>
 
       <div class="container col-12">
@@ -26,14 +20,13 @@
                 <th scope="col">
                   <a href="" @click.prevent="sort('lesson_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'lesson_Status'" :sortDirection="getSortDirection('lesson_Status')"/></a></th>
                 <th scope="col">Course Details</th>
-                <th scope="col" v-if="userRole != 'Student'">Attendance</th>
-                <th scope="col" class="actions" v-if="userRole == 'Admin'">Action(s)</th>
+                <th scope="col">Attendance</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(lesson, key) in displayedLessons" :key="key">
                 <td class="name">
-                  <course-name-desc :name="lesson.run_course.run_Name" :category="lesson.run_course.coursecat_Name" :description="lesson.run_course.course_Desc"></course-name-desc>
+                  <course-name-desc :name="lesson.run_Name" :category="lesson.run_course.coursecat_Name" :description="lesson.run_course.course_Desc"></course-name-desc>
                 </td>
                 <td>{{ lesson.instructor_Name }}</td>
                 <td class="text-nowrap"><course-date-time :date="lesson.lesson_Date"></course-date-time></td>
@@ -41,14 +34,7 @@
                 <td><course-date-time :time="lesson.lesson_Endtime"></course-date-time></td>
                 <td :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }" ><course-status :status="lesson.lesson_Status"></course-status></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(lesson.run_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                <td v-if="userRole == 'Admin'" :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }"><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewAttendance(lesson.lesson_ID)">View Attendance</a></td>
-                <td v-else-if="userRole == 'Trainer' && lesson.isTrainerForLesson" :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }"><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewAttendance(lesson.lesson_ID)">View Attendance</a></td>
-                <td v-if="lesson.lesson_Status =='Upcoming' && userRole == 'Admin'" class="actions">
-                  <div class="action-buttons">
-                    <course-action status="edit-lesson" @click="editLesson(lesson.lesson_ID)"></course-action>
-                    <course-action status="remove-lesson" @click="removeLesson(lesson.lesson_ID)"></course-action>
-                  </div>
-                </td>
+                <td :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }"><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewAttendance(lesson.lesson_ID)">View Attendance</a></td>
               </tr>               
             </tbody>
           </table>
@@ -62,7 +48,6 @@
         </div>
       </div>
       <vue-awesome-paginate v-if="lessons.length/itemsPerPage > 0" v-model="localCurrentPageLessons" :totalItems="lessons.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeLessons" class="justify-content-center pagination-container"/>
-      <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
     </div>
   
 </template>
@@ -77,25 +62,7 @@
   import courseDateTime from "@/components/course/courseDateTime.vue";
   import UserService from "@/api/services/UserService.js";
   import courseStatus from '../../components/course/courseStatus.vue';
-  import SearchFilter from '@/components/search/AllLessonSearchFilter.vue';
-  import courseAction from '../../components/course/courseAction.vue';
-  import DefaultModal from "@/components/DefaultModal.vue";
   
-  // function showSuccessMessage(vm) {
-  //   vm.title = "Remove Lesson Successfully";
-  //   vm.message = "You have successfully remove lesson for the run course.";
-  //   vm.showAlert = true;
-  //   vm.buttonType = "success";
-  // }
-
-  // // Utility function to show an unsuccessful message
-  // function showUnsuccessMessage(vm) {
-  //   vm.title = "Remove Lesson Unsucessful";
-  //   vm.message = "Removal of the lesson from the course was unsuccessful.";
-  //   vm.showAlert = true;
-  //   vm.buttonType = "danger";
-  // }
-
   export default {
     components: {
       sortIcon,
@@ -103,10 +70,7 @@
       VueAwesomePaginate,
       courseNameDesc,
       courseDateTime,
-      courseStatus,
-      SearchFilter,
-      courseAction,
-      DefaultModal
+      courseStatus
     },
     data() {
       return {
@@ -119,11 +83,6 @@
         receivedMessage: '',
         errorMsge: 'No records found',
         userRole: "",
-        statusOptions: ["Ongoing", "Upcoming", "Ended"],
-        search_run_course_name: null,
-        search_instructor_name: null,
-        search_course_category: null,
-        search_status: null,
       }
     },
     computed: {
@@ -146,26 +105,22 @@
         this.localCurrentPageLessons = newPage;
         this.$emit('page-change', newPage);
       },
-      async searchAllLesson(runCourseName, instructorName, courseCategory, lessonStatus) {
-        this.search_run_course_name = runCourseName
-        this.search_instructor_name = instructorName
-        this.search_course_category = courseCategory
-        this.search_status = lessonStatus
-
+      async loadData() {
+        console.log('load')
         try {
-          let response = await LessonService.getAllLessons(this.search_run_course_name, this.search_instructor_name, this.search_course_category, this.search_status)
+          const user_ID = await UserService.getUserID();
+          console.log(user_ID)
+          let response = await LessonService.getLessonsByInstructorId(user_ID)
           console.log(response)
           if (response.code == 200) {
             this.lessons = response.lessons
+            console.log(this.lessons)
           } else {
             this.errorMsge = response.message
           }
         } catch (error) {
           console.error("Error fetching lesson details:", error);
         }
-      },
-      async loadData() {
-        await this.searchAllLesson()
       },
       sort(column) {
         if (this.sortColumn === column) {
@@ -190,51 +145,23 @@
       goToViewAttendance(lesson_id) {
         this.$router.push({ name: 'viewAttendance', params: {lessonId: lesson_id}});
       },
-      editLesson(lessonId) {
-        this.$router.push({ name: 'editRunCourseLesson', params: { id: lessonId }});
-      }, 
-      async removeLesson(lesson_ID) {
-        try {
-          let response = await LessonService.removeLesson(lesson_ID);
-          if (response.code == 200) {
-          // showSuccessMessage(this)
-          this.title = "Remove Lesson Successfully";
-          this.message = "You have successfully remove lesson for the run course.";
-          this.showAlert = true;
-          this.buttonType = "success";
-        } else {
-          // showUnsuccessMessage(this)
-          this.title = "Remove Lesson Unsucessful";
-          this.message = "Removal of the lesson from the course was unsuccessful.";
-          this.showAlert = true;
-          this.buttonType = "danger";
-        }
-          
-        } catch (error) {
-          // showUnsuccessMessage(this)
-          this.title = "Remove Lesson Unsucessful";
-          this.showAlert = true;
-          this.buttonType = "danger";
-          this.message = error.message;
-          
-        }
-      },
-      async handleModalClosed(value) {
-        this.showAlert = value;
-        this.loadData();   
-      },
     },
     async created() {
-      const user_ID = await UserService.getUserID();
-      const role = await UserService.getUserRole(user_ID);
-      this.userRole = role
-      console.log(this.userRole)
-      this.loadData();
-      // if (role == 'Student') {
-      //   this.$router.push({ name: 'studentViewCourse' }); 
-      // } else {
-      //   this.loadData();
-      // }
+        const user_ID = await UserService.getUserID();
+        const role = await UserService.getUserRole(user_ID);
+        this.userRole = role
+        console.log(this.userRole)
+        if (role == "Admin") {
+        this.$router.push({ name: "adminViewCourse" });
+        } else if (role == "Student") {
+        this.$router.push({ name: "studentViewCourse" });
+        } else {
+          try {
+              this.loadData();
+          } catch (error) {
+              console.error("Error fetching lesson details:", error);
+          }
+        }
     },
     }
 </script>

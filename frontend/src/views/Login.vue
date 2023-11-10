@@ -96,15 +96,15 @@ export default {
     async performLogin() {
       try {
         const response = await UserService.login(this.email,this.password)
-        console.log(response);
-
-        let userRole = await UserService.getUserRole()
-        if (userRole === 'Student') {
-          this.router.push('/studentViewCourse')
-        } else if (userRole === 'Instructor' || userRole === 'Trainer') {
-          this.router.push('/instructorTrainerViewVotingCampaign') // will need to change the route
-        } else if (userRole === 'Admin') {
-          this.router.push('/adminViewCourse')
+        if (response.code === 200) {
+          let userRole = await UserService.getUserRole()
+          if (userRole === 'Student') {
+            this.router.push('/studentViewCourse')
+          } else if (userRole === 'Instructor' || userRole === 'Trainer') {
+            this.router.push('/instructorTrainerViewVotingCampaign') // will need to change the route
+          } else if (userRole === 'Admin') {
+            this.router.push('/adminViewCourse')
+          }
         }
 
       } catch (error) {

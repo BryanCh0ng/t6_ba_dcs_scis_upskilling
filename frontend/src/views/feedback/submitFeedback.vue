@@ -1,7 +1,7 @@
 <template>
     <div>
       <div class="container" v-if="!haveError">
-        <div class="text-center pb-5 pt-4">
+        <div class="text-center pb-5 pt-5">
           <h2>{{ headingTitle }}</h2>
           <h4 class="text-grey">{{ this.course.run_Name }}</h4>
         </div>

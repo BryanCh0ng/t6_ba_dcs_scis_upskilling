@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ul class="nav nav-pills justify-content-center pt-4">
+    <ul class="nav nav-pills justify-content-center pt-5">
       <li class="nav-item">
         <a class="nav-link" :class="{ 'active': activeTab === 'assigned' }" @click="activeTab = 'assigned'">Assigned</a>
       </li> 
@@ -34,7 +34,6 @@
                     <th scope="col">Start & End Time</th>
                     <th scope="col">Course Details</th>
                     <th scope="col">Lessons</th>
-                    <th scope="col">Action(s)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,9 +54,6 @@
                         <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(assigned_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                         <td>
                           <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(assigned_course.rcourse_ID)">View Lessons</a>
-                        </td>
-                        <td>
-                          <course-action status="attendance" :id="assigned_course.course_ID"></course-action>
                         </td>
                     </tr>
                 </tbody>
