@@ -242,8 +242,8 @@ export default {
                 let response = await CourseService.getAllCoursesAdmin();
                 this.formData.courses = response.data.course;
             } catch (error) {
-                console.error('Error fetching all courses: ', error);
-                this.errorMsg.push('Error fetching all courses');
+                // console.error('Error fetching all courses: ', error);
+                this.errorMsg.push('Error fetching all courses:', error);
             }
         },
         async fetchAllCourseCats() {
@@ -252,8 +252,8 @@ export default {
                 this.formData.courseCats = response;
                 //console.log(response)
             } catch (error) {
-                console.log('Error fetching all course categories: ', error);
-                this.errorMsg.push('Error fetching all course categories')
+                // console.log('Error fetching all course categories: ', error);
+                this.errorMsg.push('Error fetching all course categories', error)
             }
         },
         async fetchAllRunCourses() {
@@ -261,8 +261,8 @@ export default {
                 let response = await RunCourseService.getAllRunCourses();
                 this.formData.runCourses = response.data.course;
             } catch (error) {
-                console.log('Error fetching all run courses: ', error);
-                this.errorMsg.push('Error fetching all run courses');
+                // console.log('Error fetching all run courses: ', error);
+                this.errorMsg.push('Error fetching all run courses', error);
             }
         },
         async fetchAllCoaches() {
@@ -270,8 +270,8 @@ export default {
                 let response = await UserService.getAllCoaches();
                 this.formData.coaches = response;
             } catch (error) {
-                console.error('Error fetching all instructors and trainers: ', error)
-                this.errorMsg.push('Error fetching all instructors and trainers')
+                // console.error('Error fetching all instructors and trainers: ', error)
+                this.errorMsg.push('Error fetching all instructors and trainers', error)
             }
         },
         async fetchFilterData() {
@@ -286,7 +286,7 @@ export default {
             }
         },
         async onReset() {
-            console.log("run")
+            // console.log("run")
             this.v$.$reset();
             
             this.formData =  {
@@ -324,21 +324,21 @@ export default {
 
             if (!this.v$.$invalid) {
                 // Form is valid, submit or perform further actions
-                console.log('Form has no validation errors');
+                // console.log('Form has no validation errors');
 
-                console.log(this.formData.selectedCourses)
+                // console.log(this.formData.selectedCourses)
 
-                console.log(typeof(this.formData.selectedCourses))
+                // console.log(typeof(this.formData.selectedCourses))
 
-                console.log(this.formData.selectedCourseCats)
+                // console.log(this.formData.selectedCourseCats)
 
-                console.log(this.formData.selectedRunCourses)
+                // console.log(this.formData.selectedRunCourses)
 
-                console.log(this.formData.selectedCoaches)
+                // console.log(this.formData.selectedCoaches)
 
-                console.log(this.formData.startDate)
+                // console.log(this.formData.startDate)
 
-                console.log(this.formData.endDate)
+                // console.log(this.formData.endDate)
 
                 this.$emit('apply-filters', {
                     courses: this.formData.selectedCourses,
