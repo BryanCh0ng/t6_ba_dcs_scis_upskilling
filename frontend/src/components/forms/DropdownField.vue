@@ -1,6 +1,6 @@
 <template>
     <div>
-        <select v-model="selectedValue" :class="{ 'form-select': true, 'border-0': !hasError, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': hasError}" class="custom-select">
+        <select v-model="selectedValue" :class="{ 'form-select': true, 'border-0': !hasError, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': hasError}" class="custom-select" :disabled="disabled">
             <option disabled hidden value="">{{ defaultPlaceholder }}</option>
             <slot></slot>
         </select>
@@ -18,6 +18,7 @@ export default {
         modelValue: String,
         defaultPlaceholder: String,
         errors: Array, // Pass errors from parent
+        disabled: Boolean
     },
     setup(props, { emit }) {
         const selectedValue = ref(props.modelValue || '');

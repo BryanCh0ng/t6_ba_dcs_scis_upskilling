@@ -183,6 +183,7 @@ class GetRunCourse(Resource):
 
         return json.loads(json.dumps({"message": "There is no such runcourse"})), 404
 
+"""
 edit_runcourse = api.parser()
 @api.route("/edit_runcourse/<int:runcourse_id>", methods=["PUT"])
 @api.doc(description="Edit run course")
@@ -341,7 +342,74 @@ class CreateRunCourse(Resource):
             return {
                 "message": "Failed to create a new run course: " + str(e)
             }, 500
+"""
+
+edit_runcourse = api.parser()
+@api.route("/edit_runcourse/<int:runcourse_id>", methods=["PUT"])
+class EditRunCourse(Resource):
+    @api.expect(edit_runcourse)
+    def put(self, runcourse_id):
+
+        try: 
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to edit run course"}, 404
+    
+            #Get the updated data from the request body 
+            updated_data = request.json
         
+            runcourse = RunCourse.query.filter_by(rcourse_ID=runcourse_id).first()
+
+            if runcourse:
+                # Update the fields based on updated_data
+                for field, value in updated_data.items():
+                    #print(f"Updating {field} to {value}")
+                    setattr(runcourse, field, value)
+
+                #Commit the changes to the database 
+                db.session.commit()
+
+                return json.loads(json.dumps(runcourse.json(), default=str)), 200
+
+            return json.loads(json.dumps({"message": "There is no such runcourse"})), 404
+
+        except Exception as e:
+            db.session.rollback()
+            return "Failed" + str(e), 500
+
+@api.route("/create_runcourse/<int:course_id>", methods=["POST"])
+@api.doc(description="Create run course")
+class CreateRunCourse(Resource):
+    def post(self, course_id):
+        try: 
+            user_role = common.getUserRole()
+            if (user_role) != 'Admin':
+                return {"message": "Unathorized Access, Failed to create run course"}, 404
+            
+            # Get the data for creating a new run course from the request body
+            new_run_course_data = request.json
+
+            #print(new_run_course_data)
+
+            # Create a new run course object with the data
+            new_run_course = RunCourse(**new_run_course_data)
+
+            # Add the new course to the database
+            db.session.add(new_run_course)
+
+            # Commit the changes to the database
+            db.session.commit()
+
+            # Inside the create_proposed_course route
+            #print("Data before returning:", new_proposed_course.json())
+
+            # Return the newly created course as JSON response
+            return json.loads(json.dumps(new_run_course.json(), default=str)), 201
+
+        except Exception as e:
+            db.session.rollback()
+            return "Failed to create a new course: " + str(e), 500
+            
 # Apply Feedback Template to Course
 course_apply_feedback_template = api.parser()
 course_apply_feedback_template.add_argument("rcourse_id", help="Enter course id")

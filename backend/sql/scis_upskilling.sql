@@ -43,7 +43,7 @@ INSERT INTO user VALUES
     (17, 'Grace Chan', 'grace.chan.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
     (18, 'Lucas Koh', 'lucas.koh.2020@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
     (19, 'Hannah Lee', 'hannah.lee.2021@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
-    (20, 'Benjamin Lim', 'benjamin.lim.2022@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
+    (20, 'Benjamin Lim', 'benjamin.lim.2022@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Instructor'),
     (21, 'Lily Tan', 'lily.tan.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
     (22, 'William Ng', 'william.ng.2020@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
     (23, 'Zoe Goh', 'zoe.goh.2021@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
@@ -2076,7 +2076,7 @@ INSERT INTO feedback VALUES
     (1307, 1, 51, 9, '5', 10),
     (1308, 1, 51, 10, 'Quite engaging?', 10),
     (1309, 1, 51, 11, 'His teaching is good enough', 10),
-    -- user_id 52
+   -- user_id 53
     (1310, 1, 52, 1, '4', 10),
     (1311, 1, 52, 2, '5', 10),
     (1312, 1, 52, 3, '3', 10),
