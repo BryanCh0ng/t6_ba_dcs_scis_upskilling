@@ -62,6 +62,7 @@
         </div>
       </div>
       <vue-awesome-paginate v-if="lessons.length/itemsPerPage > 0" v-model="localCurrentPageLessons" :totalItems="lessons.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeLessons" class="justify-content-center pagination-container"/>
+      
       <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
     </div>
   
@@ -80,21 +81,6 @@
   import SearchFilter from '@/components/search/AllLessonSearchFilter.vue';
   import courseAction from '../../components/course/courseAction.vue';
   import DefaultModal from "@/components/DefaultModal.vue";
-  
-  // function showSuccessMessage(vm) {
-  //   vm.title = "Remove Lesson Successfully";
-  //   vm.message = "You have successfully remove lesson for the run course.";
-  //   vm.showAlert = true;
-  //   vm.buttonType = "success";
-  // }
-
-  // // Utility function to show an unsuccessful message
-  // function showUnsuccessMessage(vm) {
-  //   vm.title = "Remove Lesson Unsucessful";
-  //   vm.message = "Removal of the lesson from the course was unsuccessful.";
-  //   vm.showAlert = true;
-  //   vm.buttonType = "danger";
-  // }
 
   export default {
     components: {
@@ -124,6 +110,10 @@
         search_instructor_name: null,
         search_course_category: null,
         search_status: null,
+        title: "",
+        message: "",
+        buttonType: "",
+        showAlert: false,
       }
     },
     computed: {
@@ -201,20 +191,22 @@
       }, 
       async removeLesson(lesson_ID) {
         try {
+          console.log(lesson_ID)
           let response = await LessonService.removeLesson(lesson_ID);
+          console.log(response)
           if (response.code == 200) {
-          // showSuccessMessage(this)
-          this.title = "Remove Lesson Successfully";
-          this.message = "You have successfully remove lesson for the run course.";
-          this.showAlert = true;
-          this.buttonType = "success";
-        } else {
-          // showUnsuccessMessage(this)
-          this.title = "Remove Lesson Unsucessful";
-          this.message = "Removal of the lesson from the course was unsuccessful.";
-          this.showAlert = true;
-          this.buttonType = "danger";
-        }
+            // showSuccessMessage(this)
+            this.title = "Remove Lesson Successfully";
+            this.message = "You have successfully remove lesson for the run course.";
+            this.buttonType = "success";
+            this.showAlert = true;
+          } else {
+            // showUnsuccessMessage(this)
+            this.title = "Remove Lesson Unsucessful";
+            this.message = "Removal of the lesson from the course was unsuccessful.";
+            this.buttonType = "danger";
+            this.showAlert = true;
+          }
           
         } catch (error) {
           // showUnsuccessMessage(this)
@@ -241,11 +233,6 @@
       }
       console.log(this.userRole)
       this.loadData();
-      // if (role == 'Student') {
-      //   this.$router.push({ name: 'studentViewCourse' }); 
-      // } else {
-      //   this.loadData();
-      // }
     },
     }
 </script>
