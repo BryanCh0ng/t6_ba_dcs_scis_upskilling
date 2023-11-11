@@ -150,14 +150,16 @@ export default {
             console.log(no_of_feedback_response)
             if (no_of_feedback_response.code == 200) {
               this.course_rating = "Rating: " + rating_response.data.overall_average_rating + "/5 out of " + no_of_feedback_response.data.total_feedbacks + " feedback(s)";
-            } else {
-              this.errorMessage = no_of_feedback_response.message
-            }
+            } 
+            // else {
+            //   this.errorMessage = no_of_feedback_response.message
+            // }
         } else {
           this.errorMessage = rating_response.message
         }
       } catch (error) {
-        this.errorMessage = error.message
+        console.log(error)
+        //this.errorMessage = error.message
       }
       } else {
        try {
@@ -177,15 +179,16 @@ export default {
           console.log(no_of_feedback_response)
           if (no_of_feedback_response.code == 200) {
             this.course_rating = "Rating: " + rating_response.data.overall_average_rating + "/5 out of " + no_of_feedback_response.data.total_feedbacks + " feedback(s)";
-          } else {
-            this.errorMessage = no_of_feedback_response.message
-          }
+          } 
+          // else {
+          //   this.errorMessage = no_of_feedback_response.message
+          // }
         } else {
           this.errorMessage = rating_response.message
         }
       } catch (error) {
-        // console.log(error)
-        this.errorMessage = error.message
+        console.log(error)
+        //this.errorMessage = error.message
       }
       }
     }

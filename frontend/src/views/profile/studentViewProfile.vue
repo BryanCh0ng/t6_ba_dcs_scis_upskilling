@@ -73,9 +73,7 @@
                   <td v-else></td>
                 </tr>
               </tbody>
-
             </table>
-
           </div>
           <div v-else-if="registered_courses=[] && onInitialEmptyRegistered">
             <div class="pt-5 text-center">

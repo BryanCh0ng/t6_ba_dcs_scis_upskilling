@@ -270,27 +270,32 @@ class GetRandomReviewsByRCourseId(Resource):
             TemplateAttribute.input_Type == 'Text Field'
           ).first()
           
+          print(template_attribute_query.template_Attribute_ID)
+          print(rcourse_id)
           if template_attribute_query:
-            template_attribute_id = template_attribute_query.template_Attribute_ID
             random_reviews = (
                 db.session.query(
                   Feedback,
                 ).filter(
                   Feedback.rcourse_ID == rcourse_id,
-                  Feedback.template_Attribute_ID == template_attribute_id
+                  Feedback.template_Attribute_ID == template_attribute_query.template_Attribute_ID,
+                  Feedback.answer != ""
                 )
                 .order_by(db.func.random())
                 .limit(no_of_reviews)
                 .all()
               )
+            print(random_reviews)
             if random_reviews:
               print(random_reviews)
+              db.session.close()
               return {"code": 200, "reviews":[review.json() for review in random_reviews]}, 200
             return {"code": 202, "message": "There are no reviews available currently"}, 202
 
         if course_id:
           rcourse_ids = db.session.query(RunCourse.rcourse_ID).filter(RunCourse.course_ID == course_id).all()
           rcourse_id_list = [result[0] for result in rcourse_ids]
+          print(rcourse_id_list)
 
           if rcourse_id_list:
             template_attribute_query = db.session.query(
@@ -308,16 +313,19 @@ class GetRandomReviewsByRCourseId(Resource):
                     Feedback,
                   ).filter(
                     Feedback.rcourse_ID.in_(rcourse_id_list),
-                    Feedback.template_Attribute_ID == template_attribute_id
+                    Feedback.template_Attribute_ID == template_attribute_id,
+                    Feedback.answer != ""
                   )
                   .order_by(db.func.random())
                   .limit(no_of_reviews)
                   .all()
                 )
+              print(random_reviews)
               if random_reviews:
+                db.session.close()
                 return {"code": 200, "reviews":[review.json() for review in random_reviews]}, 200
 
-          return {"code": 202, "message": "There are no reviews available currently"}, 202
+          return {"code": 202, "message": "There are no feedbacks available currently"}, 202
 
       except Exception as e:
         print(e)

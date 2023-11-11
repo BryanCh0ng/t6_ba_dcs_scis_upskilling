@@ -49,12 +49,6 @@
                         {{ item.label }}
                       </a>
                       <hr class="dropdown-divider" v-if="index === roleSpecificDropdownItems.length - 2" />
-
-
-
-
-
-                      
                     </li>
                   </ul>
                 </div>

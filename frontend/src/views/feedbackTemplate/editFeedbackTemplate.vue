@@ -234,8 +234,9 @@ export default {
             this.showAlert = !this.showAlert;
           }
         } catch (error) {
+            console.log(error)
             this.title = "Feedback Template Edit Failed";
-            this.message = error.response.data.message.toString();
+            this.message = "An unexpected error has occured while attempt to update feedback template.";
             this.buttonType = "danger"
             this.showAlert = !this.showAlert;
             // throw new Error("Feedback Template Edit was unsuccessful");

@@ -147,6 +147,7 @@ class GetAllLessons(Resource):
             ended_lessons_sorted = sorted(ended_lessons, key=convert_to_datetime)
 
             combined_sorted_lessons =  ongoing_lessons_sorted + upcoming_lessons_sorted + ended_lessons_sorted
+            db.session.close()
             return {"code": 200, "lessons": combined_sorted_lessons}, 200
 
         except Exception as e:
