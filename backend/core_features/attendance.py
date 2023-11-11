@@ -192,6 +192,8 @@ class updateAttendanceByLessonId(Resource):
                         AttendanceRecord.lesson_ID == lesson_id
                     ).first()
                 if attendance_record_query:
+                    if action == 'Present':
+                        absentReason = None
                     update_data = {
                         'status': action,
                         'attrecord_Status': 'Submitted',
@@ -208,6 +210,8 @@ class updateAttendanceByLessonId(Resource):
                     return True
                 else:
                     reason = reasonInput if absentReason == 'Others' else absentReason
+                    if action == 'Present':
+                        reason = None
                     new_attendance_record = AttendanceRecord(None, lesson_ID = lesson_id, status=action, attrecord_Status='Submited', reason=reason, user_ID=student_id)
                     db.session.add(new_attendance_record)
                     db.session.commit()

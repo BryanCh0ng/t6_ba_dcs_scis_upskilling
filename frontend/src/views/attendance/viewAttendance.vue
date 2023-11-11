@@ -30,7 +30,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(attendance, key) in this.attendances" :key="key">
+              <tr v-for="(attendance, key) in this.attendances" :key="key" @click="selectAttendance(key)">
                 <td class="attendance_checkbox">
                   <input v-if="allowAction" type="checkbox" :value="attendance.user_ID" :checked="selectedStudents.includes(attendance.user_ID)" @change="selectAttendance(key)" />
                 </td>
@@ -109,7 +109,7 @@
         checkboxAll: false,
         selectedStudents: [],
         action: null,
-        selectedAbsentReason: '',
+        selectedAbsentReason: 'Medical Leave',
         othersSelected: false,
         reasonInput: '',
         title: "",

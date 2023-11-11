@@ -74,8 +74,8 @@
           <button v-show="showRemoveButton" class="btn btn-danger font-weight-bold text-nowrap" @click="removeFromBlacklist" title="Remove from Blacklist">Remove from Blacklist</button>
       </div>
 
-      <div class="container col-12 table-responsive">
-        <div v-if="student && student.length > 0">
+      <div class="container col-12">
+        <div class="table-responsive" v-if="student && student.length > 0">
           <table class="table bg-white">
             <thead>
               <tr class="text-nowrap">
@@ -131,9 +131,9 @@
             :search-api="getAllInstructorsAndTrainers"
             @search-complete="handleSearchComplete" />
 
-        <div class="container col-12 table-responsive">
+        <div class="container col-12">
             <h5 class="pb-3">All Instructor/Trainer Database</h5>
-            <div v-if="instructors_trainers && instructors_trainers.length > 0">
+            <div class="table-responsive" v-if="instructors_trainers && instructors_trainers.length > 0">
                 <table class="table bg-white">
                 <thead>
                     <tr class="text-nowrap">
