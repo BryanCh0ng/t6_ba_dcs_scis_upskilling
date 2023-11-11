@@ -22,10 +22,10 @@ pip install -r requirements.txt
 ## Frontend Dependencies
 ```
 npm install papaparse / npm install papaparse@5.4.1
-npm i chartjs / npm i chartjs@0.3.24
-npm i chartjs-plugin-datalabels / npm i chartjs-plugin-datalabels@2.2.0
-npm i chartjs-chart-wordcloud
-npm i vuedraggable
+npm install chartjs / npm i chartjs@0.3.24
+npm install  chartjs-plugin-datalabels / npm i chartjs-plugin-datalabels@2.2.0
+npm install  chartjs-chart-wordcloud
+npm install  vuedraggable
 npm install html2pdf.js
 npm install --save @fortawesome/free-regular-svg-icons
 npm install @vuepic/vue-datepicker
