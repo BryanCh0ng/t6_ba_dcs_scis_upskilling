@@ -35,7 +35,7 @@
                 <!-- Dropdown toggle button -->
                 <span class="dropdown-toggle btn dropdownbtn" id="userDropdown" role="button" @click="toggleUserDropdown" aria-expanded="false">
                   <div class="username-container">
-                    <span id="username">{{ user_name }}</span>
+                    <font-awesome-icon icon="fa fa-user" style="padding-right: 10px"/><span id="username">{{ user_name }}</span>
                   </div>
                   
                 </span>
