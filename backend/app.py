@@ -21,7 +21,6 @@ from core_features.common import api as common
 from core_features.feedback import api as feedback
 from core_features.lesson import api as lesson
 from core_features.attendance import api as attendance
-from core_features.automated import api as automated
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
 
@@ -49,7 +48,6 @@ api.add_namespace(common)
 api.add_namespace(feedback)
 api.add_namespace(lesson)
 api.add_namespace(attendance)
-api.add_namespace(automated)
 
 CORS(app, supports_credentials=True)
 # ==================== CONNECTING TO DATABASE ====================#
@@ -65,7 +63,6 @@ app.config['SQLALCHEMY_POOL_SIZE'] = 30
 # app.config['SQLALCHEMY_POOL_SIZE'] = 2
 # app.config['SQLALCHEMY_MAX_OVERFLOW'] = 0
 
-# app.config['SQLALCHEMY_DATABASE_URI'] += "?autocommit=true"
 db = SQLAlchemy(app)
 
 # ==================== Mail and Bcrypt ====================#

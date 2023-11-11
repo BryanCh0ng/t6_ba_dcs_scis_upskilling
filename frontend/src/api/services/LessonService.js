@@ -72,27 +72,7 @@ class LessonService extends BaseApiService {
             return this.handleError(error);
         }
     }
-
-    async getLessonsByStudentId(user_id) {
-        try {
-            let runcourse_lessons = await axiosClient.get("/lesson/get_lessons_by_user_id", { params: { user_id: user_id } });
-            console.log(runcourse_lessons)
-            return runcourse_lessons.data
-          } catch (error) {
-            return this.handleError(error);
-         }
-    }
-
-    async getLessonsByInstructorId(user_id) {
-        try {
-            let runcourse_lessons = await axiosClient.get("/lesson/get_lessons_by_instructor_id", { params: { user_id: user_id } });
-            console.log(runcourse_lessons)
-            return runcourse_lessons.data
-          } catch (error) {
-            return this.handleError(error);
-         }
-    }
-
 }
 
 export default new LessonService();
+

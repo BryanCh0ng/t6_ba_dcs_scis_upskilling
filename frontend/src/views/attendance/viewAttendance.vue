@@ -16,9 +16,8 @@
             <thead>
               <tr class="text-nowrap">
                 <th><input v-if="allowAction" type="checkbox" v-model="checkboxAll" @change="checkAll" /></th>
-                <th></th>
-                <!-- <th scope="col">
-                  <a href="" @click.prevent="sort('user_ID')" class="text-decoration-none text-dark">Student ID <sort-icon :sortColumn="sortColumn === 'user_ID'" :sortDirection="getSortDirection('user_ID')"/></a></th> -->
+                <th scope="col">
+                  <a href="" @click.prevent="sort('user_ID')" class="text-decoration-none text-dark">Student ID <sort-icon :sortColumn="sortColumn === 'user_ID'" :sortDirection="getSortDirection('user_ID')"/></a></th>
                 <th scope="col">
                   <a href="" @click.prevent="sort('user_Name')" class="text-decoration-none text-dark">Student Name <sort-icon :sortColumn="sortColumn === 'user_Name'" :sortDirection="getSortDirection('user_Name')"/></a></th>
                 <th scope="col">
@@ -30,12 +29,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(attendance, key) in this.attendances" :key="key" @click="selectAttendance(key)">
+              <tr v-for="(attendance, key) in this.attendances" :key="key">
                 <td class="attendance_checkbox">
                   <input v-if="allowAction" type="checkbox" :value="attendance.user_ID" :checked="selectedStudents.includes(attendance.user_ID)" @change="selectAttendance(key)" />
                 </td>
-                <td>{{ key }}</td>
-                <!-- <td>{{ attendance.user_ID }}</td> -->
+                <td>{{ attendance.user_ID }}</td>
                 <td>{{ attendance.user_Name }}</td>
                 <td>{{ attendance.user_Email }}</td>
                 <td><course-status :status="attendance.status"></course-status></td>
@@ -49,7 +47,8 @@
             </div>
             <div class="row pt-lg-0 pt-3 col-lg-5 mt-4 d-flex justify-content-evenly">
               <div class="row col-12">
-                <button class="m-1 col btn attendance-btn btn-outline-success text-dark" :class="{ 'bg-medium-sea-green text-white': action === 'Present' }"  @click="setAttendance('Present')">Present</button>
+                <button class="m-1 col btn attendance-btn btn-outline-success text-dark" :class="{ 'btn-success text-white': action === 'Present' }"  @click="setAttendance('Present')">Present</button>
+                <button class="m-1 col btn attendance-btn btn-outline-warning text-dark" :class="{ 'btn-warning text-white': action === 'Late' }" @click="setAttendance('Late')">Late</button>
                 <button class="m-1 col btn attendance-btn btn-outline-danger text-dark"  :class="{ 'btn-danger text-white': action === 'Absent' }"  @click="setAttendance('Absent')">Absent</button>
               </div>
             </div>
@@ -62,7 +61,7 @@
           </div>
           <div class="row pb-4 bg-white mb-5" v-if="action === 'Absent' && allowAction">
             <div class="col-12 d-flex justify-content-center">
-              <select class="w-50 form-control-lg mt-2" v-model="selectedAbsentReason" @change="handleselectAbsentReason">
+              <select class="form-control-lg mt-2" v-model="selectedAbsentReason" @change="handleselectAbsentReason">
                 <option value="Medical Leave">Medical Leave</option>
                 <option value="Family Matters">Family Matters</option>
                 <option value="Personal Reason">Personal Reasons</option>
@@ -141,7 +140,7 @@
           console.log(lesson_response)
           if (lesson_response.code == 200) {
             this.lesson = lesson_response.lesson;
-            if (!this.hasLessonStarted(this.lesson.lesson_Date, this.lesson.lesson_Starttime) && this.message != 'Unable to mark attendance as user logged in is not instructor of this lesson.') {
+            if (!this.hasLessonStarted(this.lesson.lesson_Date, this.lesson.lesson_Starttime)) {
               this.message = 'Unable to mark attendance as is not during lesson datetime';
               this.buttonType = "danger";
               this.showAlert = !this.showAlert;
@@ -149,10 +148,6 @@
             }
           }
         } catch (error) {
-          this.title = 'View Attendance Failed';
-          this.message = error.response.data.message;
-          this.buttonType = "danger";
-          this.showAlert = !this.showAlert;
           console.error("Error fetching attendance records", error);
         }
       },
@@ -192,8 +187,7 @@
         const [hours, minutes, seconds] = lessonTime.split(':').map(Number);
         const targetDateTime = new Date(selectedDate);
         targetDateTime.setHours(hours, minutes, seconds);
-        const isSameDay = selectedDate.toDateString() === currentTime.toDateString();
-        return isSameDay && targetDateTime <= currentTime;
+        return targetDateTime <= currentTime;
       },
       convertDate,
       convertTime,
@@ -221,7 +215,7 @@
           this.showAlert = !this.showAlert;
         } else if (this.action == null) {
           this.title = 'Submit Attendance Failed';
-          this.message = 'Please select if student(s) are present or absent before submitting attendance';
+          this.message = 'Please select if student(s) are present, absent, or late before submitting attendance';
           this.buttonType = "danger";
           this.showAlert = !this.showAlert;
         } else if (this.selectedAbsentReason == 'Others' && this.reasonInput == '') {
@@ -248,12 +242,10 @@
               this.title = 'Submit Attendance Failed';
               this.message = submit_attendance_response.message
               this.buttonType = "danger";
-              this.showAlert = !this.showAlert;
             }
           } catch (error) {
-            this.message = error.response.data.message;
+            this.message = 'Submit Attendance Failed';
             this.buttonType = "danger";
-            this.showAlert = !this.showAlert;
           }
         }
       },
@@ -269,10 +261,6 @@
       },
       handleModalClosed(value) {
         this.showAlert = value;
-        if(this.title == 'Submit Attendance Success') {
-          this.loadData();
-        }
-        console.log(value)
       },
     },
     async created() {

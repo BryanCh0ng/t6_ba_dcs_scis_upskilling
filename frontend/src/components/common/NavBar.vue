@@ -48,13 +48,6 @@
                       <a :class="{ active: isActiveLink(item.path) }" class="nav-link" :href="item.path" @click="item.action ? item.action() : null">
                         {{ item.label }}
                       </a>
-                      <hr class="dropdown-divider" v-if="index === roleSpecificDropdownItems.length - 2" />
-
-
-
-
-
-                      
                     </li>
                   </ul>
                 </div>
@@ -101,7 +94,6 @@ export default {
           this.user_role === "Trainer"
         ) {
           links.push(
-            { path: "/viewAllLessons", label: "All Lessons" },
             { path: "/instructorTrainerViewVotingCampaign", label: "Voting Campaign" },
             { path: "/proposeCourse", label: "Propose Course" },
             { path: "/contactUs", label: "Contact Us" },
@@ -133,11 +125,9 @@ export default {
 
       if (this.user_role === "Student") {
         items.push({ path: "/studentViewProfile", label: "Profile" });
-        items.push({ path: "/studentViewLesson", label: "My Lessons" });
       } else if (this.user_role === "Instructor" || this.user_role === "Trainer") {
         items.push(
           { path: "/instructorTrainerViewProfile", label: "Profile" },
-          { path: "/instructorTrainerViewLesson", label: "My Lessons" },
           { path: "/viewDashboard", label: "Dashboard" }
         );
       } else if (this.user_role === "Admin") {

@@ -20,8 +20,8 @@
               <th scope="col">End Time</th>
               <th scope="col">
                 <a href="" @click.prevent="sort('lesson_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'lesson_Status'" :sortDirection="getSortDirection('lesson_Status')"/></a></th>
-              <th scope="col" v-if="userRole != 'Student'">Attendance</th>
-              <th scope="col" class="actions" v-if="userRole == 'Admin'">Action(s)</th>
+              <th scope="col" v-if="userRole !== 'Student'">Attendance</th>
+              <th scope="col" v-if="userRole === 'Admin'" class="actions">Action(s)</th>
             </tr>
           </thead>
           <tbody>
@@ -31,9 +31,8 @@
               <td><course-date-time :time="lesson.lesson_Starttime"></course-date-time></td>
               <td><course-date-time :time="lesson.lesson_Endtime"></course-date-time></td>
               <td :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }" ><course-status :status="lesson.lesson_Status"></course-status></td>
-              <td v-if="userRole == 'Admin'" :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }"><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewAttendance(lesson.lesson_ID)">View Attendance</a></td>
-              <td v-else-if="userRole == 'Trainer' && lesson.isTrainerForLesson" :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }"><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewAttendance(lesson.lesson_ID)">View Attendance</a></td>
-              <td v-if="lesson.lesson_Status=='Upcoming' && userRole == 'Admin'" class="actions">
+              <td v-if="userRole != 'Student'" :class="{ 'text-grey-important': lesson.lesson_Status == 'Ended' }"><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewAttendance(lesson.lesson_ID)">View Attendance</a></td>
+              <td v-if="userRole === 'Admin' && lesson.lesson_Status=='Upcoming'" class="actions">
                 <div class="action-buttons">
                   <course-action status="edit-lesson" @click="editLesson(lesson.lesson_ID)"></course-action>
                   <course-action status="remove-lesson" @click="removeLesson(lesson.lesson_ID)"></course-action>
@@ -93,7 +92,7 @@ export default {
     courseDateTime,
     courseAction,
     DefaultModal,
-    courseStatus,
+    courseStatus
   },
   data() {
     return {
@@ -104,11 +103,11 @@ export default {
       itemsPerPage: 10,
       localCurrentPageLessons: 1,
       errorMsge: 'No records found',
-      userRole: "",
       title: "",
       message: "",
       buttonType: "",
       showAlert: false,
+      userRole: ""
     }
   },
   computed: {
@@ -136,7 +135,7 @@ export default {
         const { id: course_ID } = this.$route.params;
         this.course_ID = course_ID
         let response = await LessonService.getRunCourseById(course_ID)
-        console.log(response)
+        // console.log(response)
         if (response.code == 200) {
           this.lessons = response.lessons
         } else {
@@ -196,6 +195,7 @@ export default {
       } catch (error) {
         showUnsuccessMessage(this)
         this.message = error.message;
+        
       }
     },
     async handleModalClosed(value) {
@@ -207,7 +207,6 @@ export default {
     const user_ID = await UserService.getUserID();
     const role = await UserService.getUserRole(user_ID);
     this.userRole = role;
-    console.log(this.userRole)
     this.loadData()
     // if (role == 'Student') {
     //   this.$router.push({ name: 'studentViewCourse' }); 

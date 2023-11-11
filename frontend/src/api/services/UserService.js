@@ -12,7 +12,8 @@ class UserService extends BaseApiService {
             return response.data;
         } catch (error) {
             // Handle errors
-            return this.handleError(error);
+            console.error(error);
+            throw error;
         }
     }
 
@@ -24,7 +25,8 @@ class UserService extends BaseApiService {
             });
             return response.data;
         } catch (error) {
-            return this.handleError(error);
+            console.error(error);
+            throw error;
         }
     }
 
@@ -33,7 +35,8 @@ class UserService extends BaseApiService {
             const response = await axiosClient.post("user/register", userData);
             return response.data;
         } catch (error) {
-            return this.handleError(error);
+            console.error(error);
+            throw error;
         }
     }
 
@@ -44,7 +47,8 @@ class UserService extends BaseApiService {
             });
             return response.data;
         } catch (error) {
-            return this.handleError(error);
+            console.error(error);
+            throw error;
         }
     }
 
@@ -57,7 +61,8 @@ class UserService extends BaseApiService {
             });
             return response.data;
         } catch (error) {
-            return this.handleError(error);
+            console.error(error);
+            throw error;
         }
     }
     
@@ -66,7 +71,8 @@ class UserService extends BaseApiService {
             const response = await axiosClient.get("user/get_user_id");
             return response.data;
         } catch (error) {
-            return this.handleError(error);
+            console.error(error);
+            throw error;
         }
     }
 
@@ -75,7 +81,8 @@ class UserService extends BaseApiService {
             const response = await axiosClient.get("user/get_user_name");
             return response.data;
         } catch (error) {
-            return this.handleError(error);
+            console.error(error);
+            throw error;
         }
     }
     
@@ -84,7 +91,8 @@ class UserService extends BaseApiService {
             const response = await axiosClient.get("user/get_role");
             return response.data;
         } catch (error) {
-            return this.handleError(error);
+            console.error(error);
+            throw error;
         }
     }
     
@@ -93,7 +101,8 @@ class UserService extends BaseApiService {
             const response = await axiosClient.get("user/logout");
             return response.data;
         } catch (error) {
-            return this.handleError(error);
+            console.error(error);
+            throw error;
         }
     }
 

@@ -391,25 +391,7 @@ const routes = [
         title: 'View Attendance',
         requiresAuth: true
     }, 
-  },
-  {
-    path: '/studentViewLesson',
-    name: 'studentViewLesson',
-    component: () => import('../views/lesson/studentViewLesson.vue'),
-    meta: {
-        title: 'Student View Lesson',
-        requiresAuth: true
-    }, 
-  },
-  {
-    path: '/instructorTrainerViewLesson',
-    name: 'instructorTrainerViewLesson',
-    component: () => import('../views/lesson/instructorTrainerViewLesson.vue'),
-    meta: {
-        title: 'Instructor Trainer View Lesson',
-        requiresAuth: true
-    }, 
-  }  
+  } 
 ]
 
 const router = createRouter({

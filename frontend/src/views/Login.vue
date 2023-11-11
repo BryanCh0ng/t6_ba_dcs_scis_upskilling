@@ -30,6 +30,7 @@
         
       </div>
     </div>
+    <!-- <success-modal :show="showSuccessModal" :message="successMessage" @close="hideSuccessModal"/> -->
   </div>
 </template>
 
@@ -98,9 +99,9 @@ export default {
         if (response.code === 200) {
           let userRole = await UserService.getUserRole()
           if (userRole === 'Student') {
-            this.router.push('/studentViewRecommendations')
+            this.router.push('/studentViewCourse')
           } else if (userRole === 'Instructor' || userRole === 'Trainer') {
-            this.router.push('/instructorTrainerViewVotingCampaign')
+            this.router.push('/instructorTrainerViewVotingCampaign') // will need to change the route
           } else if (userRole === 'Admin') {
             this.router.push('/adminViewCourse')
           }

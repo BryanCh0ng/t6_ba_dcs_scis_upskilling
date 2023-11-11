@@ -61,10 +61,8 @@
       </div>
       <div class="pt-5 row">
         <div class="col-12 d-flex">
-          <h5 class="col-6">{{ course_rating }}</h5>
-        </div>
-        <div class="col-12 d-flex">
           <h5 class="col-6">Feedbacks: </h5>
+          <h5>{{ course_rating }}</h5>
         </div>
         <div v-if="feedback_reviews && feedback_reviews.length > 0">
           <div class="col-6" v-for="feedback in feedback_reviews" :key="feedback.feedback_ID">
@@ -100,10 +98,10 @@ export default {
   data() {
     return {
       noOfReviews: this.no_of_reviews,
-      errorMessage: "",
+      errorMessage: '',
       feedback_reviews: {},
       course_rating: "",
-      total_feedbacks: ""
+      total_feedbacks: "",
     };
   },
   computed: {
@@ -128,58 +126,45 @@ export default {
       }
     },
     async getReviews() {
-      this.feedback_reviews = {};
-      this.course_rating = "";
-      this.total_feedbacks = "";
-      this.errorMessage = "";
       if (this.isRunCourse) {
+       const rcourse_id = this.course.rcourse_ID
        try {
-        const response = await FeedbackService.getRandomReviews(this.course.rcourse_ID, null, this.noOfReviews)
+        // console.log(rcourse_id)
+        // console.log(this.noOfReviews)
+        const response = await FeedbackService.getRandomReviews(rcourse_id, null, this.noOfReviews)
+        // console.log(response)
         if (response.code == 200) {
           this.feedback_reviews = response.reviews
         } else {
           this.errorMessage = response.message
-        } 
-        let rcourse_ids = [parseInt(this.course.rcourse_ID)];
-        rcourse_ids = JSON.stringify(rcourse_ids);
-        const rating_response = await DashboardService.getCourseAverageRatings(null, null, rcourse_ids, null, null, null)
+        }
+        // console.log(this.feedback_reviews)
+        // console.log(this.errorMessage)
+        const rating_response = await DashboardService.getCourseAverageRatings([this.course.course_ID], null, null, null, null, null)
         if (rating_response.code == 200) {
-            console.log(this.course.rcourse_ID)
-            console.log(rcourse_ids)
-            const no_of_feedback_response = await DashboardService.getTotalFeedbacks(null, null, rcourse_ids, null, null, null)
-            console.log(no_of_feedback_response)
-            if (no_of_feedback_response.code == 200) {
-              this.course_rating = "Rating: " + rating_response.data.overall_average_rating + "/5 out of " + no_of_feedback_response.data.total_feedbacks + " feedback(s)";
-            } else {
-              this.errorMessage = no_of_feedback_response.message
-            }
+          this.course_rating = "Rating: " + rating_response.data.overall_average_rating + "/5 out of " + rating_response.data.total_feedbacks + " feedback(s)";
         } else {
           this.errorMessage = rating_response.message
         }
       } catch (error) {
+        // console.log(error)
         this.errorMessage = error.message
       }
       } else {
        try {
+        // console.log(this.noOfReviews)
         const response = await FeedbackService.getRandomReviews(null, this.course.course_ID, this.noOfReviews)
+        // console.log(response)
         if (response.code == 200) {
           this.feedback_reviews = response.reviews
         } else {
           this.errorMessage = response.message
         }
-        let course_ids = [parseInt(this.course.course_ID)];
-        course_ids = JSON.stringify(course_ids);
-        const rating_response = await DashboardService.getCourseAverageRatings(course_ids, null, null, null, null, null)
+        // console.log(this.feedback_reviews)
+        // console.log(this.errorMessage)
+        const rating_response = await DashboardService.getCourseAverageRatings([this.course.course_ID], null, null, null, null, null)
         if (rating_response.code == 200) {
-          console.log(this.course.course_ID)
-          console.log(course_ids)
-          const no_of_feedback_response = await DashboardService.getTotalFeedbacks(course_ids, null, null, null, null, null)
-          console.log(no_of_feedback_response)
-          if (no_of_feedback_response.code == 200) {
-            this.course_rating = "Rating: " + rating_response.data.overall_average_rating + "/5 out of " + no_of_feedback_response.data.total_feedbacks + " feedback(s)";
-          } else {
-            this.errorMessage = no_of_feedback_response.message
-          }
+          this.course_rating = "Rating: " + rating_response.data.overall_average_rating + "/5 out of " + rating_response.data.total_feedbacks + " feedback(s)";
         } else {
           this.errorMessage = rating_response.message
         }

@@ -21,8 +21,8 @@
               <th scope="col">
                 <a href="" @click.prevent="sort('runcourse_Status')" class="text-decoration-none text-dark">Run Status <sort-icon :sortColumn="sortColumn === 'runcourse_Status'" :sortDirection="getSortDirection('runcourse_Status')"/></a></th>
               <th scope="col">Course Details</th>
-              <th scope="col">Lesson(s)</th>
-              <th scope="col">Registration(s)</th>
+              <th scope="col">Lessons</th>
+              <th scope="col">Registrations</th>
               <th scope="col">Feedback</th>
               <th scope="col">Feedback Template</th>
               <th scope="col">Action(s)</th>
@@ -46,8 +46,8 @@
               <td><a class="text-nowrap text-dark text-decoration-underline view-lessons" @click="viewLessons(course.rcourse_ID)">View Lessons</a></td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-registrations" @click="viewRegistrations(course.rcourse_ID)">View Registrations</a></td>
               <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToRunCourseFeedbackAnalysis(course.rcourse_ID)">View Feedback Analysis</a></td>
-              <td v-if="course.feedback_Startdate && isBeforeCurrentDate(course.feedback_Startdate)"><a v-if="course.course_Status != 'Retired'" class="btn bg-light-blue" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
-              <td v-else><a v-if="course.course_Status != 'Retired'" class="btn bg-light-blue disabled" title="Unable to remove run course due to ongoing/past feedback period'">Apply Feedback Template</a></td>
+              <td v-if="course.feedback_Startdate && isBeforeCurrentDate(course.feedback_Startdate)"><a v-if="course.course_Status != 'Retired'" class="btn btn-info" @click="openFeedbackTemplateModal(course)" data-bs-toggle="modal" data-bs-target="#apply_course_feedback_template_modal">Apply Feedback Template</a></td>
+              <td v-else><a v-if="course.course_Status != 'Retired'" class="btn btn-info disabled" title="Unable to remove run course due to ongoing/past feedback period'">Apply Feedback Template</a></td>
               <td v-if="course.runcourse_Status=='Ongoing'">
                 <course-action @action-and-message-updated="handleActionData" status="close_registration" :course="course" :courseName="course.courseName" ></course-action>
               </td>

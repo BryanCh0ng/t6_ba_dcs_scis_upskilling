@@ -40,7 +40,6 @@
                   <th scope="col">
                     <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Status', 'registered')">Status <sort-icon :sortColumn="sortColumn === 'reg_Status'" :sortDirection="getSortDirection('reg_Status')"/></a></th>
                   <th scope="col">Course Details</th>
-                  <th scope="col">Lesson(s)</th>
                   <th scope="col">Action(s)</th>
                 </tr>
               </thead>
@@ -63,7 +62,6 @@
                     <course-status :status="registered_course.reg_Status"></course-status>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(registered_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(registered_course.rcourse_ID)">View Lessons</a></td>
                   <td v-if="(registered_course.reg_Status === 'Enrolled' || registered_course.reg_Status === 'Pending') && isClosingDateValid(registered_course.reg_Enddate)">
                       <course-action status="registered_drop" @action-and-message-updated="handleActionData" :course="registered_course"></course-action>
                   </td>
@@ -615,10 +613,7 @@ export default {
     view_submit_feedback(id) {
       console.log(id)
       this.$router.push({ name: 'submitFeedback', params: {id}})
-    },
-    viewLessons(courseID) {
-      this.$router.push({ name: 'viewRunCourseLesson', params: {id: courseID}});
-    },
+    }
   },
   computed: {
     displayedRegisteredCourses() {

@@ -3,11 +3,10 @@
     <div class="container text-center pt-5">
       <h2 v-if="currentViewMode === 'analysis'">Feedback Analysis</h2>
       <h2 v-else>All Feedback Records</h2>
-      <div class="mb-5">
-        <h4 class="text-secondary" v-if="currentPage === 'course' || courseName !== ''">For {{ courseName }}</h4>
-        <h4 class="text-secondary" v-if="currentPage === 'runcourse' || runcourseName !== ''">For {{ runcourseName }}</h4>
-        <h4 class="text-secondary" v-if="currentPage === 'coach' || instructorName !== ''">For {{ instructorName }}</h4>
-      </div>
+      <h4 class="mb-5 text-secondary" v-if="currentPage === 'course'">For {{ courseName }}</h4>
+      <h4 class="mb-5 text-secondary" v-else-if="currentPage === 'runcourse'">For {{ runcourseName }}</h4>
+      <h4 class="mb-5 text-secondary" v-else-if="currentPage === 'coach'">For {{ instructorName }}</h4>
+      <h4 class="mb-5 text-secondary" v-else></h4>
 
       <div class="container col-12 d-flex mt-3 mb-3 w-100 justify-content-between">
         <div class="d-flex">
@@ -121,8 +120,8 @@
           <!-- Include Word Cloud component here for course done well topic -->
           <!-- <WordCloud :wordData="courseDoneWellTopics[index].wordData" /> -->
           <WordChart v-if="courseDoneWellTopics.length > 0" :datasets="courseDoneWellTopics[index].wordData"
-            :label="'Overall Course Done Well'" :size1="13" :size2="15" :fit="false" />
-          <p><strong>Overall Course Done Well - {{ getFirstWord(topic) }}</strong></p>
+            :label="'Overall Course Done Well'" :size1="12" :size2="15" :fit="false" />
+          <p><strong>Overall Course Done Well - Topic {{ index + 1 }}</strong></p>
         </div>
 
         <!-- Topic Modeling - Course Suggestions / Improve -->
@@ -131,8 +130,8 @@
           <!-- Include Word Cloud component here for course suggestions topic -->
           <!-- <WordCloud :wordData="courseSuggestionsTopics[index].wordData" /> -->
           <WordChart v-if="courseSuggestionsTopics.length > 0" :datasets="courseSuggestionsTopics[index].wordData"
-            :label="'Overall Course Suggestions'" :size1="13" :size2="15" :fit="false" />
-          <p><strong>Overall Course Suggestions - {{ getFirstWord(topic) }}</strong></p>
+            :label="'Overall Course Suggestions'" :size1="12" :size2="15" :fit="false" />
+          <p><strong>Overall Course Suggestions - Topic {{ index + 1 }}</strong></p>
         </div>
 
         <!-- Topic Modeling - Instructor Done Well -->
@@ -141,8 +140,8 @@
           <!-- Include Word Cloud component here for instructor done well topic -->
           <!-- <WordCloud :wordData="instructorDoneWellTopics[index].wordData" /> -->
           <WordChart v-if="instructorDoneWellTopics.length > 0" :datasets="instructorDoneWellTopics[index].wordData"
-            :label="'Overall Instructor Done Well'" :size1="13" :size2="15" :fit="false" />
-          <p><strong>Overall Instructor Done Well - {{ getFirstWord(topic) }}</strong></p>
+            :label="'Overall Instructor Done Well'" :size1="12" :size2="15" :fit="false" />
+          <p><strong>Overall Instructor Done Well - Topic {{ index + 1 }}</strong></p>
         </div>
 
         <!-- Topic Modeling - Instructor Suggestions -->
@@ -151,8 +150,8 @@
           <!-- Include Word Cloud component here for instructor suggestions topic -->
           <!-- <WordCloud :wordData="instructorSuggestionsTopics[index].wordData" /> -->
           <WordChart v-if="instructorSuggestionsTopics.length > 0" :datasets="instructorSuggestionsTopics[index].wordData"
-            :label="'Overall Instructor Suggestions'" :size1="13" :size2="15" :fit="false" />
-          <p><strong>Overall Instructor Suggestions - {{ getFirstWord(topic) }}</strong></p>
+            :label="'Overall Instructor Suggestions'" :size1="12" :size2="15" :fit="false" />
+          <p><strong>Overall Instructor Suggestions - Topic {{ index + 1 }}</strong></p>
         </div>
       </div>
     </div>
@@ -206,6 +205,8 @@
 
 <script>
 import UserService from "@/api/services/UserService.js";
+import CourseService from "@/api/services/CourseService.js";
+import RunCourseService from "@/api/services/runCourseService.js";
 import DashboardService from '@/api/services/dashboardService';
 import DoughnutChart from "@/components/dashboard/DoughnutChart.vue";
 import WordChart from "@/components/dashboard/WordChart.vue"
@@ -320,34 +321,16 @@ export default {
   },
   methods: {
     async fetchCourseName() {
-      if (this.courseID !== []) {
-        const coursenames = await DashboardService.getFilteredCoursesName(this.courseIDs)
-        if (coursenames.data.length > 5) {
-          this.courseName = ""
-        } else {
-          this.courseName = coursenames.data.join(", ");
-        }
-      } 
+      const coursename = await CourseService.getCourseName(this.courseID)
+      this.courseName = coursename.data
     },
     async fetchRunCourseName() {
-      if (this.runcourseIDs !== []) {
-        const runcoursenames = await DashboardService.getFilteredRunCoursesName(this.runcourseIDs)
-        if (runcoursenames.data.length > 5) {
-          this.runcourseName = ""
-        } else {
-          this.runcourseName = runcoursenames.data.join(", ");
-        }
-      } 
+      const runcoursename = await RunCourseService.getRunCourseName(this.runcourseID)
+      this.runcourseName = runcoursename.data
     },
     async fetchInstructorName() {
-      if (this.coachesIDs.length !== []) {
-        const instructorNames = await DashboardService.getFilteredCoachesName(this.coachesIDs)
-        if (instructorNames.data.length > 5) {
-          this.instructorName = ""
-        } else {
-          this.instructorName = instructorNames.data.join(", ");
-        }
-      }
+      const instructorname = await UserService.getUserName(this.coachesID)
+      this.instructorName = instructorname
     },
     //Total Feedbacks 
     async fetchTotalFeedbacks() {
@@ -542,9 +525,6 @@ export default {
         console.error("Error fetching instructor feedbacks: ", error);
       }
     },
-    getFirstWord(topic) {
-      return topic.wordData[0].word;
-    },
     toggleViewMode() {
       this.currentViewMode = this.currentViewMode === 'analysis' ? 'feedback' : 'analysis';
     },
@@ -590,8 +570,15 @@ export default {
       // Create a Blob and download link
       const blob = new Blob([csv], { type: 'text/csv' });
 
-      let names = [this.courseName, this.runcourseName, this.instructorName].filter(Boolean);
-      let startOfFileName = names.length > 0 ? names.join('_') : 'Overall';
+      // Set the file name to the course name
+      let startOfFileName;
+      if (this.courseName) {
+        startOfFileName = this.courseName;
+      } else if (this.runcourseName) {
+        startOfFileName = this.runcourseName;
+      } else {
+        startOfFileName = "Overall";
+      }
 
       const fileName = `${startOfFileName}_feedback_data.csv`;
 
@@ -606,10 +593,16 @@ export default {
       try {
         const container = this.$refs.analysisView;
 
-        let names = [this.courseName, this.runcourseName, this.instructorName].filter(Boolean);
-        let startOfFileName = names.length > 0 ? names.join('_') : 'Overall';
+        let courseName;
+        if (this.courseID) {
+          courseName = this.courseName;
+        } else if (this.runcourseName) {
+          courseName = this.runcourseName;
+        } else {
+          courseName = "overall"
+        }
 
-        const fileName = `${startOfFileName}_feedback_analysis.pdf`;
+        const fileName = `${courseName}_feedback_analysis.pdf`;
 
         const options = {
           margin: 5,
@@ -636,9 +629,6 @@ export default {
     async fetchData() {
       // Create an array of promises to fetch data
       const dataPromises = [
-        this.fetchCourseName(),
-        this.fetchRunCourseName(),
-        this.fetchInstructorName(),
         this.fetchTotalFeedbacks(),
         this.fetchCourseAverageRating(),
         this.fetchInstructorAverageRating(),
@@ -650,6 +640,9 @@ export default {
         this.fetchInstructorSentimentData(),
         this.fetchCourseWordcloudData(),
         this.fetchInstructorWordcloudData(),
+        this.fetchCourseName(),
+        this.fetchRunCourseName(),
+        this.fetchInstructorName(),
         this.fetchCourseFeedbackData()
       ];
 

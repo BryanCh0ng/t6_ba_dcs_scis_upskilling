@@ -5,7 +5,11 @@
         
         <image-half></image-half>
 
+        <!-- Form content half -->
         <form-container>
+          <!-- <template v-slot:logo>
+            <img src="../assets/smulogo.png" title="smu logo" id="logo"/>
+          </template> -->
             <error-message :error-message="errorMessage" />
 
             <form @submit.prevent="onSubmit">
@@ -23,7 +27,7 @@
         
       </div>
     </div>
-    <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
+    <success-modal :show="showSuccessModal" :message="successMessage" @close="hideSuccessModal"/>
   </div>
 </template>
 
@@ -32,24 +36,11 @@ import ImageHalf from "../components/ImageHalf.vue";
 import FormContainer from "../components/RegistrationPasswordContainer.vue";
 import PasswordField from "../components/PasswordField.vue";
 import ErrorMessage from "../components/ErrorMessage.vue";
+import SuccessModal from "../components/SuccessModal.vue";
 import { required, minLength } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 import UserService from "@/api/services/UserService.js";
-import DefaultModal from "@/components/DefaultModal.vue";
 
-function showSuccessMessage(vm) {
-  vm.title = "Reset Password Successfully";
-  vm.message = "Reset password link has been sent successfully. Please check your email.";
-  vm.showAlert = true;
-  vm.buttonType = "success";
-}
-
-function showUnsuccessMessage(vm) {
-    vm.title = "Reset Password Unsuccessfully";
-    vm.message = "Reset password unsucessfully. Please check your credentials.";
-    vm.showAlert = true;
-    vm.buttonType = "danger";
-}
 
 export default {
   name: "ResetPassword",
@@ -64,10 +55,8 @@ export default {
       confirmpassword: "",
       email: "",
       errorMessage: "",
-      showAlert: false,
-      title: "",
-      message: "",
-      buttonType: "",
+      showSuccessModal: false,
+      successMessage: "You have reset your password successfully."
     };
   },
   created() {
@@ -81,10 +70,10 @@ export default {
   },
   components: {
     ErrorMessage,
+    SuccessModal,
     PasswordField,
     ImageHalf,
-    FormContainer,
-    DefaultModal
+    FormContainer
   },
   methods: {
     onSubmit() {
@@ -92,6 +81,11 @@ export default {
       this.v$.$touch();
 
       this.errorMessage = ""; // Reset error message
+
+      console.log("Form Data:", {
+        password: this.password,
+        confirmpassword: this.confirmpassword,
+      });
 
       // Check for empty fields
       if (!this.password || !this.confirmpassword) {
@@ -123,23 +117,21 @@ export default {
 
     async performReset() {
       try {
-        
+        // Will need to update the flask api endpoint
+        // Send login request
+        console.log(this.email)
         const response = await UserService.resetPassword(this.password, this.confirmpassword, this.email)
-        if (response.code === 200) {
-          showSuccessMessage(this)
-        } else {
-          showUnsuccessMessage(this)
-        }
+       
 
-        
+        this.showSuccessModal = true;
+        console.log(response.data);
       } catch (error) {
-        showUnsuccessMessage(this)
+        this.errorMessage = "Reset failed. Please check your credentials.";
         console.log("Reset error:", error.request.response);
       }
     },
-    async handleModalClosed(value) {
-      this.showAlert = value;
-
+    hideSuccessModal() {
+      this.showSuccessModal = false;
       this.$router.push('/');
     },
   },

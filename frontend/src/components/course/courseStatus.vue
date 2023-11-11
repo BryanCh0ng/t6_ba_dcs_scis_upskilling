@@ -46,8 +46,6 @@
                 return 'mt-1 pt-2 pb-2 badge text-light bg-crimson';
             case 'Upcoming':
                 return 'mt-1 pt-2 pb-2 badge text-light bg-blue';
-            case 'Late':
-                return 'mt-1 pt-2 pb-2 badge text-light bg-warning';
             default:
                 return 'mt-1 pt-2 pb-2 badge text-light bg-secondary';
             } 

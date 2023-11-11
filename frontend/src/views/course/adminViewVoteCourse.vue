@@ -14,7 +14,6 @@
              <search-filter
               :status-options="statusOptions"
               :search-api="searchAllVotingCoursesAdmin"
-              course-name-placeholder="Course Name"
               @search-complete="handleSearchComplete" />
 
             <div class="container col-12">
@@ -79,9 +78,9 @@
               :search-api="searchAllNotOfferedVotingCoursesAdmin"
               @search-complete="handleSearchCompleteNotOffered" />
 
-            <div class="container col-12">
+            <div class="container col-12 table-responsive">
               <h5 class="pb-3">Courses Available that has low number of interest</h5>
-              <div class="table-responsive" v-if="notoffered_courses && notoffered_courses.length > 0">
+              <div v-if="notoffered_courses && notoffered_courses.length > 0">
                 <table class="table bg-white">
                   <thead>
                     <tr class="text-nowrap">

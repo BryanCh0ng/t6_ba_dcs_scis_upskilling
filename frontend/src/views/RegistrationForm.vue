@@ -7,7 +7,9 @@
 
         <!-- Form content half -->
         <form-container>
-         
+          <!-- <template v-slot:logo>
+            <img src="../assets/smulogo.png" title="smu logo" id="logo"/>
+          </template> -->
             <error-message :error-message="errorMessage" />
 
             <form @submit.prevent="onSubmit">
@@ -46,13 +48,13 @@
         
       </div>
     </div>
-    <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
+    <success-modal :show="showSuccessModal" :message="successMessage" @close="hideSuccessModal"/>
   </div>
 </template>
 
 <script>
 import ImageHalf from "../components/ImageHalf.vue";
-import DefaultModal from "@/components/DefaultModal.vue";
+import SuccessModal from "../components/SuccessModal.vue";
 import FormContainer from "../components/CommonFormContainer.vue";
 import ErrorMessage from "../components/ErrorMessage.vue";
 import DropdownField from "../components/DropdownField.vue";
@@ -62,25 +64,11 @@ import { required, email, minLength } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 import UserService from "@/api/services/UserService.js";
 
-function showSuccessMessage(vm) {
-  vm.title = "Registered Successfully";
-  vm.message = "You have been successfully registered. You can now proceed to log into your account!";
-  vm.showAlert = true;
-  vm.buttonType = "success";
-}
-
-function showUnsuccessMessage(vm) {
-    vm.title = "Registered Unsuccessfully";
-    vm.message = "We're sorry, but your registration could not be completed at this time. Please double-check your information and try again.";
-    vm.showAlert = true;
-    vm.buttonType = "danger";
-}
-
 export default {
   name: "RegistrationForm",
 
   setup() {
-    const v$ = useVuelidate(); 
+    const v$ = useVuelidate(); // Initialize Vuelidate
     return { v$ };
   },
 
@@ -94,10 +82,8 @@ export default {
       organizationName: "",
       alumni: "",
       errorMessage: "",
-      showAlert: false,
-      title: "",
-      message: "",
-      buttonType: "",
+      showSuccessModal: false,
+      successMessage: "Your account has been successfully created."
     };
   },
 
@@ -116,12 +102,12 @@ export default {
   },
   components: {
     ImageHalf,
+    SuccessModal,
     FormContainer,
     ErrorMessage,
     DropdownField,
     InputField,
     PasswordField,
-    DefaultModal
   },
   methods: {
     onSubmit() {
@@ -188,15 +174,11 @@ export default {
         }
         
         const response = await UserService.register(userData)
-        console.log(response)
-        if (response.code === 200) {
-          showSuccessMessage(this)
-        } else {
-          showUnsuccessMessage(this)
-        }
         
+        console.log(response)
+        this.showSuccessModal = true;
       } catch (error) {
-        showUnsuccessMessage(this)
+        this.errorMessage = "Register failed. Please check your credentials.";
         console.log("Register error:", error.request.response);
       }
     },
@@ -205,9 +187,8 @@ export default {
         this.role = ""; // Clear the placeholder value when the user interacts
       }
     },
-    async handleModalClosed(value) {
-      this.showAlert = value;
-
+    hideSuccessModal() {
+      this.showSuccessModal = false;
       this.$router.push('/');
     },
   },
