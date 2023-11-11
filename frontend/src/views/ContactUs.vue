@@ -38,7 +38,6 @@ import { required } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 import ContactUsService from "../api/services/contactService.js"
 import UserService from "@/api/services/UserService.js";
-import DefaultModal from "@/components/DefaultModal.vue";
 
 function showSuccessMessage(vm) {
   vm.title = "Message Sent Successfully";
@@ -84,7 +83,6 @@ export default {
   components: {
     DefaultModal,
     InputField,
-    DefaultModal
   },
   created() {
     this.get_user_id();
