@@ -367,7 +367,7 @@ export default {
   top: 80%; 
   left: -22px; 
   z-index: 1;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .admin-dropdown {
@@ -393,14 +393,26 @@ export default {
   cursor: pointer;
 }
 
+hr.dropdown-divider {
+    margin-top: 3px;
+    margin-bottom: 0;
+}
+
+
+@media (max-width: 1399px) {
+  .dropdown {
+    position: relative;
+    top: 1px;
+  }
+}
 
 @media (max-width: 768px) {
-  .dropdown {
+  /* .dropdown {
     bottom: 120%;
     left: 5px;
     transform: translateY(-10px);
     margin-bottom: 40px;
-  }
+  } */
 
   .dropdown-content {
     position: absolute;

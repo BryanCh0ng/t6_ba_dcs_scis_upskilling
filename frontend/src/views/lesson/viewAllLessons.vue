@@ -146,6 +146,11 @@
         this.localCurrentPageLessons = newPage;
         this.$emit('page-change', newPage);
       },
+      async handleSearchComplete(searchResults) {
+        // console.log("searchResults", searchResults);
+        this.lessons = searchResults;
+        
+      },
       async searchAllLesson(runCourseName, instructorName, courseCategory, lessonStatus) {
         this.search_run_course_name = runCourseName
         this.search_instructor_name = instructorName
@@ -157,6 +162,7 @@
           console.log(response)
           if (response.code == 200) {
             this.lessons = response.lessons
+            return this.lessons
           } else {
             this.errorMsge = response.message
           }
