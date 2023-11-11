@@ -163,7 +163,6 @@
         modalButtonElement.click();
       },
       async loadData() {
-        console.log('load')
         try {
           let response = await CourseService.searchAllCourseAdmin(this.search_course_name, this.search_course_category, this.search_status)
           

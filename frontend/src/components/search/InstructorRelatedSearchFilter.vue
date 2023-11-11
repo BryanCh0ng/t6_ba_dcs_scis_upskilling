@@ -29,6 +29,7 @@
 <script>
 import InputField from "../InputField.vue";
 import DropdownField from "../DropdownField.vue";
+import _ from "lodash";
 
 export default {
   name: "SearchFilter",
@@ -52,6 +53,17 @@ export default {
   async mounted() {
     this.statusDropdownOptions = this.statusOptions;
   },
+  watch: {
+        instructorName: _.debounce(function() {
+            this.searchFilter();
+        }, 300),
+        role() {
+            this.searchFilter();
+        },
+        organizationName() {
+            this.searchFilter();
+        }
+    },
   methods: {
     resetFilter() {
       this.instructorName = "";

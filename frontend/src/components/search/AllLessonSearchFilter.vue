@@ -38,6 +38,7 @@
 <script>
 import DropdownField from "../DropdownField.vue";
 import CourseCategoryService from "@/api/services/CourseCategoryService.js"
+import _ from "lodash";
 
 export default({
     name: "SearchFilter",
@@ -62,6 +63,20 @@ export default({
     async mounted() {
         await this.fetchCategoryDropdownOptions();
         this.statusDropdownOptions = this.statusOptions;
+    },
+    watch: {
+        courseName: _.debounce(function() {
+            this.searchFilter();
+        }, 300),
+        instructorName: _.debounce(function() {
+            this.searchFilter();
+        }, 300),
+        category() {
+            this.searchFilter();
+        },
+        status() {
+            this.searchFilter();
+        }
     },
     methods: {
         async fetchCategoryDropdownOptions() {

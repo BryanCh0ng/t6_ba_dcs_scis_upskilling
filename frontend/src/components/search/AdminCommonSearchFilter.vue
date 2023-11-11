@@ -33,10 +33,9 @@
 </template>
 
 <script>
-// import { axiosClient } from "../api/axiosClient";
 import DropdownField from "../DropdownField.vue";
-// import CourseService from "@/api/services/CourseService.js"
-import CourseCategoryService from "@/api/services/CourseCategoryService.js"
+import CourseCategoryService from "@/api/services/CourseCategoryService.js";
+import _ from "lodash";
 
 export default({
     name: "SearchFilter",
@@ -62,6 +61,17 @@ export default({
         await this.fetchCategoryDropdownOptions();
         this.statusDropdownOptions = this.statusOptions;
     },
+    watch: {
+        courseName: _.debounce(function() {
+            this.searchFilter();
+        }, 300),
+        category() {
+            this.searchFilter();
+        },
+        status() {
+            this.searchFilter();
+        }
+    },
     methods: {
         
         async fetchCategoryDropdownOptions() {
@@ -73,7 +83,7 @@ export default({
             }
         },
         resetFilter() {
-            console.log(this.status);
+            // console.log(this.status);
             this.courseName = "";
             this.category = "";
             this.status = "";

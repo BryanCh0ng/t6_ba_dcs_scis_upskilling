@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container col-12 d-flex mb-3 w-100">
+    <div class="container col-12 pt-5 d-flex mb-3 w-100">
         <h5 class="col m-auto">View My Lessons</h5>
     </div>
 

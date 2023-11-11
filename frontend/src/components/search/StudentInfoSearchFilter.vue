@@ -27,6 +27,7 @@
 
 <script>
 import DropdownField from "../DropdownField.vue";
+import _ from "lodash";
 
 export default({
     name: "SearchFilter",
@@ -44,6 +45,14 @@ export default({
     },
     components: {
         DropdownField
+    },
+    watch: {
+        name: _.debounce(function() {
+            this.searchFilter();
+        }, 300),
+        status() {
+            this.searchFilter();
+        }
     },
     methods: {
         resetFilter() {
