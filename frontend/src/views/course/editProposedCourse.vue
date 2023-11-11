@@ -137,6 +137,8 @@ export default {
   },
 
   async created() {
+    document.title = "Edit Proposed Course | Upskilling Engagement System";
+
     this.getUserID();
     const action = this.$route.params.action;
     this.action = action;

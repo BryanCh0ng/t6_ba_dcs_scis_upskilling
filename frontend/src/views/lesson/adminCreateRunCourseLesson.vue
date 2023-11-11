@@ -138,6 +138,8 @@ export default {
         DefaultModal
     },
     async created() {
+        document.title = "Add Lesson | Upskilling Engagement System";
+
         const runcourse_id = this.$route.params.id;
         const runcourse_info = await runCourseService.getRunCourseById(runcourse_id);
         

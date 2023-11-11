@@ -277,6 +277,7 @@ export default {
     };
   },
   async created() {
+    
     const user_ID = await UserService.getUserID();
     const role = await UserService.getUserRole(user_ID);
 
@@ -287,33 +288,38 @@ export default {
       const parts = url.split("/"); // Split the URL by "/"
       const lastPart = parts[parts.length - 1]; // Get the last element of the array
 
-      document.title = "Feedback Analysis"; //need to change
-
       if (window.history.state.back === "/adminViewCourse") {
         this.currentPage = "course";
+        document.title = "Feedback Analysis | Upskilling Engagement System";
         this.courseID = this.$route.params.id;
         this.courseIDs.push(parseInt(this.$route.params.id));
         this.courseIDs = JSON.stringify(this.courseIDs);
       } else if (window.history.state.back === "/adminViewRunCourse") {
         this.currentPage = "runcourse";
+        document.title = "Feedback Analysis | Upskilling Engagement System";
         this.runcourseID = this.$route.params.id;
         this.runcourseIDs.push(parseInt(this.$route.params.id));
         this.runcourseIDs = JSON.stringify(this.runcourseIDs);
       } else if (window.history.state.back && window.history.state.back.startsWith("/adminViewCourseRun/")) {
         this.currentPage = "runcourse";
+        document.title = "Feedback Analysis | Upskilling Engagement System";
         this.runcourseID = this.$route.params.id;
         this.runcourseIDs.push(parseInt(this.$route.params.id));
         this.runcourseIDs = JSON.stringify(this.runcourseIDs);
       } else if (window.history.state.back === "/adminViewManagement") {
         this.currentPage = "coach";
+        document.title = "Feedback Analysis | Upskilling Engagement System";
         this.coachesID = this.$route.params.id;
         this.coachesIDs.push(parseInt(this.$route.params.id));
         this.coachesIDs = JSON.stringify(this.coachesIDs);
       } else if ((lastPart === "viewDashboard" && (role === "Trainer" || role === "Instructor"))) {
         this.currentPage = "coach";
+        document.title = "Dashboard | Upskilling Engagement System";
         this.coachesID = user_ID;
         this.coachesIDs.push(parseInt(user_ID));
         this.coachesIDs = JSON.stringify(this.coachesIDs);
+      } else if(lastPart === "viewDashboard" && role === "Admin") {
+        document.title = "Dashboard | Upskilling Engagement System";
       }
       await this.fetchData();
     }

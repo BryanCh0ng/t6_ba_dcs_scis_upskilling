@@ -225,6 +225,8 @@
       },
     },
     async created() {
+      document.title = "Lesson DB | Upskilling Engagement System";
+
       const user_ID = await UserService.getUserID();
       const role = await UserService.getUserRole(user_ID);
       this.userRole = role

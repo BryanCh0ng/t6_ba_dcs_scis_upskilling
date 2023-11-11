@@ -255,6 +255,8 @@ export default {
     
   },
   async created() {
+    document.title = "Run Course DB | Upskilling Engagement System";
+
     const user_ID = await UserService.getUserID();
     const role = await UserService.getUserRole(user_ID);
     if (role == 'Student') {

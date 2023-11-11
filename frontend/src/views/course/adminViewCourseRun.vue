@@ -238,6 +238,8 @@
       }
     },
     async created() {
+      document.title = "Run Courses | Upskilling Engagement System";
+
       const { id: course_ID } = this.$route.params;
       this.course_ID = course_ID
 

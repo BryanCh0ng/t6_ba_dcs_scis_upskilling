@@ -73,6 +73,9 @@ export default {
     ImageHalf,
     PasswordField,
   },
+  created() {
+    document.title = "Login | Upskilling Engagement System";
+  },
   methods: {
     onSubmit() {
       this.v$.$touch();

@@ -435,7 +435,8 @@ export default {
       return this.search_blacklist === true || this.search_blacklist === null;
     },
   },
-  async created() {
+  async created() { 
+    document.title = "User Management | Upskilling Engagement System"
     const user_ID = await UserService.getUserID();
     this.user_ID = user_ID;
     const role = await UserService.getUserRole(user_ID);

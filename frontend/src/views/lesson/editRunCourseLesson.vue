@@ -128,6 +128,8 @@ export default {
         };
     },
     async created() {
+        document.title = "Edit Lesson | Upskilling Engagement System";
+
         this.lesson_ID = this.$route.params.id;
         await this.fetchLessonData(this.lesson_ID);
     },
