@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div class="col-12 d-flex align-items-center">
+    <div class="col-12 d-flex">
         <div class="text-nowrap">{{ name }}</div>
         <div class="ms-2">
           <course-category-badge :category="category"></course-category-badge>
         </div>
       </div>
-      <div class="col-12 text-grey two-lines">
+      <div class="col-12 text-grey two-lines text-start">
         {{ description }}
       </div>
   </div>

@@ -28,7 +28,7 @@
                 <td class="name">
                   <course-name-desc :name="lesson.run_Name" :category="lesson.run_course.coursecat_Name" :description="lesson.run_course.course_Desc"></course-name-desc>
                 </td>
-                <td>{{ lesson.instructor_Name }}</td>
+                <td class="text-nowrap">{{ lesson.instructor_Name }}</td>
                 <td class="text-nowrap"><course-date-time :date="lesson.lesson_Date"></course-date-time></td>
                 <td><course-date-time :time="lesson.lesson_Starttime"></course-date-time></td>
                 <td><course-date-time :time="lesson.lesson_Endtime"></course-date-time></td>

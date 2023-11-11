@@ -87,7 +87,7 @@
                   <td class="name">
                     <course-name-desc :name="proposed_course.course_Name" :category="proposed_course.coursecat_Name" :description="proposed_course.course_Desc"></course-name-desc>
                   </td>
-                  <td class="submitted_by_name">
+                  <td class="submitted_by_name text-nowrap">
                     {{ proposed_course.submitted_by_name }}
                   </td>
                   <td class="pl-0 border-top">

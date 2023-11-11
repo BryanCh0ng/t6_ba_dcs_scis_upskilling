@@ -13,3 +13,9 @@
 .reject-reason-label {
   margin-left: 10px;
 }
+
+table th a, table th, table td {
+  padding: 25px !important;
+  vertical-align: middle;
+  text-align: center;
+}

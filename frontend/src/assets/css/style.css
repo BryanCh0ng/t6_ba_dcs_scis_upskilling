@@ -66,9 +66,13 @@ body {
   background-color: #11a633 !important;
 }
 
-.btn-info, .btn-info:hover, .btn-info:focus{
+.btn-info, .btn-info:hover, .btn-info:focus, .btn-info:focus, .btn-info:active{
   background-color: teal;
   border-color: teal;
+}
+
+.btn:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 /* --------------------------- MODAL ----------------------------------- */
@@ -136,8 +140,22 @@ body {
   cursor: pointer;
 }
 
-.nav-pills, .nav-link.active, .nav-pills, .show>.nav-link, .nav-link {
+.nav-pills, .nav-pills, .show>.nav-link, .nav-link {
   color: #151C55 !important;
+}
+
+.nav-pills>.nav-item>.nav-link.active {
+  color: white !important;
+  background-color: steelblue !important;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3)
+}
+
+.nav-pills>.nav-item>.nav-link.hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3)
+}
+
+.nav-pills>.nav-item {
+  background-color: white !important;
 }
 
 .nav-pills {
@@ -187,4 +205,14 @@ button:disabled, .btn.disabled {
 
 .bg-light-blue {
   background-color: #0dcaf0 !important;
+}
+
+table th a, table th, table td {
+  padding: 25px !important;
+  vertical-align: middle;
+  text-align: center;
+}
+
+th {
+  color: grey !important;
 }

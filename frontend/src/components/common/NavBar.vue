@@ -48,6 +48,13 @@
                       <a :class="{ active: isActiveLink(item.path) }" class="nav-link" :href="item.path" @click="item.action ? item.action() : null">
                         {{ item.label }}
                       </a>
+                      <hr class="dropdown-divider" v-if="index === roleSpecificDropdownItems.length - 2" />
+
+
+
+
+
+                      
                     </li>
                   </ul>
                 </div>

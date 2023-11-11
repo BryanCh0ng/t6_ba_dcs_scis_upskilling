@@ -30,7 +30,7 @@
       </form>
     </div>
     <!-- Success modal -->
-    <div v-if="showSuccessModal" class="modal-backdrop">
+    <!-- <div v-if="showSuccessModal" class="modal-backdrop">
       <div class="modal-content">
         <p>
           Your message has been successfully sent. We appreciate your feedback!
@@ -39,7 +39,8 @@
           Close
         </button>
       </div>
-    </div>
+    </div> -->
+    <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
   </div>
 </template>
 
@@ -51,6 +52,7 @@ import { required } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 import ContactUsService from "../api/services/contactService.js"
 import UserService from "@/api/services/UserService.js";
+import DefaultModal from "@/components/DefaultModal.vue";
 
 export default {
   setup() {
@@ -64,9 +66,12 @@ export default {
       subject: "",
       errorMessage: "", // Error message for subject field
       message: "",
-      showSuccessModal: false,
+      //showSuccessModal: false,
       subjectPlaceholder: "Subject",
-      messagePlaceholder: "Message"
+      messagePlaceholder: "Message",
+      buttonType: "",
+      title: "",
+      showAlert: false
     };
   },
 
@@ -79,6 +84,7 @@ export default {
   components: {
     ErrorMessage,
     InputField,
+    DefaultModal
   },
   created() {
     this.get_user_id();
@@ -121,23 +127,34 @@ export default {
       try {
         const response = await ContactUsService.createNewMsg(formData);
         console.log('API Response:', response);
-        this.showSuccessModal = true;
+        //this.showSuccessModal = true;
+        if (response.code == 201) {
+          this.message = "Your message has been successfully sent. We appreciate your feedback!";
+          this.buttonType = "success"
+          this.title = "Feedback Submitted Successfully",
+          this.showAlert = true;
+        } else {
+          this.message = response.message.
+          this.buttonType = "danger"
+          this.showAlert = false;
+        }   
       } catch (error) {
         console.error('Error submitting form:', error);
       }
     },
-    async hideSuccessModal() {
-      this.showSuccessModal = false;
-      const user_ID = await UserService.getUserID();
-      const role = await UserService.getUserRole(user_ID);
-      if (role == 'Student') {
-        this.$router.push({name: "studentViewCourse"});
-      } else if (role == 'Instructor' || role == 'Trainer') {
-        this.$router.push({ name: 'instructorTrainerViewProfile' });
-      }
-      
+    // async hideSuccessModal() {
+    //   //this.showSuccessModal = false;
+    //   const user_ID = await UserService.getUserID();
+    //   const role = await UserService.getUserRole(user_ID);
+    //   if (role == 'Student') {
+    //     this.$router.push({name: "studentViewCourse"});
+    //   } else if (role == 'Instructor' || role == 'Trainer') {
+    //     this.$router.push({ name: 'instructorTrainerViewProfile' });
+    //   }
+    // },
+    handleModalClosed(value) {
+        this.showAlert = value;
     },
-    
   },
 };
 </script>
