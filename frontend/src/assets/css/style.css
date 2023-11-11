@@ -231,8 +231,8 @@ th {
   font-size: 110%;
   position: absolute;
   padding: 1px 5px 2px 5px;
-  bottom: -1.6em;
-  left: 100%;
+  bottom: -2em;
+  left: -50%;
   white-space: nowrap;
   box-shadow: 1px 1px 3px #222222;
   opacity: 0;
@@ -243,4 +243,10 @@ th {
 
 [data-title] {
   position: relative;
+}
+
+@media (max-width: 700px) {
+  .navbar-toggler {
+    display: block;
+  }
 }

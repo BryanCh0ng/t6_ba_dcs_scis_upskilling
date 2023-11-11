@@ -26,7 +26,7 @@
                 <th scope="col">
                   <a href="" @click.prevent="sort('lesson_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'lesson_Status'" :sortDirection="getSortDirection('lesson_Status')"/></a></th>
                 <th scope="col">Course Details</th>
-                <th scope="col" v-if="userRole != 'Student'">Attendance</th>
+                <th scope="col">Attendance</th>
                 <th scope="col" class="actions" v-if="userRole == 'Admin'">Action(s)</th>
               </tr>
             </thead>
@@ -231,8 +231,11 @@
       } else {
         document.title = "All Lessons | Upskilling Engagement System";
       }
-      console.log(this.userRole)
-      this.loadData();
+      if (role == 'Student') {
+        this.$router.push({ name: 'studentViewCourse' }); 
+      } else {
+        this.loadData();
+      }
     },
     }
 </script>
