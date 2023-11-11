@@ -4,19 +4,16 @@
     <div class="container">
       <h2 class="text-center mb-4 pt-5">Contact Us</h2>
 
-      <!-- Error Message -->
-      <error-message :error-message="errorMessage" />
-
       <form @submit.prevent="submitForm">
         <div class="form-group mt-5 mb-4">
-          <input-field v-model="subject" type="text" :placeholder="subjectPlaceholder" />
+          <input-field v-model="subject" type="text" :placeholder="subjectPlaceholder" required/>
         </div>
         <div class="form-group">
           <textarea
-            v-model="message"
+            v-model="bodyMessage"
             class="form-control border-0 shadow-sm px-4 field"
             :placeholder="messagePlaceholder"
-            style="height: 200px"
+            style="height: 200px" required
           ></textarea>
         </div>
 
@@ -29,30 +26,34 @@
         </button>
       </form>
     </div>
-    <!-- Success modal -->
-    <!-- <div v-if="showSuccessModal" class="modal-backdrop">
-      <div class="modal-content">
-        <p>
-          Your message has been successfully sent. We appreciate your feedback!
-        </p>
-        <button @click="hideSuccessModal" class="btn btn-secondary close-btn" title="Close">
-          Close
-        </button>
-      </div>
-    </div> -->
+    
     <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
   </div>
 </template>
 
 <script>
-// import { axiosClient } from "../api/axiosClient";
-import ErrorMessage from "../components/ErrorMessage.vue";
+import DefaultModal from "@/components/DefaultModal.vue";
 import InputField from "../components/InputField.vue";
 import { required } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 import ContactUsService from "../api/services/contactService.js"
 import UserService from "@/api/services/UserService.js";
 import DefaultModal from "@/components/DefaultModal.vue";
+
+function showSuccessMessage(vm) {
+  vm.title = "Message Sent Successfully";
+  vm.message = "Your message has been successfully sent. We appreciate your feedback.";
+  vm.showAlert = true;
+  vm.buttonType = "success";
+}
+
+function showUnsuccessMessage(vm) {
+    vm.title = "Message Failed to Send";
+    vm.message = "Unfortunately, we were unable to send your message. Please try again later.";
+    vm.showAlert = true;
+    vm.buttonType = "danger";
+}
+
 
 export default {
   setup() {
@@ -64,14 +65,13 @@ export default {
     return {
       user_ID: null,
       subject: "",
-      errorMessage: "", // Error message for subject field
-      message: "",
-      //showSuccessModal: false,
+      bodyMessage: "",
       subjectPlaceholder: "Subject",
       messagePlaceholder: "Message",
-      buttonType: "",
+      showAlert: false,
       title: "",
-      showAlert: false
+      message: "",
+      buttonType: "",
     };
   },
 
@@ -82,7 +82,7 @@ export default {
     };
   },
   components: {
-    ErrorMessage,
+    DefaultModal,
     InputField,
     DefaultModal
   },
@@ -94,7 +94,7 @@ export default {
       try {
         const user_ID = await UserService.getUserID()
         this.user_ID = user_ID
-        // console.log(this.user_ID)
+        
       } catch (error) {
         console.error('Error fetching user ID:', error);
         this.user_ID = null;
@@ -104,71 +104,37 @@ export default {
       // Trigger Vuelidate validation
       this.v$.$touch();
 
-      this.errorMessage = ""; // Reset error message
-
-      // Check for empty fields
-      if (!this.subject || !this.message) {
-        this.errorMessage = "Please ensure all fields are filled.";
-        return;
-      }
-      
-      if (this.v$.$invalid) {
-        this.errorMessage = "Please fix the validation errors.";
-        return;
-      }
-
       const formData = {
         user_ID: this.user_ID, 
         msg_Subject: this.subject,
-        msg_Body: this.message,
+        msg_Body: this.bodyMessage,
         msg_Datetime: new Date().toISOString(), 
       };
 
       try {
         const response = await ContactUsService.createNewMsg(formData);
-        console.log('API Response:', response);
-        //this.showSuccessModal = true;
-        if (response.code == 201) {
-          this.message = "Your message has been successfully sent. We appreciate your feedback!";
-          this.buttonType = "success"
-          this.title = "Feedback Submitted Successfully",
-          this.showAlert = true;
+        // console.log('API Response:', response);
+        if (response.code === 201) {
+          showSuccessMessage(this)
         } else {
-          this.message = response.message.
-          this.buttonType = "danger"
-          this.showAlert = false;
-        }   
+          showUnsuccessMessage(this)
+        }
       } catch (error) {
         console.error('Error submitting form:', error);
       }
     },
-    // async hideSuccessModal() {
-    //   //this.showSuccessModal = false;
-    //   const user_ID = await UserService.getUserID();
-    //   const role = await UserService.getUserRole(user_ID);
-    //   if (role == 'Student') {
-    //     this.$router.push({name: "studentViewCourse"});
-    //   } else if (role == 'Instructor' || role == 'Trainer') {
-    //     this.$router.push({ name: 'instructorTrainerViewProfile' });
-    //   }
-    // },
-    handleModalClosed(value) {
-        this.showAlert = value;
+    async handleModalClosed(value) {
+      this.showAlert = value;
+
+      const role = await UserService.getUserRole(this.user_ID);
+
+      if (role == 'Student') {
+        this.$router.push({name: "studentViewCourse"});
+      } else if (role == 'Instructor' || role == 'Trainer') {
+        this.$router.push({ name: 'instructorTrainerViewProfile' });
+      }
+      
     },
   },
 };
 </script>
-
-<style scoped>
-.modal-content {
-  width: 50%;
-  height: 15%;
-}
-
-.close-btn {
-  position: absolute;
-  bottom: 25px;
-  right: 20px;
-  width: 150px;
-}
-</style>

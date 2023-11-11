@@ -40,7 +40,7 @@ class Login(Resource):
 
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-        print(hashed_password)
+        # print(hashed_password)
 
         # compare input and database, then display results
         try:
@@ -127,7 +127,7 @@ class Register(Resource):
         from app import mail, bcrypt
         # get inputs
         data = request.get_json()
-        print(data)
+        # print(data)
         password = data['password']
         repassword = data['confirmpassword']
 
@@ -162,11 +162,11 @@ class Register(Resource):
                 newExternalUser = ExternalUser(user_ID=getattr(user, 'user_ID'), organisation_Name=data['organizationName'], is_Alumni=bool(int(data['alumni'])))
                 db.session.add(newExternalUser)
                 db.session.commit()
-                return json.loads(json.dumps(newExternalUser.json(), default=str)), 200
+                return json.loads(json.dumps({"code": 200, "data": newExternalUser.json()}, default=str)), 200
             
             else:
                 db.session.commit()
-                return json.loads(json.dumps(newUser.json(), default=str)), 200
+                return json.loads(json.dumps({"code": 200, "data": newUser.json()}, default=str)), 200
 
             db.session.close()
         
@@ -191,6 +191,7 @@ class ForgotPassword(Resource):
         # check if email does not exist, else send email w new password
         try:
             user = User.query.filter_by(user_Email=email).first()
+            
             if not user:
                 db.session.close()
                 return json.loads(json.dumps({"code": 404, "message": "Email does not exist"}, default=str)), 404
