@@ -4,7 +4,7 @@
             <form>
                 <div class="row">
                     <div class="col-md">
-                        <input v-model="courseName" type="text" placeholder="Course Name"  ref="courseNameInput" class="form-control border-0 shadow-sm px-4 field mb-3"/>
+                        <input v-model="courseName" type="text" :placeholder="courseNamePlaceholder"  ref="courseNameInput" class="form-control border-0 shadow-sm px-4 field mb-3"/>
                     </div>
                     <div class="col-md">
                         <dropdown-field
@@ -53,24 +53,20 @@ export default({
         statusOptions: Array, 
         searchApi: Function,
         defaultStatus: String,
+        courseNamePlaceholder: String
     },
     components: {
         DropdownField,
     },
     async mounted() {
-        // await this.getAllCourses();
-        // await this.searchFilterCourses();
         await this.fetchCategoryDropdownOptions();
         this.statusDropdownOptions = this.statusOptions;
     },
     methods: {
-        // async getAllCourses() {
-        //     let response = await CourseService.getAllCourses();
-        //     this.courseList = response.data.course;
-        // },
+        
         async fetchCategoryDropdownOptions() {
             try {
-                const categoryOptions = await CourseCategoryService.getAllCourseCategory(); // Use the CourseCategoryService
+                const categoryOptions = await CourseCategoryService.getAllCourseCategory(); 
                 this.categoryDropdownOptions = categoryOptions;
             } catch (error) {
                 console.error('Error fetching category dropdown options:', error);

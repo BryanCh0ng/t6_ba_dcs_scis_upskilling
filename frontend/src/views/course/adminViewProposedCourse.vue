@@ -64,6 +64,7 @@
         <common-search-filter class="mt-5"
         :status-options="statusOptions"
         :search-api="searchAllApprovedRejectedProposedCoursesAdmin"
+        course-name-placeholder="Course Name"
         @search-complete="handleSearchComplete2" />
 
         <div class="container col-12">

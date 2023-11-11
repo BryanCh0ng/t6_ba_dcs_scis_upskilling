@@ -3,6 +3,7 @@
     <search-filter
       :status-options="statusOptions"
       :search-api="searchAllRunCoursesAdmin" 
+      course-name-placeholder="Run Course Name"
       @search-complete="handleSearchComplete"
       class="pt-5"/>
       

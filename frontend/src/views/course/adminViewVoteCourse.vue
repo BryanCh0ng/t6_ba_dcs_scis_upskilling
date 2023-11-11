@@ -14,6 +14,7 @@
              <search-filter
               :status-options="statusOptions"
               :search-api="searchAllVotingCoursesAdmin"
+              course-name-placeholder="Course Name"
               @search-complete="handleSearchComplete" />
 
             <div class="container col-12">
