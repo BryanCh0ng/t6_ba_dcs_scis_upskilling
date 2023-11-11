@@ -1,7 +1,6 @@
 from flask import request, jsonify, session
 from core_features import common
 from flask_restx import Namespace, Resource
-from flask_apscheduler import APScheduler
 from allClasses import *
 from flask_mail import Message
 from sqlalchemy.orm import aliased
@@ -13,10 +12,6 @@ import string
 app.logger.setLevel(logging.DEBUG)
 
 api = Namespace('management', description='User Management')
-
-scheduler = APScheduler()
-scheduler.init_app(app)
-scheduler.start()
 
 from app import mail, bcrypt
 
@@ -318,68 +313,6 @@ class BlacklistStudent(Resource):
                 return jsonify({'code': 400, 'message': f'You did not select any user to be blacklisted'})
         except Exception as e:
             return "Failed. " + str(e), 500
-
-# Automate blacklist
-@scheduler.task('cron', id='check_and_blacklist_users', hour=0, minute=0, misfire_grace_time=900) 
-# Define the function to check and blacklist users
-def check_and_blacklist_users():
-    with app.app_context():
-        try:
-            # Get a list of all users
-            users = db.session.query(User).all()
-
-            current_date = datetime.now().date()
-
-            for user in users:
-                user_ID = user.user_ID
-
-                # Get a list of all run courses for the user
-                run_courses = db.session.query(RunCourse).join(
-                    Registration, Registration.rcourse_ID == RunCourse.rcourse_ID
-                ).filter(
-                    Registration.user_ID == user_ID,
-                    Registration.reg_Status == "Enrolled",
-                    RunCourse.run_Startdate <= current_date
-                ).all()
-
-                for run_course in run_courses:
-                    
-                    lessons = db.session.query(Lesson).filter(Lesson.rcourse_ID == run_course.rcourse_ID).all()
-                    total_lessons = len(lessons)
-
-                    attendance_records = db.session.query(AttendanceRecord).filter(
-                        AttendanceRecord.user_ID == user_ID,
-                        AttendanceRecord.lesson_ID.in_([lesson.lesson_ID for lesson in lessons])
-                    ).all()
-
-                    valid_reason_keywords = ["sick", "doctor appointment", "medical leave", "family emergency", "mc", "personal reasons", "hospitalized"]
-
-                    missed_lessons_without_valid_reason = 0
-
-                    for record in attendance_records:
-                        if record.status == 'Absent':
-                            if not record.reason or record.reason.strip().lower not in valid_reason_keywords:
-                                missed_lessons_without_valid_reason += 1
-                
-                if total_lessons > 0:
-                    attendance_rate = (total_lessons - missed_lessons_without_valid_reason) / total_lessons * 100
-                    # print(attendance_rate)
-                    # Check if the attendance rate is below 70%
-                    if attendance_rate <= 70:
-                        # Check if the user is already blacklisted
-                        existing_blacklist = Blacklist.query.filter_by(user_ID=user_ID).first()
-                        if not existing_blacklist:
-                            # Add the user to the blacklist
-                            blacklist_entry = Blacklist(user_ID=user_ID, blacklist_Datetime=datetime.now())
-                            db.session.add(blacklist_entry)
-                            db.session.commit()
-                
-            db.session.close()
-            return jsonify({ "code": 201, "message": "Blacklist has been successfully updated!"} )   
-
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error while checking and blacklisting users: {str(e)}")
 
 retrieve_blacklist_remove = api.parser()
 retrieve_blacklist_remove.add_argument(

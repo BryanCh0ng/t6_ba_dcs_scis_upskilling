@@ -1,6 +1,5 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
-from flask_apscheduler import APScheduler
 from allClasses import *
 from core_features import common
 import json
@@ -16,33 +15,6 @@ api = Namespace('runcourse', description='Run Course related operations')
 # create_runcourse()
 
 # get_all_runcourses() ---------------------------------------------
-
-#set up here; if initialised in app.py = circular import in production
-scheduler = APScheduler()
-scheduler.init_app(app)
-scheduler.start()
-
-@scheduler.task('interval', id='on_registration_close', seconds=3600, misfire_grace_time=900)
-def open_close_registration():
-    runCourseList = RunCourse.query.all()
-    current_date = datetime.now().strftime("%Y-%m-%d")
-    current_time = datetime.now().strftime("%H:%M:%S")
-
-    for runCourse in runCourseList:
-        startDate = runCourse.reg_Startdate
-        startTime = runCourse.reg_Starttime
-
-        if current_date == startDate:
-            if current_time >= startTime:
-                try:
-                    setattr(runCourse, "runcourse_Status", "Ongoing")
-                    db.session.commit()
-
-                    return json.loads(json.dumps({"message": 'Success', "code": 200}, default=str))
-                
-                except Exception as e:
-                    db.session.rollback()
-                    return "Failed" + str(e), 500
 
 retrieve_all_runcourses = api.parser()
 retrieve_all_runcourses.add_argument("course_id", help="Enter course id")

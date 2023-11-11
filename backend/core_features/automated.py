@@ -16,6 +16,110 @@ scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
 
+@scheduler.task('interval', id='check_registration_close', seconds=3600, misfire_grace_time=900)
+def check_registration_close():
+    regList = Registration.query.all()
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    current_time = datetime.now().strftime("%H:%M:%S")
+
+    for reg in regList:
+        rcourseid_set = set()
+        rcourseid_set.add(reg.json()["rcourse_ID"])
+
+    for rcourseid in rcourseid_set:
+        rcourse = RunCourse.query.filter(RunCourse.rcourse_ID == rcourseid).first().json()
+        rcourse_enddate = rcourse["reg_Enddate"]
+
+        if rcourse_enddate == current_date:
+            rcourse_endtime = rcourse["reg_Endtime"]
+
+            if rcourse_endtime <= current_time:
+                coursesize = rcourse["course_Size"]
+                registrations = Registration.query.filter(Registration.rcourse_ID == rcourseid).order_by(Registration.reg_ID).all()
+                registrations_num = len(registrations.json())
+
+                if coursesize >= registrations_num:
+                    for registration in registrations:
+                        try:
+                            setattr(registration, "reg_Status", "Enrolled")
+
+                            db.session.commit()
+                            db.session.close()
+
+                            return jsonify(
+                                {
+                                    "code": 201,
+                                    "data": registration.json(),
+                                    "message": "Registration has been successfully updated!"
+                                }
+                            )
+    
+                        except Exception as e:
+                            db.session.rollback()
+                            return "Failed" + str(e), 500
+                        
+                else:
+                    reg_list = []
+                    blacklist = []
+                    i = 0
+
+                    for registration in registrations:
+                        userid = registration.json()["user_ID"]
+
+                        blacklist_entry = Blacklist.query.filter(Blacklist.user_ID == userid).first()
+
+                        if blacklist_entry:
+                            blacklist.append(registration)
+                            
+                        elif not blacklist_entry and i < coursesize:
+                            reg_list.append(registration)
+                            i += 1
+
+                    if i < coursesize:
+                        for j in range(0, coursesize - i):
+                            reg_list.append(blacklist.pop(0))
+
+                    for reg in reg_list:
+                        try:
+                            setattr(reg, "reg_Status", "Enrolled")
+
+                            db.session.commit()
+                            db.session.close()
+
+                            return jsonify(
+                                {
+                                    "code": 201,
+                                    "data": reg.json(),
+                                    "message": "Registration has been successfully updated!"
+                                }
+                            )
+    
+                        except Exception as e:
+                            db.session.rollback()
+                            return "Failed" + str(e), 500
+
+@scheduler.task('interval', id='on_registration_close', seconds=3600, misfire_grace_time=900)
+def open_close_registration():
+    runCourseList = RunCourse.query.all()
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    current_time = datetime.now().strftime("%H:%M:%S")
+
+    for runCourse in runCourseList:
+        startDate = runCourse.reg_Startdate
+        startTime = runCourse.reg_Starttime
+
+        if current_date == startDate:
+            if current_time >= startTime:
+                try:
+                    setattr(runCourse, "runcourse_Status", "Ongoing")
+                    db.session.commit()
+
+                    return json.loads(json.dumps({"message": 'Success', "code": 200}, default=str))
+                
+                except Exception as e:
+                    db.session.rollback()
+                    return "Failed" + str(e), 500
+                                        
 # Automate update student attendance 
 # @scheduler.task('interval', id='check_and_update_student_attendance', seconds=30, misfire_grace_time=30)
 @scheduler.task('cron', id='check_and_update_student_attendance', hour=4, minute=0, misfire_grace_time=900)
@@ -70,20 +174,82 @@ def check_and_update_student_attendance():
             lessons = db.session.query(Lesson).filter(Lesson.lesson_Date < today).all()
             if lessons:
                 for lesson in lessons:
-                    print(lesson.lesson_ID)
+                    # print(lesson.lesson_ID)
                     attendance_response = get_attendance_list_from_lesson_id(lesson.lesson_ID)
-                    print(attendance_response)
+                    # print(attendance_response)
                     if attendance_response[0]["code"] == 200:
                         attendances = attendance_response[0]["attendances"]
                         for attendance in attendances:
-                            print(lesson.lesson_ID)
+                            # print(lesson.lesson_ID)
                             update_attendance_response = add_update_attendance(lesson.lesson_ID, attendance['user_ID'])
-                            print("update_attendance_response", update_attendance_response)     
+                            # print("update_attendance_response", update_attendance_response)     
                     
-            print('Automate update student attendance done')
+            # print('Automate update student attendance done')
             return jsonify({ "code": 201, "message": "Attendance has been successfully updated!"} )   
 
         except Exception as e:
             db.session.rollback()
-            print(str(e))
+            # print(str(e))
             print(f"Error while update student attendance: {str(e)}")
+
+# Automate blacklist
+@scheduler.task('cron', id='check_and_blacklist_users', hour=4, minute=0, misfire_grace_time=900) 
+# Define the function to check and blacklist users
+def check_and_blacklist_users():
+    with app.app_context():
+        try:
+            # Get a list of all users
+            users = db.session.query(User).all()
+
+            current_date = datetime.now().date()
+
+            for user in users:
+                user_ID = user.user_ID
+
+                # Get a list of all run courses for the user
+                run_courses = db.session.query(RunCourse).join(
+                    Registration, Registration.rcourse_ID == RunCourse.rcourse_ID
+                ).filter(
+                    Registration.user_ID == user_ID,
+                    Registration.reg_Status == "Enrolled",
+                    RunCourse.run_Startdate <= current_date
+                ).all()
+
+                for run_course in run_courses:
+                    
+                    lessons = db.session.query(Lesson).filter(Lesson.rcourse_ID == run_course.rcourse_ID).all()
+                    total_lessons = len(lessons)
+
+                    attendance_records = db.session.query(AttendanceRecord).filter(
+                        AttendanceRecord.user_ID == user_ID,
+                        AttendanceRecord.lesson_ID.in_([lesson.lesson_ID for lesson in lessons])
+                    ).all()
+
+                    valid_reason_keywords = ["sick", "doctor appointment", "medical leave", "family emergency", "mc", "personal reasons", "hospitalized"]
+
+                    missed_lessons_without_valid_reason = 0
+
+                    for record in attendance_records:
+                        if record.status == 'Absent':
+                            if not record.reason or record.reason.strip().lower not in valid_reason_keywords:
+                                missed_lessons_without_valid_reason += 1
+                
+                if total_lessons > 0:
+                    attendance_rate = (total_lessons - missed_lessons_without_valid_reason) / total_lessons * 100
+                    # print(attendance_rate)
+                    # Check if the attendance rate is below 70%
+                    if attendance_rate <= 70:
+                        # Check if the user is already blacklisted
+                        existing_blacklist = Blacklist.query.filter_by(user_ID=user_ID).first()
+                        if not existing_blacklist:
+                            # Add the user to the blacklist
+                            blacklist_entry = Blacklist(user_ID=user_ID, blacklist_Datetime=datetime.now())
+                            db.session.add(blacklist_entry)
+                            db.session.commit()
+                
+            db.session.close()
+            return jsonify({ "code": 201, "message": "Blacklist has been successfully updated!"} )   
+
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error while checking and blacklisting users: {str(e)}")

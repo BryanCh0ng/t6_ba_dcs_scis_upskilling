@@ -1,6 +1,5 @@
 from flask import request, jsonify
 from flask_restx import Namespace, Resource, fields
-from flask_apscheduler import APScheduler
 from core_features import common
 from allClasses import *
 import json
@@ -12,91 +11,6 @@ api = Namespace('registration', description='Registration related operations')
 # create_new_registration()
 # update_registration()
 
-scheduler = APScheduler()
-scheduler.init_app(app)
-scheduler.start()
-
-@scheduler.task('interval', id='check_registration_close', seconds=3600, misfire_grace_time=900)
-def check_registration_close():
-    regList = Registration.query.all()
-    current_date = datetime.now().strftime("%Y-%m-%d")
-    current_time = datetime.now().strftime("%H:%M:%S")
-
-    for reg in regList:
-        rcourseid_set = set()
-        rcourseid_set.add(reg.json()["rcourse_ID"])
-
-    for rcourseid in rcourseid_set:
-        rcourse = RunCourse.query.filter(RunCourse.rcourse_ID == rcourseid).first().json()
-        rcourse_enddate = rcourse["reg_Enddate"]
-
-        if rcourse_enddate == current_date:
-            rcourse_endtime = rcourse["reg_Endtime"]
-
-            if rcourse_endtime <= current_time:
-                coursesize = rcourse["course_Size"]
-                registrations = Registration.query.filter(Registration.rcourse_ID == rcourseid).order_by(Registration.reg_ID).all()
-                registrations_num = len(registrations.json())
-
-                if coursesize >= registrations_num:
-                    for registration in registrations:
-                        try:
-                            setattr(registration, "reg_Status", "Enrolled")
-
-                            db.session.commit()
-                            db.session.close()
-
-                            return jsonify(
-                                {
-                                    "code": 201,
-                                    "data": registration.json(),
-                                    "message": "Registration has been successfully updated!"
-                                }
-                            )
-    
-                        except Exception as e:
-                            db.session.rollback()
-                            return "Failed" + str(e), 500
-                        
-                else:
-                    reg_list = []
-                    blacklist = []
-                    i = 0
-
-                    for registration in registrations:
-                        userid = registration.json()["user_ID"]
-
-                        blacklist_entry = Blacklist.query.filter(Blacklist.user_ID == userid).first()
-
-                        if blacklist_entry:
-                            blacklist.append(registration)
-                            
-                        elif not blacklist_entry and i < coursesize:
-                            reg_list.append(registration)
-                            i += 1
-
-                    if i < coursesize:
-                        for j in range(0, coursesize - i):
-                            reg_list.append(blacklist.pop(0))
-
-                    for reg in reg_list:
-                        try:
-                            setattr(reg, "reg_Status", "Enrolled")
-
-                            db.session.commit()
-                            db.session.close()
-
-                            return jsonify(
-                                {
-                                    "code": 201,
-                                    "data": reg.json(),
-                                    "message": "Registration has been successfully updated!"
-                                }
-                            )
-    
-                        except Exception as e:
-                            db.session.rollback()
-                            return "Failed" + str(e), 500
                         
 # get_all_registrations()
 get_all_registrations = api.parser()
