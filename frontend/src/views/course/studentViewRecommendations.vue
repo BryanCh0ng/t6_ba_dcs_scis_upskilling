@@ -577,6 +577,8 @@ export default {
     },
   },
   async created() {
+    document.title = "Recommendations | Upskilling Engagement System";
+
     const user_ID = await UserService.getUserID();
     this.user_ID = user_ID
     const role = await UserService.getUserRole(user_ID);

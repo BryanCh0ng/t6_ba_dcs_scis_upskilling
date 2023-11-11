@@ -225,11 +225,14 @@
       },
     },
     async created() {
-      document.title = "Lesson DB | Upskilling Engagement System";
-
       const user_ID = await UserService.getUserID();
       const role = await UserService.getUserRole(user_ID);
       this.userRole = role
+      if(this.userRole === "Admin") {
+        document.title = "Lesson DB | Upskilling Engagement System";
+      } else {
+        document.title = "All Lessons | Upskilling Engagement System";
+      }
       console.log(this.userRole)
       this.loadData();
       // if (role == 'Student') {

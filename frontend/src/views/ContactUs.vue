@@ -85,6 +85,7 @@ export default {
     InputField,
   },
   created() {
+    document.title = "Contact Us | Upskilling Engagement System";
     this.get_user_id();
   },
   methods: {

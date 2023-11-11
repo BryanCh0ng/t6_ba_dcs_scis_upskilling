@@ -350,6 +350,8 @@ export default {
     }
   },
   async created() {
+    document.title = "Profile | Upskilling Engagement System";
+    
     this.getUserID();
     const user_id = await UserService.getUserID();
     const role = await UserService.getUserRole(user_id);
