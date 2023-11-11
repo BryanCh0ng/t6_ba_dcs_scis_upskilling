@@ -74,7 +74,7 @@ export default {
     PasswordField,
   },
   created() {
-    document.title = "Login | Upskilling Engagement System";
+    document.title = "Sign In | Upskilling Engagement System";
   },
   methods: {
     onSubmit() {

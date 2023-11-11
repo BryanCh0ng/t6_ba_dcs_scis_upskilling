@@ -78,6 +78,9 @@ export default {
     InputField,
     DefaultModal
   },
+  created() {
+    document.title = "Sign Up | Upskilling Engagement System";
+  },
   methods: {
     onSubmit() {
       // Trigger Vuelidate validation

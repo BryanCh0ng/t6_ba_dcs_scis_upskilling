@@ -77,6 +77,9 @@ export default {
     FormContainer,
     DefaultModal
   },
+  created() {
+    document.title = "Forgot Password | Upskilling Engagement System";
+  },
   methods: {
     onSubmit() {
       // Trigger Vuelidate validation
