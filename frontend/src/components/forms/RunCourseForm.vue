@@ -1638,12 +1638,13 @@ export default {
 }
 
 .dp-custom-input.conditional-bg-color {
-  background-color: #e9ecef; /* Set conditional background color */
+  background-color: #CCCCCC; /* Set conditional background color */
 }
 </style>
 
 <style scoped>
 .grey-background {
-    background-color: #e9ecef;
+    background-color: #CCCCCC;
 }
+
 </style>

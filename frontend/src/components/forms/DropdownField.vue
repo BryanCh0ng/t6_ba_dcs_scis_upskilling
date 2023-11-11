@@ -52,8 +52,10 @@ export default {
 </script>
 
 <style scoped>
-.custom-select {
-    cursor: pointer !important;
-}; 
+.custom-select:disabled {
+    cursor: not-allowed !important; /* optional: change cursor style for better UX */
+    background-color: 	#CCCCCC; /* Replace with the desired background color */
+}
+
 
 </style>
