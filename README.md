@@ -1,7 +1,7 @@
 # t6_ba_dcs_scis_upskilling 
 
 ## Project Overview (Upskilling Engagement System)
-#### A comprehensive platform for students to propose courses, 
+A comprehensive platform for students to propose courses, 
 indicate interest and enroll in courses offered by various groups, 
 while also enabling course organizers to easily manage courses and 
 offer more relevant sessions by gathering feedback from students. 
@@ -13,7 +13,7 @@ npm install
 ```
 
 ## Requirements
-##### You can install the necessary dependencies using the `requirements.txt` file. 
+You can install the necessary dependencies using the `requirements.txt` file. 
 To install these dependencies, run the following command:
 ```
 pip install -r requirements.txt
