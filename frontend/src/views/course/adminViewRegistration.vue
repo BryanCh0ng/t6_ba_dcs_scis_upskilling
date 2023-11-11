@@ -16,8 +16,8 @@
       </div>
     </div>
 
-    <div class="container col-12 table-responsive">
-      <div v-if="student && student.length > 0">
+    <div class="container col-12">
+      <div class="table-responsive" v-if="student && student.length > 0">
         <table class="table bg-white">
           <thead>
             <tr class="text-nowrap">

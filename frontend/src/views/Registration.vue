@@ -5,12 +5,7 @@
         
         <image-half></image-half>
 
-        <!-- Form content half -->
         <form-container>
-          <!-- <template v-slot:logo>
-            <img src="../assets/smulogo.png" title="smu logo" id="logo"/>
-          </template> -->
-            <error-message :error-message="errorMessage" />
 
             <form @submit.prevent="onSubmit">
 
@@ -28,19 +23,32 @@
         
       </div>
     </div>
-    <success-modal :show="showSuccessModal" :message="successMessage" @close="hideSuccessModal"/>
+    <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
   </div>
 </template>
 
 <script>
 import ImageHalf from "../components/ImageHalf.vue";
-import SuccessModal from "../components/SuccessModal.vue";
 import FormContainer from "../components/CommonFormContainer.vue";
-import ErrorMessage from "../components/ErrorMessage.vue";
 import InputField from "../components/InputField.vue";
 import { required, email } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 import UserService from "@/api/services/UserService.js";
+import DefaultModal from "@/components/DefaultModal.vue";
+
+function showSuccessMessage(vm) {
+  vm.title = "Registration Link Sent Successfully";
+  vm.message = "Registration link has been sent successfully. Please check your email";
+  vm.showAlert = true;
+  vm.buttonType = "success";
+}
+
+function showUnsuccessMessage(vm) {
+    vm.title = "Registration Link Sent Unsuccessfully";
+    vm.message = "Sent registration link failed. Please check your credentials.";
+    vm.showAlert = true;
+    vm.buttonType = "danger";
+}
 
 export default {
   name: "RegistrationForm",
@@ -53,9 +61,10 @@ export default {
   data() {
     return {
       email: "",
-      errorMessage: "",
-      showSuccessModal: false,
-      successMessage: "Registration link has been sent to your email."
+      showAlert: false,
+      title: "",
+      message: "",
+      buttonType: ""
     };
   },
   validations() {
@@ -65,24 +74,14 @@ export default {
   },
   components: {
     ImageHalf,
-    SuccessModal,
     FormContainer,
-    ErrorMessage,
     InputField,
+    DefaultModal
   },
   methods: {
     onSubmit() {
       // Trigger Vuelidate validation
       this.v$.$touch();
-
-      // Reset error message
-      this.errorMessage = "";
-
-      // Check for required fields
-      if (!this.email) {
-        this.errorMessage = "Please ensure all fields are filled.";
-        return;
-      }
 
       this.sendRegLink();
     },
@@ -90,16 +89,19 @@ export default {
       try {
         const response = await UserService.verifyEmail(this.email)
         if (response.code === 200) {
-          this.showSuccessModal = true;
+          showSuccessMessage(this)
+        } else {
+          showUnsuccessMessage(this)
         }
         
       } catch (error) {
-        this.errorMessage = "Sent Registration failed. Please check your credentials.";
+        showUnsuccessMessage(this)
         console.log("Sent Registration Link error:", error.message);
       }
     },
-    hideSuccessModal() {
-      this.showSuccessModal = false;
+    async handleModalClosed(value) {
+      this.showAlert = value;
+
       this.$router.push('/');
     },
   },

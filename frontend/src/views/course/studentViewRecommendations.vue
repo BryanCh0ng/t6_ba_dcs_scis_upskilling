@@ -10,9 +10,9 @@
     </ul>
     <div class="tab-content ">
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'for_registration' }">
-        <div class="pt-5 container col-12 table-responsive" v-if="shouldShowTopRegisterPicks">
+        <div class="pt-5 container col-12" v-if="shouldShowTopRegisterPicks">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Top Picks</h1>
-            <div v-if="top_register_picks && top_register_picks.length > 0"> 
+            <div class="table-responsive" v-if="top_register_picks && top_register_picks.length > 0"> 
               <table class="table bg-white">
                 <thead>
                   <tr class="text-nowrap">
@@ -59,9 +59,9 @@
         </div>
         <vue-awesome-paginate v-model="localCurrentPageTopPickRegister" v-if="top_register_picks.length/itemsPerPage > 0 && shouldShowTopRegisterPicks" :totalItems="top_register_picks.length" :items-per-page="itemsPerPage" @page-change="handlePageTopRegisterCourses" class="justify-content-center pagination-container"/>
       
-        <div class="pt-5 container col-12 table-responsive" v-if="showRegistrationJustForYou">
+        <div class="pt-5 container col-12" v-if="showRegistrationJustForYou">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
-          <div v-if="registration_justforyou && registration_justforyou.length > 0"> 
+          <div class="table-responsive" v-if="registration_justforyou && registration_justforyou.length > 0"> 
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
@@ -109,9 +109,9 @@
         </div>
         <vue-awesome-paginate v-model="localCurrentPageRegCourseOthers" v-if="registration_justforyou.length/itemsPerPage > 0 && showRegistrationJustForYou" :totalItems="registration_justforyou.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeRegCourseOthers" class="justify-content-center pagination-container"/>
 
-        <div class="pt-5 container col-12 table-responsive" v-if="showRegistratonOthers">
+        <div class="pt-5 container col-12" v-if="showRegistratonOthers">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1>
-          <div v-if="registration_others && registration_others.length > 0"> 
+          <div class="table-responsive" v-if="registration_others && registration_others.length > 0"> 
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
@@ -160,9 +160,9 @@
       </div>
 
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'express_interest' }">
-        <div class="pt-5 container col-12 table-responsive" v-if="shouldShowTopInterestPicks">
+        <div class="pt-5 container col-12" v-if="shouldShowTopInterestPicks">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Top Picks</h1>
-          <div v-if="top_interest_picks && top_interest_picks.length > 0"> 
+          <div class="table-responsive" v-if="top_interest_picks && top_interest_picks.length > 0"> 
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
@@ -191,9 +191,9 @@
         <vue-awesome-paginate v-model="localCurrentPageTopPickInterest" v-if="top_interest_picks.length/itemsPerPage > 0 && shouldShowTopInterestPicks" :totalItems="top_interest_picks.length" :items-per-page="itemsPerPage" @page-change="handlePageTopInterestCourses" class="justify-content-center pagination-container"/>
           
         
-          <div class="pt-5 container col-12 table-responsive" v-if="showInterestsJustForYou">
+          <div class="pt-5 container col-12" v-if="showInterestsJustForYou">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Just For You</h1>
-          <div v-if="interests_justforyou && interests_justforyou.length > 0"> 
+          <div class="table-responsive" v-if="interests_justforyou && interests_justforyou.length > 0"> 
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
@@ -221,9 +221,9 @@
         </div>
         <vue-awesome-paginate v-model="localCurrentInterestOthers" v-if="interests_justforyou.length/itemsPerPage > 0 && showInterestsJustForYou" :totalItems="interests_justforyou.length" :items-per-page="itemsPerPage" @page-change="handlePageChangeInterestOthers" class="justify-content-center pagination-container"/>
       
-        <div class="pt-5 container col-12 table-responsive" v-if="showInterestsOthers">
+        <div class="pt-5 container col-12" v-if="showInterestsOthers">
           <h1 class="recommendation-title pb-3 d-flex justify-content-center">Others Like You Also Like</h1> 
-          <div v-if="interests_others && interests_others.length > 0"> 
+          <div class="table-responsive" v-if="interests_others && interests_others.length > 0"> 
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">

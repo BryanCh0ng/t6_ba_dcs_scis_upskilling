@@ -34,7 +34,6 @@
                     <th scope="col">Start & End Time</th>
                     <th scope="col">Course Details</th>
                     <th scope="col">Lessons</th>
-                    <th scope="col">Action(s)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,22 +41,19 @@
                         <td class="name">
                             <course-name-desc :name="assigned_course.run_Name" :category="assigned_course.coursecat_Name" :description="assigned_course.course_Desc"></course-name-desc>
                         </td>
-                        <td> {{ assigned_course.course_Venue }} </td>
+                        <td class="text-nowrap"> {{ assigned_course.course_Venue }} </td>
                         <td class="start_date">
                             <course-date :date="assigned_course.run_Startdate"></course-date>
                         </td>
                         <td class="end_date">
                             <course-date :date="assigned_course.run_Enddate"></course-date>
                         </td>
-                        <td class="time">
+                        <td class="time text-nowrap">
                           <course-duration :start_time="assigned_course.run_Starttime" :end_time="assigned_course.run_Endtime"></course-duration> 
                         </td>
                         <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(assigned_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                         <td>
                           <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(assigned_course.rcourse_ID)">View Lessons</a>
-                        </td>
-                        <td>
-                          <course-action status="attendance" :id="assigned_course.course_ID"></course-action>
                         </td>
                     </tr>
                 </tbody>

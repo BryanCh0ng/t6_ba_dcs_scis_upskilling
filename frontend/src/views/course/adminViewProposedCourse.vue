@@ -64,11 +64,12 @@
         <common-search-filter class="mt-5"
         :status-options="statusOptions"
         :search-api="searchAllApprovedRejectedProposedCoursesAdmin"
+        course-name-placeholder="Course Name"
         @search-complete="handleSearchComplete2" />
 
-        <div class="container col-12 table-responsive">
+        <div class="container col-12">
           <h5 class="pb-3">All Proposals</h5>
-          <div  v-if="proposed_courses && proposed_courses.length > 0">
+          <div class="table-responsive" v-if="proposed_courses && proposed_courses.length > 0">
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
@@ -87,7 +88,7 @@
                   <td class="name">
                     <course-name-desc :name="proposed_course.course_Name" :category="proposed_course.coursecat_Name" :description="proposed_course.course_Desc"></course-name-desc>
                   </td>
-                  <td class="submitted_by_name">
+                  <td class="submitted_by_name text-nowrap">
                     {{ proposed_course.submitted_by_name }}
                   </td>
                   <td class="pl-0 border-top">

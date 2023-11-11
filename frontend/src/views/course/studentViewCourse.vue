@@ -81,9 +81,9 @@
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'course_vote' }">
         <search-filter :search-api="searchUnvotedActiveInfo" @search-complete="handleSearchCompleteVote"/>
 
-        <div class="container col-12 table-responsive">
+        <div class="container col-12">
           <h5 class="pb-3">Courses Available to Vote</h5>
-          <div v-if="vote_courses && vote_courses.length > 0">
+          <div class="table-responsive" v-if="vote_courses && vote_courses.length > 0">
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">

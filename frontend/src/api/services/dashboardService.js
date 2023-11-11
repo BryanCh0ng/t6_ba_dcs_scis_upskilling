@@ -4,7 +4,7 @@ import BaseApiService from "../BaseApiService";
 class DashboardService extends BaseApiService {
     async getTotalFeedbacks(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
-            // console.log(course_ID)
+            console.log(course_ID)
             // console.log(runcourse_ID)
             const response = await axiosClient.get('/dashboard/total_no_of_feedbacks', {
                 params: {
@@ -216,7 +216,58 @@ class DashboardService extends BaseApiService {
             return this.handleError(error)
         }
     }
-    
+
+    // async getTotalFeedbacks(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
+    //     try {
+    //         const response = await axiosClient.get('/dashboard/total_no_of_feedbacks', {
+    //             params: {
+    //                 course_ID: course_ID,
+    //                 coursecat_ID: coursecat_ID,
+    //                 rcourse_ID: rcourse_ID,
+    //                 instructor_ID: instructor_ID,
+    //                 run_Startdate: run_Startdate,
+    //                 run_Enddate: run_Enddate
+    //             },
+    //         });
+    //         return response.data;
+    //     } catch (error) {
+    //         return this.handleError(error)
+    //     }
+    // }
+
+    async getFilteredCoursesName(courseID) {
+        try {
+            const response = await axiosClient.get('/dashboard/get_filtered_course_name', {
+                params: { course_id: courseID }
+            });
+            return response.data;
+        } catch (error) {
+            throw new Error('Error fetching course name');
+        }
+    }
+
+    async getFilteredRunCoursesName(rcourse_id) {
+        try {
+            const response = await axiosClient.get('/dashboard/get_filtered_runcourse_name', {
+                params: { rcourse_id: rcourse_id }
+            });
+            return response.data;
+        } catch (error) {
+            throw new Error('Error fetching course name');
+        }
+    }
+
+    async getFilteredCoachesName(instructor_id) {
+        try {
+            const response = await axiosClient.get('/dashboard/get_filtered_user_name', {
+                params: { instructor_id: instructor_id }
+            });
+            return response.data;
+        } catch (error) {
+            throw new Error('Error fetching course name');
+        }
+    }
+
 }
 
 export default new DashboardService();

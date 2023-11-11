@@ -12,11 +12,10 @@ api = Namespace('feedback', description='Feedback related operations')
 
 post_feedback_student = api.parser()
 @api.route("/post_feedback_student" ,methods=["POST", "GET"])
-@api.doc(description="Search if template id exists, if does get template, else create new template")
+@api.doc(description="Submit Student Feedback")
 class GetTemplate(Resource):
     @api.expect(post_feedback_student)
     def post(self):
-        
         new_student_feedback = request.json
         courseID = new_student_feedback.get("rcourse_id")
         templateID = new_student_feedback.get("template_id")
@@ -45,8 +44,6 @@ class GetTemplate(Resource):
                 for eachdata in data:
                    AttributeID = eachdata.get("attribute_id")
                    answer = eachdata.get("answer")
-                   print(AttributeID)
-                   print(answer)
                    NewFeedback =Feedback( None, templateID, userID, AttributeID, answer, courseID)
                    db.session.add(NewFeedback)
                    db.session.commit()
@@ -265,8 +262,31 @@ class GetRandomReviewsByRCourseId(Resource):
         no_of_reviews = get_random_reviews_by_rcourse_id.parse_args().get("no_of_reviews")
 
         if rcourse_id:
-          course_id = db.session.query(RunCourse.course_ID).filter(RunCourse.rcourse_ID == rcourse_id).first()
-          course_id = course_id[0]
+          template_attribute_query = db.session.query(
+            TemplateAttribute,
+          ).filter(
+            TemplateAttribute.question == 'Any Feedbacks for the course',
+            TemplateAttribute.template_ID == None,
+            TemplateAttribute.input_Type == 'Text Field'
+          ).first()
+          
+          if template_attribute_query:
+            template_attribute_id = template_attribute_query.template_Attribute_ID
+            random_reviews = (
+                db.session.query(
+                  Feedback,
+                ).filter(
+                  Feedback.rcourse_ID == rcourse_id,
+                  Feedback.template_Attribute_ID == template_attribute_id
+                )
+                .order_by(db.func.random())
+                .limit(no_of_reviews)
+                .all()
+              )
+            if random_reviews:
+              print(random_reviews)
+              return {"code": 200, "reviews":[review.json() for review in random_reviews]}, 200
+            return {"code": 202, "message": "There are no reviews available currently"}, 202
 
         if course_id:
           rcourse_ids = db.session.query(RunCourse.rcourse_ID).filter(RunCourse.course_ID == course_id).all()

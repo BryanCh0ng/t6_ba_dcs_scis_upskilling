@@ -7,8 +7,11 @@ from sqlalchemy import asc
 from core_features import common
 import json
 from sqlalchemy.orm import aliased
+from flask_apscheduler import APScheduler
+
 
 api = Namespace('attendance', description='Attendance related operations')
+
 
 get_attendance_by_lesson_id = api.parser()
 get_attendance_by_lesson_id.add_argument("lesson_id", help="Enter lesson id")
@@ -19,10 +22,22 @@ class GetAttendanceByLessonId(Resource):
     def get(self):
       try:
         user_role = common.getUserRole()
+        session_user_ID = common.getUserID()
+        lesson_id = get_attendance_by_lesson_id.parse_args().get("lesson_id")
         if (user_role) == 'Student':
             return {"code": 400, "message": "Unathorized Access, Failed to get attendance record"}, 404
-
-        lesson_id = get_attendance_by_lesson_id.parse_args().get("lesson_id")
+        
+        if user_role == 'Trainer' or user_role == 'Instructor':
+            instructor_id_query = (
+                db.session.query(RunCourse.instructor_ID).join(Lesson, Lesson.rcourse_ID == RunCourse.rcourse_ID)
+                .filter(
+                    Lesson.lesson_ID == lesson_id
+                ).first()
+            )
+            instructor_id = instructor_id_query[0] if instructor_id_query else None
+            if (instructor_id != session_user_ID):
+                return {"code": 400, "message": "Unathorized Access, Failed to get attendance record"}, 404
+ 
         registration_alias = aliased(Registration, name="registration_alias")
         attendance_record_alias = aliased(AttendanceRecord, name="attendance_record_alias")
 
@@ -70,7 +85,6 @@ class GetAttendanceByLessonId(Resource):
             return {"code": 400, "message": "There is no attendance record for this lesson"}, 400
       except Exception as e:
           return {"code": 404, "message": "Failed " + str(e)}, 404
-
 
 get_attendances_by_trainer_instructor_id = api.parser()
 get_attendances_by_trainer_instructor_id.add_argument("trainer_instructor_id", help="Enter trainer/instructor id")
@@ -178,6 +192,8 @@ class updateAttendanceByLessonId(Resource):
                         AttendanceRecord.lesson_ID == lesson_id
                     ).first()
                 if attendance_record_query:
+                    if action == 'Present':
+                        absentReason = None
                     update_data = {
                         'status': action,
                         'attrecord_Status': 'Submitted',
@@ -194,6 +210,8 @@ class updateAttendanceByLessonId(Resource):
                     return True
                 else:
                     reason = reasonInput if absentReason == 'Others' else absentReason
+                    if action == 'Present':
+                        reason = None
                     new_attendance_record = AttendanceRecord(None, lesson_ID = lesson_id, status=action, attrecord_Status='Submited', reason=reason, user_ID=student_id)
                     db.session.add(new_attendance_record)
                     db.session.commit()
@@ -210,7 +228,8 @@ class updateAttendanceByLessonId(Resource):
                 current_time = datetime.now()
                 hours, minutes, seconds = map(int, lesson['lesson_Starttime'].split(':'))
                 lesson_date_time = lesson_date.replace(hour=hours, minute=minutes, second=seconds)
-                has_passed = lesson_date_time <= current_time
+                is_same_day = lesson_date.date() == current_time.date()
+                has_passed = lesson_date_time <= current_time if is_same_day else False
                 if (has_passed == False):
                     return {"code": 404, "message": "Unable to mark attendance as is not during lesson datetime"}, 404
                 elif (lesson['instructor_ID'] != common.getUserID()):
@@ -235,3 +254,5 @@ class updateAttendanceByLessonId(Resource):
             print(str(e))
             db.session.rollback()
             return jsonify({"code": 500, "message": "Failed " + str(e)}), 500
+
+
