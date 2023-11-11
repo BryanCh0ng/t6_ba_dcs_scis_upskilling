@@ -150,4 +150,13 @@ export default {
   }
 };
 </script>
-  
+
+<style>
+
+[data-title]:after {
+  font-size: 120%;
+  background-color: black;
+  border-radius: 5px;
+}
+
+</style>
