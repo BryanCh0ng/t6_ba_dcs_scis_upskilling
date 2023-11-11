@@ -71,6 +71,9 @@ export default {
             }
         }
     },
+    created() {
+        document.title = "Add Admin | Upskilling Engagement System";
+    },
     methods: {
         async handleModalClosed(value){
             this.showAlert = value;
