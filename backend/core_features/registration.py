@@ -18,7 +18,12 @@ scheduler.start()
 
 @scheduler.task('interval', id='check_registration_close', seconds=3600, misfire_grace_time=900)
 def check_registration_close():
-    regList = Registration.query.all()
+    #idk why this fixes sqlalchemy.exc.DatabaseError: (mysql.connector.errors.DatabaseError) 2005 (HY000): Unknown MySQL server host 'None' (11001) (Background on this error at: https://sqlalche.me/e/14/4xp6)
+    try:
+        regList = Registration.query.all()
+    except:
+        return
+    ##
     current_date = datetime.now().strftime("%Y-%m-%d")
     current_time = datetime.now().strftime("%H:%M:%S")
 
@@ -28,10 +33,10 @@ def check_registration_close():
 
     for rcourseid in rcourseid_set:
         rcourse = RunCourse.query.filter(RunCourse.rcourse_ID == rcourseid).first().json()
-        rcourse_enddate = rcourse["reg_Enddate"]
+        rcourse_enddate = rcourse["reg_Enddate"].strftime("%Y-%m-%d")
 
         if rcourse_enddate == current_date:
-            rcourse_endtime = rcourse["reg_Endtime"]
+            rcourse_endtime = rcourse["reg_Endtime"].strftime("%H:%M:%S")
 
             if rcourse_endtime <= current_time:
                 coursesize = rcourse["course_Size"]

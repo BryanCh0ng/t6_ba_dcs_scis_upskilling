@@ -22,27 +22,51 @@ scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
 
-@scheduler.task('interval', id='on_registration_close', seconds=3600, misfire_grace_time=900)
+@scheduler.task('interval', id='on_registration_close', seconds=10, misfire_grace_time=900)
 def open_close_registration():
-    runCourseList = RunCourse.query.all()
+
+    #idk why this fixes sqlalchemy.exc.DatabaseError: (mysql.connector.errors.DatabaseError) 2005 (HY000): Unknown MySQL server host 'None' (11001) (Background on this error at: https://sqlalche.me/e/14/4xp6)
+    try:
+        runCourseList = RunCourse.query.all()
+    except:
+        return
+    ##
+
     current_date = datetime.now().strftime("%Y-%m-%d")
     current_time = datetime.now().strftime("%H:%M:%S")
 
     for runCourse in runCourseList:
-        startDate = runCourse["reg_Startdate"]
-        startTime = runCourse["reg_Starttime"]
+        startDate = runCourse.json()["reg_Startdate"].strftime("%Y-%m-%d")
+        startTime = runCourse.json()["reg_Starttime"].strftime("%H:%M:%S")
+        status = runCourse.json()["runcourse_Status"]
+        endDate = runCourse.json()["reg_Enddate"].strftime("%Y-%m-%d")
+        endTime = runCourse.json()["reg_Endtime"].strftime("%H:%M:%S")
 
-        if current_date == startDate:
-            if current_time >= startTime:
+        if current_date == startDate and current_time >= startTime:
+            if status != "Ongoing":
                 try:
                     setattr(runCourse, "runcourse_Status", "Ongoing")
-                    db.commit()
-
+                    db.session.commit()
+                    db.session.close()
+                    
                     return json.loads(json.dumps({"message": 'Success', "code": 200}, default=str))
                 
                 except Exception as e:
                     db.session.rollback()
                     return "Failed" + str(e), 500
+        
+        elif current_date == endDate and current_time >= endTime:
+            if status != "Closed":
+                try:
+                    setattr(runCourse, "runcourse_Status", "Closed")
+                    db.session.commit()
+                    db.session.close()
+
+                    return json.loads(json.dumps({"message": 'Success', "code": 200}, default=str))
+                
+                except Exception as e:
+                    db.session.rollback()
+                    return "Failed" + str(e), 500 
 
 retrieve_all_runcourses = api.parser()
 retrieve_all_runcourses.add_argument("course_id", help="Enter course id")
