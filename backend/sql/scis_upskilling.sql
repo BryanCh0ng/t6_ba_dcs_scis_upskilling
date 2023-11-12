@@ -751,7 +751,7 @@ INSERT INTO feedback VALUES
     (89, 1, 11, 10, 'Prof value-adds the content in the slides, bringing in real life industrial experiences. It is also helpful that he encourages students to clarify doubts with him online anytime', 1),
     (90, 1, 11, 11, 'Nil', 1),
     (91, 1, 11, 12, '4', 1),
-    (92, 1, 11, 12, 'The instructor was very knowledgeable. Loved the real-world applications included', 1),
+    (92, 1, 11, 13, 'The instructor was very knowledgeable. Loved the real-world applications included', 1),
     -- user_id 12
     (93, 1, 12, 1, '5', 1),
     (94, 1, 12, 2, '5', 1),
