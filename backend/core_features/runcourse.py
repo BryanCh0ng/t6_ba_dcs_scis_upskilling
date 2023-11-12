@@ -22,7 +22,7 @@ scheduler = APScheduler()
 scheduler.init_app(app)
 scheduler.start()
 
-@scheduler.task('interval', id='on_registration_close', seconds=10, misfire_grace_time=900)
+@scheduler.task('interval', id='on_registration_close', seconds=3600, misfire_grace_time=900)
 def open_close_registration():
 
     #idk why this fixes sqlalchemy.exc.DatabaseError: (mysql.connector.errors.DatabaseError) 2005 (HY000): Unknown MySQL server host 'None' (11001) (Background on this error at: https://sqlalche.me/e/14/4xp6)
