@@ -65,7 +65,6 @@ class ManagementService extends BaseApiService {
 
     async blacklistStudent(user_ids) {
         try {
-            // console.log(user_ids)
             const response = await axiosClient.post("/management/blacklist", {
                 user_ids: user_ids,
             });
@@ -77,7 +76,6 @@ class ManagementService extends BaseApiService {
 
     async removeFromBlacklist(user_ids) {
         try {
-            // console.log(user_ids)
             const response = await axiosClient.post("/management/remove_from_blacklist", {
                 user_ids: user_ids,
             });
@@ -100,7 +98,6 @@ class ManagementService extends BaseApiService {
 
     async addAdmin(newAdminData) {
         try {
-            console.log(newAdminData)
             let response = await axiosClient.post('/management/add_admin', newAdminData);
             return response.data;
         } catch (error) {

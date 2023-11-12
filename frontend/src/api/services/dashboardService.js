@@ -4,8 +4,6 @@ import BaseApiService from "../BaseApiService";
 class DashboardService extends BaseApiService {
     async getTotalFeedbacks(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
-            console.log(course_ID)
-            // console.log(runcourse_ID)
             const response = await axiosClient.get('/dashboard/total_no_of_feedbacks', {
                 params: {
                     course_ID: course_ID,
@@ -24,8 +22,6 @@ class DashboardService extends BaseApiService {
 
     async getCourseAverageRatings(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
-            console.log(course_ID)
-            // console.log(runcourse_ID)
             const response = await axiosClient.get('/dashboard/course_average_ratings', {
                 params: {
                     course_ID: course_ID,
@@ -62,7 +58,6 @@ class DashboardService extends BaseApiService {
 
     async getCourseDoneWellFeedback(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
-            // console.log(course_ID)
             const response = await axiosClient.get('/dashboard/feedback_course_done_well_specific', {
                 params: {
                     course_ID: course_ID,
@@ -81,7 +76,6 @@ class DashboardService extends BaseApiService {
 
     async getCourseImproveFeedback(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
-            // console.log(course_ID)
             const response = await axiosClient.get('/dashboard/feedback_course_improve_specific', {
                 params: {
                     course_ID: course_ID,
@@ -100,7 +94,6 @@ class DashboardService extends BaseApiService {
 
     async getInstructorDoneWellFeedback(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
-            // console.log(course_ID)
             const response = await axiosClient.get('/dashboard/feedback_instructor_done_well_specific', {
                 params: {
                     course_ID: course_ID,
@@ -119,7 +112,6 @@ class DashboardService extends BaseApiService {
 
     async getInstructorImproveFeedback(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
-            // console.log(course_ID)
             const response = await axiosClient.get('/dashboard/feedback_instructor_improve_specific', {
                 params: {
                     course_ID: course_ID,

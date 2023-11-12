@@ -63,7 +63,6 @@ class CourseService extends BaseApiService {
                     coursecat_id: coursecat_ID
                 }
             });
-            // console.log(response.data);
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -80,7 +79,6 @@ class CourseService extends BaseApiService {
                     coursecat_id: coursecat_ID
                 }
             });
-            // console.log(response.data);
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -98,7 +96,6 @@ class CourseService extends BaseApiService {
                     reg_status: reg_Status
                 }
             });
-            // console.log(response.data);
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -245,7 +242,6 @@ class CourseService extends BaseApiService {
                     pcourse_status: status
                 }
             });
-            // console.log(response.data)
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -262,7 +258,6 @@ class CourseService extends BaseApiService {
                     vote_status: vote_Status
                 }
             });
-            // console.log("Response data:", response.data);
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -278,7 +273,6 @@ class CourseService extends BaseApiService {
                     coursecat_id: coursecat_ID,
                 }
             });
-            // console.log("Response data:", response.data);
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -296,7 +290,6 @@ class CourseService extends BaseApiService {
                     course_status: course_Status
                 }
             });
-            // console.log(response.data)
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -315,7 +308,6 @@ class CourseService extends BaseApiService {
                     course_id: course_id
                 }
             });
-            // console.log(response.data)
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -350,7 +342,6 @@ class CourseService extends BaseApiService {
                     course_status: course_Status
                 }
             });
-            // console.log(response.data)
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -361,7 +352,6 @@ class CourseService extends BaseApiService {
     async deactivateRunCourse(course_ID) {
         try {
             let deactivateRunCourse = await axiosClient.post("/course/deactivate_course", { course_id: course_ID } );
-            console.log(deactivateRunCourse)
             return deactivateRunCourse.data
         } catch (error) {
             console.log("Cannot deactivate the course");
@@ -375,7 +365,6 @@ class CourseService extends BaseApiService {
             let retireRunCourse = await axiosClient.post("/course/retire_course", { course_id: course_ID });
             return retireRunCourse.data
         } catch (error) {
-            // console.log("Cannot retire the course");
             return this.handleError(error);
         }
     }
@@ -414,7 +403,6 @@ class CourseService extends BaseApiService {
                 vote_ID: vote_ID,
                 user_ID: user_ID,
             });
-            // console.log(response.data);
             return response.data;
             
         } catch (error) {
@@ -428,7 +416,6 @@ class CourseService extends BaseApiService {
                 vote_ID: vote_ID,
                 user_ID: user_ID,
             });
-            // console.log(response);
             return response.data;
             
         } catch (error) {
@@ -441,7 +428,6 @@ class CourseService extends BaseApiService {
             const response = await axiosClient.put("/course/update_vote_unoffered_course", {
                 course_ID: course_ID,
             });
-            // console.log(response);
             return response.data;
             
         } catch (error) {
@@ -454,7 +440,6 @@ class CourseService extends BaseApiService {
             const response = await axiosClient.put("/course/close_vote_course", {
                 course_ID: course_ID,
             });
-            // console.log(response);
             return response.data;
             
         } catch (error) {
@@ -500,7 +485,6 @@ class CourseService extends BaseApiService {
               rcourse_id: rcourse_id
             };
             const response = await axiosClient.get(endpoint, { params });
-            console.log(response)
             return response.data;
 
         } catch (error) {

@@ -5,7 +5,6 @@ class FeedbackService extends BaseApiService {
     async postStudentFeedback(data) {
         try {
             let response = await axiosClient.post("/feedback/post_feedback_student", data)
-            console.log(response)
             return response.data
         } catch (error) {
             return this.handleError(error)
@@ -19,7 +18,6 @@ class FeedbackService extends BaseApiService {
               rcourse_id: rcourse_id
             };
             const response = await axiosClient.get(endpoint, { params });
-            console.log(response)
             return response.data;
 
         } catch (error) {
@@ -36,7 +34,6 @@ class FeedbackService extends BaseApiService {
                 no_of_reviews: no_of_reviews
             };
             const response = await axiosClient.get(endpoint, { params });
-            console.log(response)
             return response.data;
         } catch (error) {
             return this.handleError(error);
@@ -45,7 +42,6 @@ class FeedbackService extends BaseApiService {
 
     async getFeedbackForRunCourse(course_ID, runcourse_ID) {
         try {
-            // console.log(course_ID)
             const response = await axiosClient.get('/feedback/get_feedback_for_runcourse', {
                 params: {
                     course_ID: course_ID,
