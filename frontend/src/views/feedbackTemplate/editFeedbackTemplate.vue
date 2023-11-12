@@ -175,7 +175,6 @@ export default {
       this.updateQuestionNumbers();
     },
     destroyComponent(id) {
-      console.log(this.questions.data)
       const component = this.questions.data.find(c => c.id === id);
       if (component) {
         component.destroyed = true;
@@ -188,7 +187,6 @@ export default {
         haveError = true;
       }
       var formData = this.getFormData();
-      console.log(formData)
       if (formData.some(item => item.haveError === true)) {
         haveError = true
       }

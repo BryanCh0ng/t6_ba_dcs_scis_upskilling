@@ -114,8 +114,6 @@ export default {
 
                     this.submitFormData ["role_Name"] = "Admin"
 
-                    console.log(this.submitFormData)
-
                     await this.addAdmin();
 
                     this.setSuccessAlert("User Creation");

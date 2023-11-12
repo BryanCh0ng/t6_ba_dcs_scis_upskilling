@@ -83,7 +83,6 @@ export default({
             }
         },
         resetFilter() {
-            // console.log(this.status);
             this.courseName = "";
             this.category = "";
             this.status = "";

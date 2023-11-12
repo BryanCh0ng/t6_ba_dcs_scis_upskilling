@@ -410,7 +410,6 @@ export default {
       try {
         // course
         const response = await DashboardService.getInstructorDoneWellFeedback(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
-        // console.log(response)
         this.instructorDoneWellTopics = response.topic_words_list;
 
       } catch (error) {
@@ -422,7 +421,6 @@ export default {
       try {
         // course
         const response = await DashboardService.getInstructorImproveFeedback(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
-        // console.log(response)
         this.instructorSuggestionsTopics = response.topic_words_list;
 
       } catch (error) {
@@ -464,8 +462,6 @@ export default {
           this.sentimentData2.label = "Overall Instructor Sentiment";
 
           this.filterSelected = false;
-
-          // console.log(this.sentimentData2.dataArray)
         }
 
         if (response.data.code === 400) {
@@ -497,9 +493,7 @@ export default {
           }
 
           this.positiveCourseWordData = positive_word_data;
-          //console.log(this.positiveCourseWordData)
           this.negativeCourseWordData = negative_word_data;
-          //console.log(this.negativeCourseWordData)
 
           this.filterSelected = false;
         }
@@ -516,7 +510,6 @@ export default {
     async fetchInstructorWordcloudData() {
       try {
         const response = await DashboardService.getInstructorWordcloudData(this.courseIDs, this.coursecatIDs, this.runcourseIDs, this.coachesIDs, this.startDate, this.endDate);
-        //console.log(response.data)
         if (response.data.code === 200) {
           const { positive_word_data, negative_word_data } = response.data;
 
@@ -533,9 +526,7 @@ export default {
           }
 
           this.positiveInstructorWordData = positive_word_data;
-          //console.log(this.positiveInstructorWordData)
           this.negativeInstructorWordData = negative_word_data;
-          //console.log(this.negativeInstructorWordData)
 
           this.filterSelected = false;
         }
@@ -561,11 +552,6 @@ export default {
         if (feedbackForCourse.data.code == 200) {
           this.header = feedbackForCourse.data.header
           this.feedbackData = feedbackForCourse.data.answers;
-
-          // Log the length of each element in feedbackData
-          /*this.feedbackData.forEach(answerSet => {
-            console.log('Length of answerSet:', answerSet.length);
-          });*/
 
           this.filterSelected = false;
         }

@@ -99,7 +99,6 @@ export default {
           this.message = "Feedback not yet open for submission";
           this.buttonType = "danger"
         } else {
-          console.log(this.course)
           this.haveError = false
           const response = await FeedbackTemplateService.getTemplateById(this.course.template_ID)
           console.log(response)
@@ -197,8 +196,6 @@ export default {
         'data': this.templateData,
         'common_questions_data': this.common_questions
       }
-      console.log(data)
-      console.log(this.common_questions)
       const isAnyAnswerBlank = this.templateData.some((element) => {
         return !element.answer.toString().trim();
       });
@@ -255,7 +252,6 @@ export default {
     },
     updateCommonLikert(answer) {
       this.common_questions[0]['answer'] = answer.value;
-      console.log(this.common_questions);
     }
   },
   async created() {

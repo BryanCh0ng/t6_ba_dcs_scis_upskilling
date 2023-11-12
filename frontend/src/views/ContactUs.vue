@@ -112,7 +112,7 @@ export default {
 
       try {
         const response = await ContactUsService.createNewMsg(formData);
-        // console.log('API Response:', response);
+       
         if (response.code === 201) {
           showSuccessMessage(this)
         } else {

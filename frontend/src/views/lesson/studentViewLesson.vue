@@ -103,15 +103,11 @@ export default {
       this.$emit('page-change', newPage);
     },
     async loadData() {
-      console.log('load')
       try {
         const user_ID = await UserService.getUserID();
-        console.log(user_ID)
         let response = await LessonService.getLessonsByStudentId(user_ID)
-        console.log(response)
         if (response.code == 200) {
           this.lessons = response.lessons
-          console.log(this.lessons)
         } else {
           this.errorMsge = response.message
         }

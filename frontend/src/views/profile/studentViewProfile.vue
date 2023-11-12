@@ -362,7 +362,7 @@ export default {
         this.user_ID = user_id
 
         let registered_response= await CourseService.searchCourseRegistrationInfo(user_id, null, null, null)
-        console.log(registered_response)
+
         this.registered_courses = registered_response.data
         if (this.registered_courses == undefined || this.registered_courses.length == 0) {
           this.onInitialEmptyRegistered = true
@@ -381,7 +381,7 @@ export default {
         }
 
         let completed_response = await CourseService.searchCompletedInfo(user_id, null, null, null)
-        // console.log(completed_response.data)
+     
         this.completed_courses = completed_response.data
         if (this.completed_courses == undefined || this.completed_courses.length == 0) {
           this.onInitialEmptyCompleted = true
@@ -463,7 +463,7 @@ export default {
     },
     async searchCourseRegistrationInfo(user_ID, course_Name, coursecat_ID, status) {
       try {
-        console.log(this.user_ID)
+     
         user_ID = this.user_ID
 
         let response = await CourseService.searchCourseRegistrationInfo(
@@ -473,7 +473,7 @@ export default {
           status
         );
         this.registered_courses = response.data;
-        // console.log(this.registered_courses)
+      
         return this.registered_courses;
       } catch (error) {
         console.error("Error fetching info:", error);
@@ -609,11 +609,9 @@ export default {
         return this.currentDate < regClosingDate;
     },
     editCourse(courseId) {
-      console.log(courseId)
       this.$router.push({ name: 'editProposedCourse', params: { courseId } });
     },
     view_submit_feedback(id) {
-      console.log(id)
       this.$router.push({ name: 'submitFeedback', params: {id}})
     },
     viewLessons(courseID) {

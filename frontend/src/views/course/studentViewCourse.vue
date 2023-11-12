@@ -218,7 +218,6 @@ export default {
       this.search_course_name = course_Name;
       this.search_course_category = coursecat_ID;
       try {
-        // console.log(course_Name)
         let response = await CourseService.searchUnregisteredActiveInfo(
           user_ID,
           course_Name,
@@ -235,7 +234,6 @@ export default {
       this.search_course_name = course_Name;
       this.search_course_category = coursecat_ID;
       try {
-        // console.log(coursecat_ID)
         let response = await CourseService.searchUnvotedActiveInfo(
           user_ID,
           course_Name,

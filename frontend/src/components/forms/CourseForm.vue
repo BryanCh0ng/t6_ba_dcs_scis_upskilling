@@ -224,14 +224,9 @@ export default {
         async createCourse() {
             try {
                 this.createCourseResponse = await CourseService.createCourse(this.submitFormData);
-                //console.log(typeof(this.createCourseResponse))
-                //console.log(this.createCourseResponse.data.course_ID)
-
             } catch (error) {
                 console.error('Error creating a new course', error);
                 this.title = "Course Creation Failed";
-
-                //throw new Error("Course Creation was unsuccessful");
 
                 if (error.response.status === 500) {
                     throw new Error("Course Creation was unsuccessful");
@@ -318,7 +313,7 @@ export default {
 
             if (!this.v$.$invalid) {
 
-                // console.log('Form has no validation errors');
+                console.log('Form has no validation errors');
 
                 try {
 

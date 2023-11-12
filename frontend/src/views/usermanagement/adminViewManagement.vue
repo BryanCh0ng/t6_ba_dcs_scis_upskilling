@@ -286,7 +286,6 @@ export default {
       }
     },
     async searchStudentInfo(user_Name, blacklisted) {
-      console.log(user_Name)
       try {
         if (blacklisted === "Blacklisted") {
           this.search_blacklist = true;
@@ -411,7 +410,6 @@ export default {
     },
     async removeAdmin(user_ID) {
       this.modalTitle = "Remove Admin"
-      console.log(user_ID)
       let response = await ManagementService.removeAdmin(user_ID)
       this.modalMessage = response.message
       this.showModal = true;
@@ -456,14 +454,14 @@ export default {
         document.title = "User Management | Upskilling Engagement System"
         
         let admin_response = await ManagementService.getAllAdmin(null)
-        // console.log(admin_response)
+
         this.admin = admin_response.data
 
         let student_response = await ManagementService.getAllStudent(null, null)
         this.student = student_response.data
 
         let instructor_response = await ManagementService.getAllInstructorsAndTrainers(null, null, null)
-        console.log(instructor_response)
+
         this.instructors_trainers = instructor_response.data
       } catch (error) {
         console.error("Error fetching course details:", error);

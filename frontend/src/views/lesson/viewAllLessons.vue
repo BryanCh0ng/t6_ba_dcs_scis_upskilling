@@ -137,7 +137,6 @@
         this.$emit('page-change', newPage);
       },
       async handleSearchComplete(searchResults) {
-        // console.log("searchResults", searchResults);
         this.lessons = searchResults;
         
       },
@@ -149,7 +148,6 @@
 
         try {
           let response = await LessonService.getAllLessons(this.search_run_course_name, this.search_instructor_name, this.search_course_category, this.search_status)
-          console.log(response)
           if (response.code == 200) {
             this.lessons = response.lessons
             return this.lessons
@@ -191,9 +189,7 @@
       }, 
       async removeLesson(lesson_ID) {
         try {
-          console.log(lesson_ID)
           let response = await LessonService.removeLesson(lesson_ID);
-          console.log(response)
           if (response.code == 200) {
             // showSuccessMessage(this)
             this.title = "Remove Lesson Successfully";

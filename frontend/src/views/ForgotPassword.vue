@@ -90,7 +90,6 @@ export default {
 
     async sendResetLink() {
       try {
-        console.log(this.email)
         const response = await UserService.forgotPassword(this.email)
         
         if (response.code === 200) {

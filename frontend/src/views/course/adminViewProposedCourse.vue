@@ -188,12 +188,10 @@ export default {
       this.showModal = false;
     },
     async handleSearchComplete(searchResults) {
-      // console.log(searchResults)
       this.pending_courses = searchResults;
     },
     async searchAllSubmittedProposedCoursesAdmin(course_Name, coursecat_ID) {
       try {
-        console.log(coursecat_ID)
         let response = await CourseService.searchAllSubmittedProposedCoursesAdmin(
           course_Name,
           coursecat_ID
@@ -206,18 +204,15 @@ export default {
       }
     },
      async handleSearchComplete2(searchResults) {
-      // console.log(searchResults)
       this.proposed_courses = searchResults;
     },
     async searchAllApprovedRejectedProposedCoursesAdmin(course_Name, coursecat_ID, status) {
       try {
-        console.log(status)
         let response = await CourseService.searchAllApprovedRejectedProposedCoursesAdmin(
           course_Name,
           coursecat_ID,
           status
         );
-        // console.log(response.data)
         this.proposed_courses = response.data;
         return this.proposed_courses;
       } catch (error) {

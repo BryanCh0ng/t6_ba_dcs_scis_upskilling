@@ -30,7 +30,6 @@ export default {
         } else {
             document.title = "Edit Course | Upskilling Engagement System";
             this.courseId = this.$route.params.id;
-            //console.log(this.courseId)
         }
     },
 };

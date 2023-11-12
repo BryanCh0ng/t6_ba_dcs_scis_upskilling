@@ -64,7 +64,6 @@ export default {
         if (this.status == 'Retire') {
           response = await CourseService.retireRunCourse(this.course.course_ID);
         } else if (this.status == 'Activate') {
-          console.log(this.course.course_ID)
           response = await CourseService.activateRunCourse(this.course.course_ID);
         } else if (this.status == 'Deactivate') {
           response = await CourseService.deactivateRunCourse(this.course.course_ID);
@@ -87,7 +86,6 @@ export default {
       try {
         let response;
         let user_ID = await UserService.getUserID();
-        console.log(user_ID)
         if (this.status == 'Vote') {
           response = await CourseService.voteCourse(this.course.vote_ID, user_ID);
         } else if (this.status == 'say-pass') {
@@ -130,7 +128,6 @@ export default {
     //   }
     // },
     async registerCourse() {
-      // console.log(this.course)
       let response = await RunCourseService.changeRegistrationStatus({ "rcourse_ID": this.course.rcourse_ID })
       console.log(response)
       this.message = response.message;

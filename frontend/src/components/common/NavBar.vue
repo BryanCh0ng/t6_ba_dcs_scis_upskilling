@@ -158,7 +158,6 @@ export default {
       try {
         const user_ID = await UserService.getUserID()
         this.user_ID = user_ID
-        // console.log(this.user_ID)
 
         if (user_ID === "Session not set") {
           this.user_ID = null
@@ -184,7 +183,6 @@ export default {
       try {
         const user_name = await UserService.getUserName()
         this.user_name = user_name
-        // console.log(this.user_name)
       } catch (error) {
         console.error('Error fetching user ID:', error);
         this.user_name = null;
@@ -226,7 +224,6 @@ export default {
     this.router.push('/');
     },
     toggleUserDropdown() {
-      // console.log("Toggling user dropdown");
       this.showUserDropdown = !this.showUserDropdown;
     },
   }

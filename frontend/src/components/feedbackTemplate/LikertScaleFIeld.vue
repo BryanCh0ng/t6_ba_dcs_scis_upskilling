@@ -31,7 +31,6 @@ export default {
   },
   watch: {
     selectedOption(newValue) {
-      console.log(newValue)
       this.$emit('input', {value: newValue, key: this.qnNum-1});
     }
   }

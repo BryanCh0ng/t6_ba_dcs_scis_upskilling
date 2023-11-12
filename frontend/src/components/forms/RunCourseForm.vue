@@ -1170,12 +1170,9 @@ export default {
         async fetchRunCourseByCourseID() {
             try {
                 const response = await RunCourseService.getRunCourseCountByCourseId(this.courseId);
-
-                //console.log(response.data.run_course_count)
                 
                 this.formData.runName = response.data.course_name + " - Run " + (parseInt(response.data.run_course_count) + 1);
-
-                //console.log(response.data);
+                
             } catch (error) {
                 console.error('Error fetching run course name:', error);
                 this.errorMsg.push('Error fetching run course name');
@@ -1406,7 +1403,6 @@ export default {
                         
                         try {
                             const response = await RunCourseService.getAvailableInstructors(this.runcourseId, this.formatDateToYYYYMMDD(this.formData.startDate), this.formatDateToYYYYMMDD(this.formData.endDate), this.formatTimeObjectToString(this.formData.startTime), this.formatTimeObjectToString(this.formData.endTime));
-                            //console.log(response)
                             this.formData.instructors = response
                         } catch (error) {
                             console.error('Error fetching filtered instructors:', error);

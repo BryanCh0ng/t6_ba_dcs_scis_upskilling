@@ -165,9 +165,7 @@
         try {
           const course_id = this.$route.params.id
           let response = await CourseService.searchAllRunCourseByCourseId(this.search_course_name, this.search_course_category, this.search_status, course_id)
-          console.log(this.courses)
           this.courses = response.data
-          console.log(response)
         } catch (error) {
           console.error("Error fetching course details:", error);
         }

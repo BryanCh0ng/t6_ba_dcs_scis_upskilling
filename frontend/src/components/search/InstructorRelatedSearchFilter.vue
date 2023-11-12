@@ -79,8 +79,6 @@ export default {
         const user_Name = this.instructorName;
         const organizationName = this.organizationName;
         const role = this.role;
-        // console.log("user_Name:", user_Name);
-        // console.log("organizationName:", organizationName);
 
         let searchResults;
 

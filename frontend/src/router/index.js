@@ -424,7 +424,6 @@ router.beforeEach(async (to, from, next) => {
   if (requiresAuth) {
     try {
       const user_ID = await UserService.getUserID();
-      console.log(user_ID)
       if (typeof user_ID === 'number' && user_ID > 0) {
         next();
       } else {

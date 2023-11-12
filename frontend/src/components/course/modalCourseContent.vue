@@ -125,7 +125,6 @@ export default {
   computed: {
     isRunCourse() {
       var runStatus = this.course['runcourse_Status'];
-      console.log(this.course)
       return runStatus !== undefined
     },
     userRole() {
@@ -161,8 +160,6 @@ export default {
         rcourse_ids = JSON.stringify(rcourse_ids);
         const rating_response = await DashboardService.getCourseAverageRatings(null, null, rcourse_ids, null, null, null)
         if (rating_response.code == 200) {
-            console.log(this.course.rcourse_ID)
-            console.log(rcourse_ids)
             const no_of_feedback_response = await DashboardService.getTotalFeedbacks(null, null, rcourse_ids, null, null, null)
             console.log(no_of_feedback_response)
             if (no_of_feedback_response.code == 200) {
@@ -190,8 +187,6 @@ export default {
         course_ids = JSON.stringify(course_ids);
         const rating_response = await DashboardService.getCourseAverageRatings(course_ids, null, null, null, null, null)
         if (rating_response.code == 200) {
-          console.log(this.course.course_ID)
-          console.log(course_ids)
           const no_of_feedback_response = await DashboardService.getTotalFeedbacks(course_ids, null, null, null, null, null)
           console.log(no_of_feedback_response)
           if (no_of_feedback_response.code == 200) {

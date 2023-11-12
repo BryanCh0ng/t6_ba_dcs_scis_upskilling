@@ -98,8 +98,7 @@ export default({
                 const status = this.status;
 
                 let searchResults;
-                // console.log(status)
-                
+            
                 // Use the searchApi function from the parent component
                 searchResults = await this.searchApi(user_ID, course_Name, coursecat_ID, status);
                 

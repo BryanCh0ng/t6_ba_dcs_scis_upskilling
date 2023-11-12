@@ -136,13 +136,11 @@ export default {
         const { id: course_ID } = this.$route.params;
         this.course_ID = course_ID
         let response = await LessonService.getRunCourseById(course_ID)
-        console.log(response)
         if (response.code == 200) {
           this.lessons = response.lessons
         } else {
           this.errorMsge = response.message
         }
-        // console.log(this.lessons)
       } catch (error) {
         console.error("Error fetching lesson details:", error);
       }
@@ -208,13 +206,7 @@ export default {
     const user_ID = await UserService.getUserID();
     const role = await UserService.getUserRole(user_ID);
     this.userRole = role;
-    console.log(this.userRole)
     this.loadData()
-    // if (role == 'Student') {
-    //   this.$router.push({ name: 'studentViewCourse' }); 
-    // } else {
-    //   this.loadData();
-    // }
   },
   
   }

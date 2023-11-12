@@ -75,7 +75,6 @@ export default({
             try {
                 const course_Name = this.courseName;
                 const coursecat_ID = this.category;
-                console.log(coursecat_ID)
 
                 let searchResults;
 

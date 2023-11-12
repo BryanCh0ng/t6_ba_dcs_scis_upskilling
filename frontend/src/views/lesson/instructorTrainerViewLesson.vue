@@ -106,15 +106,11 @@
         this.$emit('page-change', newPage);
       },
       async loadData() {
-        console.log('load')
         try {
           const user_ID = await UserService.getUserID();
-          console.log(user_ID)
           let response = await LessonService.getLessonsByInstructorId(user_ID)
-          console.log(response)
           if (response.code == 200) {
             this.lessons = response.lessons
-            console.log(this.lessons)
           } else {
             this.errorMsge = response.message
           }
@@ -151,7 +147,6 @@
         const user_ID = await UserService.getUserID();
         const role = await UserService.getUserRole(user_ID);
         this.userRole = role
-        console.log(this.userRole)
         if (role == "Admin") {
         this.$router.push({ name: "adminViewCourse" });
         } else if (role == "Student") {

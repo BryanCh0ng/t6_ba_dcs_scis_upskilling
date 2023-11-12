@@ -211,11 +211,9 @@ export default {
       this.loadData();
     },
     async handleSearchComplete(searchResults) {
-      // console.log("searchResults", searchResults);
       this.vote_courses = searchResults; 
     },
     async handleSearchCompleteNotOffered(searchResults) {
-      // console.log("searchResults", searchResults);
       this.notoffered_courses = searchResults; 
     },
     async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, vote_status) {
@@ -252,7 +250,6 @@ export default {
           course_Name,
           coursecat_ID,
         );
-        // console.log(response.data)
         this.notoffered_courses = response.data;
         return this.notoffered_courses;
       } catch (error) {

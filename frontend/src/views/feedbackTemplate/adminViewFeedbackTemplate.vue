@@ -165,7 +165,6 @@
         this.selectedFeedbackTemplate = null;
       },
       openDeleteModal(feedback_template) {
-        console.log(feedback_template)
         this.selectedFeedbackTemplate = feedback_template;
         this.deleteModalOpen = !this.deleteModalOpen;
         this.showDeleteModal = true;

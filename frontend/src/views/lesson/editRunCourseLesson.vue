@@ -238,9 +238,6 @@ export default {
             const lessonStartTime = formatTime(`${this.lessonForm.lesson_Starttime.hours}:${this.lessonForm.lesson_Starttime.minutes}:${this.lessonForm.lesson_Starttime.seconds}`);
             const lessonEndTime = formatTime(`${this.lessonForm.lesson_Endtime.hours}:${this.lessonForm.lesson_Endtime.minutes}:${this.lessonForm.lesson_Endtime.seconds}`);
 
-            console.log(lessonStartTime)
-            console.log(lessonEndTime)
-
             if (lessonStartTime.getTime() === lessonEndTime.getTime()) {
                 showUnsuccessMessage(this, "Invalid Lesson Times", "The lesson start time cannot be the same as the lesson end time.");
                 return false;
@@ -271,7 +268,6 @@ export default {
             return true;
         },
         isEditingLesson(lesson) {
-            console.log(lesson.lesson_ID === parseInt(this.lesson_ID))
             return lesson.lesson_ID === parseInt(this.lesson_ID);
         },
         cancelEdit() {

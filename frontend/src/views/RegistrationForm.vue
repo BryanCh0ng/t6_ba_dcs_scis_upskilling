@@ -188,7 +188,7 @@ export default {
         }
         
         const response = await UserService.register(userData)
-        console.log(response)
+    
         if (response.code === 200) {
           showSuccessMessage(this)
         } else {

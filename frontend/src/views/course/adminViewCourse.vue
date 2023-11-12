@@ -138,7 +138,6 @@
         this.$emit('page-change', newPage);
       },
       async handleSearchComplete(searchResults) {
-        // console.log("searchResults", searchResults);
         this.courses = searchResults;
         
       },
@@ -167,7 +166,6 @@
           let response = await CourseService.searchAllCourseAdmin(this.search_course_name, this.search_course_category, this.search_status)
           
           this.courses = response.data
-          // console.log(this.courses)
         } catch (error) {
           console.error("Error fetching course details:", error);
         }

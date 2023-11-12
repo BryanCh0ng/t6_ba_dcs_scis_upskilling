@@ -290,7 +290,6 @@ export default {
       this.showModal = false;
     },
     handleActionData(actionData) {
-      // console.log(actionData.message)
       this.receivedMessage = actionData.message;
       this.actionCourse = actionData.course
       const modalButtonElement = this.$el.querySelector('.invisible-btn')
@@ -327,17 +326,14 @@ export default {
     },
 
     async handleSearchCompleteAssigned(searchResults) {
-      // console.log(searchResults)
       this.assigned_courses = searchResults;
     },
 
     async handleSearchCompleteProposed(searchResults) {
-      // console.log(searchResults)
       this.proposed_courses = searchResults;
     },
 
     async handleSearchCompleteConducted(searchResults) {
-      // console.log(searchResults)
       this.conducted_courses = searchResults;
     },
 
@@ -352,7 +348,6 @@ export default {
           status
         );
         this.assigned_courses = response.data;
-        // console.log(this.assigned_courses)
         return this.assigned_courses;
       } catch (error) {
         console.error("Error fetching info:", error);
@@ -449,7 +444,6 @@ export default {
     async loadData() {
       try {
           const user_ID = await UserService.getUserID();
-          console.log(user_ID)
           
           let assigned_courses = await CourseService.searchInstructorAssignedCourseInfo(user_ID, null, null, null)
           this.assigned_courses = assigned_courses.data
@@ -522,8 +516,6 @@ export default {
           this.assigned_courses = []
           this.onInitialEmptyAssigned = true
         }
-
-        console.log(this.user_ID)
 
         let proposed_courses = await CourseService.searchInstructorProposedCourseInfo(this.user_ID, null, null, null)
         if (proposed_courses.code == 200 ) {

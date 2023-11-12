@@ -68,8 +68,7 @@ export default({
         },
         
         resetFilter() {
-            
-            console.log(this.courseName)
+          
             this.courseName = "";
             this.category = "";
 
