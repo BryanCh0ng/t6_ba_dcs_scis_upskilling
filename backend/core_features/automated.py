@@ -174,22 +174,22 @@ def check_and_update_student_attendance():
             lessons = db.session.query(Lesson).filter(Lesson.lesson_Date < today).all()
             if lessons:
                 for lesson in lessons:
-                    # print(lesson.lesson_ID)
+                    
                     attendance_response = get_attendance_list_from_lesson_id(lesson.lesson_ID)
-                    # print(attendance_response)
+                    
                     if attendance_response[0]["code"] == 200:
                         attendances = attendance_response[0]["attendances"]
                         for attendance in attendances:
-                            # print(lesson.lesson_ID)
+                            
                             update_attendance_response = add_update_attendance(lesson.lesson_ID, attendance['user_ID'])
-                            # print("update_attendance_response", update_attendance_response)     
+                            
                     
-            # print('Automate update student attendance done')
+            
             return jsonify({ "code": 201, "message": "Attendance has been successfully updated!"} )   
 
         except Exception as e:
             db.session.rollback()
-            # print(str(e))
+            
             print(f"Error while update student attendance: {str(e)}")
 
 # Automate blacklist
@@ -236,7 +236,7 @@ def check_and_blacklist_users():
                 
                 if total_lessons > 0:
                     attendance_rate = (total_lessons - missed_lessons_without_valid_reason) / total_lessons * 100
-                    # print(attendance_rate)
+                    
                     # Check if the attendance rate is below 70%
                     if attendance_rate <= 70:
                         # Check if the user is already blacklisted

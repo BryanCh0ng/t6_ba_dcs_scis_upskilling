@@ -119,7 +119,7 @@ class GetTemplate(Resource):
         else:
             return {"code": 400, "message": "There is no such template"}, 404
       except Exception as e :
-            print(str(e))
+            
             return {"code": 404, "message": str(e)}, 404
     
 @api.route("/post_feedback_template", methods=["POST"])
@@ -355,7 +355,7 @@ class EditFeedbackTemplate(Resource):
           return {"code": 404, "message": "There is no such feedback template"}, 404
 
         except Exception as e:
-            print("Error:", str(e))
+            
             return {"code": 500, "message": "Failed " + str(e) }, 500
 
 delete_feedback_template = api.parser()

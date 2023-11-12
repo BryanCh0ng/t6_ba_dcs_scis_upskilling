@@ -18,28 +18,6 @@ api = Namespace('course', description='Course related operations')
 # get_course_by_id()
 # create_new_course()
 
-# retrieve_all_courses = api.parser()
-# retrieve_all_courses.add_argument("course_name", help="Enter course name")
-# @api.route("/get_all_courses")
-# @api.doc(description="Get all courses")
-# class GetAllCourses(Resource):
-# 	@api.expect(retrieve_all_courses)
-# 	def get(self):
-# 		arg = retrieve_all_courses.parse_args().get("course_name")
-# 		course_Name = arg if arg else ""
-# 		courseList = Course.query.filter(Course.course_Name.contains(course_Name)).all()
-# 		db.session.close()
-# 		if len(courseList):
-# 			return jsonify(
-# 				{
-# 					"code": 200,
-# 					"data": {
-# 						"course": [course.json() for course in courseList]
-# 					}
-# 				}
-# 			)
-# 		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
-
 retrieve_all_courses_hr = api.parser()
 @api.route("/get_all_courses_admin")
 @api.doc(description="Get all courses (Admin)")
@@ -181,7 +159,7 @@ class CreateCourse(Resource):
         try:
             # Get the data for creating a new course from the request body
             new_course_data = request.json
-            #print(new_course_data)
+            
             new_course_name = new_course_data.get("course_Name") 
 
             # Assuming new_course_name is the input course name you want to check against the database
@@ -259,7 +237,7 @@ class EditCourse(Resource):
 
                 # Update the fields based on updated_data
                 for field, value in updated_data.items():
-                    #print(f"Updating {field} to {value}")
+                    
                     setattr(course, field, value)
 
                 #Commit the changes to the database 
@@ -1001,8 +979,6 @@ class GetAllProposedCoursesAdmin(Resource):
         results = query.all()
         db.session.close()
 
-        # app.logger.debug(results)
-
         if results:
             result_data = []
             for result in results:
@@ -1036,8 +1012,6 @@ class GetAllProposedCoursesAdmin(Resource):
         course_name = args.get("course_name", "")
         course_category_id = args.get("coursecat_id", "")
         pcourse_status = args.get("pcourse_status", "")
-
-        # app.logger.debug(pcourse_status)
 
         query = db.session.query(
             ProposedCourse,
@@ -1767,7 +1741,7 @@ class GetUserCourses(Resource):
                             trimmed_reason = record.reason.strip()
                             
                             if trimmed_reason.lower() in valid_reason_keywords:
-                                # print("Valid Reason Found")
+                                
                                 missed_lessons_with_valid_reason += 1
                             
 

@@ -206,7 +206,7 @@ class GetLessonsByRcourseId(Resource):
                 else:
                     return {"code": 400, 'message': "An error has occurred while retrieving run details"}, 400
             except Exception as e:
-                print(str(e))
+                
                 return  {"code": 404, 'message':  "Failed " + str(e)}, 400
 
         try:
@@ -525,7 +525,7 @@ class GetLessonsByUserId(Resource):
             return {"code": 200, 'lessons': unique_sorted_lessons}, 200
 
         except Exception as e:
-            print(str(e))
+            
             return {"code": 404, "message": "Failed " + str(e)}, 404
         
 
@@ -589,7 +589,7 @@ class GetLessonsByUserId(Resource):
                         "instructor_Name": run_course[3],
                         "course_Desc": run_course[0].course_Desc,
                     }
-                    print(course_info)
+                    
                     all_lessons = Lesson.query.filter_by(rcourse_ID = str(course_info['rcourse_ID'])).order_by(Lesson.lesson_Date.asc()).all()
                     lessons = []
                     if all_lessons:
@@ -627,5 +627,5 @@ class GetLessonsByUserId(Resource):
                 else:
                     return  {"code": 404, 'message':  "No Lessons Found"}, 404
         except Exception as e:
-            print(str(e))
+            
             return {"code": 404, "message": "Failed " + str(e)}, 404

@@ -116,9 +116,6 @@ class CreateProposedCourse(Resource):
             # Commit the changes to the database
             db.session.commit()
 
-            # Return the newly created course as JSON response
-            #return json.loads(json.dumps(new_proposed_course.json(), default=str)), 201
-
             new_proposed_course.proposed_Date = new_proposed_course.proposed_Date.strftime('%Y-%m-%d')
 
             return {
@@ -174,9 +171,7 @@ class UpdateProposedCourse(Resource):
                'coursecat_ID': coursecat_ID
             }
             result = Course.query.filter_by(course_ID=course_id).update(result_data)
-            # course.course_Name = course_name
-            # course.course_Desc = course_desc
-            # course.coursecat_ID = coursecat_ID
+           
 
             db.session.commit()
             db.session.close()

@@ -33,7 +33,7 @@ class GetTemplate(Resource):
                   db.session.commit()
               return True
             except Exception as e:
-                print(str(e))
+                
                 db.session.rollback()
                 return False
        
@@ -203,7 +203,7 @@ class GetStudentFeedbackIncludingAnswersAndTemplate(Resource):
           # else:
           #   return {"code": 400, "message": "There was an error retrieving feedback answers"}, 400
         except Exception as e :
-              print(str(e))
+              
               return {"code": 404, "message": 'answer ' + str(e)}, 404
 
       try:
@@ -243,7 +243,7 @@ class GetStudentFeedbackIncludingAnswersAndTemplate(Resource):
         return {"code": 200, "question_response": template_response['template'], "common_question_response": common_questions}, 200
 
       except Exception as e:
-        print(str(e))
+        
         return {"code": 404, "message": "Failed" + str(e)}, 404
 
 
@@ -270,8 +270,7 @@ class GetRandomReviewsByRCourseId(Resource):
             TemplateAttribute.input_Type == 'Text Field'
           ).first()
           
-          print(template_attribute_query.template_Attribute_ID)
-          print(rcourse_id)
+          
           if template_attribute_query:
             random_reviews = (
                 db.session.query(
@@ -285,9 +284,9 @@ class GetRandomReviewsByRCourseId(Resource):
                 .limit(no_of_reviews)
                 .all()
               )
-            print(random_reviews)
+            
             if random_reviews:
-              print(random_reviews)
+              
               db.session.close()
               return {"code": 200, "reviews":[review.json() for review in random_reviews]}, 200
             return {"code": 202, "message": "There are no reviews available currently"}, 202
@@ -295,7 +294,7 @@ class GetRandomReviewsByRCourseId(Resource):
         if course_id:
           rcourse_ids = db.session.query(RunCourse.rcourse_ID).filter(RunCourse.course_ID == course_id).all()
           rcourse_id_list = [result[0] for result in rcourse_ids]
-          print(rcourse_id_list)
+         
 
           if rcourse_id_list:
             template_attribute_query = db.session.query(
@@ -320,7 +319,7 @@ class GetRandomReviewsByRCourseId(Resource):
                   .limit(no_of_reviews)
                   .all()
                 )
-              print(random_reviews)
+              
               if random_reviews:
                 db.session.close()
                 return {"code": 200, "reviews":[review.json() for review in random_reviews]}, 200
@@ -328,7 +327,7 @@ class GetRandomReviewsByRCourseId(Resource):
           return {"code": 202, "message": "There are no feedbacks available currently"}, 202
 
       except Exception as e:
-        print(e)
+       
         return {"code": 404, "message": "Failed " + str(e)}, 404
       
 # For specific run course 
@@ -413,9 +412,6 @@ class RunCourseFeedback(Resource):
                 feedback_list = list(feedback_dict.values())
 
                 db.session.close()
-
-                #print(unique_questions_list)
-                #print(feedback_list)
 
                 return jsonify({'data': feedback_list, 'questions': unique_questions_list, 'code': 200})
 
@@ -631,7 +627,7 @@ class GetFeedback(Resource):
             )
 
         except Exception as e:
-            print("Error:", str(e))
+            
             return jsonify(
                 {
                     "code": 500,

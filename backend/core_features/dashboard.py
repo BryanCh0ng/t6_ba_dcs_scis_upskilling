@@ -17,9 +17,6 @@ import nltk.data
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import re
-import ast
-import contractions
-import gensim
 from gensim import corpora
 from sklearn.decomposition import NMF
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -133,91 +130,6 @@ class TotalFeedbacks(Resource):
 
         return jsonify(response_data)
 
-"""
-# To get course average ratings - all and specific
-average_course_ratings = api.parser()
-average_course_ratings.add_argument("course_ID", help="Enter course_ID")
-average_course_ratings.add_argument("runcourse_ID", help="Enter runcourse_ID")
-
-@api.route("/course_average_ratings")
-@api.doc(description="Course specific feedback")
-class CourseAverageRatings(Resource):
-    def get(self):
-        args = average_course_ratings.parse_args()
-        course_ID = args.get("course_ID", "")
-        runcourse_ID = args.get("runcourse_ID", "")
-
-        keywords = ['course']  # Define keywords to identify relevant questions
-
-        try:
-            total_ratings = []
-            total_questions = 0
-
-            # To retrieve relevant questions and calculate average rating
-            relevant_questions = db.session.query(FeedbackTemplate, TemplateAttribute) \
-                .join(TemplateAttribute, FeedbackTemplate.template_ID == TemplateAttribute.template_ID) \
-                .join(Feedback, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID) \
-                .join(RunCourse, RunCourse.rcourse_ID == Feedback.rcourse_ID) \
-                .filter(TemplateAttribute.input_Type == 'Likert Scale')
-
-            for keyword in keywords:
-                relevant_questions = relevant_questions.filter(func.lower(TemplateAttribute.question).contains(keyword))
-
-            if runcourse_ID:
-                relevant_questions = relevant_questions.filter(RunCourse.rcourse_ID == runcourse_ID)  # Filter by a specific "Run Course" if runcourse_ID is provided
-            
-            if course_ID:
-                relevant_questions = relevant_questions.filter(RunCourse.course_ID == course_ID)
-
-            for feedback_template, template_attribute in relevant_questions:
-                question_id = template_attribute.template_Attribute_ID
-                feedback_entries = db.session.query(Feedback) \
-                    .filter(Feedback.template_Attribute_ID == question_id)
-
-                if runcourse_ID:
-                    feedback_entries = feedback_entries.filter(Feedback.rcourse_ID == runcourse_ID)  # Filter by a specific "Run Course" if runcourse_ID is provided
-                
-                if course_ID:
-                    feedback_entries = feedback_entries.filter(Feedback.rcourse_ID.in_(db.session.query(RunCourse.rcourse_ID).filter(RunCourse.course_ID == course_ID)))
-
-                feedback_entries = feedback_entries.all()
-
-                if feedback_entries:
-                    for entry in feedback_entries:
-                        total_ratings.append(int(entry.answer))  # Assuming 'answer' contains the Likert Scale value as an integer
-                        total_questions += 1
-            
-            total_feedback = int(total_questions / len(relevant_questions.all()))
-
-            # Calculate the overall average rating
-            if total_ratings and total_questions > 0:
-                overall_average_rating = round(sum(total_ratings) / total_questions, 2)
-                message = "Course ratings calculated successfully."
-            else:
-                overall_average_rating = 0
-                message = "No ratings"
-
-            db.session.close()
-
-            response_data = {
-                "code": 200,
-                "data": {
-                    "course_ID": course_ID,
-                    "runcourse_ID": runcourse_ID,
-                    "overall_average_rating": overall_average_rating,
-                    "total_feedback": total_feedback
-                },
-                "message": message,
-            }
-        
-        except Exception as e:
-            response_data = {
-                "code": 500,
-                "message": str(e)
-            }
-
-        return jsonify(response_data)
-"""
 
 # To get course average ratings - all and specific
 average_course_ratings = api.parser()
@@ -333,103 +245,6 @@ class CourseAverageRatings(Resource):
             }
 
         return jsonify(response_data)
-
-"""
-# To get instructor specific average ratings
-instructor_average_ratings = api.parser()
-instructor_average_ratings.add_argument("course_ID", help="Enter course_ID")
-instructor_average_ratings.add_argument("runcourse_ID", help="Enter runcourse_ID")
-
-@api.route("/instructor_average_ratings")
-@api.doc(description="Instructor specific feedback")
-class InstructorAverageRatings(Resource):
-    @api.expect(instructor_average_ratings)
-    def get(self):
-        args = instructor_average_ratings.parse_args()
-        course_ID = args.get("course_ID", "")
-        runcourse_ID = args.get("runcourse_ID", "")
-        instructor_ID = args.get("instructor_ID", "")
-
-        keywords = ['instructor']  # Define keywords to identify relevant questions
-        try:
-            total_ratings = []
-            total_questions = 0
-
-            # To retrieve relevant questions and calculate average rating
-            relevant_questions = db.session.query(FeedbackTemplate, TemplateAttribute) \
-                .join(TemplateAttribute, FeedbackTemplate.template_ID == TemplateAttribute.template_ID) \
-                .join(Feedback, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID) \
-                .join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID) \
-                .filter(TemplateAttribute.input_Type == 'Likert Scale')
-            
-            for keyword in keywords:
-                relevant_questions = relevant_questions.filter(func.lower(TemplateAttribute.question).contains(keyword))
-                
-            # Filter by course_ID and runcourse_ID
-            if course_ID:
-                relevant_questions = relevant_questions.filter(RunCourse.course_ID == course_ID)
-            if runcourse_ID:
-                relevant_questions = relevant_questions.filter(RunCourse.rcourse_ID == runcourse_ID)
-            
-            # Filter by instructor ID if provided
-            if instructor_ID:
-                relevant_questions = relevant_questions.filter(RunCourse.instructor_ID == instructor_ID)
-
-            relevant_questions = relevant_questions.all()
-
-            for feedback_template, template_attribute in relevant_questions:
-                question_id = template_attribute.template_Attribute_ID
-                feedback_entries = db.session.query(Feedback) \
-                    .filter(Feedback.template_Attribute_ID == question_id)
-
-                # Filter by course_ID and runcourse_ID
-                if course_ID:
-                    feedback_entries = feedback_entries.filter(Feedback.rcourse_ID.in_(db.session.query(RunCourse.rcourse_ID).filter(RunCourse.course_ID == course_ID)))
-                if runcourse_ID:
-                    feedback_entries = feedback_entries.filter(Feedback.rcourse_ID == runcourse_ID)
-
-                # Filter by instructor ID if provided
-                if instructor_ID:
-                    feedback_entries = feedback_entries.join(RunCourse, Feedback.rcourse_ID == RunCourse.rcourse_ID) \
-                        .filter(RunCourse.instructor_ID == instructor_ID)
-
-                feedback_entries = feedback_entries.all()
-
-                if feedback_entries:
-                    for entry in feedback_entries:
-                        if entry.answer.isdigit():
-                            total_ratings.append(int(entry.answer))
-                            total_questions += 1
-
-            # Calculate the instructor-specific average rating
-            if total_ratings and total_questions > 0:
-                instructor_average_rating = round(sum(total_ratings) / total_questions, 2)
-                message = "Instructor ratings calculated successfully."
-            else:
-                instructor_average_rating = 0
-                message = "No ratings for this instructor."
-
-            db.session.close()
-
-            response_data = {
-                "code": 200,
-                "data": {
-                    "course_ID": course_ID,
-                    "runcourse_ID": runcourse_ID,
-                    "instructor_ID": instructor_ID,
-                    "instructor_average_rating": instructor_average_rating
-                },
-                "message": message,
-            }
-
-        except Exception as e:
-            response_data = {
-                "code": 500,
-                "message": str(e)
-            }
-
-        return jsonify(response_data)
-"""
 
 # To get instructor specific average ratings
 instructor_average_ratings = api.parser()
@@ -618,11 +433,6 @@ def tune_nmf_hyperparameters(corpus, n_topics_range, max_df_range):
                 best_n_topics = n_topics
                 best_max_df = max_df_value
                 best_silhouette_score = silhouette_avg
-            
-    # print("best_n_topics", best_n_topics)
-    # print("best_max_df", best_max_df)
-    # print("best_silhouette_score", best_silhouette_score)
-
     
     return best_n_topics, best_max_df, best_silhouette_score
 
@@ -809,9 +619,9 @@ class CourseImproveFeedback(Resource):
 
         if course_ID and course_ID != "[]":
             course_ID = json.loads(course_ID)
-            #print(courseID)
+            
             query = query.filter(RunCourse.course_ID.in_(course_ID))
-            #print("running", str(query))
+            
 
         if coursecatID and coursecatID != "[]":
             coursecatID = json.loads(coursecatID)
@@ -837,7 +647,7 @@ class CourseImproveFeedback(Resource):
 
 
         results = query.all()
-        # print(results)
+        
         db.session.close()
 
         if results:
@@ -949,9 +759,9 @@ class InstructorDoneWellFeedback(Resource):
 
         if course_ID and course_ID != "[]":
             course_ID = json.loads(course_ID)
-            #print(courseID)
+            
             query = query.filter(RunCourse.course_ID.in_(course_ID))
-            #print("running", str(query))
+            
 
         if coursecatID and coursecatID != "[]":
             coursecatID = json.loads(coursecatID)
@@ -976,8 +786,7 @@ class InstructorDoneWellFeedback(Resource):
             query = query.filter(RunCourse.run_Startdate >= formatted_start_date, RunCourse.run_Enddate <= formatted_end_date)
         
         results = query.all()
-        # print(results)
-
+       
         db.session.close()
 
         if results:
@@ -1083,10 +892,9 @@ class InstructorDoneWellFeedback(Resource):
 
         if course_ID and course_ID != "[]":
             course_ID = json.loads(course_ID)
-            #print(courseID)
+            
             query = query.filter(RunCourse.course_ID.in_(course_ID))
-            #print("running", str(query))
-
+           
         if coursecatID and coursecatID != "[]":
             coursecatID = json.loads(coursecatID)
             query = query.filter(Course.coursecat_ID.in_(coursecatID))
@@ -1237,9 +1045,9 @@ class CourseSentimentData(Resource):
 
             if courseID and courseID != "[]":
                 courseID = json.loads(courseID)
-                #print(courseID)
+                
                 query = query.filter(RunCourse.course_ID.in_(courseID))
-                #print("running", str(query))
+                
 
             if coursecatID and coursecatID != "[]":
                 coursecatID = json.loads(coursecatID)
@@ -1265,14 +1073,10 @@ class CourseSentimentData(Resource):
 
             # Fetch the results
             filtered_results = query.all()
-            #print(filtered_results)
+            
             db.session.close()
                         
             if filtered_results:
-
-                # Iterate through the results and print the course_ID from RunCourse table
-                #or course, run_course, feedback, template_attribute in filtered_results:
-                    #print("Course ID from RunCourse:", run_course.course_ID)
 
                 # Serialize each object within the list dynamically
                 serialized_results = []
@@ -1324,10 +1128,6 @@ class CourseSentimentData(Resource):
                 counts = list(sentiment_counts.values())
                 percentages = [round(count / total_count * 100, 1) for count in counts]  # Format to 2 decimal places
 
-                # Output the labels and counts lists
-                #print("Sentiment Labels:", labels)
-                #print("Sentiment Counts:", percentages)
-
                 return jsonify(
                     {
                         "code": 200,
@@ -1346,8 +1146,7 @@ class CourseSentimentData(Resource):
             )
 
         except Exception as e:
-            print("Error:", str(e))
-            #return "Failed" + str(e), 500
+            
             return jsonify(
                 {
                     "code": 500,
@@ -1474,10 +1273,6 @@ class InstructorSentimentData(Resource):
                 counts = list(sentiment_counts.values())
                 percentages = [round(count / total_count * 100, 1) for count in counts]  # Format to 2 decimal places
 
-                # Output the labels and counts lists
-                #print("Sentiment Labels:", labels)
-                #print("Sentiment Counts:", percentages)
-
                 return jsonify(
                     {
                         "code": 200,
@@ -1496,7 +1291,7 @@ class InstructorSentimentData(Resource):
             )
 
         except Exception as e:
-            print("Error:", str(e))
+           
             #return "Failed" + str(e), 500
             return jsonify(
                 {
@@ -1587,7 +1382,7 @@ class CourseWordcloudData(Resource):
             if courseID and courseID != "[]":
                 courseID = json.loads(courseID)
                 query = query.filter(RunCourse.course_ID.in_(courseID))
-                #print("running", str(query))
+                
 
             if coursecatID and coursecatID != "[]":
                 coursecatID = json.loads(coursecatID)
@@ -1695,7 +1490,7 @@ class CourseWordcloudData(Resource):
             )
 
         except Exception as e:
-            print("Error:", str(e))
+           
             #return "Failed" + str(e), 500
             return jsonify(
                 {
@@ -1744,9 +1539,9 @@ class InstructorWordcloudData(Resource):
 
             if courseID and courseID != "[]":
                 courseID = json.loads(courseID)
-                print(courseID)
+                
                 query = query.filter(RunCourse.course_ID.in_(courseID))
-                #print("running", str(query))
+                
 
             if coursecatID and coursecatID != "[]":
                 coursecatID = json.loads(coursecatID)
@@ -1862,93 +1657,6 @@ class InstructorWordcloudData(Resource):
                     "message": "Failed to retreive instructor feedbacks: " + str(e)
                 }
             )
-
-
-# total_no_of_feedbacks = api.parser()
-# total_no_of_feedbacks.add_argument("course_ID", help="Enter course ID")
-# total_no_of_feedbacks.add_argument("coursecat_ID", help="Enter course category ID")
-# total_no_of_feedbacks.add_argument("rcourse_ID", help="Enter runcourse ID")
-# total_no_of_feedbacks.add_argument("instructor_ID", help="Enter instructor ID")
-# total_no_of_feedbacks.add_argument("run_Startdate", help="Enter run start date")
-# total_no_of_feedbacks.add_argument("run_Enddate", help="Enter run end date")
-
-# @api.route("/total_no_of_feedbacks")
-# @api.doc(description="Total number of feedbacks")
-# class TotalFeedbacks(Resource):
-#     @api.expect(total_no_of_feedbacks)
-#     def get(self):
-#         args = total_no_of_feedbacks.parse_args()
-#         courseID = args.get("course_ID", "")
-#         coursecatID = args.get("coursecat_ID", "")
-#         rcourseID = args.get("rcourse_ID", "")
-#         instructorID = args.get("instructor_ID", "")
-#         start_date = args.get('run_Startdate', "")
-#         end_date = args.get("run_Enddate", "")
-
-#         formatted_start_date = None
-#         formatted_end_date = None
-
-#         try:
-#             total_feedbacks = 0
-
-#             query = (
-#                 db.session.query(Course, RunCourse, Feedback, TemplateAttribute)
-#                 .join(RunCourse, Course.course_ID == RunCourse.course_ID)  # Join Course and RunCourse using course_id
-#                 .join(Feedback, RunCourse.rcourse_ID == Feedback.rcourse_ID)  # Join RunCourse and Feedback using rcourse_id
-#                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)  # Join Feedback and TemplateAttribute using attribute_id
-#                 .filter(or_(func.lower(TemplateAttribute.question).like("%instructor%"), func.lower(TemplateAttribute.question).like("%course%")))
-#                 .filter(or_(TemplateAttribute.input_Type == "Text Field", TemplateAttribute.input_Type == "Likert Scale"))
-#             )
-
-#             if courseID and courseID != "[]":
-#                 courseID = json.loads(courseID)
-#                 #print(courseID)
-#                 query = query.filter(RunCourse.course_ID.in_(courseID))
-#                 #print("running", str(query))
-
-#             if coursecatID and coursecatID != "[]":
-#                 coursecatID = json.loads(coursecatID)
-#                 query = query.filter(Course.coursecat_ID.in_(coursecatID))
-
-#             if rcourseID and rcourseID != "[]":
-#                 # Filter by rcourse_ID
-#                 rcourseID = json.loads(rcourseID)
-#                 query = query.filter(Feedback.rcourse_ID.in_(rcourseID))
-
-#             if instructorID and instructorID != "[]":
-#                 instructorID = json.loads(instructorID)
-#                 query = query.filter(RunCourse.instructor_ID.in_(instructorID))
-
-#             if start_date:
-#                 formatted_start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
-
-#             if end_date:
-#                 formatted_end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
-
-#             if formatted_start_date and formatted_end_date: 
-#                 query = query.filter(RunCourse.run_Startdate >= formatted_start_date, RunCourse.run_Enddate <= formatted_end_date)
-
-#             feedbacks = query.all()
-
-#             total_feedbacks = len(feedbacks) 
-
-#             db.session.close()
-
-#             response_data = {
-#                 "code": 200,
-#                 "data": {
-#                     "total_feedbacks": total_feedbacks
-#                 },
-#                 "message": "message",
-#             }
-
-#         except Exception as e:
-#             response_data = {
-#                 "code": 500,
-#                 "message": str(e)
-#             }
-
-#         return jsonify(response_data)
 
 retrieve_course_name = api.parser()
 retrieve_course_name.add_argument("course_id", help="Enter course id")

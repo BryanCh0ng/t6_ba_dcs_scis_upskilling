@@ -126,7 +126,6 @@ class GetAttendanceByLessonId(Resource):
             # Convert the dictionary to a list of key-value tuples
             lesson_attendance_list = list(lesson_attendance.items())
 
-            print(lesson_attendance_list)
             if rcourse not in attendances:
                 attendances[tuple(rcourse.items())] = []
 
@@ -251,7 +250,7 @@ class updateAttendanceByLessonId(Resource):
                 db.session.rollback()
                 return lesson_response
         except Exception as e:
-            print(str(e))
+            
             db.session.rollback()
             return jsonify({"code": 500, "message": "Failed " + str(e)}), 500
 

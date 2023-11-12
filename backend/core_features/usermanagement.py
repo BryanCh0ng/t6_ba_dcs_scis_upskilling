@@ -97,9 +97,7 @@ class GetAllAdmin(Resource):
             if student_name:
                 students = [
                     user for user in students if student_name.lower() in user.user_Name.lower()]
-                
-                print(students)
-
+               
             # Check if blacklisted is specified and is 'True' (case-insensitive)
             if blacklisted is not None:
                 if blacklisted.lower() == 'true':
@@ -361,10 +359,10 @@ class RemoveAdmin(Resource):
         try:
             current_admin_ID = int(session.get('user_ID'))
             user_ID = int(remove_admin_id.parse_args().get("user_ID"))
-            print(current_admin_ID,"==",user_ID)
+            
             
             if user_ID == current_admin_ID:
-                print("they are equal")
+                
                 return json.loads(json.dumps({"message":"You can't remove yourself"})), 200  # Use 400 Bad Request status
             else:
                 user = User.query.filter_by(user_ID=user_ID).first()            
@@ -429,8 +427,6 @@ class AddAdmin(Resource):
             # Add the random_password to the new_admin_data dictionary
             new_admin_data["user_Password"] = random_password
 
-            print(new_admin_data)
-
             new_user = User(**new_admin_data)
 
             # Add the new course to the database
@@ -447,7 +443,7 @@ class AddAdmin(Resource):
             return json.loads(json.dumps(new_user.json(), default=str)), 201
 
         except Exception as e:
-            print("Error:", str(e))
+           
             return "Failed to create a new user: " + str(e), 500
     
     def send_email_to_admin(self, fullName, email):
@@ -475,6 +471,6 @@ class AddAdmin(Resource):
         """
         msg.html = "<p>Please click the link to change your password <a href='http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"'>http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"</a>.</p>"
         mail.send(msg)
-        print("success")
+        
         return "Email sent!"
         

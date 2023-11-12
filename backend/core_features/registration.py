@@ -58,7 +58,7 @@ class CreateNewRegistration(Resource):
     @api.expect(create_registration_model)
     def post(self):
         data = request.get_json()
-        print(data)
+        
         rcourse_ID = data.get("rcourse_ID")
         user_ID = data.get("user_ID")
         session_user_ID = common.getUserID()
@@ -359,7 +359,7 @@ class EnrollStudent(Resource):
             )
   
         except Exception as e:
-            #print("Error:", str(e))
+            
             return jsonify(
                 {
                     "code": 500,
@@ -430,7 +430,7 @@ class DropStudent(Resource):
             )
   
         except Exception as e:
-            #print("Error:", str(e))
+            
             return jsonify(
                 {
                     "code": 500,
