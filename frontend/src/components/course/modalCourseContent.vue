@@ -58,6 +58,22 @@
             Registration Count: <br> <strong>{{ course.registration_count }}</strong>
           </div>
         </div>
+        <div class="pt-3 row">
+          <div class="col-6">
+            Feedback Start Date: <br> <strong>{{ convertDate(course.feedback_Startdate) }}</strong>
+          </div>
+          <div class="col-6">
+            Feedback Start Time: <br> <strong>{{ convertTime(course.feedback_Starttime) }}</strong>
+          </div>
+        </div>
+        <div class="pt-3 row">
+          <div class="col-6">
+            Feedback End Date: <br> <strong>{{ convertDate(course.feedback_Enddate) }}</strong>
+          </div>
+          <div class="col-6">
+            Feedback End Time: <br> <strong>{{ convertTime(course.feedback_Endtime) }}</strong>
+          </div>
+        </div>
       </div>
       <div class="pt-5 row">
         <div class="col-12 d-flex">
@@ -135,6 +151,7 @@ export default {
       if (this.isRunCourse) {
        try {
         const response = await FeedbackService.getRandomReviews(this.course.rcourse_ID, null, this.noOfReviews)
+        console.log(response)
         if (response.code == 200) {
           this.feedback_reviews = response.reviews
         } else {

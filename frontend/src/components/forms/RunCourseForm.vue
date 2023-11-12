@@ -36,7 +36,7 @@
                     </div>
                     <!--Registration Start Time-->
                     <div class="col-md-6 form-group mt-4 mt-md-0"> 
-                        <VueDatePicker v-model="formData.openingTime" placeholder="Registration Start Time" title="Registration Start Time"
+                        <VueDatePicker v-model="formData.openingTime" placeholder="Registration Opening Time" title="Registration Opening Time"
                             time-picker 
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.openingTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.openingTime?.$error, 'grey-background':isOpeningDateReadOnly }"
                             :input-class-name="isOpeningDateReadOnly ? 'dp-custom-input conditional-bg-color' : 'dp-custom-input'"
