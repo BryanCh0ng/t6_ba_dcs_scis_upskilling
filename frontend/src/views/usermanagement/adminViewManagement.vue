@@ -70,8 +70,15 @@
 
       <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Student Database</h5>
-          <button v-show="showBlacklistButton" class="btn btn-danger me-2 font-weight-bold text-nowrap" @click="blacklist" title="Blacklist Student">Blacklist Student</button>
-          <button v-show="showRemoveButton" class="btn btn-danger font-weight-bold text-nowrap" @click="removeFromBlacklist" title="Remove from Blacklist">Remove from Blacklist</button>
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Action
+            </button>
+            <ul class="dropdown-menu">
+              <li v-show="showBlacklistButton"><a class="dropdown-item" @click="blacklist" title="Blacklist Student">Blacklist Student</a></li>
+              <li v-show="showRemoveButton"><a class="dropdown-item" @click="removeFromBlacklist" title="Remove from Blacklist">Remove from Blacklist</a></li>
+            </ul>
+          </div>
       </div>
 
       <div class="container col-12">
@@ -436,7 +443,6 @@ export default {
     },
   },
   async created() { 
-    document.title = "User Management | Upskilling Engagement System"
     const user_ID = await UserService.getUserID();
     this.user_ID = user_ID;
     const role = await UserService.getUserRole(user_ID);
@@ -447,6 +453,8 @@ export default {
       this.$router.push({ name: 'instructorTrainerViewProfile' });
     } else if (role == 'Admin') {
       try {
+        document.title = "User Management | Upskilling Engagement System"
+        
         let admin_response = await ManagementService.getAllAdmin(null)
         // console.log(admin_response)
         this.admin = admin_response.data

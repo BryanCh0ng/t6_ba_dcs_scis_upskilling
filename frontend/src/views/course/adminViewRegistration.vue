@@ -5,13 +5,13 @@
 
     <div class="container col-12 d-flex mb-3 w-100">
       <h5 class="col m-auto">All Registration Status for '{{ this.runCourseName }}'</h5>
-      <div class="dropdown">
+      <div v-if="shouldShowActionButtons" class="dropdown">
         <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
           Action
         </button>
         <ul class="dropdown-menu">
-          <li><a class="dropdown-item" @click="enrolStudent">Enroll Student</a></li>
-          <li><a class="dropdown-item" @click="dropStudent">Drop Student</a></li>
+          <li v-if="status === null || status === 'Pending'"><a class="dropdown-item" @click="enrolStudent">Enroll Student</a></li>
+          <li v-if="status === null || status === 'Enrolled'"><a class="dropdown-item" @click="dropStudent">Drop Student</a></li>
         </ul>
       </div>
     </div>
@@ -103,7 +103,7 @@ export default {
       itemsPerPage: 10,
       student: [],
       name: "",
-      status: "",
+      status: null,
       runCourseName: "",
       errorMsg: [],
       title: "",
@@ -124,14 +124,19 @@ export default {
     if (role == 'Student') {
       this.$router.push({ name: 'studentViewCourse' });
     } else if (role == 'Instructor' || role == 'Trainer') {
-      this.$router.push({ name: 'instructorTrainerViewProfile' }); //Need to change
+      this.$router.push({ name: 'instructorTrainerViewLesson' }); //Need to change
     } else if (role == 'Admin') {
-      document.title = ""; //Need to change 
+      document.title = "Run Course Registration | Upskilling Engagement System"; //Need to change 
       this.runCourseID = this.$route.params.id;
       await this.loadData();
     }
   },
-  computed: {
+  computed: {  
+    shouldShowActionButtons() {
+      return this.status === null ||
+             this.status === 'Pending' ||
+             this.status === 'Enrolled';
+    },
     displayedStudent() {
       const startIndex = (this.localCurrentPageStudent - 1) * this.itemsPerPage;
       const endIndex = startIndex + this.itemsPerPage;
@@ -190,7 +195,7 @@ export default {
       this.showAlert = value;
 
       if (!this.showAlert && this.buttonType === "success") {
-        this.loadData();
+        window.location.reload();
       }
 
       //Clear the select all checkbox
