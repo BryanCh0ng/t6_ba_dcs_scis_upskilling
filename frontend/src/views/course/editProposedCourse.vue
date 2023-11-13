@@ -1,6 +1,6 @@
 <template>
   <div id="editProposedCourse">
-    <div class="container mt-5">
+    <div class="container pt-5">
       <h2 v-if="action == 'approve'" class="text-center mb-4">
         Edit Course (Proposed Course Approved)
       </h2>
@@ -11,7 +11,7 @@
           <input v-model="course_name"
             type="text"
             placeholder="Course Name"
-            class="form-control border-0 shadow-sm px-4 field mb-3"
+            class="form-control border-0 shadow-sm px-4 field mb-3" required
           />
         </div>
         <div class="form-group">
@@ -34,7 +34,7 @@
             class="form-control border-0 shadow-sm px-4 field"
             :placeholder="descPlaceholder"
             style="height: 200px"
-            @input="limitCourseDescription"
+            @input="limitCourseDescription" required
           ></textarea>
           <div class="text-muted mt-2">
             Character Count: {{ courseDescLength }}/800
@@ -45,7 +45,7 @@
             <button
               type="button"
               class="btn btn-secondary shadow-sm w-100 mt-2 field cancelbtn"
-              @click="cancelForm"
+              @click="cancelForm" title="Cancel"
             >
               Cancel
             </button>
@@ -55,6 +55,7 @@
               v-if="action == 'approve'"
               type="submit"
               class="btn btn-block shadow-sm w-100 mt-2 field submitbtn"
+              title="Approve Proposed Course"
             >
               Approve Proposed Course
             </button>
@@ -62,6 +63,7 @@
               v-else
               type="submit"
               class="btn btn-block shadow-sm w-100 mt-2 field submitbtn"
+              title="Save"
             >
               Save
             </button>
@@ -70,7 +72,6 @@
       </form>
     </div>
 
-    <!-- Success modal -->
     <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
   </div>
 </template>
@@ -112,7 +113,6 @@ export default {
       category: "",
       course_name: "",
       course_desc: "",
-      errorMessage: "",
       showAlert: false,
       title: "",
       message: "",
@@ -137,6 +137,8 @@ export default {
   },
 
   async created() {
+    document.title = "Edit Proposed Course | Upskilling Engagement System";
+
     this.getUserID();
     const action = this.$route.params.action;
     this.action = action;
@@ -212,22 +214,6 @@ export default {
       // Trigger Vuelidate validation
       this.v$.$touch();
 
-      // Check for validation errors
-      if (!this.course_name || !this.course_desc || !this.category) {
-        this.errorMessage = "Please ensure all fields are filled.";
-        return;
-      }
-
-      if (this.course_desc.length > 800) {
-        this.errorMessage = "Course description must be 800 characters or less.";
-        return;
-      }
-
-      if (this.v$.$invalid) {
-        this.errorMessage = "Please fix the validation errors.";
-        return;
-      }
-
       const courseId = this.$route.params.courseId;
 
       const formData = {
@@ -239,7 +225,7 @@ export default {
       try {
         if (this.action == 'approve') {
           const result = await ProposedCourseService.updateProposedCourse(courseId, formData);
-          console.log(result);
+          
           if (result.message == "Proposed course updated successfully") {
             let approve_result;
             if (result.success) {
@@ -260,7 +246,7 @@ export default {
           }
         } else {
           const result = await ProposedCourseService.updateProposedCourse(courseId, formData);
-          console.log(result);
+          
           if (result.message == "Proposed course updated successfully") {
             showSuccessMessage(this);
           } else if (result.message == "Course Update Unsuccessful. A course with the same name already exists.") {

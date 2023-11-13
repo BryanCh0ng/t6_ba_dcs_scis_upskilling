@@ -8,7 +8,7 @@ from datetime import datetime, date, time
 import logging
 app.logger.setLevel(logging.DEBUG)
 
-api = Namespace('common', description='Course related operations')
+api = Namespace('common', description='Common related operations')
 
 sort_records = api.parser()
 sort_records.add_argument("sort_column", help="Enter sort column")
@@ -62,7 +62,6 @@ def getUserRole(user_ID=None):
     
 def getUserID():
     user_ID = session.get('user_ID')
-    print(user_ID)
     if user_ID:
         id = User.query.filter_by(user_ID=user_ID).first().user_ID
         db.session.close()

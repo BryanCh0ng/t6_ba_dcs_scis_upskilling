@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="container pt-4">
+    <div class="container pt-5">
       <div class="text-center">
         <h2>Feedback Template</h2>
         <h4 class="text-grey">Customized feedback for a specific course</h4>
@@ -79,7 +79,7 @@
             <button
               v-if="!element.destroyed"
               @click="destroyComponent(element.id)"
-              class="btn btn-secondary mt-5 mb-5 col-12"
+              class="btn btn-secondary mt-5 mb-5 col-12" title="Remove Question"
             >
               Remove Question {{ element.qnNum }}
             </button>
@@ -91,13 +91,13 @@
         </div>
         <div class="row">
           <div class="col-6 form-group">
-            <button type="button" class="btn btn-primary shadow-sm w-100 mt-5" @click="openModal" data-bs-toggle="modal" data-bs-target="#preview_modal">
+            <button type="button" class="btn btn-primary shadow-sm w-100 mt-5" @click="openModal" data-bs-toggle="modal" data-bs-target="#preview_modal" title="Preview">
               Preview
             </button>
           </div>
 
           <div class="col-6 form-group">
-            <button type="submit" @click="submitFeedbackTemplate" class="btn btn-edit shadow-sm w-100 mt-5">
+            <button type="submit" @click="submitFeedbackTemplate" class="btn btn-edit shadow-sm w-100 mt-5" title="Save Changes">
               Save Changes
             </button>
           </div>
@@ -175,7 +175,6 @@ export default {
       this.updateQuestionNumbers();
     },
     destroyComponent(id) {
-      console.log(this.questions.data)
       const component = this.questions.data.find(c => c.id === id);
       if (component) {
         component.destroyed = true;
@@ -188,7 +187,6 @@ export default {
         haveError = true;
       }
       var formData = this.getFormData();
-      console.log(formData)
       if (formData.some(item => item.haveError === true)) {
         haveError = true
       }
@@ -234,8 +232,9 @@ export default {
             this.showAlert = !this.showAlert;
           }
         } catch (error) {
+            console.log(error)
             this.title = "Feedback Template Edit Failed";
-            this.message = error.response.data.message.toString();
+            this.message = "An unexpected error has occured while attempt to update feedback template.";
             this.buttonType = "danger"
             this.showAlert = !this.showAlert;
             // throw new Error("Feedback Template Edit was unsuccessful");

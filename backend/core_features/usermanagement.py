@@ -73,6 +73,7 @@ class GetAllAdmin(Resource):
                 return jsonify({"code": 404, "message": "No admin users found."})
         except Exception as e:
             return jsonify({"code": 500, "message": "Error occurred while fetching admin users.", "error": str(e)})
+
 # All Students
 retrieve_student_parser = api.parser()
 retrieve_student_parser.add_argument("student_name", help="Enter student name")
@@ -80,8 +81,6 @@ retrieve_student_parser.add_argument(
     "blacklisted", help="Filter by blacklisted status")
 
 # Define the API route for getting all student users
-
-
 @api.route("/get_all_student")
 @api.doc(description="Get all student users")
 class GetAllAdmin(Resource):
@@ -93,12 +92,12 @@ class GetAllAdmin(Resource):
         blacklisted = args.get("blacklisted", None)
 
         try:
-            students = User.query.filter_by(role_Name='student').all()
+            students = User.query.filter_by(role_Name='Student').all()
 
             if student_name:
                 students = [
                     user for user in students if student_name.lower() in user.user_Name.lower()]
-
+               
             # Check if blacklisted is specified and is 'True' (case-insensitive)
             if blacklisted is not None:
                 if blacklisted.lower() == 'true':
@@ -112,14 +111,22 @@ class GetAllAdmin(Resource):
                 student_list = []
 
                 for user in students:
-                    is_blacklisted = Blacklist.query.filter_by(
-                        user_ID=user.user_ID).first() is not None
+                    is_blacklisted = Blacklist.query.filter_by(user_ID=user.user_ID).first() is not None
+
+                    if (not is_blacklisted):
+                        blacklist_datetime = ""
+                    else:
+                        blacklist_data = Blacklist.query.filter_by(user_ID=user.user_ID).first()
+                        blacklist_datetime = common.format_date_time(blacklist_data.blacklist_Datetime)
+
                     student_data = {
                         'user_ID': user.user_ID,
                         'user_Name': user.user_Name,
                         'user_Email': user.user_Email,
-                        'is_blacklisted': is_blacklisted
+                        'is_blacklisted': is_blacklisted,
+                        'blacklist_date': blacklist_datetime
                     }
+
 
                     student_list.append(student_data)
 
@@ -134,11 +141,9 @@ class GetAllAdmin(Resource):
 
 # All Instructors
 retrieve_instructors_trainers = api.parser()
-retrieve_instructors_trainers.add_argument(
-    "instructor_name", help="Enter instructor name")
+retrieve_instructors_trainers.add_argument("instructor_name", help="Enter instructor name")
 retrieve_instructors_trainers.add_argument("role_name", help="Enter role name")
-retrieve_instructors_trainers.add_argument(
-    "organization_name", help="Enter organization")
+retrieve_instructors_trainers.add_argument("organization_name", help="Enter organization")
 
 
 @api.route("/get_all_instructors_and_trainers")
@@ -249,7 +254,6 @@ class GetAllInstructorsAndTrainers(Resource):
 retrieve_student_name = api.parser()
 retrieve_student_name.add_argument("user_id", help="Enter user id")
 
-
 @api.route("/get_student_name")
 @api.doc(description="Get student name")
 class GetStudentName(Resource):
@@ -264,12 +268,10 @@ class GetStudentName(Resource):
 
         return jsonify({"code": 200, "data": user_name})
 
-
 # Blacklist Student
 retrieve_blacklist_student_id = api.parser()
 retrieve_blacklist_student_id.add_argument(
     "user_ids", type=int, action="append", required=True, help="Enter user ids as a list")
-
 
 @api.route('/blacklist', methods=['POST'])
 @api.doc(description="Blacklist Student")
@@ -298,7 +300,7 @@ class BlacklistStudent(Resource):
 
                 # Create new blacklist entries for each user
                 for user_id in user_ids:
-                    blacklist_entry = Blacklist(user_ID=user_id)
+                    blacklist_entry = Blacklist(user_ID=user_id, blacklist_Datetime=datetime.now())
                     db.session.add(blacklist_entry)
 
                 db.session.commit()
@@ -310,11 +312,9 @@ class BlacklistStudent(Resource):
         except Exception as e:
             return "Failed. " + str(e), 500
 
-
 retrieve_blacklist_remove = api.parser()
 retrieve_blacklist_remove.add_argument(
     "user_ids", type=int, action="append", required=True, help="Enter user IDs as a list")
-
 
 @api.route('/remove_from_blacklist', methods=['POST'])
 @api.doc(description="Remove Students from Blacklist")
@@ -359,10 +359,10 @@ class RemoveAdmin(Resource):
         try:
             current_admin_ID = int(session.get('user_ID'))
             user_ID = int(remove_admin_id.parse_args().get("user_ID"))
-            print(current_admin_ID,"==",user_ID)
+            
             
             if user_ID == current_admin_ID:
-                print("they are equal")
+                
                 return json.loads(json.dumps({"message":"You can't remove yourself"})), 200  # Use 400 Bad Request status
             else:
                 user = User.query.filter_by(user_ID=user_ID).first()            
@@ -427,8 +427,6 @@ class AddAdmin(Resource):
             # Add the random_password to the new_admin_data dictionary
             new_admin_data["user_Password"] = random_password
 
-            print(new_admin_data)
-
             new_user = User(**new_admin_data)
 
             # Add the new course to the database
@@ -445,7 +443,7 @@ class AddAdmin(Resource):
             return json.loads(json.dumps(new_user.json(), default=str)), 201
 
         except Exception as e:
-            print("Error:", str(e))
+           
             return "Failed to create a new user: " + str(e), 500
     
     def send_email_to_admin(self, fullName, email):
@@ -473,6 +471,6 @@ class AddAdmin(Resource):
         """
         msg.html = "<p>Please click the link to change your password <a href='http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"'>http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"</a>.</p>"
         mail.send(msg)
-        print("success")
+        
         return "Email sent!"
         

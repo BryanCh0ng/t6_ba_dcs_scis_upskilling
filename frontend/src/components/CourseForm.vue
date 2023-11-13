@@ -544,7 +544,6 @@ export default {
         // Form is valid, submit or perform further actions
         console.log('Form submitted successfully');
         const user_ID = await UserService.getUserID();
-        console.log(user_ID)
         //Create the course service
         await axiosClient.post("/course/create_course", {
           courseName : this.formData.courseName,

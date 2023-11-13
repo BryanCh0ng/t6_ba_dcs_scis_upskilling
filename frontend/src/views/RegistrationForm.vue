@@ -7,9 +7,7 @@
 
         <!-- Form content half -->
         <form-container>
-          <!-- <template v-slot:logo>
-            <img src="../assets/smulogo.png" title="smu logo" id="logo"/>
-          </template> -->
+         
             <error-message :error-message="errorMessage" />
 
             <form @submit.prevent="onSubmit">
@@ -36,7 +34,7 @@
 
               <password-field :value="confirmpassword" placeholder="Confirm Password" @update:value="confirmpassword = $event"/>
 
-              <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+              <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn" title="Sign Up">
                 Sign Up
               </button>
 
@@ -48,13 +46,13 @@
         
       </div>
     </div>
-    <success-modal :show="showSuccessModal" :message="successMessage" @close="hideSuccessModal"/>
+    <DefaultModal :visible="showAlert" :title="title" :message="message" :variant="buttonType" @modal-closed="handleModalClosed" />
   </div>
 </template>
 
 <script>
 import ImageHalf from "../components/ImageHalf.vue";
-import SuccessModal from "../components/SuccessModal.vue";
+import DefaultModal from "@/components/DefaultModal.vue";
 import FormContainer from "../components/CommonFormContainer.vue";
 import ErrorMessage from "../components/ErrorMessage.vue";
 import DropdownField from "../components/DropdownField.vue";
@@ -64,11 +62,25 @@ import { required, email, minLength } from "@vuelidate/validators";
 import { useVuelidate } from "@vuelidate/core";
 import UserService from "@/api/services/UserService.js";
 
+function showSuccessMessage(vm) {
+  vm.title = "Registered Successfully";
+  vm.message = "You have been successfully registered. You can now proceed to log into your account!";
+  vm.showAlert = true;
+  vm.buttonType = "success";
+}
+
+function showUnsuccessMessage(vm) {
+    vm.title = "Registered Unsuccessfully";
+    vm.message = "We're sorry, but your registration could not be completed at this time. Please double-check your information and try again.";
+    vm.showAlert = true;
+    vm.buttonType = "danger";
+}
+
 export default {
   name: "RegistrationForm",
 
   setup() {
-    const v$ = useVuelidate(); // Initialize Vuelidate
+    const v$ = useVuelidate(); 
     return { v$ };
   },
 
@@ -82,8 +94,10 @@ export default {
       organizationName: "",
       alumni: "",
       errorMessage: "",
-      showSuccessModal: false,
-      successMessage: "Your account has been successfully created."
+      showAlert: false,
+      title: "",
+      message: "",
+      buttonType: "",
     };
   },
 
@@ -102,28 +116,17 @@ export default {
   },
   components: {
     ImageHalf,
-    SuccessModal,
     FormContainer,
     ErrorMessage,
     DropdownField,
     InputField,
     PasswordField,
+    DefaultModal
   },
   methods: {
     onSubmit() {
       // Trigger Vuelidate validation
       this.v$.$touch();
-
-      // Display the current form data for debugging
-      // console.log("Form Data:", {
-      //   role: this.role,
-      //   fullName: this.fullName,
-      //   email: this.email,
-      //   password: this.password,
-      //   confirmpassword: this.confirmpassword,
-      //   organizationName: this.organizationName,
-      //   alumni: this.alumni,
-      // });
 
       // Reset error message
       this.errorMessage = "";
@@ -183,21 +186,17 @@ export default {
             organizationName: this.organizationName,
             alumni: this.alumni,
         }
-        console.log(userData)
+        
         const response = await UserService.register(userData)
-        // const response = await axiosClient.post("/user/register", {
-        //   role: this.role,
-        //   fullName: this.fullName,
-        //   email: this.email,
-        //   password: this.password,
-        //   confirmpassword: this.confirmpassword,
-        //   organizationName: this.organizationName,
-        //   alumni: this.alumni,
-        // });
-        console.log(response)
-        this.showSuccessModal = true;
+    
+        if (response.code === 200) {
+          showSuccessMessage(this)
+        } else {
+          showUnsuccessMessage(this)
+        }
+        
       } catch (error) {
-        this.errorMessage = "Register failed. Please check your credentials.";
+        showUnsuccessMessage(this)
         console.log("Register error:", error.request.response);
       }
     },
@@ -206,8 +205,9 @@ export default {
         this.role = ""; // Clear the placeholder value when the user interacts
       }
     },
-    hideSuccessModal() {
-      this.showSuccessModal = false;
+    async handleModalClosed(value) {
+      this.showAlert = value;
+
       this.$router.push('/');
     },
   },

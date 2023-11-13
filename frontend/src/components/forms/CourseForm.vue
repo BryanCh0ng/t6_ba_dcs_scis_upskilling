@@ -1,10 +1,9 @@
 <template>
     <div id="courseform">
-        <div class="container">
-
-            <h2 v-if="view === 'createCourse'" class="text-center pt-3">Create Course For Registration</h2>
-            <h2 v-else-if="view === 'proposeCourse'" class="text-center pt-3">Propose a Course</h2>
-            <h2 v-else class="text-center pt-3">Edit Course</h2>
+        <div class="container pt-5">
+            <h2 v-if="view === 'createCourse'" class="text-center">Create Course</h2>
+            <h2 v-else-if="view === 'proposeCourse'" class="text-center">Propose Course</h2>
+            <h2 v-else class="text-center">Edit Course</h2>
 
             <form @submit.prevent="onSubmit" @reset="onReset">
                 <!--Course Name-->
@@ -225,14 +224,9 @@ export default {
         async createCourse() {
             try {
                 this.createCourseResponse = await CourseService.createCourse(this.submitFormData);
-                //console.log(typeof(this.createCourseResponse))
-                //console.log(this.createCourseResponse.data.course_ID)
-
             } catch (error) {
                 console.error('Error creating a new course', error);
                 this.title = "Course Creation Failed";
-
-                //throw new Error("Course Creation was unsuccessful");
 
                 if (error.response.status === 500) {
                     throw new Error("Course Creation was unsuccessful");
@@ -319,7 +313,7 @@ export default {
 
             if (!this.v$.$invalid) {
 
-                // console.log('Form has no validation errors');
+                console.log('Form has no validation errors');
 
                 try {
 

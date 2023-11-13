@@ -66,6 +66,15 @@ body {
   background-color: #11a633 !important;
 }
 
+.btn-info, .btn-info:hover, .btn-info:focus, .btn-info:focus, .btn-info:active{
+  background-color: teal;
+  border-color: teal;
+}
+
+.btn:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
 /* --------------------------- MODAL ----------------------------------- */
 .modal-backdrop {
   position: fixed;
@@ -131,8 +140,22 @@ body {
   cursor: pointer;
 }
 
-.nav-pills, .nav-link.active, .nav-pills, .show>.nav-link, .nav-link {
+.nav-pills, .nav-pills, .show>.nav-link, .nav-link {
   color: #151C55 !important;
+}
+
+.nav-pills>.nav-item>.nav-link.active {
+  color: white !important;
+  background-color: steelblue !important;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3)
+}
+
+.nav-pills>.nav-item>.nav-link.hover {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3)
+}
+
+.nav-pills>.nav-item {
+  background-color: white !important;
 }
 
 .nav-pills {
@@ -154,7 +177,7 @@ body {
 }
 
 .bg-blue {
-  background-color: blue;
+  background-color: steelblue;
 }
 
 .bg-crimson {
@@ -168,4 +191,62 @@ body {
 button:disabled, .btn.disabled {
   display: block;
   pointer-events: auto !important;
+}
+
+.text-grey-important {
+  color: grey !important;
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: nowrap;
+  gap:8px;
+}
+
+.bg-light-blue {
+  background-color: #0dcaf0 !important;
+}
+
+table th a, table th, table td {
+  padding: 25px !important;
+  vertical-align: middle;
+  text-align: center;
+}
+
+th {
+  color: grey !important;
+}
+
+
+[data-title]:hover:after {
+  opacity: 1;
+  transition: all 0.1s ease 0.5s;
+  visibility: visible;
+}
+
+[data-title]:after {
+  content: attr(data-title);
+  background-color: rgba(70, 130, 180, 0.7);
+  color: white;
+  font-size: 110%;
+  position: absolute;
+  padding: 1px 5px 2px 5px;
+  bottom: -2em;
+  left: -50%;
+  white-space: nowrap;
+  box-shadow: 1px 1px 3px #222222;
+  opacity: 0;
+  border: 1px solid #111111;
+  z-index: 99999;
+  visibility: hidden;
+}
+
+[data-title] {
+  position: relative;
+}
+
+@media (max-width: 700px) {
+  .navbar-toggler {
+    display: block;
+  }
 }

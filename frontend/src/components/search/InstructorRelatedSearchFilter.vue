@@ -1,6 +1,6 @@
 <template>
   <div id="searchfilter">
-    <div class="container mb-5">
+    <div class="container mt-5 mb-5">
       <form>
         <div class="row">
           <div class="col-md">
@@ -16,7 +16,7 @@
           </div>
           <div class="col-md col-lg-3">
             <div class="d-flex justify-content-between">
-              <button @click="resetFilter" class="btn" id="resetbtn" button="type">Clear</button>
+              <button @click="resetFilter" class="btn" id="resetbtn" button="type">Reset</button>
               <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
             </div>
           </div>
@@ -29,6 +29,7 @@
 <script>
 import InputField from "../InputField.vue";
 import DropdownField from "../DropdownField.vue";
+import _ from "lodash";
 
 export default {
   name: "SearchFilter",
@@ -52,6 +53,17 @@ export default {
   async mounted() {
     this.statusDropdownOptions = this.statusOptions;
   },
+  watch: {
+        instructorName: _.debounce(function() {
+            this.searchFilter();
+        }, 300),
+        role() {
+            this.searchFilter();
+        },
+        organizationName() {
+            this.searchFilter();
+        }
+    },
   methods: {
     resetFilter() {
       this.instructorName = "";
@@ -67,8 +79,6 @@ export default {
         const user_Name = this.instructorName;
         const organizationName = this.organizationName;
         const role = this.role;
-        // console.log("user_Name:", user_Name);
-        // console.log("organizationName:", organizationName);
 
         let searchResults;
 

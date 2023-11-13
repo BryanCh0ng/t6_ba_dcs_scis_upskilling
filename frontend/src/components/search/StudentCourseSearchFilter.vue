@@ -15,7 +15,7 @@
                     </div>
                     <div class="col-sm">
                         <div class="d-flex justify-content-between">
-                            <button @click="resetFilter" class="btn" id="resetbtn" type="button">Clear All</button>
+                            <button @click="resetFilter" class="btn" id="resetbtn" type="button">Reset</button>
                             <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
                         </div>
                     </div>
@@ -26,10 +26,10 @@
 </template>
 
 <script>
-// import { axiosClient } from "../api/axiosClient";
 import DropdownField from "../DropdownField.vue";
-import CourseCategoryService from "@/api/services/CourseCategoryService.js"
-import UserService from "@/api/services/UserService.js"
+import CourseCategoryService from "@/api/services/CourseCategoryService.js";
+import UserService from "@/api/services/UserService.js";
+import _ from "lodash";
 
 export default({
     name: "SearchFilter",
@@ -44,10 +44,18 @@ export default({
         DropdownField,
     },
     async mounted() {
-        await this.fetchCategoryDropdownOptions(); // Fetch category options using the new service
+        await this.fetchCategoryDropdownOptions(); 
     },
     props: {
         searchApi: Function,
+    },
+    watch: {
+        courseName: _.debounce(function() {
+            this.searchFilter();
+        }, 300),
+        category() {
+            this.searchFilter();
+        }
     },
     methods: {
         async fetchCategoryDropdownOptions() {
@@ -60,8 +68,7 @@ export default({
         },
         
         resetFilter() {
-            
-            console.log(this.courseName)
+          
             this.courseName = "";
             this.category = "";
 

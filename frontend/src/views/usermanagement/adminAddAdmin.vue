@@ -1,6 +1,6 @@
 <template>
     <div id="addadmin">
-        <div class="container mt-5 pt-4">
+        <div class="container mt-5 pt-5">
 
             <h2 class="text-center">Add Admin</h2>
 
@@ -22,8 +22,8 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
-                    Submit
+                <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn" title="Add Admin">
+                    Add Admin
                 </button>
                 
             </form>
@@ -71,6 +71,9 @@ export default {
             }
         }
     },
+    created() {
+        document.title = "Add Admin | Upskilling Engagement System";
+    },
     methods: {
         async handleModalClosed(value){
             this.showAlert = value;
@@ -110,8 +113,6 @@ export default {
                     this.submitFormData["user_Email"] = this.formData.emailAddress
 
                     this.submitFormData ["role_Name"] = "Admin"
-
-                    console.log(this.submitFormData)
 
                     await this.addAdmin();
 

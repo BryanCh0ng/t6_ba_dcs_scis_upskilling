@@ -2,7 +2,7 @@
   <div>
     <search-filter
       :search-api="searchAllOngoingVoteCourse" 
-      @search-complete="handleSearchComplete" />
+      @search-complete="handleSearchComplete" class="pt-2"/>
 
     <div class="container col-12">
       <h5 class="pb-3">Courses Available for Students to Indicate Interest</h5>
@@ -139,6 +139,7 @@ export default {
     }
   },
   async created() {
+    document.title = "Voting Campaign | Upskilling Engagement System";
     const user_ID = await UserService.getUserID();
     const role = await UserService.getUserRole(user_ID);
     if (role == 'Student') {

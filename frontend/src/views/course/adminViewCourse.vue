@@ -3,12 +3,13 @@
       <search-filter
         :status-options="statusOptions"
         :search-api="searchAllCourseAdmin" 
+        course-name-placeholder="Course Name"
         @search-complete="handleSearchComplete" 
-        :default-status="'Active'" class="pt-4"/>
+        :default-status="'Active'" class="pt-5"/>
 
       <div class="container col-12 d-flex mb-3 w-100">
           <h5 class="col m-auto">All Courses</h5>
-          <button class="btn btn-primary" @click="goToCreateCourse">Create Course</button>
+          <button class="btn btn-primary" @click="goToCreateCourse" title="Create Course">Create Course</button>
       </div>
 
       <div class="container col-12">
@@ -20,9 +21,9 @@
                   <a href="" @click.prevent="sort('course_Name')" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
                 <th scope="col">
                   <a href="" @click.prevent="sort('course_Status')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'course_Status'" :sortDirection="getSortDirection('course_Status')"/></a></th>
-                <th scope="col">Feedback Analysis</th>
                 <th scope="col">Course Details</th>
                 <th scope="col">Course Run(s)</th>
+                <th scope="col">Feedback</th>
                 <th scope="col">Action(s)</th>
               </tr>
             </thead>
@@ -34,14 +35,24 @@
                 <td class="pl-0 border-top">
                     <course-status :status="course.course_Status"></course-status>
                 </td>
-                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis">View Feedback Analysis</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                 <td><a class="text-nowrap text-dark text-decoration-underline view-runs" @click="goToViewCourseRun(course.course_ID)">View Runs</a></td>
-                <td v-if="course.course_Status === 'Active'"><course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-                <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
-                <td v-if="course.course_Status != 'Retired'"><course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action></td>
-                <td v-if="course.course_Status === 'Active'"><course-action status="create_run" :course="course" @click="goToCreateRunCourseWithId(course.course_ID)"></course-action></td>
-                <td v-else-if="course.course_Status === 'Inactive'"><course-action status="Retire" @action-and-message-updated="handleActionData" :course="course"></course-action></td>
+                <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToCourseFeedbackAnalysis(course.course_ID)">View Feedback Analysis</a></td>
+                <td v-if="course.course_Status === 'Active'" class="actions">
+                  <div class="action-buttons">
+                    <course-action status="Deactivate" @action-and-message-updated="handleActionData" :course="course"></course-action>
+                    <course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action>
+                    <course-action status="create_run" :course="course" @click="goToCreateRunCourseWithId(course.course_ID)"></course-action>
+                  </div>
+                </td>
+                <td v-else-if="course.course_Status === 'Inactive'" class="actions">
+                  <div class="action-buttons">
+                    <course-action status="Activate" @action-and-message-updated="handleActionData" :course="course"></course-action>
+                    <course-action status="Edit" :course="course" @click="goToEditCourseWithId(course.course_ID)"></course-action>
+                    <course-action status="Retire" @action-and-message-updated="handleActionData" :course="course"></course-action>
+                  </div>
+                </td>
+                <td v-else></td>
               </tr>               
             </tbody>
           </table>
@@ -127,7 +138,6 @@
         this.$emit('page-change', newPage);
       },
       async handleSearchComplete(searchResults) {
-        // console.log("searchResults", searchResults);
         this.courses = searchResults;
         
       },
@@ -152,18 +162,15 @@
         modalButtonElement.click();
       },
       async loadData() {
-        console.log('load')
         try {
           let response = await CourseService.searchAllCourseAdmin(this.search_course_name, this.search_course_category, this.search_status)
           
           this.courses = response.data
-          // console.log(this.courses)
         } catch (error) {
           console.error("Error fetching course details:", error);
         }
       },
       modalAfterActionClose() {
-        console.log('test')
         this.loadData();
       },
       sort(column) {
@@ -197,9 +204,14 @@
       },
       goToViewCourseRun(courseID) {
         this.$router.push({ name: 'adminViewCourseRun', params: {id: courseID}});
-      }
+      },
+      goToCourseFeedbackAnalysis(courseID) {
+        this.$router.push({ name: 'viewCourseFeedbackAnalysis', params: {id: courseID}});
+      },
     },
     async created() {
+      document.title = "Course DB | Upskilling Engagement System";
+
       const user_ID = await UserService.getUserID();
       const role = await UserService.getUserRole(user_ID);
       if (role == 'Student') {

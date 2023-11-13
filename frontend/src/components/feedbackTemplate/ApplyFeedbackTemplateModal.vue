@@ -111,14 +111,11 @@
       this.error = false; 
       this.errorMessage = '';
       this.successMsge = '';
-      console.log(this.included_courses)
-      console.log(this.not_included_courses)
       const data = {
         not_included_courses: this.not_included_courses,
         included_courses: this.included_courses,
         template_ID: this.feedback_template.template_ID
       }
-      console.log(data)
       try {
         const response = await FeedbackTemplateService.applyFeedbackTemplateToCourses(data)
         console.log(response)
@@ -143,9 +140,6 @@
       return new Date(feedbackStartDate) > currentDate;
     },
     isCourseInOriginalIncludedCourse(courseToFind){
-      console.log(courseToFind)
-      console.log(this.included_courses)
-      console.log(this.original_included_courses)
       let found = this.original_included_courses.find(course => course.run_Name === courseToFind);
       console.log(found)
       return found;
@@ -153,12 +147,10 @@
   },
   watch: {
     modalOpen() {
-      console.log('open')
       this.fetchData(); 
     },
   },
   mounted() {
-    console.log('mounted')
     this.fetchData(); 
   },
   };

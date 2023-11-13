@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ul class="nav nav-pills justify-content-center pt-4">
+    <ul class="nav nav-pills justify-content-center pt-5">
       <li class="nav-item">
         <a class="nav-link" :class="{ 'active': activeTab === 'submitted' }" @click="activeTab = 'submitted'">Submitted</a>
       </li> 
@@ -14,7 +14,7 @@
         :search-api="searchAllSubmittedProposedCoursesAdmin"
         @search-complete="handleSearchComplete" />
 
-        <div class="container col-12e">
+        <div class="container col-12">
           <h5 class="pb-3">Proposed Course</h5>
           <div v-if="pending_courses && pending_courses.length > 0" class="table-responsive">
             <table class="table bg-white">
@@ -42,11 +42,12 @@
                     {{ pending_course.submitted_by }}
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(pending_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <div>
-                    <td><course-action status="pending_approve" :id="pending_course.course_ID" @click="editCourse(pending_course.course_ID, 'approve')"></course-action></td>
-                  <td><course-action status="pending_reject" :id="pending_course.course_ID" @click="openReject(pending_course)" data-bs-toggle="modal" data-bs-target="#rejected_modal"></course-action></td>
-                  </div>
-                  
+                  <td>
+                    <div class="action-buttons">
+                      <course-action status="pending_approve" :id="pending_course.course_ID" @click="editCourse(pending_course.course_ID, 'approve')"></course-action>
+                      <course-action status="pending_reject" :id="pending_course.course_ID" @click="openReject(pending_course)" data-bs-toggle="modal" data-bs-target="#rejected_modal"></course-action>
+                    </div>
+                  </td>                  
                 </tr>
               </tbody>
             </table>
@@ -63,11 +64,12 @@
         <common-search-filter class="mt-5"
         :status-options="statusOptions"
         :search-api="searchAllApprovedRejectedProposedCoursesAdmin"
+        course-name-placeholder="Course Name"
         @search-complete="handleSearchComplete2" />
 
-        <div class="container col-12 table-responsive">
+        <div class="container col-12">
           <h5 class="pb-3">All Proposals</h5>
-          <div  v-if="proposed_courses && proposed_courses.length > 0">
+          <div class="table-responsive" v-if="proposed_courses && proposed_courses.length > 0">
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
@@ -86,7 +88,7 @@
                   <td class="name">
                     <course-name-desc :name="proposed_course.course_Name" :category="proposed_course.coursecat_Name" :description="proposed_course.course_Desc"></course-name-desc>
                   </td>
-                  <td class="submitted_by_name">
+                  <td class="submitted_by_name text-nowrap">
                     {{ proposed_course.submitted_by_name }}
                   </td>
                   <td class="pl-0 border-top">
@@ -186,12 +188,10 @@ export default {
       this.showModal = false;
     },
     async handleSearchComplete(searchResults) {
-      // console.log(searchResults)
       this.pending_courses = searchResults;
     },
     async searchAllSubmittedProposedCoursesAdmin(course_Name, coursecat_ID) {
       try {
-        console.log(coursecat_ID)
         let response = await CourseService.searchAllSubmittedProposedCoursesAdmin(
           course_Name,
           coursecat_ID
@@ -204,18 +204,15 @@ export default {
       }
     },
      async handleSearchComplete2(searchResults) {
-      // console.log(searchResults)
       this.proposed_courses = searchResults;
     },
     async searchAllApprovedRejectedProposedCoursesAdmin(course_Name, coursecat_ID, status) {
       try {
-        console.log(status)
         let response = await CourseService.searchAllApprovedRejectedProposedCoursesAdmin(
           course_Name,
           coursecat_ID,
           status
         );
-        // console.log(response.data)
         this.proposed_courses = response.data;
         return this.proposed_courses;
       } catch (error) {
@@ -283,6 +280,8 @@ export default {
     }
   },
   async created() {
+    document.title = "Propose Course DB | Upskilling Engagement System";
+
     const user_ID = await UserService.getUserID();
     const role = await UserService.getUserRole(user_ID);
     if (role == 'Student') {

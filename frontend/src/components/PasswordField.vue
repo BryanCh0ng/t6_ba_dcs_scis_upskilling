@@ -5,7 +5,7 @@
       :type="showPassword ? 'text' : 'password'"
       :placeholder="placeholder"
       class="form-control border-0 shadow-sm px-4 field"
-      @input="updateLocalValue"
+      @input="updateLocalValue" required
     />
     <div class="input-group-append">
       <div class="input-group-text eye-icon-container">

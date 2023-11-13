@@ -60,7 +60,6 @@
         this.selectedOption = this.course.template_ID
       } 
       try {
-        console.log('created')
         let response = await FeedbackTemplateService.getAllTemplates()
         console.log(response)
         if (response.code == 200) {
@@ -78,8 +77,6 @@
     },
     async apply(){
       try {
-        console.log(this.selectedOption)
-        console.log(this.course.rcourse_ID)
         const response = await runCourseService.CourseApplyFeedbackTemplate(this.course.rcourse_ID, this.selectedOption)
         console.log(response)
         if (response.code == 200) {
@@ -104,7 +101,6 @@
   watch: {
     modalOpen(newVal) {
       console.log(newVal)
-      console.log('modal open')
       this.fetchData(); 
     },
   },

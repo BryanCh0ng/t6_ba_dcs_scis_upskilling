@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ul class="nav nav-pills justify-content-center pt-4">
+    <ul class="nav nav-pills justify-content-center pt-5">
       <li class="nav-item">
         <a class="nav-link" :class="{ active: activeTab === 'course_reg' }" @click="activeTab = 'course_reg'">Courses Available to Register</a>
       </li>
@@ -19,8 +19,8 @@
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                    <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'run')">Course Name / Description
-                      <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/>
+                    <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Name', 'run')">Course Name / Description
+                      <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/>
                     </a>
                   </th>
                   <th scope="col">
@@ -39,13 +39,14 @@
                     </a>
                   </th>
                   <th scope="col">Course Details</th>
+                  <th scope="col">Lessons</th>
                   <th scope="col">Action(s)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(course, key) in displayedRunCourses" :key="key">
                   <td class="name">
-                    <course-name-desc :name="course.course_Name" :category="course.coursecat_Name" :description="course.course_Desc"></course-name-desc>
+                    <course-name-desc :name="course.run_Name" :category="course.coursecat_Name" :description="course.course_Desc"></course-name-desc>
                   </td>
                   <td class="start_date">
                     <course-date-time :date="course.run_Startdate" :time="course.run_Starttime"></course-date-time>
@@ -60,7 +61,10 @@
                     <a class="text-nowrap text-dark text-decoration-underline view-course-details" @click="openModal(course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a>
                   </td>
                   <td>
-                    <course-action @action-and-message-updated="handleActionData" :status="course.course_Status" :course="course"></course-action>
+                    <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(course.rcourse_ID)">View Lessons</a>
+                  </td>
+                  <td>
+                    <course-action @action-and-message-updated="handleActionData" :status="course.runcourse_Status" :course="course"></course-action>
                   </td>
                 </tr>
               </tbody>
@@ -77,9 +81,9 @@
       <div class="tab-pane fade" :class="{ 'show active': activeTab === 'course_vote' }">
         <search-filter :search-api="searchUnvotedActiveInfo" @search-complete="handleSearchCompleteVote"/>
 
-        <div class="container col-12 table-responsive">
+        <div class="container col-12">
           <h5 class="pb-3">Courses Available to Vote</h5>
-          <div v-if="vote_courses && vote_courses.length > 0">
+          <div class="table-responsive" v-if="vote_courses && vote_courses.length > 0">
             <table class="table bg-white">
               <thead>
                 <tr class="text-nowrap">
@@ -214,7 +218,6 @@ export default {
       this.search_course_name = course_Name;
       this.search_course_category = coursecat_ID;
       try {
-        // console.log(course_Name)
         let response = await CourseService.searchUnregisteredActiveInfo(
           user_ID,
           course_Name,
@@ -231,7 +234,6 @@ export default {
       this.search_course_name = course_Name;
       this.search_course_category = coursecat_ID;
       try {
-        // console.log(coursecat_ID)
         let response = await CourseService.searchUnvotedActiveInfo(
           user_ID,
           course_Name,
@@ -318,8 +320,14 @@ export default {
         this.user_ID = null;
       }
     },
+
+    viewLessons(courseID) {
+      this.$router.push({ name: 'viewRunCourseLesson', params: {id: courseID}});
+    },
   },
   async created() {
+    document.title = "View Courses | Upskilling Engagement System";
+
     const user_ID = await UserService.getUserID();
     this.user_ID = user_ID;
     const role = await UserService.getUserRole(user_ID);

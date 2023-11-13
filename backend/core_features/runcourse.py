@@ -15,6 +15,7 @@ api = Namespace('runcourse', description='Run Course related operations')
 # create_runcourse()
 
 # get_all_runcourses() ---------------------------------------------
+
 retrieve_all_runcourses = api.parser()
 retrieve_all_runcourses.add_argument("course_id", help="Enter course id")
 @api.route("/get_all_runcourses")
@@ -36,6 +37,9 @@ class GetAllRunCourses(Resource):
                 course.run_Endtime = course.run_Endtime.strftime('%H:%M:%S')
                 course.reg_Starttime = course.reg_Starttime.strftime('%H:%M:%S')
                 course.reg_Endtime = course.reg_Endtime.strftime('%H:%M:%S')  
+                course.feedback_Starttime = course.feedback_Starttime.strftime('%H:%M:%S')  
+                course.feedback_Endtime = course.feedback_Endtime.strftime('%H:%M:%S') 
+
             return jsonify(
                 {
                     "code": 200,
@@ -182,9 +186,6 @@ class EditRunCourse(Resource):
             end_time = datetime.strptime(updated_data.get('run_Endtime'), '%H:%M:%S').time()
             instructor_id = updated_data.get('instructor_ID')
 
-            # Query existing run courses for the given instructor
-            #runs = RunCourse.query.filter_by(instructor_ID=instructor_id).all()
-
             # Query existing run courses for the given instructor excluding the current record being edited
             runs = RunCourse.query.filter(RunCourse.instructor_ID == instructor_id, RunCourse.rcourse_ID != runcourse_id).all()
             
@@ -264,8 +265,6 @@ class CreateRunCourse(Resource):
                             return {
                                 'message': 'Instructor is already occupied at the chosen date and time'
                             }, 400
-                
-            #print(new_run_course_data)
 
             # Create a new run course object with the data
             new_run_course = RunCourse(**new_run_course_data)
@@ -275,12 +274,6 @@ class CreateRunCourse(Resource):
 
             # Commit the changes to the database
             db.session.commit()
-
-            # Inside the create_proposed_course route
-            #print("Data before returning:", new_proposed_course.json())
-
-            # Return the newly created course as JSON response
-            #return json.loads(json.dumps(new_run_course.json(), default=str)), 201
 
             # Convert dates and times to formatted strings
             new_run_course.run_Startdate = start_date.strftime('%Y-%m-%d')
@@ -329,8 +322,7 @@ class CourseApplyFeedbackTemplate(Resource):
             templateID = args.get("template_id")
             
             course = RunCourse.query.filter_by(rcourse_ID=rcourseID).first()
-            print(course)
-            print(templateID)
+           
 
             # check if template id is valid
             if course is None:
@@ -347,7 +339,7 @@ class CourseApplyFeedbackTemplate(Resource):
 
         except Exception as e:
             db.session.rollback()
-            print(str(e))
+            
             return jsonify({"code": 500, "message": "Failed. " + str(e)})
 
 get_course_formats = api.parser()
@@ -364,6 +356,29 @@ class GetCourseFormats(Resource):
 
         return json.loads(json.dumps({"message": "No course formats found."})), 404
 
+# Run Course Name
+retrieve_runcourse_name = api.parser()
+retrieve_runcourse_name.add_argument("rcourse_id", help="Enter rcourse id")
+
+@api.route("/get_runcourse_name")
+@api.doc(description="Get run course name")
+class GetStudentName(Resource):
+    @api.expect(retrieve_runcourse_name)
+    def get(self):
+        args = retrieve_runcourse_name.parse_args()
+        rcourse_id = args.get("rcourse_id", "")
+
+        runcourse = RunCourse.query.filter_by(rcourse_ID=rcourse_id).first()
+        db.session.close()
+
+        if runcourse:
+            runcourse_name = runcourse.run_Name
+            
+            return jsonify({"code": 200, "data": runcourse_name})
+        else:
+            
+            return jsonify({"code": 404, "message": "Course not found"})
+            
 retrieve_run_course_count = api.parser()
 retrieve_run_course_count.add_argument("course_id", help="Enter course id")
 @api.route("/get_run_course_count_by_course_id")
