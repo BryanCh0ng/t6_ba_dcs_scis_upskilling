@@ -648,6 +648,7 @@ CREATE TABLE IF NOT EXISTS `feedback`(
 	rcourse_id int NOT NULL,
 	PRIMARY KEY (`feedback_id`),
 	FOREIGN KEY (template_attribute_id) REFERENCES templateattribute(template_attribute_id),
+    FOREIGN KEY (submitted_by) REFERENCES user(user_id),
 	FOREIGN KEY (rcourse_id) REFERENCES runcourse(rcourse_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
