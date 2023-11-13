@@ -88,6 +88,10 @@ bcrypt = Bcrypt(app)
 from core_features.usermanagement import api as usermanagement
 api.add_namespace(usermanagement)
 
+@app.teardown_appcontext
+def teardown_db(exception=None):
+    db.session.remove()
+
 # ==================== TEST FUNCTIONS ====================
 test_parser = api.parser()
 test_parser.add_argument("number1", help="First number to add")

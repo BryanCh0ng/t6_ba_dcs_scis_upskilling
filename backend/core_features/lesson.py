@@ -34,19 +34,16 @@ class GetAllLessons(Resource):
 
         def get_runcourse_details(rcourse_id):
             try: 
-                rc_alias = aliased(RunCourse)
-                user_alias = aliased(User)
-
                 run_course = db.session.query(
                     Course,
-                    rc_alias,
+                    RunCourse,
                     CourseCategory,
-                    user_alias.user_Name,
-                    user_alias.user_ID
-                ).select_from(Course).join(rc_alias, Course.course_ID == rc_alias.course_ID).join(
+                    User.user_Name,
+                    User.user_ID
+                ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).join(
                     CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
-                ).join(user_alias, rc_alias.instructor_ID == user_alias.user_ID) .filter(
-                    rc_alias.rcourse_ID == rcourse_id).first()
+                ).join(User, RunCourse.instructor_ID == User.user_ID) .filter(
+                    RunCourse.rcourse_ID == rcourse_id).first()
 
                 if run_course:
                     run_course[1].run_Starttime = run_course[1].run_Starttime.strftime('%H:%M:%S')
@@ -73,6 +70,7 @@ class GetAllLessons(Resource):
                 else:
                     return {"code": 400, 'message': "An error has occurred while retrieving run details"}, 400
             except Exception as e:
+                print(str(e))
                 return  {"code": 404, 'message':  "Failed " + str(e)}, 400
 
         try:
@@ -130,7 +128,6 @@ class GetAllLessons(Resource):
                     else: 
                         return runcourse_response
 
-            db.session.close()
             sorted_lessons = sorted(lessons, key=lambda lesson: (
                 lesson["lesson_Status"] == "Ongoing",
                 lesson["lesson_Status"] == "Upcoming",
@@ -147,11 +144,13 @@ class GetAllLessons(Resource):
             ended_lessons_sorted = sorted(ended_lessons, key=convert_to_datetime)
 
             combined_sorted_lessons =  ongoing_lessons_sorted + upcoming_lessons_sorted + ended_lessons_sorted
-            db.session.close()
             return {"code": 200, "lessons": combined_sorted_lessons}, 200
 
         except Exception as e:
+            print(str(e))
             return {"code": 404, "message": "Failed " + str(e)}, 404
+        finally:
+            db.session.close()
         
 
 get_lessons_by_rcourse_id = api.parser()
@@ -556,20 +555,18 @@ class GetLessonsByUserId(Resource):
             if user_role != "Trainer" and user_role != "Instructor":
                 return {"message": "Unathorized Access, No rights to view lessons"}, 404   
             
-            rc_alias = aliased(RunCourse)
-            user_alias = aliased(User)
-
             run_courses = db.session.query(
                 Course,
-                rc_alias,
+                RunCourse,
                 CourseCategory,
-                user_alias.user_Name
-            ).select_from(Course).join(rc_alias, Course.course_ID == rc_alias.course_ID).join(
+                User.user_Name
+            ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).join(
                 CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
-            ).join(user_alias, rc_alias.instructor_ID == user_alias.user_ID) .filter(
-                rc_alias.instructor_ID == user_id).all()
+            ).join(User, RunCourse.instructor_ID == User.user_ID) .filter(
+                RunCourse.instructor_ID == user_id).all()
             
             if run_courses:
+                lessons = []
                 for run_course in run_courses:
                     run_course[1].run_Starttime = run_course[1].run_Starttime.strftime('%H:%M:%S')
                     run_course[1].run_Endtime = run_course[1].run_Endtime.strftime('%H:%M:%S')
@@ -589,9 +586,7 @@ class GetLessonsByUserId(Resource):
                         "instructor_Name": run_course[3],
                         "course_Desc": run_course[0].course_Desc,
                     }
-                    
                     all_lessons = Lesson.query.filter_by(rcourse_ID = str(course_info['rcourse_ID'])).order_by(Lesson.lesson_Date.asc()).all()
-                    lessons = []
                     if all_lessons:
                         for lesson in all_lessons:
                             status = 'Upcoming'
@@ -611,21 +606,25 @@ class GetLessonsByUserId(Resource):
                                 "instructor_Name": course_info['instructor_Name'],
                                 "run_course": course_info,
                             })
-                        flattened_lessons = sorted(lessons, key=lambda lesson: lesson["lesson_Status"])
-                        upcoming_lessons = [lesson for lesson in flattened_lessons if lesson["lesson_Status"] == "Upcoming"]
-                        ongoing_lessons = [lesson for lesson in flattened_lessons if lesson["lesson_Status"] == "Ongoing"]
-                        ended_lessons = [lesson for lesson in flattened_lessons if lesson["lesson_Status"] == "Ended"]
+                    else:
+                        return  {"code": 404, 'message':  "No Lessons Found"}, 40
+                flattened_lessons = sorted(lessons, key=lambda lesson: lesson["lesson_Status"])
+                upcoming_lessons = [lesson for lesson in flattened_lessons if lesson["lesson_Status"] == "Upcoming"]
+                ongoing_lessons = [lesson for lesson in flattened_lessons if lesson["lesson_Status"] == "Ongoing"]
+                ended_lessons = [lesson for lesson in flattened_lessons if lesson["lesson_Status"] == "Ended"]
 
-                        upcoming_lessons_sorted = sorted(upcoming_lessons, key=convert_to_datetime)
-                        ongoing_lessons_sorted = sorted(ongoing_lessons, key=convert_to_datetime)
-                        ended_lessons_sorted = sorted(ended_lessons, key=convert_to_datetime)
+                upcoming_lessons_sorted = sorted(upcoming_lessons, key=convert_to_datetime)
+                ongoing_lessons_sorted = sorted(ongoing_lessons, key=convert_to_datetime)
+                ended_lessons_sorted = sorted(ended_lessons, key=convert_to_datetime)
 
-                        combined_sorted_lessons =  ongoing_lessons_sorted + upcoming_lessons_sorted + ended_lessons_sorted
+                combined_sorted_lessons =  ongoing_lessons_sorted + upcoming_lessons_sorted + ended_lessons_sorted
 
-                        unique_sorted_lessons = [next(group) for key, group in groupby(combined_sorted_lessons, key=group_key)]
-                        return {"code": 200, 'lessons': unique_sorted_lessons}, 200
-                else:
-                    return  {"code": 404, 'message':  "No Lessons Found"}, 404
+                unique_sorted_lessons = [next(group) for key, group in groupby(combined_sorted_lessons, key=group_key)]
+                return {"code": 200, 'lessons': unique_sorted_lessons}, 200
+            else:
+                return  {"code": 404, 'message':  "No Lessons Found"}, 404
         except Exception as e:
-            
+            print(str(e))
             return {"code": 404, "message": "Failed " + str(e)}, 404
+        finally:
+            db.session.close()
