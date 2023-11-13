@@ -2485,7 +2485,8 @@ INSERT INTO registration VALUES
     (124, 11, 56, 'Dropped'),
     (125, 11, 1, 'Enrolled'),
     (126, 12, 1, 'Enrolled'),
-    (127, 13, 1, 'Enrolled');
+    (127, 13, 1, 'Enrolled'), 
+    (128, 11, 6, 'Enrolled');
 
 
 DROP TABLE IF EXISTS `lesson`;
