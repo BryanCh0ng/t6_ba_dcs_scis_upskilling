@@ -1,14 +1,13 @@
+from os import name
 import sys
-#sys.path.append("C:\\GitHub\\t6_ba_dcs_scis_upskilling")
 import unittest
 import flask_testing
 from flask import request, jsonify, session
 from flask_restx import Namespace, Resource, fields
-#from allClasses import *
-#import app
+
 import json
-from allClasses import *
-from backend.core_features import contactus
+
+from app import *
 from sqlalchemy.orm import aliased
 from sqlalchemy import func, and_, exists
 from datetime import datetime
@@ -25,10 +24,10 @@ class TestApp(flask_testing.TestCase):
         return app
 
     def setUp(self):
-        self.contactUs1 = ContactUs(msg_ID=1, user_ID=1, msg_Subject='Active', 
+        self.contactUs1 = ContactUs( msg_ID=1,user_ID=1, msg_Subject='Active', 
                                 msg_Body='I tell people what to do', msg_Datetime= "2023-08-25 17:00:00")
 
-        self.contactUs2 = ContactUs(msg_ID=2, user_ID=1, msg_Subject='Active', 
+        self.contactUs2 = ContactUs( msg_ID=2,user_ID=1, msg_Subject='Active', 
                                 msg_Body='I tell people ', msg_Datetime= "2023-08-25 17:00:00")
         
         self.contactUs3 = ContactUs(msg_ID=3, user_ID=2, msg_Subject='Active', 
@@ -45,17 +44,30 @@ class TestApp(flask_testing.TestCase):
 
 
 ############## TEST #################################
-class getallmsg(Testapp):
+class getallmsg(TestApp):
     def test_get_all_msg(self):
-        response = self.app.get('/get_all_msg')
+        response = self.client.get('/get_all_msg', content_type='application/json')
+        print(response.status_code)
+        print(response.get_data(as_text=True))
         self.assertEqual(response.status_code, 200)
         
         
     def test_get_msg_by_id(self):
-        response = self.app.get("/get_all_msg?msg_ID=1")
+        response = self.client.get("/get_all_msg?msg_ID=1", content_type='application/json')
+        print(response.status_code)
+        print(response.get_data(as_text=True))
         self.assertEqual(response.status_code, 200)
 
     def test_get_msg_no_id(self):
-        response = self.app.get("/get_all_msg?msg_ID=13")
+        response = self.client.get("/get_all_msg?msg_ID=13", content_type='application/json')
+        print(response.status_code)
+        print(response.get_data(as_text=True))
         self.assertEqual(response.status_code, 404)
-        self.assertEqual(response.message, "No such message exists")
+        self.assertEqual(response.json, {
+                "code": 404,
+                "message": "No such message exists"
+            })
+
+
+if name == 'main':
+    unittest.main()
