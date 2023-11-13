@@ -7,6 +7,8 @@ sys.path.append(parent_dir)
 
 from allClasses import *
 
+### this test file runs unit tests to see if each class in allClasses.py can be initialised and jsonified ###
+
 class TestUser(unittest.TestCase):
     def test_json(self):
         user = User(
