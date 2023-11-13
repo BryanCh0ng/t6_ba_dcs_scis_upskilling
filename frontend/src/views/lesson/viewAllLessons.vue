@@ -224,12 +224,12 @@
       this.userRole = role
       if(this.userRole === "Admin") {
         document.title = "Lesson DB | Upskilling Engagement System";
+        this.loadData();
       } else {
+        if (role == 'Student') {
+          this.$router.push({ name: 'studentViewCourse' }); 
+        }
         document.title = "All Lessons | Upskilling Engagement System";
-      }
-      if (role == 'Student') {
-        this.$router.push({ name: 'studentViewCourse' }); 
-      } else {
         this.loadData();
       }
     },
