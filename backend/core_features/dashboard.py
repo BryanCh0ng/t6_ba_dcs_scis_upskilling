@@ -72,7 +72,7 @@ class TotalFeedbacks(Resource):
             query = (
                 db.session.query(Course, RunCourse, Feedback, TemplateAttribute)
                 .join(RunCourse, Course.course_ID == RunCourse.course_ID)  # Join Course and RunCourse using course_id
-                .join(Feedback, RunCourse.rcourse_ID == Feedback.rcourse_ID)  # Join RunCourse and Feedback using rcourse_id
+                .join(Feedback, (RunCourse.rcourse_ID == Feedback.rcourse_ID))  # Join RunCourse and Feedback using rcourse_id
                 .join(TemplateAttribute, Feedback.template_Attribute_ID == TemplateAttribute.template_Attribute_ID)  # Join Feedback and TemplateAttribute using attribute_id
                 #.filter(or_(func.lower(TemplateAttribute.question).like("%instructor%"), func.lower(TemplateAttribute.question).like("%course%")))
                 #.filter(or_(TemplateAttribute.input_Type == "Text Field", TemplateAttribute.input_Type == "Likert Scale"))
