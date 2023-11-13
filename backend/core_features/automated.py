@@ -28,10 +28,10 @@ def check_registration_close():
 
     for rcourseid in rcourseid_set:
         rcourse = RunCourse.query.filter(RunCourse.rcourse_ID == rcourseid).first().json()
-        rcourse_enddate = rcourse["reg_Enddate"]
+        rcourse_enddate = rcourse["reg_Enddate"].strftime("%Y-%m-%d")
 
         if rcourse_enddate == current_date:
-            rcourse_endtime = rcourse["reg_Endtime"]
+            rcourse_endtime = rcourse["reg_Endtime"].strftime("%H:%M:%S")
 
             if rcourse_endtime <= current_time:
                 coursesize = rcourse["course_Size"]
@@ -105,20 +105,37 @@ def open_close_registration():
     current_time = datetime.now().strftime("%H:%M:%S")
 
     for runCourse in runCourseList:
-        startDate = runCourse.reg_Startdate
-        startTime = runCourse.reg_Starttime
+        startDate = runCourse.reg_Startdate.strftime("%Y-%m-%d")
+        startTime = runCourse.reg_Starttime.strftime("%H:%M:%S")
+        status = runCourse.runcourse_Status
+        endDate = runCourse.reg_Enddate.strftime("%Y-%m-%d")
+        endTime = runCourse.reg_Endtime.strftime("%H:%M:%S")
 
-        if current_date == startDate:
-            if current_time >= startTime:
+        if current_date == startDate and current_time >= startTime:
+            if status != "Ongoing":
                 try:
                     setattr(runCourse, "runcourse_Status", "Ongoing")
                     db.session.commit()
-
+                    db.session.close()
+                    
                     return json.loads(json.dumps({"message": 'Success', "code": 200}, default=str))
                 
                 except Exception as e:
                     db.session.rollback()
                     return "Failed" + str(e), 500
+        
+        elif current_date == endDate and current_time >= endTime:
+            if status != "Closed":
+                try:
+                    setattr(runCourse, "runcourse_Status", "Closed")
+                    db.session.commit()
+                    db.session.close()
+
+                    return json.loads(json.dumps({"message": 'Success', "code": 200}, default=str))
+                
+                except Exception as e:
+                    db.session.rollback()
+                    return "Failed" + str(e), 500 
                                         
 # Automate update student attendance 
 # @scheduler.task('interval', id='check_and_update_student_attendance', seconds=30, misfire_grace_time=30)
