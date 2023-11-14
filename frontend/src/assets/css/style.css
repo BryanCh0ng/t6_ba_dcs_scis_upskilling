@@ -188,6 +188,10 @@ body {
   background-color: darkgrey;
 }
 
+.bg-rebacca-purple {
+  background-color: rebeccapurple;
+}
+
 button:disabled, .btn.disabled {
   display: block;
   pointer-events: auto !important;

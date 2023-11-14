@@ -138,7 +138,16 @@ INSERT INTO user VALUES
     (111, 'Hannah Tan', 'hannah.tan.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
     (112, 'Matthew Lim', 'matthew.lim.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
     (113, 'Evelyn Koh', 'evelyn.koh.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
-    (114, 'Joseph Wong', 'joseph.wong.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student');
+    (114, 'Joseph Wong', 'joseph.wong.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
+    -- backup accounts to test in aws
+    (115, 'AWS', 'aws.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
+    (116, 'AWS1', 'aws1.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
+    (117, 'AWS2', 'aws2.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
+    (118, 'AWS3', 'aws3.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
+    (119, 'AWS4', 'aws4.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
+    (120, 'AWS5', 'aws4.2023@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Student'),
+    (121, 'AWS Admin', 'aws.admin@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Admin'),
+    (122, 'AWS Trainer', 'aws.trainer@smu.edu.sg', '$2b$12$5ZMFOF1.pQvm6OBEeTlNduMHNbo/I/hzn3z3DLkK12QNeOP4Rej7q', 'Trainer');
 
 DROP TABLE IF EXISTS `externaluser`;
 CREATE TABLE IF NOT EXISTS `externaluser` (
@@ -636,7 +645,8 @@ INSERT INTO runcourse VALUES
     (13, 'Blockchain and Smart Contracts - Run 1' ,'2024-01-25', '2024-05-15', '16:00:00', '18:00:00', 5, 'face-to-face', 'SCIS SR 2-4', 'Ongoing', 35, 20, 0, 2, '2023-10-25', '2023-12-10', '10:00:00', '10:00:00', '2024-05-16', '2024-05-20', '08:00:00', '08:00:00', 1, 10),
     (14, 'Mulesoft Certified Developer - Run 1' ,'2024-04-08', '2024-08-04', '15:00:00', '17:00:00', 46, 'face-to-face', 'SCIS SR 3-2', 'Ongoing', 30, 20, 0, 2, '2023-10-20', '2023-12-05', '10:00:00', '10:00:00', '2024-08-05', '2024-08-15', '07:00:00', '23:59:00', 1, 12),
     (15, 'Intro to Digital Marketing - Run 1' ,'2024-01-25', '2024-05-25', '09:30:00', '11:30:00', 41, 'face-to-face', 'SCIS SR 2-3', 'Ongoing', 40, 30, 0, 2, '2023-10-30', '2023-12-15', '10:00:00', '10:00:00', '2024-05-26', '2024-05-30', '14:00:00', '14:00:00', 1, 14),
-    (16, 'Intro to Drupal & Drupal Certification - Run 1' ,'2023-01-02', '2024-04-02', '14:00:00', '16:00:00', 42, 'face-to-face', 'SCIS SR 2-3', 'Ongoing', 25, 15, 0, 2, '2023-10-25', '2023-12-20', '10:00:00', '10:00:00', '2024-04-03', '2024-04-20', '12:00:00', '12:00:00', 1, 15);
+    (16, 'Intro to Drupal & Drupal Certification - Run 1' ,'2023-01-02', '2024-04-02', '14:00:00', '16:00:00', 42, 'face-to-face', 'SCIS SR 2-3', 'Ongoing', 25, 15, 0, 2, '2023-10-25', '2023-12-20', '10:00:00', '10:00:00', '2024-04-03', '2024-04-20', '12:00:00', '12:00:00', 1, 15),
+    (17, 'Quantum Leap - Run 2' ,'2023-12-10', '2023-12-12', '12:00:00', '14:00:00', 4, 'face-to-face', 'SCIS SR 2-4', 'Ongoing', 35, 20, 0, 2, '2023-11-13', '2023-11-25', '10:00:00', '10:00:00', '2023-12-13', '2023-12-20', '10:00:00', '10:00:00', 1, 2);
  
 DROP TABLE IF EXISTS `feedback`;
 CREATE TABLE IF NOT EXISTS `feedback`(
@@ -2487,7 +2497,9 @@ INSERT INTO registration VALUES
     (125, 11, 1, 'Enrolled'),
     (126, 12, 1, 'Enrolled'),
     (127, 13, 1, 'Enrolled'), 
-    (128, 11, 6, 'Enrolled');
+    (128, 11, 6, 'Pending'),
+    (129, 3, 1, 'Enrolled'),
+    (130, 7, 1, 'Enrolled');
 
 
 DROP TABLE IF EXISTS `lesson`;
@@ -2615,7 +2627,11 @@ INSERT INTO lesson VALUES
     (96, 16, '2023-12-29', '14:00:00', '16:00:00'),
     (97, 16, '2024-01-05', '14:00:00', '16:00:00'),
     (98, 16, '2024-01-12', '14:00:00', '16:00:00'),
-    (99, 16, '2024-01-19', '14:00:00', '16:00:00');
+    (99, 16, '2024-01-19', '14:00:00', '16:00:00'),
+-- rcourse_id = 17
+    (100, 17, '2023-12-10', '12:00:00', '14:00:00'),
+    (101, 17, '2023-12-11', '12:00:00', '14:00:00'),
+    (102, 17, '2023-12-12', '12:00:00', '14:00:00');
 
 
 DROP TABLE IF EXISTS `attendancerecord`;

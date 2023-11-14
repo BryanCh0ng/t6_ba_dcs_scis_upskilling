@@ -29,7 +29,7 @@
             case 'Offered':
                 return 'mt-1 pt-2 pb-2 badge text-light bg-medium-sea-green';
             case 'Ongoing':
-                return 'mt-1 pt-2 pb-2 badge text-light bg-medium-sea-green';
+                return 'mt-1 pt-2 pb-2 badge text-light bg-rebacca-purple';
             case 'Active':
             return 'mt-1 pt-2 pb-2 badge text-light bg-medium-sea-green';
             case 'Retired':

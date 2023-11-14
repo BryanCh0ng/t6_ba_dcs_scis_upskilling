@@ -450,7 +450,7 @@ class AddAdmin(Resource):
         msg = Message("Welcome to Upskilling Engagement System",
                     sender="upskilling.engagement@outlook.com", recipients=[email])
         #Need to change this when we deployed to AWS 
-        reset_password_link = f'http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email={email}'
+        reset_password_link = f'http://ec2-52-73-137-78.compute-1.amazonaws.com/t6_ba_dcs_scis_upskilling/resetPassword?email={email}'
         """
         msg.html = f'''\
                     <html>
@@ -469,7 +469,7 @@ class AddAdmin(Resource):
                     </html>
                     ''' 
         """
-        msg.html = "<p>Please click the link to change your password <a href='http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"'>http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"</a>.</p>"
+        msg.html = "<p>Please click the link to change your password <a href='http://ec2-52-73-137-78.compute-1.amazonaws.com/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"'>http://ec2-52-73-137-78.compute-1.amazonaws.com/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"</a>.</p>"
         mail.send(msg)
         
         return "Email sent!"

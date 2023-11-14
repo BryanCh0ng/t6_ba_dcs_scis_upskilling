@@ -166,19 +166,16 @@ class GetLessonsByRcourseId(Resource):
         
         def get_runcourse_details(rcourse_id):
             try: 
-                rc_alias = aliased(RunCourse)
-                user_alias = aliased(User)
-
                 run_course = db.session.query(
                     Course,
-                    rc_alias,
+                    RunCourse,
                     CourseCategory,
-                    user_alias.user_Name,
-                    user_alias.user_ID
-                ).select_from(Course).join(rc_alias, Course.course_ID == rc_alias.course_ID).join(
+                    User.user_Name,
+                    User.user_ID
+                ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).join(
                     CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
-                ).join(user_alias, rc_alias.instructor_ID == user_alias.user_ID) .filter(
-                    rc_alias.rcourse_ID == rcourse_id).first()
+                ).join(User, RunCourse.instructor_ID == User.user_ID) .filter(
+                    RunCourse.rcourse_ID == rcourse_id).first()
 
                 if run_course:
                     run_course[1].run_Starttime = run_course[1].run_Starttime.strftime('%H:%M:%S')
@@ -408,18 +405,15 @@ class GetLessonsByUserId(Resource):
     def get(self):
         def get_runcourse_details_lessons(rcourse_id):
             try: 
-                rc_alias = aliased(RunCourse)
-                user_alias = aliased(User)
-
                 run_course = db.session.query(
                     Course,
-                    rc_alias,
+                    RunCourse,
                     CourseCategory,
-                    user_alias.user_Name
-                ).select_from(Course).join(rc_alias, Course.course_ID == rc_alias.course_ID).join(
+                    User.user_Name
+                ).select_from(Course).join(RunCourse, Course.course_ID == RunCourse.course_ID).join(
                     CourseCategory, Course.coursecat_ID == CourseCategory.coursecat_ID
-                ).join(user_alias, rc_alias.instructor_ID == user_alias.user_ID) .filter(
-                    rc_alias.rcourse_ID == rcourse_id).first()
+                ).join(User, RunCourse.instructor_ID == User.user_ID) .filter(
+                    RunCourse.rcourse_ID == rcourse_id).first()
 
                 if run_course:
                     run_course[1].run_Starttime = run_course[1].run_Starttime.strftime('%H:%M:%S')

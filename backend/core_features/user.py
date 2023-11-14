@@ -97,7 +97,7 @@ class VerifyEmail(Resource):
         msg = Message('Welcome to Upskilling Engagement System',
                   sender='upskilling.engagement@outlook.com',
                   recipients=[email])
-        msg.html = "<p>Please click the link to verify your email and finish creating your account <a href='http://localhost:8080/t6_ba_dcs_scis_upskilling/registerform?email="+ email +"'>http://localhost:8080/t6_ba_dcs_scis_upskilling/registerform?email="+ email +"</a>.</p>"
+        msg.html = "<p>Please click the link to verify your email and finish creating your account <a href='http://ec2-52-73-137-78.compute-1.amazonaws.com/t6_ba_dcs_scis_upskilling/registerform?email="+ email +"'>http://ec2-52-73-137-78.compute-1.amazonaws.com/t6_ba_dcs_scis_upskilling/registerform?email="+ email +"</a>.</p>"
         mail.send(msg)
         return "Email sent!"
 
@@ -208,7 +208,7 @@ class ForgotPassword(Resource):
         msg = Message('[Upskilling Engagement System] Reset Password',
                   sender='upskilling.engagement@outlook.com',
                   recipients=[email])
-        msg.html = "<p>Please click the link to change your password <a href='http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"'>http://localhost:8080/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"</a>.</p>"
+        msg.html = "<p>Please click the link to change your password <a href='http://ec2-52-73-137-78.compute-1.amazonaws.com/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"'>http://ec2-52-73-137-78.compute-1.amazonaws.com/t6_ba_dcs_scis_upskilling/resetPassword?email="+ email +"</a>.</p>"
         mail.send(msg)
         return "Email sent!"
 

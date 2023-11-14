@@ -262,34 +262,8 @@ class GetRandomReviewsByRCourseId(Resource):
         no_of_reviews = get_random_reviews_by_rcourse_id.parse_args().get("no_of_reviews")
 
         if rcourse_id:
-          template_attribute_query = db.session.query(
-            TemplateAttribute,
-          ).filter(
-            TemplateAttribute.question == 'Any Feedbacks for the course',
-            TemplateAttribute.template_ID == None,
-            TemplateAttribute.input_Type == 'Text Field'
-          ).first()
-          
-          
-          if template_attribute_query:
-            random_reviews = (
-                db.session.query(
-                  Feedback,
-                ).filter(
-                  Feedback.rcourse_ID == rcourse_id,
-                  Feedback.template_Attribute_ID == template_attribute_query.template_Attribute_ID,
-                  Feedback.answer != ""
-                )
-                .order_by(db.func.random())
-                .limit(no_of_reviews)
-                .all()
-              )
-            
-            if random_reviews:
-              
-              db.session.close()
-              return {"code": 200, "reviews":[review.json() for review in random_reviews]}, 200
-            return {"code": 202, "message": "There are no reviews available currently"}, 202
+          course_id = db.session.query(RunCourse.course_ID).filter(RunCourse.rcourse_ID == rcourse_id).first()
+          course_id = course_id[0]
 
         if course_id:
           rcourse_ids = db.session.query(RunCourse.rcourse_ID).filter(RunCourse.course_ID == course_id).all()
@@ -324,7 +298,7 @@ class GetRandomReviewsByRCourseId(Resource):
                 db.session.close()
                 return {"code": 200, "reviews":[review.json() for review in random_reviews]}, 200
 
-          return {"code": 202, "message": "There are no feedbacks available currently"}, 202
+          return {"code": 202, "message": "There is no past feedback available currently"}, 202
 
       except Exception as e:
        
