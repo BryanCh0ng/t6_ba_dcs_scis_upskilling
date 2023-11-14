@@ -167,14 +167,6 @@ class GetCourse(Resource):
 
         return {"code": 404, "message": "There is no such course"}, 404
 
-@api.route("/addition", methods=["POST"])
-class Addition(Resource):
-    def post(self):
-        data = request.json
-        first = data.get("first")
-        second = data.get("second")
-        return first + second
-
 @api.route("/create_course", methods=["POST"])
 @api.doc(description="Create course")
 class CreateCourse(Resource):
