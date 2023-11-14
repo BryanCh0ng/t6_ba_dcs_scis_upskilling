@@ -40,30 +40,30 @@
                     </div>
                 </div>
 
-                <div v-if="view === 'createCourse' || view === 'proposeCourse'" class="row">
+                <div v-if="view === 'createCourse' || view === 'proposeCourse'" class="row mt-5">
                     <div class="col-md-6 form-group">
-                        <button type="reset" class="btn btn-secondary shadow-sm w-100 mt-5 field cancelbtn">
+                        <button type="reset" class="btn btn-secondary shadow-sm w-100 field cancelbtn">
                             Reset
                         </button>
                     </div>
 
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                        <button type="submit" class="btn btn-block shadow-sm w-100 field submitbtn">
                             Submit
                         </button>
                     </div>
                 </div>
 
-                <div v-else class="row">
+                <div v-else class="row mt-5">
                     <div class="col-md-6 form-group">
                         <button type="button" @click="goToAdminViewCourse"
-                            class="btn btn-secondary shadow-sm w-100 mt-5 field cancelbtn">
+                            class="btn btn-secondary shadow-sm w-100 field cancelbtn">
                             Cancel
                         </button>
                     </div>
 
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                        <button type="submit" class="btn btn-block shadow-sm w-100 field submitbtn">
                             Save
                         </button>
                     </div>
