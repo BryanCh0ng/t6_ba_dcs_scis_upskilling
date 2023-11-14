@@ -66,6 +66,7 @@ class TestCreateCourse(TestCourse):
         }
         with self.app.test_request_context(json=request_body):
             response = CreateCourse().post()
+            
 
             self.assertEqual(response[1], 201)
             self.assertEqual(response[0]['data'], {
@@ -75,6 +76,24 @@ class TestCreateCourse(TestCourse):
                 "coursecat_ID": 1,
                 "course_Status": "Inactive"
                 }
+            )
+    def test_create_course_duplicate(self):
+        request_body = {
+            # "course_ID": 1,
+            "course_Name": 'Database Mining',
+            "course_Desc": "test description",
+            "coursecat_ID": 1,
+            "course_Status": "Inactive"
+        }
+        with self.app.test_request_context(json=request_body):
+            response = CreateCourse().post()
+
+            
+
+            self.assertEqual(response[1], 409)
+            self.assertEqual(response[0]['message'], 
+                'Course name already exists'
+                
             )
 
 
