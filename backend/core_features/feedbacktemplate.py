@@ -34,10 +34,9 @@ class GetAllTemplates(Resource):
             courses_using_template = RunCourse.query.filter_by(template_ID = template.template_ID).all()
             if courses_using_template:
               for course in courses_using_template:
-                  if datetime.now().date() > course.run_Startdate: #TO CAHNGE TO FEEDBACK START DATE
+                  if datetime.now().date() >= course.feedback_Startdate:
                     template.existingFeedback = True
-                  elif datetime.now().date() > course.run_Enddate: #TO CAHNGE TO FEEDBACK START DATE:
-                    template.existingFeedback = True
+
         db.session.close()
         templates_json = [template.json() for template in templates]
         templates_json = [{'template_ID': template.template_ID, 'template_Name': template.template_Name, 'created_On': common.format_date_time(template.created_On),'existingFeedback': template.existingFeedback} for template in templates]
@@ -311,9 +310,9 @@ class EditFeedbackTemplate(Resource):
           courses_using_template = RunCourse.query.filter_by(template_ID = template_id).all()
           if courses_using_template:
             for course in courses_using_template:
-                if datetime.now().date() > course.run_Startdate: #TO CAHNGE TO FEEDBACK START DATE
+                if datetime.now().date() > course.feedback_Startdate:
                   return {"code": 404, "message": "There are run courses with ongoing feedback period, unable to edit feedback template" }, 404
-                elif datetime.now().date() > course.run_Enddate: #TO CAHNGE TO FEEDBACK START DATE:
+                elif datetime.now().date() > course.feedback_Enddate:
                   return {"code": 404, "message": "There are run courses with past feedback period, unable to edit feedback template" }, 404
 
           if template:
@@ -383,9 +382,9 @@ class DeleteFeedbackTemplate(Resource):
         courses_using_template = RunCourse.query.filter_by(template_ID = templateID).all()
         if courses_using_template:
            for course in courses_using_template:
-              if datetime.now().date() > course.run_Startdate: #TO CAHNGE TO FEEDBACK START DATE
+              if datetime.now().date() > course.feedback_Startdate:
                  return {"code": 404, "message": "There are run courses with ongoing feedback period, unable to delete feedback template" }, 404
-              elif datetime.now().date() > course.run_Enddate: #TO CAHNGE TO FEEDBACK START DATE:
+              elif datetime.now().date() > course.feedback_Enddate:
                  return {"code": 404, "message": "There are run courses with past feedback period, unable to delete feedback template" }, 404
 
         # check if feedback template in use
@@ -433,26 +432,6 @@ class DeleteFeedbackTemplate(Resource):
         return {"code": 404, "message": "Failed " + str(e)}, 404
 
     
-
-get_feedback_template_records = api.parser()
-get_feedback_template_records.add_argument("template_ID", help="Feedback Template ID")
-get_feedback_template_records.add_argument("user_ID", help="User ID")
-get_feedback_template_records.add_argument("rcourse_ID", help="Run course ID")
-@api.route('/get_feedback_template_records')
-@api.doc(description= "get feedback records")
-class GetFeedbackTemplateRecords(Resource):
-    @api.expect(get_feedback_template_records)
-    def post(self):
-        args = get_feedback_template_records.parse_args()
-        templateID = args.get('template_ID')
-        userID = args.get('user_ID')
-        rcourseID = args.get('rcourse_ID')
-        feedback = Feedback.query.filter( Feedback.rcourse_ID == rcourseID, Feedback.feedback_Template_ID == templateID, Feedback.submitted_By == userID).all()
-        if feedback:
-          eachfeedback_json = [eachfeedback.json() for eachfeedback in feedback]
-          return {"code": 200, "feedback": eachfeedback_json}, 200
-
-        return {"code": 404, "message" : "feedback does not exist for this rcourse"},404
 
 
 @api.route("/apply_feedback_template_to_courses", methods=["POST"])

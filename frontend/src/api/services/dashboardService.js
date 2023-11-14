@@ -2,6 +2,7 @@ import { axiosClient } from "../axiosClient";
 import BaseApiService from "../BaseApiService";
 
 class DashboardService extends BaseApiService {
+
     async getTotalFeedbacks(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
         try {
             const response = await axiosClient.get('/dashboard/total_no_of_feedbacks', {
@@ -208,24 +209,6 @@ class DashboardService extends BaseApiService {
             return this.handleError(error)
         }
     }
-
-    // async getTotalFeedbacks(course_ID, coursecat_ID, rcourse_ID, instructor_ID, run_Startdate, run_Enddate) {
-    //     try {
-    //         const response = await axiosClient.get('/dashboard/total_no_of_feedbacks', {
-    //             params: {
-    //                 course_ID: course_ID,
-    //                 coursecat_ID: coursecat_ID,
-    //                 rcourse_ID: rcourse_ID,
-    //                 instructor_ID: instructor_ID,
-    //                 run_Startdate: run_Startdate,
-    //                 run_Enddate: run_Enddate
-    //             },
-    //         });
-    //         return response.data;
-    //     } catch (error) {
-    //         return this.handleError(error)
-    //     }
-    // }
 
     async getFilteredCoursesName(courseID) {
         try {

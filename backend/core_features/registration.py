@@ -10,40 +10,7 @@ api = Namespace('registration', description='Registration related operations')
 # get_all_registrations()
 # create_new_registration()
 # update_registration()
-
-                        
-# get_all_registrations()
-get_all_registrations = api.parser()
-get_all_registrations.add_argument("reg_ID", help="Enter registration ID")
-@api.route("/get_all_registrations")
-@api.doc(description="Gets all registrations")
-class GetAllRegistrations(Resource):
-    @api.expect(get_all_registrations)
-    def get(self):
-        arg = get_all_registrations.parse_args().get("reg_ID")
-        reg_ID = arg if arg else ""
-        if reg_ID:
-            regList = Registration.query.filter(Registration.reg_ID == reg_ID).all()
-        else:
-            regList = Registration.query.all()
-        db.session.close()
-
-        if len(regList):
-            return jsonify(
-                {
-                    "code": 200,
-                    "data": {
-                        "reg_list": [reg.json() for reg in regList]
-                    }
-                }
-            )
-        
-        return jsonify(
-            {
-                "code": 404,
-                "message": "No such registration record exists"
-            }
-        )
+           
 
 # create_new_registration()
 create_registration_model = api.model("create_registration_model", {
@@ -149,40 +116,6 @@ class UpdateRegistration(Resource):
                     "message": "Failed to update registration record: " + str(e)
                 }
             )
-
-#get_registration_by_userid()
-get_registration_by_userid = api.parser()
-get_registration_by_userid.add_argument("user_ID", help="Enter user ID")
-@api.route("/get_registration_by_userid")
-@api.doc(description="Gets registration by user ID")
-class GetRegistrationByUserID(Resource):
-    @api.expect(get_registration_by_userid)
-    def get(self):
-        arg = get_registration_by_userid.parse_args().get("user_ID")
-        user_ID = arg if arg else ""
-        session_user_ID = common.getUserID()
-        if user_ID != session_user_ID:
-          return {"message": "Unathorized Access, No rights to view registrations"}, 404
- 
-        regList = Registration.query.filter(Registration.user_ID == user_ID).all()
-        db.session.close()
-
-        if len(regList):
-            return jsonify(
-                {
-                    "code": 200,
-                    "data": {
-                        "reg_list": [reg.json() for reg in regList]
-                    }
-                }
-            )
-        
-        return jsonify(
-            {
-                "code": 404,
-                "message": "No such registration record exists"
-            }
-        )
 
 #get_registration_by_rcourseid
 get_registration_by_rcourseid = api.parser()

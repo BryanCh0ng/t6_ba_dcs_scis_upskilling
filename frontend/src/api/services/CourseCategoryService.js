@@ -2,6 +2,7 @@ import { axiosClient } from "../axiosClient";
 import BaseApiService from "../BaseApiService";
 
 class CourseCategoryService extends BaseApiService {
+
     async getAllCourseCategory() {
         try {
             let response = await axiosClient.get("/coursecat/get_all_coursecat");

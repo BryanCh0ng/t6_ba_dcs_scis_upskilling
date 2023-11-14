@@ -2,6 +2,7 @@ import { axiosClient } from "../axiosClient";
 import BaseApiService from "../BaseApiService";
 
 class ManagementService extends BaseApiService {
+
     // All Admin
     async getAllAdmin(user_Name) {
         try {

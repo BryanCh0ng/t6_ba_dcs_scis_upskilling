@@ -2,6 +2,7 @@ import { axiosClient } from "../axiosClient";
 import BaseApiService from "../BaseApiService";
 
 class RecommenderService extends BaseApiService {
+
     async getUserSimilarityRegistration(user_ID) {
         try {
             let response = await axiosClient.get("/recommender/user_similarity_registration", {

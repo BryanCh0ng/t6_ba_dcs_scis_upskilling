@@ -86,58 +86,6 @@ class GetAttendanceByLessonId(Resource):
       except Exception as e:
           return {"code": 404, "message": "Failed " + str(e)}, 404
 
-get_attendances_by_trainer_instructor_id = api.parser()
-get_attendances_by_trainer_instructor_id.add_argument("trainer_instructor_id", help="Enter trainer/instructor id")
-@api.route("/get_attendance_by_trainer_instructor_id")
-@api.doc(description="Get attendance by trainer instructor id")
-class GetAttendanceByLessonId(Resource):
-    @api.expect(get_attendances_by_trainer_instructor_id)
-    def get(self):
-      try:
-        user_role = common.getUserRole()
-        if (user_role) == 'Student':
-            return {"code": 400, "message": "Unathorized Access, Failed to get attendance record"}, 404
-
-        trainer_instructor_id = get_attendances_by_trainer_instructor_id.parse_args().get("trainer_instructor_id")
-
-        
-        runcourse_query = (
-           db.session.query(RunCourse).filter(RunCourse.instructor_ID == trainer_instructor_id).all()
-        )
-
-        rcourses = [rcourse.json() for rcourse in runcourse_query]
-
-        attendances = {}
-        for rcourse in rcourses:
-            db_query = (
-                db.session.query(Lesson, AttendanceRecord)
-                .join(RunCourse, Lesson.rcourse_ID == RunCourse.rcourse_ID)
-                .join(AttendanceRecord, Lesson.lesson_ID == AttendanceRecord.lesson_ID)
-                .filter(RunCourse.rcourse_ID == rcourse['rcourse_ID'])
-                .all()
-            )
-
-            lesson_attendance = {}
-            for lesson, attendance_record in db_query:
-                if lesson not in lesson_attendance:
-                    lesson_attendance[lesson] = []
-                lesson_attendance[lesson].append(attendance_record)
-
-            # Convert the dictionary to a list of key-value tuples
-            lesson_attendance_list = list(lesson_attendance.items())
-
-            if rcourse not in attendances:
-                attendances[tuple(rcourse.items())] = []
-
-            attendances[tuple(rcourse.items())].append(lesson_attendance_list)
-
-        if attendances:
-            return {"code": 200, "data": attendances}, 200
-        else:
-            return {"code": 400, "message": "There is no attendance record for this lesson"}, 400
-      except Exception as e:
-          return {"code": 404, "message": "Failed " + str(e)}, 404
-
 
 update_attendance_by_lesson_id = api.parser()
 update_attendance_by_lesson_id.add_argument("lesson_id", help="Enter lesson id")

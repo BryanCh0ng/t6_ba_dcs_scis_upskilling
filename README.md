@@ -6,6 +6,8 @@ indicate interest and enroll in courses offered by various groups,
 while also enabling course organizers to easily manage courses and 
 offer more relevant sessions by gathering feedback from students. 
 
+Site: http://ec2-52-73-137-78.compute-1.amazonaws.com/t6_ba_dcs_scis_upskilling/
+
 
 ## Project setup
 ```

@@ -2,6 +2,7 @@ import { axiosClient } from "../axiosClient";
 import BaseApiService from "../BaseApiService";
 
 class UserService extends BaseApiService {
+
     // Login
     async login(email, password) {
         try {

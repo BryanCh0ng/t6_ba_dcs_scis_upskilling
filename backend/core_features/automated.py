@@ -138,7 +138,6 @@ def open_close_registration():
                     return "Failed" + str(e), 500 
                                         
 # Automate update student attendance 
-# @scheduler.task('interval', id='check_and_update_student_attendance', seconds=30, misfire_grace_time=30)
 @scheduler.task('cron', id='check_and_update_student_attendance', hour=4, minute=0, misfire_grace_time=900)
 def check_and_update_student_attendance():
     with app.app_context():
@@ -184,7 +183,8 @@ def check_and_update_student_attendance():
                         db.session.commit()
                         return True
                 except Exception as e:
-                    return False
+                    db.session.rollback()
+                    return "Failed" + str(e), 500 
             
 
             today = datetime.now().date()
@@ -197,17 +197,14 @@ def check_and_update_student_attendance():
                     if attendance_response[0]["code"] == 200:
                         attendances = attendance_response[0]["attendances"]
                         for attendance in attendances:
-                            
-                            update_attendance_response = add_update_attendance(lesson.lesson_ID, attendance['user_ID'])
-                            
-                    
-            
+                           add_update_attendance(lesson.lesson_ID, attendance['user_ID'])
+
             return jsonify({ "code": 201, "message": "Attendance has been successfully updated!"} )   
 
         except Exception as e:
             db.session.rollback()
-            
             print(f"Error while update student attendance: {str(e)}")
+            return "Failed" + str(e), 500 
 
 # Automate blacklist
 @scheduler.task('cron', id='check_and_blacklist_users', hour=4, minute=0, misfire_grace_time=900) 

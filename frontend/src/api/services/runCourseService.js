@@ -2,6 +2,7 @@ import { axiosClient } from "../axiosClient";
 import BaseApiService from "../BaseApiService";
 
 class runCourseService extends BaseApiService {
+
   async getAllRunCourses(courseId) {
     try {
       let courses = await axiosClient.get("/runcourse/get_all_runcourses", {params: {course_id: courseId}});
