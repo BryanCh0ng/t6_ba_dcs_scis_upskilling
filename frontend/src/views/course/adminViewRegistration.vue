@@ -5,7 +5,7 @@
 
     <div class="container col-12 d-flex mb-3 w-100">
       <h5 class="col m-auto">All Registration Status for '{{ this.runCourseName }}'</h5>
-      <div v-if="shouldShowActionButtons" class="dropdown">
+      <div v-if="shouldShowActionButtons && !isRegistrationClosed" class="dropdown">
         <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
           Action
         </button>
@@ -22,7 +22,7 @@
           <thead>
             <tr class="text-nowrap">
               <th scope="col">
-                <input type="checkbox" v-if="hasActionableRecords" v-model="selectAllStudents"
+                <input type="checkbox" v-if="hasActionableRecords && !isRegistrationClosed" v-model="selectAllStudents"
                   @change="selectAllStudentsChanged" />
               </th>
               <th scope="col">
@@ -44,7 +44,7 @@
             <tr v-for="user in displayedStudent" :key="user.reg_ID">
               <td class="user_checkbox">
                 <!-- Bind checkbox to the selectedUserIDs array -->
-                <input v-if="user.reg_Status === 'Pending' || user.reg_Status === 'Enrolled'" type="checkbox"
+                <input v-if="(user.reg_Status === 'Pending' || user.reg_Status === 'Enrolled') && !isRegistrationClosed" type="checkbox"
                   :value="user.reg_ID" :checked="selectedRegIDs.includes(user.reg_ID)" @change="selectUser(user)" />
               </td>
               <td class="user_name">
@@ -105,6 +105,9 @@ export default {
       name: "",
       status: null,
       runCourseName: "",
+      regEndDate: null,
+      regEndTime: null,
+      isRegistrationClosed: false,
       errorMsg: [],
       title: "",
       message: "",
@@ -166,6 +169,17 @@ export default {
       try {
         let response = await RunCourseService.getRunCourseById(this.runCourseID)
         this.runCourseName = response.run_Name;
+        this.regEndDate = new Date(response.reg_Enddate);
+        this.regEndTime = new Date(`${response.reg_Enddate}T${response.reg_Endtime}`);
+
+        // Get the current date and time
+        const currentDateTime = new Date();
+
+        // Compare with regEndDate and regEndTime
+        this.isRegistrationClosed = currentDateTime > this.regEndTime;
+        console.log(this.isRegistrationClosed)
+
+        console.log(this.shouldShowActionButtons)
       } catch (error) {
         console.error("Error fetching run course name: ", error)
         this.errorMsg.push("Error fetching run course name")
