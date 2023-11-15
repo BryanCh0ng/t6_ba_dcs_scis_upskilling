@@ -111,7 +111,7 @@ This will install the following:
 * `gensim`
 * `vaderSentiment`
 
-### Running the Frontend
+## Running the Frontend
 To run the frontend of the project, follow these steps:
 1. Open your terminal.
 2. Navigate to the "frontend" directory using the `cd` command:
