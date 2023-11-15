@@ -238,9 +238,11 @@
                       <course-action status="view-feedback" @click="view_submit_feedback(completed_course.rcourse_ID)" :id="completed_course.course_ID"></course-action>
                     </div>
                   </td>
-                  <div v-else>
-                    <course-action status="provide-feedback" @click="view_submit_feedback(completed_course.rcourse_ID)" :id="completed_course.course_ID"></course-action>
-                  </div>
+                  <td v-else>
+                    <div class="action-buttons">
+                      <course-action status="provide-feedback" @click="view_submit_feedback(completed_course.rcourse_ID)" :id="completed_course.course_ID"></course-action>
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </table>

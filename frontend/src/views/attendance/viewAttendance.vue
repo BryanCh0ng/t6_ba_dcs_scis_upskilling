@@ -32,7 +32,7 @@
             <tbody>
               <tr v-for="(attendance, key) in this.attendances" :key="key" @click="selectAttendance(key)">
                 <td class="attendance_checkbox">
-                  <input v-if="allowAction" type="checkbox" :value="attendance.user_ID" :checked="selectedStudents.includes(attendance.user_ID)" @change="selectAttendance(key)" />
+                  <input v-if="allowAction" type="checkbox" :value="attendance.user_ID" :checked="selectedStudents.includes(attendance.user_ID)" @change="selectAttendance(key)" @click.stop />
                 </td>
                 <td>{{ key }}</td>
                 <!-- <td>{{ attendance.user_ID }}</td> -->

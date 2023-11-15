@@ -9,7 +9,7 @@
 
       <div class="form-group row mb-4 pt-4 pb-4 bg-white rounded">
         <div>
-          <h5>Common Required Questions (will be placed at the end of feedback)</h5>
+          <h5>Required Questions (will be placed at the end of feedback)</h5>
         </div>
         <div class="form-group mt-2 mb-3">
           <label>1. Question To Ask</label>
