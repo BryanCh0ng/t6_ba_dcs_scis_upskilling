@@ -8,6 +8,7 @@ from sqlalchemy import func, and_, exists, not_, select
 from datetime import datetime, date, time
 import logging
 app.logger.setLevel(logging.DEBUG)
+import traceback
 
 api = Namespace('course', description='Course related operations')
 
@@ -17,46 +18,24 @@ api = Namespace('course', description='Course related operations')
 # get_course_by_id()
 # create_new_course()
 
-# retrieve_all_courses = api.parser()
-# retrieve_all_courses.add_argument("course_name", help="Enter course name")
-# @api.route("/get_all_courses")
-# @api.doc(description="Get all courses")
-# class GetAllCourses(Resource):
-# 	@api.expect(retrieve_all_courses)
-# 	def get(self):
-# 		arg = retrieve_all_courses.parse_args().get("course_name")
-# 		course_Name = arg if arg else ""
-# 		courseList = Course.query.filter(Course.course_Name.contains(course_Name)).all()
-# 		db.session.close()
-# 		if len(courseList):
-# 			return jsonify(
-# 				{
-# 					"code": 200,
-# 					"data": {
-# 						"course": [course.json() for course in courseList]
-# 					}
-# 				}
-# 			)
-# 		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
-
-# retrieve_all_courses_hr = api.parser()
-# @api.route("/get_all_courses_admin")
-# @api.doc(description="Get all courses (Admin)")
-# class GetAllCoursesHR(Resource):
-# 	@api.expect(retrieve_all_courses_hr)
-# 	def get(self):
-# 		courseList = Course.query.all()
-# 		db.session.close()
-# 		if len(courseList):
-# 			return jsonify(
-# 				{
-# 					"code": 200,
-# 					"data": {
-# 						"course": [course.json() for course in courseList]
-# 					}
-# 				}
-# 			)
-# 		return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
+retrieve_all_courses_hr = api.parser()
+@api.route("/get_all_courses_admin")
+@api.doc(description="Get all courses (Admin)")
+class GetAllCoursesHR(Resource):
+    @api.expect(retrieve_all_courses_hr)
+    def get(self):
+        courseList = Course.query.all()
+        db.session.close()
+        if len(courseList):
+            return jsonify(
+ 				{
+ 					"code": 200,
+ 					"data": {
+ 						"course": [course.json() for course in courseList]
+ 					}
+ 				}
+ 			)
+        return json.loads(json.dumps({"message": "There is no such course", "code": 404}, default=str))
 
 retrieve_all_courses_filter_search = api.parser()
 retrieve_all_courses_filter_search.add_argument("course_name", help="Enter course name")
@@ -126,17 +105,23 @@ class DeleteCourse(Resource):
                 return {"message": "Unathorized Access, Failed to delete run course"}, 404 
 
             rcourse_ID = delete_runcourse.parse_args().get("rcourse_ID")
-            # app.logger.debug(rcourse_ID)
+
+            current_date = datetime.now().date()
 
             runCourse = RunCourse.query.filter_by(rcourse_ID=rcourse_ID).first()            
-            if(runCourse):
+            if runCourse and runCourse.run_Startdate > current_date:
                     try:
+                        lessons_to_delete = Lesson.query.filter_by(rcourse_ID=rcourse_ID).all()
+                        for lesson in lessons_to_delete:
+                            db.session.delete(lesson)
+
                         db.session.delete(runCourse)              
                         db.session.commit()
                         db.session.close()                 
-                        return json.loads(json.dumps({"message":"Run Course has successfully deleted"})), 200
+                        return json.loads(json.dumps({"message":"Run Course and the associated lessons have been successfully deleted."})), 200
                     except Exception as e:
-                        return "Foreign key dependencies exist, cannot delete. " + str(e), 408
+                        return json.loads(json.dumps({"message":"Run Course has unsuccessfully deleted"})), 408
+                    
 
             return json.loads(json.dumps({"Message": "There is no such run course"}, default=str)), 404
 
@@ -174,7 +159,7 @@ class CreateCourse(Resource):
         try:
             # Get the data for creating a new course from the request body
             new_course_data = request.json
-            #print(new_course_data)
+            
             new_course_name = new_course_data.get("course_Name") 
 
             # Assuming new_course_name is the input course name you want to check against the database
@@ -245,14 +230,14 @@ class EditCourse(Resource):
                 # Check if the course name already exists in the database
                 #existing_course = Course.query.filter_by(course_Name=new_course_name).first()
 
-                if existing_course:
+                if existing_course and existing_course.course_ID != course_id:
                     return {
                         "message": "Course name already exists"
                     }, 409  # Conflict
 
                 # Update the fields based on updated_data
                 for field, value in updated_data.items():
-                    #print(f"Updating {field} to {value}")
+                    
                     setattr(course, field, value)
 
                 #Commit the changes to the database 
@@ -342,6 +327,11 @@ class GetUnregisteredActiveCourses(Resource):
                     'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
                     'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
                     'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
+                    'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
+                    'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
+                    'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
+                    'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime),
+
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -466,6 +456,10 @@ class GetCourseRegistrationInfo(Resource):
                     "reg_Enddate": result[2].reg_Enddate.strftime('%Y-%m-%d'),
                     "reg_Starttime": result[2].reg_Starttime.strftime('%H:%M:%S'),
                     "reg_Endtime": result[2].reg_Endtime.strftime('%H:%M:%S'),
+                    "feedback_Startdate": result[2].feedback_Startdate.strftime('%Y-%m-%d'),
+                    "feedback_Enddate": result[2].feedback_Enddate.strftime('%Y-%m-%d'),
+                    "feedback_Starttime": result[2].feedback_Starttime.strftime('%H:%M:%S'),
+                    "feedback_Endtime": result[2].feedback_Endtime.strftime('%H:%M:%S'),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -657,6 +651,10 @@ class GetCompletedCourses(Resource):
                     'reg_Enddate': common.format_date_time(result[1].reg_Enddate),
                     'reg_Starttime': common.format_date_time(result[1].reg_Starttime),
                     'reg_Endtime': common.format_date_time(result[1].reg_Endtime),
+                    'feedback_Startdate': common.format_date_time(result[1].feedback_Startdate),
+                    'feedback_Enddate': common.format_date_time(result[1].feedback_Enddate),
+                    'feedback_Starttime': common.format_date_time(result[1].feedback_Starttime),
+                    'feedback_Endtime': common.format_date_time(result[1].feedback_Endtime)
                 }
 
                 modified_run_course = {**result[1].json(), **run_course_attrs}
@@ -794,6 +792,10 @@ class GetInstructorCourses(Resource):
                     'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
                     'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
                     'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
+                    'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
+                    'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
+                    'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
+                    'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -921,6 +923,10 @@ class GetInstructorTaughtCourses(Resource):
                     'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
                     'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
                     'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
+                    'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
+                    'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
+                    'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
+                    'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime),
                 }
                 modified_run_course = {**result[2].json(), **run_course_attrs}
 
@@ -973,8 +979,6 @@ class GetAllProposedCoursesAdmin(Resource):
         results = query.all()
         db.session.close()
 
-        # app.logger.debug(results)
-
         if results:
             result_data = []
             for result in results:
@@ -1008,8 +1012,6 @@ class GetAllProposedCoursesAdmin(Resource):
         course_name = args.get("course_name", "")
         course_category_id = args.get("coursecat_id", "")
         pcourse_status = args.get("pcourse_status", "")
-
-        # app.logger.debug(pcourse_status)
 
         query = db.session.query(
             ProposedCourse,
@@ -1656,17 +1658,15 @@ class AdminUpdateRunCourse(Resource):
             db.session.rollback()
             return jsonify({"message": f"Failed to update course: {str(e)}", "code": 500})
 
-combined_search_parser = api.parser()
-combined_search_parser.add_argument("course_name", help="Enter course name", location="args")
-combined_search_parser.add_argument("coursecat_id", help="Enter course category id", location="args")
-
-@api.route("/user_courses/<int:user_id>")
+student_enrolled_courses_with_attendance = api.parser()
+student_enrolled_courses_with_attendance.add_argument("course_name", help="Enter course name", location="args")
+student_enrolled_courses_with_attendance.add_argument("coursecat_id", help="Enter course category id", location="args")
+@api.route("/studentEnrolledCourse/<int:user_ID>")
 class GetUserCourses(Resource):
-    @api.expect(combined_search_parser)
-    def get(self, user_id):
+    @api.expect(student_enrolled_courses_with_attendance)
+    def get(self, user_ID):
         try:
-            print(user_id)
-            args = combined_search_parser.parse_args()
+            args = student_enrolled_courses_with_attendance.parse_args()
             course_name = args.get("course_name")
             coursecat_id = args.get("coursecat_id")
 
@@ -1686,13 +1686,13 @@ class GetUserCourses(Resource):
                 CourseCategory,
                 CourseCategory.coursecat_ID == Course.coursecat_ID
             ).filter(
-                User.user_ID == user_id,
+                User.user_ID == user_ID,
                 Registration.reg_Status == "Enrolled"
             )
 
             # Apply filters if course_name and coursecat_id are provided
             if course_name:
-                base_query = base_query.filter(Course.course_Name == course_name)
+                base_query = base_query.filter(RunCourse.run_Name == course_name)
             if coursecat_id:
                 base_query = base_query.filter(Course.coursecat_ID == coursecat_id)
 
@@ -1709,9 +1709,50 @@ class GetUserCourses(Resource):
                     'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
                     'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
                     'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
+                    'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
+                    'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
+                    'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
+                    'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime),
                 }
 
-                modified_run_course = {**result[2].json(), **run_course_attrs}
+                # Query lessons for this RunCourse
+                lessons = db.session.query(Lesson).filter(Lesson.rcourse_ID == result[2].rcourse_ID).all()
+
+                # Calculate attendance rate
+                total_lessons = len(lessons)
+                attended_lessons = 0
+                missed_lessons_with_valid_reason = 0
+
+                # Query attendance records for this run_course
+                attendance_records = db.session.query(AttendanceRecord).filter(
+                    AttendanceRecord.user_ID == user_ID,
+                    AttendanceRecord.lesson_ID.in_([lesson.lesson_ID for lesson in lessons])
+                ).all()
+
+                valid_reason_keywords = ["sick", "doctor appointment", "medical leave", "family emergency", "mc", "personal reasons", "hospitalised"]
+
+                # Count attended and missed lessons with valid reasons
+                for record in attendance_records:
+                    if record.status == 'Present' or record.status == 'Late':
+                        attended_lessons += 1
+                    elif record.status == 'Absent':
+                        if record.reason:
+                            # Check if the reason is not empty or only contains whitespace
+                            trimmed_reason = record.reason.strip()
+                            
+                            if trimmed_reason.lower() in valid_reason_keywords:
+                                
+                                missed_lessons_with_valid_reason += 1
+                            
+
+                # Calculate attendance rate
+                if total_lessons > 0:
+                    attendance_rate = ((attended_lessons + missed_lessons_with_valid_reason) / total_lessons) * 100
+                else:
+                    attendance_rate = 0
+                
+
+                modified_run_course = {**result[2].json(), **run_course_attrs, "attendance_rate": attendance_rate}
 
                 course_info = {
                     **result[0].json(),
@@ -1777,6 +1818,10 @@ class GetAllCoursesWithRegistrationCount(Resource):
                     'reg_Enddate': common.format_date_time(result[2].reg_Enddate),
                     'reg_Starttime': common.format_date_time(result[2].reg_Starttime),
                     'reg_Endtime': common.format_date_time(result[2].reg_Endtime),
+                    'feedback_Startdate': common.format_date_time(result[2].feedback_Startdate),
+                    'feedback_Enddate': common.format_date_time(result[2].feedback_Enddate),
+                    'feedback_Starttime': common.format_date_time(result[2].feedback_Starttime),
+                    'feedback_Endtime': common.format_date_time(result[2].feedback_Endtime),
                 }
 
                 modified_run_course = {**result[2].json(), **run_course_attrs}
@@ -1808,12 +1853,12 @@ class GetStudentName(Resource):
 
         if course:
             course_name = course.course_Name
-            print(course_name)
+           
             return jsonify({"code": 200, "data": course_name})
         else:
-            print('else')
+            
             return jsonify({"code": 404, "message": "Course not found"})
-
+        
 # Student - Check if Course is Completed using user_id and rcourse_id
 is_course_completed = api.parser()
 is_course_completed.add_argument("rcourse_id", help="Enter rcourse id")

@@ -16,8 +16,12 @@ from core_features.votecourse import api as votecourse
 from core_features.feedbacktemplate import api as feedbacktemplate
 from core_features.dashboard import api as dashboard
 from core_features.recommender import api as recommender
+from core_features.feedback import api as feedback
 from core_features.common import api as common
 from core_features.feedback import api as feedback
+from core_features.lesson import api as lesson
+from core_features.attendance import api as attendance
+from core_features.automated import api as automated
 from flask_mail import Mail
 from flask_bcrypt import Bcrypt
 
@@ -40,8 +44,12 @@ api.add_namespace(votecourse)
 api.add_namespace(feedbacktemplate)
 api.add_namespace(dashboard)
 api.add_namespace(recommender)
+api.add_namespace(feedback)
 api.add_namespace(common)
 api.add_namespace(feedback)
+api.add_namespace(lesson)
+api.add_namespace(attendance)
+api.add_namespace(automated)
 
 CORS(app, supports_credentials=True)
 # ==================== CONNECTING TO DATABASE ====================#
@@ -57,6 +65,7 @@ app.config['SQLALCHEMY_POOL_SIZE'] = 30
 # app.config['SQLALCHEMY_POOL_SIZE'] = 2
 # app.config['SQLALCHEMY_MAX_OVERFLOW'] = 0
 
+# app.config['SQLALCHEMY_DATABASE_URI'] += "?autocommit=true"
 db = SQLAlchemy(app)
 
 # ==================== Mail and Bcrypt ====================#
@@ -78,6 +87,10 @@ bcrypt = Bcrypt(app)
 
 from core_features.usermanagement import api as usermanagement
 api.add_namespace(usermanagement)
+
+@app.teardown_appcontext
+def teardown_db(exception=None):
+    db.session.remove()
 
 # ==================== TEST FUNCTIONS ====================
 test_parser = api.parser()

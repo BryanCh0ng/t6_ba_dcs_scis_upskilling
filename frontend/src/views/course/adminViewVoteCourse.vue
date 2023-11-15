@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ul class="nav nav-pills justify-content-center pt-4">
+    <ul class="nav nav-pills justify-content-center pt-5">
       <li class="nav-item">
         <a class="nav-link" :class="{ 'active': activeTab === 'allvote' }" @click="activeTab = 'allvote'">Voting Campaign Courses</a>
       </li> 
@@ -14,6 +14,7 @@
              <search-filter
               :status-options="statusOptions"
               :search-api="searchAllVotingCoursesAdmin"
+              course-name-placeholder="Course Name"
               @search-complete="handleSearchComplete" />
 
             <div class="container col-12">
@@ -49,15 +50,18 @@
                       <course-status v-if="vote_status" :status="vote_status[vote_course.vote_Status]"></course-status>
                     </td>
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(vote_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                    <div v-if="vote_course && vote_course.vote_Status === 'Ongoing'">
-                      <td><course-action status="Close" @action-and-message-updated="handleActionData" :course="vote_course"></course-action></td>
-                    </div>
-
-                    <div v-else-if="vote_course && vote_course.vote_Status === 'Closed'">
-                      <td ><course-action status="promote_to_course" @action-and-message-updated="handleActionData" :course="vote_course"></course-action></td>
-                      <td><course-action @action-and-message-updated="handleActionData" status="unoffered-vote" :course="vote_course"></course-action></td>
-                    </div>
-                    <div v-else></div>
+                    <td v-if="vote_course && vote_course.vote_Status === 'Ongoing'">
+                      <div class="action-buttons">
+                        <course-action status="Close" @action-and-message-updated="handleActionData" :course="vote_course"></course-action>
+                      </div>
+                    </td>
+                    <td v-else-if="vote_course && vote_course.vote_Status === 'Closed'">
+                      <div class="action-buttons">
+                        <course-action status="promote_to_course" @action-and-message-updated="handleActionData" :course="vote_course"></course-action>
+                        <course-action @action-and-message-updated="handleActionData" status="unoffered-vote" :course="vote_course"></course-action>
+                      </div>
+                    </td>
+                    <td v-else></td>
                   </tr>
                   </tbody>
                 </table>
@@ -75,9 +79,9 @@
               :search-api="searchAllNotOfferedVotingCoursesAdmin"
               @search-complete="handleSearchCompleteNotOffered" />
 
-            <div class="container col-12 table-responsive">
+            <div class="container col-12">
               <h5 class="pb-3">Courses Available that has low number of interest</h5>
-              <div v-if="notoffered_courses && notoffered_courses.length > 0">
+              <div class="table-responsive" v-if="notoffered_courses && notoffered_courses.length > 0">
                 <table class="table bg-white">
                   <thead>
                     <tr class="text-nowrap">
@@ -207,11 +211,9 @@ export default {
       this.loadData();
     },
     async handleSearchComplete(searchResults) {
-      // console.log("searchResults", searchResults);
       this.vote_courses = searchResults; 
     },
     async handleSearchCompleteNotOffered(searchResults) {
-      // console.log("searchResults", searchResults);
       this.notoffered_courses = searchResults; 
     },
     async searchAllVotingCoursesAdmin(course_Name, coursecat_ID, vote_status) {
@@ -248,7 +250,6 @@ export default {
           course_Name,
           coursecat_ID,
         );
-        // console.log(response.data)
         this.notoffered_courses = response.data;
         return this.notoffered_courses;
       } catch (error) {
@@ -306,6 +307,8 @@ export default {
     }
   },
   async created() {
+    document.title = "Voting Campaign DB | Upskilling Engagement System";
+
     const user_ID = await UserService.getUserID();
     const role = await UserService.getUserRole(user_ID);
     if (role == 'Student') {

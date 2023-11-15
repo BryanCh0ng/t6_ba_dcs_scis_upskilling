@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ul class="nav nav-pills justify-content-center pt-4">
+    <ul class="nav nav-pills justify-content-center pt-5">
       <li class="nav-item">
         <a class="nav-link" :class="{ 'active': activeTab === 'registered' }" @click="activeTab = 'registered'">Registered</a>
       </li>
@@ -29,7 +29,7 @@
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                    <a href="" class="text-decoration-none text-dark" @click.prevent="sort('course_Name', 'registered')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                    <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Name', 'registered')">Course Name / Description <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/></a></th>
                   <th scope="col">
                     <a href="" class="text-decoration-none text-dark" @click.prevent="sort('run_Startdate', 'registered')">Course Start Date <sort-icon :sortColumn="sortColumn === 'run_Startdate'" :sortDirection="getSortDirection('run_Startdate')"/></a></th>
                   <th scope="col">
@@ -40,6 +40,7 @@
                   <th scope="col">
                     <a href="" class="text-decoration-none text-dark" @click.prevent="sort('reg_Status', 'registered')">Status <sort-icon :sortColumn="sortColumn === 'reg_Status'" :sortDirection="getSortDirection('reg_Status')"/></a></th>
                   <th scope="col">Course Details</th>
+                  <th scope="col">Lesson(s)</th>
                   <th scope="col">Action(s)</th>
                 </tr>
               </thead>
@@ -47,7 +48,7 @@
               <tbody>
                 <tr v-for="(registered_course, key) in displayedRegisteredCourses" :key="key">
                   <td>
-                    <course-name-desc :name="registered_course.course_Name" :category="registered_course.coursecat_Name" :description="registered_course.course_Desc"></course-name-desc>
+                    <course-name-desc :name="registered_course.run_Name" :category="registered_course.coursecat_Name" :description="registered_course.course_Desc"></course-name-desc>
                   </td>
                   <td>
                     <course-date-time :date="registered_course.run_Startdate" :time="registered_course.run_Starttime"></course-date-time>
@@ -62,17 +63,17 @@
                     <course-status :status="registered_course.reg_Status"></course-status>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(registered_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
+                  <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(registered_course.rcourse_ID)">View Lessons</a></td>
                   <td v-if="(registered_course.reg_Status === 'Enrolled' || registered_course.reg_Status === 'Pending') && isClosingDateValid(registered_course.reg_Enddate)">
                       <course-action status="registered_drop" @action-and-message-updated="handleActionData" :course="registered_course"></course-action>
                   </td>
                   <td v-else-if="(registered_course.reg_Status === 'Dropped') && isClosingDateValid(registered_course.reg_Enddate)">
-                      <course-action @action-and-message-updated="handleActionData" :status="registered_course.course_Status" :course="registered_course"></course-action>
+                      <course-action @action-and-message-updated="handleActionData" :status="registered_course.runcourse_Status" :course="registered_course"></course-action>
                   </td>
+                  <td v-else></td>
                 </tr>
               </tbody>
-
             </table>
-
           </div>
           <div v-else-if="registered_courses=[] && onInitialEmptyRegistered">
             <div class="pt-5 text-center">
@@ -120,6 +121,7 @@
                   <td v-if="interested_course.vote_Status == 'Ongoing'">
                       <course-action @action-and-message-updated="handleActionData" status="say-pass" :course="interested_course"></course-action>
                   </td>
+                  <td v-else></td>
                 </tr>
               </tbody>
             </table>
@@ -173,13 +175,18 @@
                     <course-status :status="proposed_course.pcourse_Status"></course-status>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <div v-if="proposed_course.pcourse_Status == 'Pending'">
-                    <td><course-action status="Edit" :id="proposed_course.course_ID" @click="editCourse(proposed_course.course_ID)"></course-action></td>
-                    <td><course-action @action-and-message-updated="handleActionData" status="remove-proposal" :course="proposed_course"></course-action></td>
-                  </div>
-                  <div v-else-if="proposed_course.pcourse_Status == 'Rejected'">
-                    <td><course-action status="rejected-reason" @click="openRejectedCourseModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#rejected_course_modal"></course-action></td>
-                  </div>
+                  <td v-if="proposed_course.pcourse_Status == 'Pending'">
+                    <div class="action-buttons">
+                      <course-action status="Edit" :id="proposed_course.course_ID" @click="editCourse(proposed_course.course_ID)"></course-action>
+                      <course-action @action-and-message-updated="handleActionData" status="remove-proposal" :course="proposed_course"></course-action>
+                    </div>
+                  </td>
+                  <td v-if="proposed_course.pcourse_Status == 'Rejected'">
+                    <div class="action-buttons">
+                      <course-action status="rejected-reason" @click="openRejectedCourseModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#rejected_course_modal"></course-action>
+                    </div>
+                  </td>
+                  <td v-else></td>
                 </tr>
               </tbody>
             </table>
@@ -210,7 +217,7 @@
               <thead>
                 <tr class="text-nowrap">
                   <th scope="col">
-                    <a href="" @click.prevent="sort('course_Name', 'completed')" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'course_Name'" :sortDirection="getSortDirection('course_Name')"/></a></th>
+                    <a href="" @click.prevent="sort('run_Name', 'completed')" class="text-decoration-none text-dark">Course Name / Description <sort-icon :sortColumn="sortColumn === 'run_Name'" :sortDirection="getSortDirection('run_Name')"/></a></th>
                   <th scope="col">
                     <a href="" @click.prevent="sort('instructor_Name', 'completed')" class="text-decoration-none text-dark">Instructor Name <sort-icon :sortColumn="sortColumn === 'instructor_Name'" :sortDirection="getSortDirection('instructor_Name')"/></a></th>
                   <th scope="col">Course Details</th>
@@ -220,17 +227,19 @@
               <tbody>
                 <tr v-for="(completed_course, key) in displayedCompletedCourses" :key="key">
                   <td>
-                    <course-name-desc :name="completed_course.course_Name" :category="completed_course.coursecat_Name" :description="completed_course.course_Desc"></course-name-desc>
+                    <course-name-desc :name="completed_course.run_Name" :category="completed_course.coursecat_Name" :description="completed_course.course_Desc"></course-name-desc>
                   </td>
                   <td>
                     {{ completed_course.instructor_Name }}
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(completed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
-                  <div v-if="completed_course.feedback_submitted == true">
-                    <td><course-action status="view-feedback" @click="view_submit_feedback(completed_course.rcourse_ID)" :id="completed_course.course_ID"></course-action></td>
-                  </div>
+                  <td v-if="completed_course.feedback_submitted == true">
+                    <div class="action-buttons">
+                      <course-action status="view-feedback" @click="view_submit_feedback(completed_course.rcourse_ID)" :id="completed_course.course_ID"></course-action>
+                    </div>
+                  </td>
                   <div v-else>
-                    <td><course-action status="provide-feedback" @click="view_submit_feedback(completed_course.rcourse_ID)" :id="completed_course.course_ID"></course-action></td>
+                    <course-action status="provide-feedback" @click="view_submit_feedback(completed_course.rcourse_ID)" :id="completed_course.course_ID"></course-action>
                   </div>
                 </tr>
               </tbody>
@@ -339,6 +348,8 @@ export default {
     }
   },
   async created() {
+    document.title = "Profile | Upskilling Engagement System";
+    
     this.getUserID();
     const user_id = await UserService.getUserID();
     const role = await UserService.getUserRole(user_id);
@@ -351,7 +362,7 @@ export default {
         this.user_ID = user_id
 
         let registered_response= await CourseService.searchCourseRegistrationInfo(user_id, null, null, null)
-        console.log(registered_response)
+
         this.registered_courses = registered_response.data
         if (this.registered_courses == undefined || this.registered_courses.length == 0) {
           this.onInitialEmptyRegistered = true
@@ -370,7 +381,7 @@ export default {
         }
 
         let completed_response = await CourseService.searchCompletedInfo(user_id, null, null, null)
-        // console.log(completed_response.data)
+     
         this.completed_courses = completed_response.data
         if (this.completed_courses == undefined || this.completed_courses.length == 0) {
           this.onInitialEmptyCompleted = true
@@ -452,7 +463,7 @@ export default {
     },
     async searchCourseRegistrationInfo(user_ID, course_Name, coursecat_ID, status) {
       try {
-        console.log(this.user_ID)
+     
         user_ID = this.user_ID
 
         let response = await CourseService.searchCourseRegistrationInfo(
@@ -462,7 +473,7 @@ export default {
           status
         );
         this.registered_courses = response.data;
-        // console.log(this.registered_courses)
+      
         return this.registered_courses;
       } catch (error) {
         console.error("Error fetching info:", error);
@@ -598,13 +609,14 @@ export default {
         return this.currentDate < regClosingDate;
     },
     editCourse(courseId) {
-      console.log(courseId)
       this.$router.push({ name: 'editProposedCourse', params: { courseId } });
     },
     view_submit_feedback(id) {
-      console.log(id)
       this.$router.push({ name: 'submitFeedback', params: {id}})
-    }
+    },
+    viewLessons(courseID) {
+      this.$router.push({ name: 'viewRunCourseLesson', params: {id: courseID}});
+    },
   },
   computed: {
     displayedRegisteredCourses() {

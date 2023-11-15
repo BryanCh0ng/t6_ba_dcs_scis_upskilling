@@ -16,7 +16,7 @@ export default {
         CourseForm
     },
     created() {
-        document.title = "Propose a Course";
+        document.title = "Propose Course | Upskilling Engagement System";
     },
 };
 </script>

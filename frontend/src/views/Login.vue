@@ -18,19 +18,18 @@
                 <router-link to="/forgotPassword" id="forgotpsd">Forgot password?</router-link>
               </div>
 
-              <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+              <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn" title="Sign In">
                 Sign In
               </button>
 
               <p class="text-center mt-2">
-                Don't have an account? <router-link to="/register">Sign Up</router-link>
+                Don't have an account? <router-link to="/register" title="Sign Up">Sign Up</router-link>
               </p>
             </form>
         </form-container>
         
       </div>
     </div>
-    <!-- <success-modal :show="showSuccessModal" :message="successMessage" @close="hideSuccessModal"/> -->
   </div>
 </template>
 
@@ -74,6 +73,9 @@ export default {
     ImageHalf,
     PasswordField,
   },
+  created() {
+    document.title = "Sign In | Upskilling Engagement System";
+  },
   methods: {
     onSubmit() {
       this.v$.$touch();
@@ -96,15 +98,15 @@ export default {
     async performLogin() {
       try {
         const response = await UserService.login(this.email,this.password)
-        console.log(response);
-
-        let userRole = await UserService.getUserRole()
-        if (userRole === 'Student') {
-          this.router.push('/studentViewCourse')
-        } else if (userRole === 'Instructor' || userRole === 'Trainer') {
-          this.router.push('/instructorTrainerViewVotingCampaign') // will need to change the route
-        } else if (userRole === 'Admin') {
-          this.router.push('/adminViewCourse')
+        if (response.code === 200) {
+          let userRole = await UserService.getUserRole()
+          if (userRole === 'Student') {
+            this.router.push('/studentViewRecommendations')
+          } else if (userRole === 'Instructor' || userRole === 'Trainer') {
+            this.router.push('/instructorTrainerViewVotingCampaign')
+          } else if (userRole === 'Admin') {
+            this.router.push('/adminViewCourse')
+          }
         }
 
       } catch (error) {

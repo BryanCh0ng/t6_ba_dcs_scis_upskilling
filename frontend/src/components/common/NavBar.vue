@@ -6,7 +6,7 @@
           <img src="../../assets/smulogo.png" title="smu logo" class="navlogo" />
           <span class="system-name">
             <span class="vertical-line"></span>
-            Upskilling Engagement <br />System
+            Upskilling <br/>Engagement <br/>System
           </span>
         </a>
         <button
@@ -35,7 +35,7 @@
                 <!-- Dropdown toggle button -->
                 <span class="dropdown-toggle btn dropdownbtn" id="userDropdown" role="button" @click="toggleUserDropdown" aria-expanded="false">
                   <div class="username-container">
-                    <span id="username">{{ user_name }}</span>
+                    <font-awesome-icon icon="fa fa-user" style="padding-right: 10px"/><span id="username">{{ user_name }}</span>
                   </div>
                   
                 </span>
@@ -48,6 +48,7 @@
                       <a :class="{ active: isActiveLink(item.path) }" class="nav-link" :href="item.path" @click="item.action ? item.action() : null">
                         {{ item.label }}
                       </a>
+                      <hr class="dropdown-divider" v-if="index === roleSpecificDropdownItems.length - 2" />
                     </li>
                   </ul>
                 </div>
@@ -94,6 +95,7 @@ export default {
           this.user_role === "Trainer"
         ) {
           links.push(
+            { path: "/viewAllLessons", label: "All Lessons" },
             { path: "/instructorTrainerViewVotingCampaign", label: "Voting Campaign" },
             { path: "/proposeCourse", label: "Propose Course" },
             { path: "/contactUs", label: "Contact Us" },
@@ -102,20 +104,21 @@ export default {
           links.push(
             { path: "/adminViewCourse", label: "Course DB" },
             { path: "/adminViewRunCourse", label: "Run Course DB" },
+            { path: "/viewAllLessons", label: "Lesson DB" },
             { path: "/adminViewVoteCourse", label: "Voting Campaign DB" },
             { path: "/adminViewProposedCourse", label: "Proposed Course DB" },
             { path: "/createCourse", label: "Create Course" }
           );
         }
       } 
-      // else {
-      //   // Add the default links for users who are not logged in
-      //   links.push(
-      //     { path: "/adminViewCourse", label: "View Courses" },
-      //     { path: "/proposeCourse", label: "Propose Course" },
-      //     { path: "/contactUs", label: "Contact Us" }
-      //   );
-      // }
+      else {
+        // Default links for users who are not logged in
+        links.push(
+          { path: "/adminViewCourse", label: "View Courses" },
+          { path: "/proposeCourse", label: "Propose Course" },
+          { path: "/contactUs", label: "Contact Us" }
+        );
+      }
 
       return links;
     },
@@ -124,17 +127,18 @@ export default {
 
       if (this.user_role === "Student") {
         items.push({ path: "/studentViewProfile", label: "Profile" });
+        items.push({ path: "/studentViewLesson", label: "My Lessons" });
       } else if (this.user_role === "Instructor" || this.user_role === "Trainer") {
         items.push(
           { path: "/instructorTrainerViewProfile", label: "Profile" },
-          { label: "Blacklist" }, // rmb to add path
-          {  label: "Dashboard" } // rmb to add path
+          { path: "/instructorTrainerViewLesson", label: "My Lessons" },
+          { path: "/viewDashboard", label: "Dashboard" }
         );
       } else if (this.user_role === "Admin") {
         items.push(
           { path: "/adminViewManagement", label: "User Management" },
-          { path: "/adminViewFeedbackTemplate", label: "Feedback Template" }, // rmb to add path
-          { label: "Dashboard" } // rmb to add path
+          { path: "/adminViewFeedbackTemplate", label: "Feedback Template" },
+          { path: "/viewDashboard", label: "Dashboard" }
         );
       }
 
@@ -154,7 +158,6 @@ export default {
       try {
         const user_ID = await UserService.getUserID()
         this.user_ID = user_ID
-        // console.log(this.user_ID)
 
         if (user_ID === "Session not set") {
           this.user_ID = null
@@ -180,7 +183,6 @@ export default {
       try {
         const user_name = await UserService.getUserName()
         this.user_name = user_name
-        // console.log(this.user_name)
       } catch (error) {
         console.error('Error fetching user ID:', error);
         this.user_name = null;
@@ -207,11 +209,13 @@ export default {
     async logout() {
       try {
         const response = await UserService.logout()
-        console.log(response)
-        this.user_role = "";
-        this.user_ID = null;
-        this.user_name = "";
-        this.router.push('/')
+        if (response.code === 200) {
+          this.user_role = "";
+          this.user_ID = null;
+          this.user_name = "";
+          this.router.push('/')
+        }
+        
       } catch (error) {
         console.error('Error logging out:', error);
     }
@@ -220,7 +224,6 @@ export default {
     this.router.push('/');
     },
     toggleUserDropdown() {
-      // console.log("Toggling user dropdown");
       this.showUserDropdown = !this.showUserDropdown;
     },
   }
@@ -247,7 +250,7 @@ export default {
 }
 
 .navbar li + li {
-  margin-left: 20px;
+  margin-left: 15px;
 }
 
 .navbar a,
@@ -286,20 +289,20 @@ export default {
 }
 
 .navlogo {
-  width: 180px;
+  width: 160px;
 }
 
 .system-name {
-  font-size: 16px;
+  font-size: 15px;
   display: flex;
   align-items: center;
-  margin-left: 10px;
+  margin-left: 5px;
   font-weight: bold;
 }
 
 .vertical-line {
   border-left: 1px solid #151c55;
-  height: 40px;
+  height: 50px;
   margin-right: 10px;
 }
 
@@ -343,7 +346,7 @@ export default {
   text-overflow: ellipsis;
   max-width: 100px;
   display: inline-block;
-  height:20px;
+  height:22px;
 }
 
 .loginbtn {
@@ -353,7 +356,7 @@ export default {
 
 .dropdown {
   position: relative;
-  top: 12px;
+  top: 15px;
 }
 
 .dropdown-content {
@@ -361,7 +364,7 @@ export default {
   top: 80%; 
   left: -22px; 
   z-index: 1;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .admin-dropdown {
@@ -387,13 +390,26 @@ export default {
   cursor: pointer;
 }
 
-@media (max-width: 768px) {
+hr.dropdown-divider {
+    margin-top: 3px;
+    margin-bottom: 0;
+}
+
+
+@media (max-width: 1399px) {
   .dropdown {
+    position: relative;
+    top: 1px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* .dropdown {
     bottom: 120%;
     left: 5px;
     transform: translateY(-10px);
     margin-bottom: 40px;
-  }
+  } */
 
   .dropdown-content {
     position: absolute;
@@ -418,11 +434,9 @@ export default {
   .navbar-collapse{
     border:0px;
   }
-
 }
 
 @media (max-width: 510px) {
-  
   .system-name {
     display: none;
   }

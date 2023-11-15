@@ -1,7 +1,7 @@
 <template>
     <div id="proposecourseform">
         <div class="container-fluid mt-5">
-            <h2 class="text-center">Propose a Course</h2>
+            <h2 class="text-center">Propose Course</h2>
             <form @submit.prevent="onSubmit" @reset="onReset">
                 <!--Course Name-->
                 <div class="form-group mt-5 mb-4">
@@ -95,7 +95,7 @@ export default {
                 courseDescription: { required: helpers.withMessage('Please provide a valid course description', required) }
             }
         }
-    },
+    }
     async mounted() {
         await this.fetchUserID();
         await this.fetchCourseCategories();

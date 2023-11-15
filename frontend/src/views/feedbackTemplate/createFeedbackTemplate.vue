@@ -1,27 +1,27 @@
 <template>
   <div>
-    <div class="container pt-4">
+    <div class="container pt-5">
       <div class="text-center">
         <h2>Feedback Template</h2>
         <h4 class="text-grey">Customised feedbacks for specific course</h4>
       </div>
       <h4 class="mt-5 mb-3">Create Feedback Template</h4>
 
-      <div class="form-group row mb-4 pt-4 pb-4 bg-light-grey">
+      <div class="form-group row mb-4 pt-4 pb-4 bg-white rounded">
         <div>
           <h5>Common Required Questions (will be placed at the end of feedback)</h5>
         </div>
-        <div class="form-group">
+        <div class="form-group mt-2 mb-3">
           <label>1. Question To Ask</label>
-          <textarea disabled="true" class="form-control" type="text" :placeholder="'How would you rate the course?'"></textarea>
+          <textarea disabled="true" class="form-control mt-2" type="text" :placeholder="'How would you rate the course?'"></textarea>
         </div>
-        <div class="form-group mt-2">
+        <div class="form-group mt-2 mb-3">
           <label>1. Input Type</label>
-          <input disabled="true" class="form-control" type="text" :placeholder="'Likert Scale'" />
+          <input disabled="true" class="form-control mt-2" type="text" :placeholder="'Likert Scale'" />
         </div>
-        <div class="form-group mt-2">
+        <div class="form-group mt-2 mb-3">
           <label>1. Likert Scale Option (Sequence from left to right)</label>
-          <ul>
+          <ul class="mt-2">
             <li>
               <input type="radio" disabled>
               <label>Very Poor</label>
@@ -44,23 +44,24 @@
             </li>
           </ul>
         </div>
-        <div class="form-group">
+        <div class="form-group mb-3">
           <label>2. Question To Ask</label>
-          <input disabled="true" class="form-control" type="text" :placeholder="'Any Feedbacks for the course?'" />
+          <input disabled="true" class="form-control mt-2" type="text" :placeholder="'Any Feedbacks for the course?'" />
         </div>
-        <div class="form-group mt-2">
+        <div class="form-group mt-2 mb-2">
           <label>2. Input Type</label>
-          <input disabled="true" class="form-control" type="text" :placeholder="'Text Field'" />
+          <input disabled="true" class="form-control mt-2" type="text" :placeholder="'Text Field'" />
         </div>
       </div>
 
-      <div class="form-group row mb-2">
+      <div class="form-group row mb-4">
         <label class="mb-1">Enter Feedback Template Name</label>
-        <input type="text" v-model="feedback_template_name" class="form-control" placeholder="Feedback Template Name" required>
+        <input type="text" v-model="feedback_template_name" class="form-control templatename" placeholder="Feedback Template Name" required>
         <div v-if="v$.feedback_template_name.$error && v$.feedback_template_name.$dirty" class="error-message mt-1 text-danger">Feedback Template Name Field is required.</div>
         <div v-if="this.isPresent" class="error-message mt-1 text-danger">{{ templateNameErrorMsge }}</div>
       </div>
 
+      <h5>Custom Feedback Questions</h5>
       <div class="form-group mt-2 mb-2" v-for="(element, index) in questions" :key="element.id">
         <feedback-template ref="feedbackTemplates" 
         :originalQnNum="element.originalQnNum" 
@@ -73,7 +74,7 @@
         @submitData="submitData">
         </feedback-template>
         <div>
-          <button  v-if="!element.destroyed" @click="destroyComponent(element.id)" class="btn btn-secondary mt-5 mb-5 col-12">
+          <button  v-if="!element.destroyed" @click="destroyComponent(element.id)" class="btn btn-secondary mt-3 mb-5 col-12" title="Remove Question">
             Remove Question {{ element.qnNum }}
           </button>
         </div>
@@ -81,15 +82,15 @@
       <div>
         <a class="mt-4 d-flex justify-content-center text-dark addQn" @click="addQuestion">+ Add Question</a>
       </div>
-      <div class="row">
+      <div class="row mb-5">
         <div class="col-6 form-group">
-          <button type="button" class="btn btn-primary shadow-sm w-100 mt-5" @click="openModal" data-bs-toggle="modal" data-bs-target="#preview_modal">
+          <button type="button" class="btn btn-primary shadow-sm w-100 mt-5" @click="openModal" data-bs-toggle="modal" data-bs-target="#preview_modal" title="Preview">
             Preview
           </button>
         </div>
 
         <div class="col-6 form-group">
-          <button type="submit" @click="submitFeedbackTemplate" class="btn btn-edit shadow-sm w-100 mt-5">
+          <button type="submit" @click="submitFeedbackTemplate" class="btn btn-edit shadow-sm w-100 mt-5" title="Create Feedback Template">
             Create
           </button>
         </div>
@@ -203,7 +204,6 @@ export default {
           data: formData
         }
         try {
-          console.log(data)
           const response = await FeedbackTemplateService.createFeedbackTemplate(data)
           if (response.code == 200) {
             this.title = "Feedback Template Create Success"
@@ -288,5 +288,13 @@ export default {
 
   li {
     list-style: none;
+  }
+
+  li input[type="radio"] + label {
+    margin-left: 10px;
+  }
+
+  .templatename {
+    height: 50px;
   }
 </style>

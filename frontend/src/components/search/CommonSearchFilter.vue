@@ -23,7 +23,7 @@
                     </div>
                     <div class="col-md">
                         <div class="d-flex justify-content-between">
-                            <button @click="resetFilter" class="btn" id="resetbtn" type="button">Clear All</button>
+                            <button @click="resetFilter" class="btn" id="resetbtn" type="button">Reset</button>
                             <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
                         </div>
                     </div>
@@ -34,12 +34,10 @@
 </template>
 
 <script>
-// import { axiosClient } from "../api/axiosClient";
 import DropdownField from "../DropdownField.vue";
-// import InputField from "../InputField.vue";
-// import CourseService from "@/api/services/CourseService.js"
-import CourseCategoryService from "@/api/services/CourseCategoryService.js"
-import UserService from "@/api/services/UserService.js"
+import CourseCategoryService from "@/api/services/CourseCategoryService.js";
+import UserService from "@/api/services/UserService.js";
+import _ from "lodash";
 
 export default({
     name: "SearchFilter",
@@ -59,19 +57,23 @@ export default({
     },
     components: {
         DropdownField,
-        // InputField,
     },
     async mounted() {
-        // await this.getAllCourses();
-        // await this.searchFilterCourses();
         await this.fetchCategoryDropdownOptions();
         this.statusDropdownOptions = this.statusOptions;
     },
+    watch: {
+        courseName: _.debounce(function() {
+            this.searchFilter();
+        }, 300),
+        category() {
+            this.searchFilter();
+        },
+        status() {
+            this.searchFilter();
+        }
+    },
     methods: {
-        // async getAllCourses() {
-        //     let response = await CourseService.getAllCourses();
-        //     this.courseList = response.data.course;
-        // },
         async fetchCategoryDropdownOptions() {
             try {
                 const categoryOptions = await CourseCategoryService.getAllCourseCategory(); // Use the CourseCategoryService
@@ -96,8 +98,7 @@ export default({
                 const status = this.status;
 
                 let searchResults;
-                // console.log(status)
-                
+            
                 // Use the searchApi function from the parent component
                 searchResults = await this.searchApi(user_ID, course_Name, coursecat_ID, status);
                 

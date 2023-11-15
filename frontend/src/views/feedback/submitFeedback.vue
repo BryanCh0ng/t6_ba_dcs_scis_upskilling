@@ -1,7 +1,7 @@
 <template>
     <div>
       <div class="container" v-if="!haveError">
-        <div class="text-center pb-5 pt-4">
+        <div class="text-center pb-5 pt-5">
           <h2>{{ headingTitle }}</h2>
           <h4 class="text-grey">{{ this.course.run_Name }}</h4>
         </div>
@@ -11,7 +11,7 @@
           <number-field :disabled="disabled" :placeholder="element.answer" v-else-if="element.selectedInputType=='Number Field'"  class="mb-5" :label="element.question" :qnNum="key+1" @input="updateAnswer"></number-field>
           <radio-button-field :disabled="disabled" :sOption="element.answer" v-else-if="element.selectedInputType=='Radio Button'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="key+1" @input="updateAnswer"></radio-button-field>
           <single-select-field :disabled="disabled" :sOption="element.answer" v-else-if="element.selectedInputType=='Single Select'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="key+1"  @input="updateAnswer"></single-select-field>
-          <likert-scale-field :disabled="disabled" :sOption="element.answer" v-else-if="element.selectedInputType=='Likert Scale'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="key+1" @input="updateAnswer"></likert-scale-field> 
+          <likert-scale-field :disabled="disabled" :sOption="element.answer" v-else-if="element.selectedInputType=='Likert Scale'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="key+1" @input="updateAnswer"></likert-scale-field>
         </div>
 
         <div class="form-group row" v-for="(element, key) in common_questions" :key="key">
@@ -80,36 +80,51 @@ export default {
     }
   },
   methods: {
+    isWithinFeedbackPeriod(start_date, start_time, end_date, end_time) {
+      const feedbackStartDate = new Date(`${start_date} ${start_time}`);
+      const feedbackEndDate = new Date(`${end_date} ${end_time}`);
+      const currentDateTime = new Date();
+      return currentDateTime >= feedbackStartDate && currentDateTime <= feedbackEndDate;
+    },
     async loadData() {
       try {
         const course_id = this.$route.params.id;
         this.course = await RunCourseService.getRunCourseById(course_id);
-        console.log(this.course)
-        this.haveError = false
-        const response = await FeedbackTemplateService.getTemplateById(this.course.template_ID)
-        console.log(response)
-        if (response.code == 200) {
+        const withinFeedbackPeriod = this.isWithinFeedbackPeriod(this.course.feedback_Startdate, this.course.feedback_Starttime, this.course.feedback_Enddate, this.course.feedback_Endtime)
+        if (!withinFeedbackPeriod) {
+          this.disabled = true;
+          this.showAlert = true;
+          this.haveError = true
+          this.title = "Submit Feedback Fail";
+          this.message = "Feedback not yet open for submission";
+          this.buttonType = "danger"
+        } else {
           this.haveError = false
-          this.templateData = response.data.template.data
-          for (let i = 0; i < this.templateData.length; i++) {
-            this.templateData[i]['answer'] = '';
+          const response = await FeedbackTemplateService.getTemplateById(this.course.template_ID)
+          console.log(response)
+          if (response.code == 200) {
+            this.haveError = false
+            this.templateData = response.data.template.data
+            for (let i = 0; i < this.templateData.length; i++) {
+              this.templateData[i]['answer'] = '';
+            }
+          } else {
+            this.disabled = true;
+            this.haveError = true
+            this.errorMsge = response.message
           }
-        } else {
-          this.disabled = true;
-          this.haveError = true
-          this.errorMsge = response.message
-        }
-        const common_response = await FeedbackTemplateService.getFeedbackTemplateCommonQuestions()
-        console.log(common_response)
-        if (common_response.code == 200){
-          this.common_questions = common_response.common_questions
-          for (let i = 0; i < this.common_questions.length; i++) {
-            this.common_questions[i]['answer'] = '';
+          const common_response = await FeedbackTemplateService.getFeedbackTemplateCommonQuestions()
+          console.log(common_response)
+          if (common_response.code == 200){
+            this.common_questions = common_response.common_questions
+            for (let i = 0; i < this.common_questions.length; i++) {
+              this.common_questions[i]['answer'] = '';
+            }
+          } else {
+            this.disabled = true;
+            this.haveError = true
+            this.errorMsge = common_response.common_questions;
           }
-        } else {
-          this.disabled = true;
-          this.haveError = true
-          this.errorMsge = common_response.common_questions;
         }
       } catch (error) {
         console.log(error) 
@@ -181,13 +196,11 @@ export default {
         'data': this.templateData,
         'common_questions_data': this.common_questions
       }
-      console.log(data)
-      console.log(this.common_questions)
       const isAnyAnswerBlank = this.templateData.some((element) => {
-        return !element.answer.trim();
+        return !element.answer.toString().trim();
       });
       const isCommonAnswerBlank = this.common_questions.some((element) => {
-        return !element.answer.trim();
+        return !element.answer.toString().trim();
       });
       if (!isAnyAnswerBlank && !isCommonAnswerBlank) {
         try{
@@ -233,13 +246,12 @@ export default {
         this.templateData[index]['answer'] = answer.value;
       } else {
         if (answer.value != undefined) {
-          this.common_questions[0]['answer'] = answer.value;
+          this.common_questions[1]['answer'] = answer.value;
         }
       }
     },
     updateCommonLikert(answer) {
-      this.common_questions[1]['answer'] = answer.value;
-      console.log(this.common_questions);
+      this.common_questions[0]['answer'] = answer.value;
     }
   },
   async created() {

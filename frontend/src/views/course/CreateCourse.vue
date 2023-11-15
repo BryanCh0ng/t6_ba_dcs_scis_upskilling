@@ -22,7 +22,7 @@ export default {
         if (role != 'Admin') {
             this.$router.push({ name: 'proposeCourse' }); 
         } else {
-            document.title = "Create Course For Registration";
+            document.title = "Create Course | Upskilling Engagement System";
         }
     },
 };

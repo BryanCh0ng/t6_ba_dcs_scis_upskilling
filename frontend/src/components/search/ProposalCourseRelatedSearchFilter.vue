@@ -1,6 +1,6 @@
 <template>
     <div id="searchfitler">
-        <div class="container mt-5 mb-5 pt-4">
+        <div class="container mt-5 mb-5">
             <form>
                 <div class="row">
                     <div class="col-md">
@@ -15,7 +15,7 @@
                     </div>
                     <div class="col-md col-lg-3">
                         <div class="d-flex justify-content-between">
-                            <button @click="resetFilter" class="btn" id="resetbtn" button="type">Clear</button>
+                            <button @click="resetFilter" class="btn" id="resetbtn" button="type">Reset</button>
                             <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
                         </div>
                     </div>
@@ -27,8 +27,8 @@
 
 <script>
 import DropdownField from "../DropdownField.vue";
-// import CourseService from "@/api/services/CourseService.js"
-import CourseCategoryService from "@/api/services/CourseCategoryService.js"
+import CourseCategoryService from "@/api/services/CourseCategoryService.js";
+import _ from "lodash";
 
 export default({
     name: "SearchFilter",
@@ -43,18 +43,20 @@ export default({
         DropdownField,
     },
     async mounted() {
-        // await this.getAllCourses();
-        // await this.searchFilterCourses();
         await this.fetchCategoryDropdownOptions();
     },
     props: {
         searchApi: Function,
     },
+    watch: {
+        courseName: _.debounce(function() {
+            this.searchFilter();
+        }, 300),
+        category() {
+            this.searchFilter();
+        }
+    },
     methods: {
-        // async getAllCourses() {
-        //     let response = await CourseService.getAllCourses();
-        //     this.courseList = response.data.course;
-        // },
         async fetchCategoryDropdownOptions() {
             try {
                 const categoryOptions = await CourseCategoryService.getAllCourseCategory(); // Use the CourseCategoryService
@@ -73,7 +75,6 @@ export default({
             try {
                 const course_Name = this.courseName;
                 const coursecat_ID = this.category;
-                console.log(coursecat_ID)
 
                 let searchResults;
 

@@ -2,6 +2,7 @@ import { axiosClient } from "../axiosClient";
 import BaseApiService from "../BaseApiService";
 
 class runCourseService extends BaseApiService {
+
   async getAllRunCourses(courseId) {
     try {
       let courses = await axiosClient.get("/runcourse/get_all_runcourses", {params: {course_id: courseId}});
@@ -48,7 +49,6 @@ class runCourseService extends BaseApiService {
   async changeRegistrationStatus(updatedData) {
     try {
       let response = await axiosClient.post("/runcourse/change_registration_status", updatedData);
-      console.log(response)
       return response.data
     } catch (error) {
       return this.handleError(error);
@@ -61,7 +61,6 @@ class runCourseService extends BaseApiService {
             rcourse_id: rcourse_id,
             template_id: template_id,
         });
-        console.log(response.data);
         return response.data;
         
     } catch (error) {
@@ -79,6 +78,20 @@ class runCourseService extends BaseApiService {
      }
   }
 
+  // Course Name
+  async getRunCourseName(rcourse_id) {
+    try {
+        let runcourse_name = await axiosClient.get("/runcourse/get_runcourse_name", {
+            params: {
+              rcourse_id: rcourse_id,
+            }
+        });
+        return runcourse_name.data;
+    } catch (error) {
+        return this.handleError(error);
+    }
+  }
+  
   async getRunCourseCountByCourseId(courseId) {
     try {
       let run_course_count = await axiosClient.get("/runcourse/get_run_course_count_by_course_id", { params: { course_id: courseId } });

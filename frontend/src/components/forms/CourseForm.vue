@@ -1,15 +1,15 @@
 <template>
     <div id="courseform">
-        <div class="container">
-
-            <h2 v-if="view === 'createCourse'" class="text-center pt-3">Create Course For Registration</h2>
-            <h2 v-else-if="view === 'proposeCourse'" class="text-center pt-3">Propose a Course</h2>
-            <h2 v-else class="text-center pt-3">Edit Course</h2>
+        <div class="container pt-5">
+            <h2 v-if="view === 'createCourse'" class="text-center">Create Course</h2>
+            <h2 v-else-if="view === 'proposeCourse'" class="text-center">Propose Course</h2>
+            <h2 v-else class="text-center">Edit Course</h2>
 
             <form @submit.prevent="onSubmit" @reset="onReset">
                 <!--Course Name-->
                 <div class="form-group mt-5 mb-4">
-                    <input v-model="formData.courseName" type="text" placeholder="Course Name" required autofocus
+                    <label for="courseName" class="mb-2">Course Name</label>
+                    <input v-model="formData.courseName" id="courseName" type="text" placeholder="Course Name" title="Course Name" required autofocus
                         :class="{ 'form-control': true, 'border-0': !v$?.formData.courseName?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseName?.$error }" />
                     <div v-if="v$?.formData.courseName?.$error" class="text-danger">
                         <span v-for="error in v$?.formData.courseName?.$errors" :key="error.$uid">{{ error.$message
@@ -18,7 +18,8 @@
                 </div>
                 <!--Course Category-->
                 <div class="form-group mb-4">
-                    <dropdown-field v-model="formData.selectedCategory" :default-placeholder="'Course Category'"
+                    <label for="courseCategory" class="mb-2">Course Category</label>
+                    <dropdown-field v-model="formData.selectedCategory" id="courseCategory" title="Course Category" :default-placeholder="'Course Category'"
                         :errors="v$?.formData.selectedCategory?.$errors[0]?.$message">
                         <option v-for="courseCategory in formData.courseCategories" :key="courseCategory.coursecat_ID"
                             :value="courseCategory.coursecat_Name">
@@ -28,7 +29,8 @@
                 </div>
                 <!--Course Description-->
                 <div class="form-group mb-4">
-                    <textarea v-model="formData.courseDescription"
+                    <label for="courseDescription" class="mb-2">Course Description</label>
+                    <textarea v-model="formData.courseDescription" id="courseDescription" title="Course Description"
                         :class="{ 'form-control': true, 'border-0': !v$?.formData.courseDescription?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseDescription?.$error }"
                         placeholder="Course Description" style="height: 200px" @input="limitCourseDescription"
                         required></textarea>
@@ -41,30 +43,30 @@
                     </div>
                 </div>
 
-                <div v-if="view === 'createCourse' || view === 'proposeCourse'" class="row">
+                <div v-if="view === 'createCourse' || view === 'proposeCourse'" class="row mt-5">
                     <div class="col-md-6 form-group">
-                        <button type="reset" class="btn btn-secondary shadow-sm w-100 mt-5 field cancelbtn">
+                        <button type="reset" class="btn btn-secondary shadow-sm w-100 field cancelbtn">
                             Reset
                         </button>
                     </div>
 
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                        <button type="submit" class="btn btn-block shadow-sm w-100 field submitbtn">
                             Submit
                         </button>
                     </div>
                 </div>
 
-                <div v-else class="row">
+                <div v-else class="row mt-5">
                     <div class="col-md-6 form-group">
                         <button type="button" @click="goToAdminViewCourse"
-                            class="btn btn-secondary shadow-sm w-100 mt-5 field cancelbtn">
+                            class="btn btn-secondary shadow-sm w-100 field cancelbtn">
                             Cancel
                         </button>
                     </div>
 
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <button type="submit" class="btn btn-block shadow-sm w-100 mt-5 field submitbtn">
+                        <button type="submit" class="btn btn-block shadow-sm w-100 field submitbtn">
                             Save
                         </button>
                     </div>
@@ -225,14 +227,9 @@ export default {
         async createCourse() {
             try {
                 this.createCourseResponse = await CourseService.createCourse(this.submitFormData);
-                //console.log(typeof(this.createCourseResponse))
-                //console.log(this.createCourseResponse.data.course_ID)
-
             } catch (error) {
                 console.error('Error creating a new course', error);
                 this.title = "Course Creation Failed";
-
-                //throw new Error("Course Creation was unsuccessful");
 
                 if (error.response.status === 500) {
                     throw new Error("Course Creation was unsuccessful");
@@ -319,7 +316,7 @@ export default {
 
             if (!this.v$.$invalid) {
 
-                // console.log('Form has no validation errors');
+                console.log('Form has no validation errors');
 
                 try {
 

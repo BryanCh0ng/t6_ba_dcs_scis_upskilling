@@ -4,7 +4,7 @@
             <form>
                 <div class="row">
                     <div class="col-md">
-                        <input v-model="courseName" type="text" placeholder="Course Name"  ref="courseNameInput" class="form-control border-0 shadow-sm px-4 field mb-3"/>
+                        <input v-model="courseName" type="text" :placeholder="courseNamePlaceholder"  ref="courseNameInput" class="form-control border-0 shadow-sm px-4 field mb-3"/>
                     </div>
                     <div class="col-md">
                         <dropdown-field
@@ -22,7 +22,7 @@
                     </div>
                     <div class="col-md">
                         <div class="d-flex justify-content-between">
-                            <button @click="resetFilter" class="btn" id="resetbtn" button="type">Clear</button>
+                            <button @click="resetFilter" class="btn" id="resetbtn" button="type">Reset</button>
                             <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
                         </div>
                     </div>
@@ -33,10 +33,9 @@
 </template>
 
 <script>
-// import { axiosClient } from "../api/axiosClient";
 import DropdownField from "../DropdownField.vue";
-// import CourseService from "@/api/services/CourseService.js"
-import CourseCategoryService from "@/api/services/CourseCategoryService.js"
+import CourseCategoryService from "@/api/services/CourseCategoryService.js";
+import _ from "lodash";
 
 export default({
     name: "SearchFilter",
@@ -53,31 +52,37 @@ export default({
         statusOptions: Array, 
         searchApi: Function,
         defaultStatus: String,
+        courseNamePlaceholder: String
     },
     components: {
         DropdownField,
     },
     async mounted() {
-        // await this.getAllCourses();
-        // await this.searchFilterCourses();
         await this.fetchCategoryDropdownOptions();
         this.statusDropdownOptions = this.statusOptions;
     },
+    watch: {
+        courseName: _.debounce(function() {
+            this.searchFilter();
+        }, 300),
+        category() {
+            this.searchFilter();
+        },
+        status() {
+            this.searchFilter();
+        }
+    },
     methods: {
-        // async getAllCourses() {
-        //     let response = await CourseService.getAllCourses();
-        //     this.courseList = response.data.course;
-        // },
+        
         async fetchCategoryDropdownOptions() {
             try {
-                const categoryOptions = await CourseCategoryService.getAllCourseCategory(); // Use the CourseCategoryService
+                const categoryOptions = await CourseCategoryService.getAllCourseCategory(); 
                 this.categoryDropdownOptions = categoryOptions;
             } catch (error) {
                 console.error('Error fetching category dropdown options:', error);
             }
         },
         resetFilter() {
-            console.log(this.status);
             this.courseName = "";
             this.category = "";
             this.status = "";

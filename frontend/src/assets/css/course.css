@@ -2,7 +2,7 @@
   margin-left:5px;
 }
 
-.view-course-details, .view-feedback-analysis, .view-runs, .apply-feedback-template {
+.view-course-details, .view-feedback-analysis, .view-runs, .apply-feedback-template, .view-lessons, .view-registrations {
   cursor: pointer;
 }
 
@@ -12,4 +12,10 @@
 
 .reject-reason-label {
   margin-left: 10px;
+}
+
+table th a, table th, table td {
+  padding: 25px !important;
+  vertical-align: middle;
+  text-align: center;
 }

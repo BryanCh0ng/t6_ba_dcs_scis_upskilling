@@ -15,7 +15,7 @@
                     </div>
                     <div class="col-md">
                         <div class="d-flex justify-content-between">
-                            <button @click="resetFilter" class="btn" id="resetbtn" button="type">Clear</button>
+                            <button @click="resetFilter" class="btn" id="resetbtn" button="type">Reset</button>
                             <button @click.prevent="searchFilter" class="btn" id="searchbtn">Search</button>
                         </div>
                     </div>
@@ -27,6 +27,7 @@
 
 <script>
 import DropdownField from "../DropdownField.vue";
+import _ from "lodash";
 
 export default({
     name: "SearchFilter",
@@ -44,6 +45,14 @@ export default({
     },
     components: {
         DropdownField
+    },
+    watch: {
+        name: _.debounce(function() {
+            this.searchFilter();
+        }, 300),
+        status() {
+            this.searchFilter();
+        }
     },
     methods: {
         resetFilter() {
