@@ -52,7 +52,7 @@ def getUserRole(user_ID=None):
 
     if user_ID:
         user = db.session.query(User).filter_by(user_ID=user_ID).first()
-        db.session.close()
+        # db.session.close()
         if user:
             return user.role_Name
         else:
@@ -62,10 +62,10 @@ def getUserRole(user_ID=None):
     
 def getUserID():
     user_ID = session.get('user_ID')
-    print(user_ID)
+    # print(user_ID)
     if user_ID:
         id = User.query.filter_by(user_ID=user_ID).first().user_ID
-        db.session.close()
+        # db.session.close()
         return id
     else:
         db.session.close()
