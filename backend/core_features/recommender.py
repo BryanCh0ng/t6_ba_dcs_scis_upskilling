@@ -225,33 +225,50 @@ class RecommenderCourseRegistration(Resource):
         # Define weights for each feature
         weights = {'description': 0.5, 'name': 0.2, 'category': 0.3}
 
-        course_data = []
+        # Prepare the combined corpus for fitting the vectorizer
+        combined_corpus = []
+        descriptions = []
+        names = []
+        categories = []
 
         for course_id in pivot_df.index:
             course = Course.query.filter(Course.course_ID == course_id).first()
-            course_description = preprocess_text(course.course_Desc)
-            course_name = preprocess_text(course.course_Name)
+            description = preprocess_text(course.course_Desc)
+            name = preprocess_text(course.course_Name)
+            category_entry = CourseCategory.query.filter(CourseCategory.coursecat_ID == course.coursecat_ID).first()
+            category = category_entry.coursecat_Name if category_entry else ""
 
-            category = CourseCategory.query.filter(CourseCategory.coursecat_ID == course.coursecat_ID).first()
-            if category:
-                course_category = preprocess_text(category.coursecat_Name)
-            else:
-                course_category = ""  
+            combined_corpus.append(f"{description} {name} {category}")
+            descriptions.append(description)
+            names.append(name)
+            categories.append(category)
 
-            combined_text = f"{course_description} {course_name} {course_category}"
-            course_data.append(combined_text)
-
+        # Fit the vectorizer on the combined corpus
         tfidf_vectorizer = TfidfVectorizer()
-        tfidf_matrix = tfidf_vectorizer.fit_transform(course_data)
+        tfidf_vectorizer.fit(combined_corpus)
 
-        weighted_tfidf = tfidf_matrix.multiply(weights['description'])
-        weighted_tfidf = weighted_tfidf + tfidf_matrix.multiply(weights['name'])
-        weighted_tfidf = weighted_tfidf + tfidf_matrix.multiply(weights['category'])
+        # Transform each feature set using the common vocabulary
+        tfidf_descriptions = tfidf_vectorizer.transform(descriptions)
+        tfidf_names = tfidf_vectorizer.transform(names)
+        tfidf_categories = tfidf_vectorizer.transform(categories)
 
-        course_similarity = cosine_similarity(weighted_tfidf, weighted_tfidf)
+        # Apply weights to the TF-IDF matrices
+        weighted_tfidf_descriptions = tfidf_descriptions.multiply(weights['description'])
+        weighted_tfidf_names = tfidf_names.multiply(weights['name'])
+        weighted_tfidf_categories = tfidf_categories.multiply(weights['category'])
+
+        # Verify the shape of weighted matrices before adding
+        assert weighted_tfidf_descriptions.shape == weighted_tfidf_names.shape == weighted_tfidf_categories.shape, "The TF-IDF matrices have inconsistent shapes."
+
+        # Combine the weighted matrices by summing them up
+        combined_weighted_tfidf = weighted_tfidf_descriptions + weighted_tfidf_names + weighted_tfidf_categories
+
+        # Calculate cosine similarity on the combined weighted matrix
+        course_similarity = cosine_similarity(combined_weighted_tfidf)
         course_similarity_df = pd.DataFrame(course_similarity, index=pivot_df.index, columns=pivot_df.index)
 
         return course_similarity_df
+
 
     def get_registered_courses(self, user_ID, course_list_req):
         reg_courses = Registration.query.filter(
@@ -553,32 +570,49 @@ class RecommenderCourseInterest(Resource):
         return pivot_df
 
     def calculate_course_similarity(self, pivot_df):
+        # Define weights for each feature
         weights = {'description': 0.5, 'name': 0.2, 'category': 0.3}
 
-        course_data = []
+        # Prepare the combined corpus for fitting the vectorizer
+        combined_corpus = []
+        descriptions = []
+        names = []
+        categories = []
 
         for course_id in pivot_df.index:
             course = Course.query.filter(Course.course_ID == course_id).first()
-            course_description = preprocess_text(course.course_Desc)
-            course_name = preprocess_text(course.course_Name)
+            description = preprocess_text(course.course_Desc)
+            name = preprocess_text(course.course_Name)
+            category_entry = CourseCategory.query.filter(CourseCategory.coursecat_ID == course.coursecat_ID).first()
+            category = category_entry.coursecat_Name if category_entry else ""
 
-            category = CourseCategory.query.filter(CourseCategory.coursecat_ID == course.coursecat_ID).first()
-            if category:
-                course_category = preprocess_text(category.coursecat_Name)
-            else:
-                course_category = ""  
+            combined_corpus.append(f"{description} {name} {category}")
+            descriptions.append(description)
+            names.append(name)
+            categories.append(category)
 
-            combined_text = f"{course_description} {course_name} {course_category}"
-            course_data.append(combined_text)
-
+        # Fit the vectorizer on the combined corpus
         tfidf_vectorizer = TfidfVectorizer()
-        tfidf_matrix = tfidf_vectorizer.fit_transform(course_data)
+        tfidf_vectorizer.fit(combined_corpus)
 
-        weighted_tfidf = tfidf_matrix.multiply(weights['description'])
-        weighted_tfidf = weighted_tfidf + tfidf_matrix.multiply(weights['name'])
-        weighted_tfidf = weighted_tfidf + tfidf_matrix.multiply(weights['category'])
+        # Transform each feature set using the common vocabulary
+        tfidf_descriptions = tfidf_vectorizer.transform(descriptions)
+        tfidf_names = tfidf_vectorizer.transform(names)
+        tfidf_categories = tfidf_vectorizer.transform(categories)
 
-        course_similarity = cosine_similarity(weighted_tfidf, weighted_tfidf)
+        # Apply weights to the TF-IDF matrices
+        weighted_tfidf_descriptions = tfidf_descriptions.multiply(weights['description'])
+        weighted_tfidf_names = tfidf_names.multiply(weights['name'])
+        weighted_tfidf_categories = tfidf_categories.multiply(weights['category'])
+
+        # Verify the shape of weighted matrices before adding
+        assert weighted_tfidf_descriptions.shape == weighted_tfidf_names.shape == weighted_tfidf_categories.shape, "The TF-IDF matrices have inconsistent shapes."
+
+        # Combine the weighted matrices by summing them up
+        combined_weighted_tfidf = weighted_tfidf_descriptions + weighted_tfidf_names + weighted_tfidf_categories
+
+        # Calculate cosine similarity on the combined weighted matrix
+        course_similarity = cosine_similarity(combined_weighted_tfidf)
         course_similarity_df = pd.DataFrame(course_similarity, index=pivot_df.index, columns=pivot_df.index)
 
         return course_similarity_df
