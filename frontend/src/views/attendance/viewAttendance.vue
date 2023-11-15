@@ -244,6 +244,7 @@
               this.message = submit_attendance_response.message
               this.buttonType = "success";
               this.showAlert = !this.showAlert;
+              this.selectedStudents = [];
             } else {
               this.title = 'Submit Attendance Failed';
               this.message = submit_attendance_response.message
