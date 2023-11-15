@@ -21,6 +21,7 @@ class TestApp(flask_testing.TestCase):
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
     app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
     app.config['TESTING'] = True
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     def create_app(self):
         return app
@@ -69,7 +70,7 @@ class getallmsg(TestApp):
             response = msg_instance.get()
             response_data = response.get_json()
             # print(response_data)
-            # print(response_data["code"])
+            # # print(response_data["code"])
             # print(response_data["data"])
         # returns test response object
             # print("=====================================================================================================================")
@@ -103,12 +104,14 @@ class getallmsg(TestApp):
 
 # class createnewMSG(TestApp):
 #     def test_create_valid_msg(self):
-#         date_string = datetime(2023,11,13,12,00,00)
+#         date_string = '2023-08-25 17:00:00'
+#         date  = datetime(2012, 3, 3, 10, 10, 10)
+#         datetime_obj = datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
 #         request_body = {
 #             "user_ID": 1, 
 #             "msg_Subject": "Active", 
 #             "msg_Body": "I am a test", 
-#             "msg_Datetime":  datetime(2023,11,13,12,00,00)
+#             "msg_Datetime":  date
 #         }
         
 #         with self.app.test_request_context(json=request_body):
@@ -116,11 +119,11 @@ class getallmsg(TestApp):
 #             response = create_msg_instance.post()
 #             print(response[1])
 #             print(response[0])
-#             print(response[2])
+
 #             # response_data = response.get_json()
 #             # print(response_data)
 
-#             self.assertEquals(response[1], 201)
+#             self.assertEqual(response[1], 201)
 
 
 

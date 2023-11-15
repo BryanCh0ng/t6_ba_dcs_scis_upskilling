@@ -23,10 +23,9 @@ class GetTemplate(Resource):
         userID = new_student_feedback.get("user_id")
         data = new_student_feedback.get("data")
         common_questions_data = new_student_feedback.get("common_questions_data")
-
-        print(courseID)
-        print(templateID)
-        print(userID)
+        # print(courseID)
+        # print(templateID)
+        # print(userID)
 
         def submit_common_questions(common_questions_data):
             try:
