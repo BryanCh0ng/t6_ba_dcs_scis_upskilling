@@ -1,6 +1,4 @@
-# t6_ba_dcs_scis_upskilling 
-
-## Upskilling Engagement System
+# Upskilling Engagement System
 A comprehensive platform for students to propose courses, 
 indicate interest and enroll in courses offered by various groups, 
 while also enabling course organizers to easily manage courses and 
@@ -21,27 +19,14 @@ Site: http://ec2-52-73-137-78.compute-1.amazonaws.com/t6_ba_dcs_scis_upskilling/
 
 ## Table of Contents
 - [Getting Started](#getting-started)
-  - [Running the Frontend](#running-the-frontend)
-  - [Running the Backend](#running-the-backend)
-- [Frontend Dependencies Installation](#frontend-dependencies-installation)
-- [Backend Dependencies Installation](#backend-dependencies-installation)
+  - [Frontend Dependencies Installation](#frontend-dependencies-installation)
+  - [Backend Dependencies Installation](#backend-dependencies-installation)
+- [Running the Frontend](#running-the-frontend)
+- [Running the Backend](#running-the-backend)
 
 ## Getting Started
 Before you can use this project, you'll need to set up the frontend and backend components. Follow the instructions below to get started:
 
-### Running the Frontend
-To run the frontend of the project, follow these steps:
-1. Open your terminal.
-2. Navigate to the "frontend" directory using the `cd` command:
-   ```bash
-   cd frontend
-
-### Running the Backend
-To run the backend of the project, follow these steps:
-1. Open your terminal.
-2. Navigate to the "backend" directory using the `cd` command:
-   ```bash
-   cd backend
 
 ## Frontend Dependencies Installation
 To set up the frontend of this project, follow these steps:
@@ -88,7 +73,7 @@ This will install the following frontend packages:
 * `vuelidate`
 4. Once the installation is complete, your frontend dependencies will be ready for use in the project. 
 
-## Backend Dependencies Installation
+### Backend Dependencies Installation
 1. Open your terminal
 2. Navigate to the "frontend" directory using the `cd` command:
    ```bash
@@ -125,3 +110,17 @@ This will install the following:
 * `tqdm`
 * `gensim`
 * `vaderSentiment`
+
+### Running the Frontend
+To run the frontend of the project, follow these steps:
+1. Open your terminal.
+2. Navigate to the "frontend" directory using the `cd` command:
+   ```bash
+   cd frontend
+
+## Running the Backend
+To run the backend of the project, follow these steps:
+1. Open your terminal.
+2. Navigate to the "backend" directory using the `cd` command:
+   ```bash
+   cd backend
