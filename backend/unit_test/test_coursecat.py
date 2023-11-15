@@ -1,7 +1,6 @@
 import unittest
 import flask_testing
 import json
-from app import app, db
 
 import os
 import sys
@@ -10,7 +9,8 @@ parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(parent_dir)
 
 from core_features.coursecat import *
-from allClasses import Course
+from allClasses import CourseCategory
+
 
 class TestCourse(flask_testing.TestCase):
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
