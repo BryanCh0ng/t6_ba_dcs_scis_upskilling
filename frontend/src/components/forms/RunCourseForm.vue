@@ -8,7 +8,8 @@
             <form @submit.prevent="onSubmit" @reset="onReset">
                 <!--Run Course Name-->
                 <div class="form-group mt-5 mb-4">
-                    <input v-model="formData.runName" type="text" placeholder="Run Course Name" title="Run Course Name" required autofocus readonly
+                    <label for="runCourseName" class="mb-2">Run Course Name</label>
+                    <input v-model="formData.runName" id="runCourseName" type="text" placeholder="Run Course Name" title="Run Course Name" required autofocus readonly
                         :class="{ 'form-control': true, 'border-0': !v$?.formData.runName?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.runName?.$error, 'grey-background': true }" />
                     <div v-if="v$?.formData.runName?.$error" class="text-danger">
                         <span v-for="error in v$?.formData.runName?.$errors" :key="error.$uid">
@@ -20,7 +21,8 @@
                 <div class="row mb-4">
                     <!--Registration Opening Date-->
                     <div class="col-md-6 form-group">
-                        <VueDatePicker v-model="formData.openingDate" placeholder="Registration Opening Date" title="Registration Opening Date"
+                        <label for="registrationOpeningDate" class="mb-2">Registration Opening Date</label>
+                        <VueDatePicker v-model="formData.openingDate" id="registrationOpeningDate" placeholder="Registration Opening Date" title="Registration Opening Date"
                             :enable-time-picker="false"
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.openingDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.openingDate?.$error, 'grey-background':isOpeningDateReadOnly }"
                             :input-class-name="isOpeningDateReadOnly ? 'dp-custom-input conditional-bg-color' : 'dp-custom-input'" 
@@ -36,7 +38,8 @@
                     </div>
                     <!--Registration Start Time-->
                     <div class="col-md-6 form-group mt-4 mt-md-0"> 
-                        <VueDatePicker v-model="formData.openingTime" placeholder="Registration Opening Time" title="Registration Opening Time"
+                        <label for="registrationOpeningTime" class="mb-2">Registration Opening Time</label>
+                        <VueDatePicker v-model="formData.openingTime" id="registrationOpeningTime" placeholder="Registration Opening Time" title="Registration Opening Time"
                             time-picker 
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.openingTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.openingTime?.$error, 'grey-background':isOpeningDateReadOnly }"
                             :input-class-name="isOpeningDateReadOnly ? 'dp-custom-input conditional-bg-color' : 'dp-custom-input'"
@@ -57,7 +60,8 @@
                 <div class="row mb-4">
                     <!--Registration Closing Date-->
                     <div class="col-md-6 form-group">
-                        <VueDatePicker v-model="formData.closingDate" placeholder="Registration Closing Date" title="Registration Closing Date"
+                        <label for="registrationClosingDate" class="mb-2">Registration Closing Date</label>
+                        <VueDatePicker v-model="formData.closingDate" id="registrationClosingDate" placeholder="Registration Closing Date" title="Registration Closing Date"
                             :enable-time-picker="false"
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.closingDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.closingDate?.$error, 'grey-background':isOpeningDateReadOnly }"
                             :input-class-name="isOpeningDateReadOnly ? 'dp-custom-input conditional-bg-color' : 'dp-custom-input'" 
@@ -73,7 +77,8 @@
                     </div>
                     <!--Registration Closing Time-->
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <VueDatePicker v-model="formData.closingTime" placeholder="Registration Closing Time" title="Registration Closing Time" 
+                        <label for="registrationClosingTime" class="mb-2">Registration Closing Time</label>
+                        <VueDatePicker v-model="formData.closingTime" id="registrationClosingTime" placeholder="Registration Closing Time" title="Registration Closing Time" 
                             time-picker 
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.closingTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.closingTime?.$error, 'grey-background':isOpeningDateReadOnly }"
                             :input-class-name="isOpeningDateReadOnly ? 'dp-custom-input conditional-bg-color' : 'dp-custom-input'"
@@ -94,7 +99,8 @@
                 <div class="row mb-4">
                     <!--Course Start Date-->
                     <div class="col-md-6 form-group">
-                        <VueDatePicker v-model="formData.startDate" placeholder="Course Start Date" title="Course Start Date" 
+                        <label for="courseStartDate" class="mb-2">Course Start Date</label>
+                        <VueDatePicker v-model="formData.startDate" id="courseStartDate" placeholder="Course Start Date" title="Course Start Date" 
                             :enable-time-picker="false"
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.startDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.startDate?.$error, 'grey-background':isStartDateReadOnly }"
                             :input-class-name="isStartDateReadOnly ? 'dp-custom-input conditional-bg-color' : 'dp-custom-input'" 
@@ -110,7 +116,8 @@
                     </div>
                      <!--Course Start Time-->
                      <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <VueDatePicker v-model="formData.startTime" placeholder="Course Start Time" title="Course Start Time" 
+                        <label for="courseStartTime" class="mb-2">Course Start Time</label>
+                        <VueDatePicker v-model="formData.startTime" id="courseStartTime" placeholder="Course Start Time" title="Course Start Time" 
                             time-picker
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.startTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.startTime?.$error, 'grey-background':isStartDateReadOnly }"
                             :input-class-name="isStartDateReadOnly ? 'dp-custom-input conditional-bg-color' : 'dp-custom-input'"
@@ -131,7 +138,8 @@
                 <div class="row mb-4">
                     <!--Course End Date-->
                     <div class="col-md-6 form-group">
-                        <VueDatePicker v-model="formData.endDate" placeholder="Course End Date" title="Course End Date" 
+                        <label for="courseStartTime" class="mb-2">Course Start Time</label>
+                        <VueDatePicker v-model="formData.endDate" id="courseStartTime" placeholder="Course End Date" title="Course End Date" 
                             :enable-time-picker="false"
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.endDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.endDate?.$error, 'grey-background':isStartDateReadOnly }"
                             :input-class-name="isStartDateReadOnly ? 'dp-custom-input conditional-bg-color' : 'dp-custom-input'" 
@@ -147,7 +155,8 @@
                     </div>
                     <!--Course End Time-->
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <VueDatePicker v-model="formData.endTime" placeholder="Course End Time" title="Course End Time" 
+                        <label for="courseEndTime" class="mb-2">Course End Time</label>
+                        <VueDatePicker v-model="formData.endTime" id="courseEndTime" placeholder="Course End Time" title="Course End Time" 
                             time-picker
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.endTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.endTime?.$error, 'grey-background':isStartDateReadOnly }"
                             :input-class-name="isStartDateReadOnly ? 'dp-custom-input conditional-bg-color' : 'dp-custom-input'" 
@@ -167,7 +176,8 @@
 
                 <!--Instructor Name-->
                 <div class="row mb-4">
-                    <dropdown-field v-model="formData.selectedInstructor" :default-placeholder="'Instructor'" title="Instructor" 
+                    <label for="instructorName" class="mb-2">Instructor Name</label>
+                    <dropdown-field v-model="formData.selectedInstructor" id="instructorName" :default-placeholder="'Instructor'" title="Instructor" 
                         :disabled="isStartDateReadOnly"
                         :errors="v$?.formData.selectedInstructor?.$errors[0]?.$message">
                         <option v-for="instructor in formData.instructors" :key="instructor.user_ID" :value="instructor.user_Name">
@@ -179,7 +189,8 @@
                 <div class="row mb-4">
                     <!--Course Format-->
                     <div class="col-md-6 form-group">
-                        <dropdown-field v-model="formData.selectedFormat" :default-placeholder="'Course Format'" title="Course Format" 
+                        <label for="courseFormat" class="mb-2">Course Format</label>
+                        <dropdown-field v-model="formData.selectedFormat" id="courseFormat" :default-placeholder="'Course Format'" title="Course Format" 
                             :disabled="isStartDateReadOnly"
                             :errors="v$?.formData.selectedFormat?.$errors[0]?.$message">
                             <option v-for="courseFormat in formData.courseFormats" :key="courseFormat.id" :value="courseFormat.name">
@@ -189,7 +200,8 @@
                     </div>
                     <!--Venue-->
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <input v-model="formData.venue" type="text" placeholder="Venue" title="Venue" :readonly="isStartDateReadOnly" required autofocus
+                        <label for="venue" class="mb-2">Venue</label>
+                        <input v-model="formData.venue" type="text" id="venue" placeholder="Venue" title="Venue" :readonly="isStartDateReadOnly" required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.venue?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.venue?.$error, 'grey-background':isStartDateReadOnly }" />
                         <div v-if="v$?.formData.venue?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.venue?.$errors" :key="error.$uid">
@@ -202,7 +214,8 @@
                 <div class="row mb-4">
                     <!--Course Size-->
                     <div class="col-md-6 form-group">
-                        <input v-model="formData.courseSize" @input="restrictToNumbers('courseSize')" type="text" placeholder="Course Size" title="Course Size" :readonly="isOpeningDateReadOnly" required autofocus
+                        <label for="courseSize" class="mb-2">Course Size</label>
+                        <input v-model="formData.courseSize" @input="restrictToNumbers('courseSize')" type="text" id="courseSize" placeholder="Course Size" title="Course Size" :readonly="isOpeningDateReadOnly" required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.courseSize?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseSize?.$error, 'grey-background':isOpeningDateReadOnly }" />
                         <div v-if="v$?.formData.courseSize?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.courseSize?.$errors" :key="error.$uid">
@@ -212,7 +225,8 @@
                     </div>
                     <!--Minimum Slots-->
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <input v-model="formData.minimumSlots" @input="restrictToNumbers('minimumSlots')" type="text" placeholder="Minimum Slots" title="Minimum Slots" :readonly="isOpeningDateReadOnly" required autofocus
+                        <label for="minimumSlots" class="mb-2">Minimum Slots</label>
+                        <input v-model="formData.minimumSlots" @input="restrictToNumbers('minimumSlots')" type="text" id="minimumSlots" placeholder="Minimum Slots" title="Minimum Slots" :readonly="isOpeningDateReadOnly" required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.minimumSlots?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.minimumSlots?.$error, 'grey-background':isOpeningDateReadOnly }" />
                         <div v-if="v$?.formData.minimumSlots?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.minimumSlots?.$errors" :key="error.$uid">
@@ -225,7 +239,8 @@
                 <div class="row mb-4">
                     <!--Course Fee-->
                     <div class="col-md-6 form-group">
-                        <input v-model="formData.courseFee" @input="validateMoneyInput" type="text" placeholder="Course Fee" title="Course Fee" :readonly="isStartDateReadOnly" required autofocus
+                        <label for="courseFee" class="mb-2">Course Fee</label>
+                        <input v-model="formData.courseFee" @input="validateMoneyInput" type="text" id="courseFee" placeholder="Course Fee" title="Course Fee" :readonly="isStartDateReadOnly" required autofocus
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.courseFee?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseFee?.$error, 'grey-background':isStartDateReadOnly }" />
                         <div v-if="v$?.formData.courseFee?.$error" class="text-danger">
                             <span v-for="error in v$?.formData.courseFee?.$errors" :key="error.$uid">
@@ -235,7 +250,8 @@
                     </div>
                     <!--Feedback Template-->
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <dropdown-field v-model="formData.selectedTemplate" :default-placeholder="'Feedback Template'" title="Feedback Template" 
+                        <label for="feedbackTemplate" class="mb-2">Feedback Template</label>
+                        <dropdown-field v-model="formData.selectedTemplate" id="feedbackTemplate" :default-placeholder="'Feedback Template'" title="Feedback Template" 
                             :disabled="isFeedbackStartDateReadOnly"
                             :errors="v$?.formData.selectedTemplate?.$errors[0]?.$message">
                             <option v-for="feedbackTemplate in formData.feedbackTemplates" :key="feedbackTemplate.template_ID" :value="feedbackTemplate.template_Name">
@@ -248,7 +264,8 @@
                 <div class="row mb-4">
                     <!--Feedback Start Date-->
                     <div class="col-md-6 form-group">
-                        <VueDatePicker v-model="formData.feedbackStartDate" placeholder="Feedback Start Date" title="Feedback Start Date" 
+                        <label for="feedbackStartDate" class="mb-2">Feedback Start Date</label>
+                        <VueDatePicker v-model="formData.feedbackStartDate" id="feedbackStartDate" placeholder="Feedback Start Date" title="Feedback Start Date" 
                             :enable-time-picker="false"
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.feedbackStartDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.feedbackStartDate?.$error, 'grey-background':isFeedbackStartDateReadOnly }"
                             :input-class-name="isFeedbackStartDateReadOnly ? 'dp-custom-input conditional-bg-color' : 'dp-custom-input'" 
@@ -264,7 +281,8 @@
                     </div>
                     <!--Feedback Start Time-->
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <VueDatePicker v-model="formData.feedbackStartTime" placeholder="Feedback Start Time" title="Feedback Start Time" 
+                        <label for="feedbackStartTime" class="mb-2">Feedback Start Time</label>
+                        <VueDatePicker v-model="formData.feedbackStartTime" id="feedbackStartTime" placeholder="Feedback Start Time" title="Feedback Start Time" 
                             time-picker 
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.feedbackStartTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.feedbackStartTime?.$error, 'grey-background':isFeedbackStartDateReadOnly }"
                             :input-class-name="isFeedbackStartDateReadOnly ? 'dp-custom-input conditional-bg-color' : 'dp-custom-input'" 
@@ -284,7 +302,8 @@
                 <div class="row">
                     <!--Feedback End Date-->
                     <div class="col-md-6 form-group">
-                        <VueDatePicker v-model="formData.feedbackEndDate" placeholder="Feedback End Date" title="Feedback End Date" 
+                        <label for="feedbackEndDate" class="mb-2">Feedback End Date</label>
+                        <VueDatePicker v-model="formData.feedbackEndDate" id="feedbackEndDate" placeholder="Feedback End Date" title="Feedback End Date" 
                             :enable-time-picker="false"
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.feedbackEndDate?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.feedbackEndDate?.$error, 'grey-background':isFeedbackStartDateReadOnly }"
                             :input-class-name="isFeedbackStartDateReadOnly ? 'dp-custom-input conditional-bg-color' : 'dp-custom-input'" 
@@ -300,7 +319,8 @@
                     </div>
                     <!--Feedback End Time-->
                     <div class="col-md-6 form-group mt-4 mt-md-0">
-                        <VueDatePicker v-model="formData.feedbackEndTime" placeholder="Feedback End Time" title="Feedback End Time" 
+                        <label for="feedbackEndTime" class="mb-2">Feedback End Time</label>
+                        <VueDatePicker v-model="formData.feedbackEndTime" id="feedbackEndTime" placeholder="Feedback End Time" title="Feedback End Time" 
                             time-picker
                             :class="{ 'form-control': true, 'border-0': !v$?.formData.feedbackEndTime?.$error, 'shadow-sm': true, 'is-invalid': v$?.formData.feedbackEndTime?.$error, 'grey-background':isFeedbackStartDateReadOnly }"
                             :input-class-name="isFeedbackStartDateReadOnly ? 'dp-custom-input conditional-bg-color' : 'dp-custom-input'" 

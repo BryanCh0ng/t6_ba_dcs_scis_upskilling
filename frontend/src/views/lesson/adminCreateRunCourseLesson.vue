@@ -33,11 +33,13 @@
                     <h5># {{ index + 1 }}</h5>
                     <!-- Lesson Date -->
                     <div class="form-group mt-2">
-                        <VueDatePicker v-model="lessonForm.lessonDate" placeholder="Lesson Date" :enable-time-picker="false" input-class-name="dp-custom-input" :format="lessonForm.datePickerFormat" required></VueDatePicker>
+                        <label for="lessonDate" class="mb-2">Lesson Date</label>
+                        <VueDatePicker v-model="lessonForm.lessonDate" id="lessonDate" placeholder="Lesson Date" :enable-time-picker="false" input-class-name="dp-custom-input" :format="lessonForm.datePickerFormat" required></VueDatePicker>
                     </div>
                     <!-- Lesson Start Time -->
                     <div class="form-group mt-4">
-                        <VueDatePicker v-model="lessonForm.lesson_Starttime" placeholder="Lesson Start Time" time-picker required input-class-name="dp-custom-input">
+                        <label for="lessonStartTime" class="mb-2">Lesson Start Time</label>
+                        <VueDatePicker v-model="lessonForm.lesson_Starttime"  id="lessonStartTime" placeholder="Lesson Start Time" time-picker required input-class-name="dp-custom-input">
                             <template #input-icon>
                                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" />
                             </template>
@@ -45,7 +47,8 @@
                     </div>
                     <!-- Lesson End Time -->
                     <div class="form-group mt-4">
-                        <VueDatePicker v-model="lessonForm.lesson_Endtime" placeholder="Lesson End Time" time-picker required input-class-name="dp-custom-input">
+                        <label for="lessonEndTime" class="mb-2">Lesson End Time</label>
+                        <VueDatePicker v-model="lessonForm.lesson_Endtime" id="lessonEndTime" placeholder="Lesson End Time" time-picker required input-class-name="dp-custom-input">
                             <template #input-icon>
                                 <font-awesome-icon icon="fa-regular fa-clock" style="padding-left: 10px" />
                             </template>

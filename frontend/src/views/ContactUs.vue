@@ -6,11 +6,14 @@
 
       <form @submit.prevent="submitForm">
         <div class="form-group mt-5 mb-4">
-          <input-field v-model="subject" type="text" :placeholder="subjectPlaceholder" required/>
+          <label for="subject" class="mb-2">Subject</label>
+          <input-field v-model="subject" type="text" id="subject" :placeholder="subjectPlaceholder" required/>
         </div>
         <div class="form-group">
+          <label for="message" class="mb-2">Message</label>
           <textarea
             v-model="bodyMessage"
+            id="message"
             class="form-control border-0 shadow-sm px-4 field"
             :placeholder="messagePlaceholder"
             style="height: 200px" required

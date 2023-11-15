@@ -8,7 +8,8 @@
             <form @submit.prevent="onSubmit" @reset="onReset">
                 <!--Course Name-->
                 <div class="form-group mt-5 mb-4">
-                    <input v-model="formData.courseName" type="text" placeholder="Course Name" required autofocus
+                    <label for="courseName" class="mb-2">Course Name</label>
+                    <input v-model="formData.courseName" id="courseName" type="text" placeholder="Course Name" title="Course Name" required autofocus
                         :class="{ 'form-control': true, 'border-0': !v$?.formData.courseName?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseName?.$error }" />
                     <div v-if="v$?.formData.courseName?.$error" class="text-danger">
                         <span v-for="error in v$?.formData.courseName?.$errors" :key="error.$uid">{{ error.$message
@@ -17,7 +18,8 @@
                 </div>
                 <!--Course Category-->
                 <div class="form-group mb-4">
-                    <dropdown-field v-model="formData.selectedCategory" :default-placeholder="'Course Category'"
+                    <label for="courseCategory" class="mb-2">Course Category</label>
+                    <dropdown-field v-model="formData.selectedCategory" id="courseCategory" title="Course Category" :default-placeholder="'Course Category'"
                         :errors="v$?.formData.selectedCategory?.$errors[0]?.$message">
                         <option v-for="courseCategory in formData.courseCategories" :key="courseCategory.coursecat_ID"
                             :value="courseCategory.coursecat_Name">
@@ -27,7 +29,8 @@
                 </div>
                 <!--Course Description-->
                 <div class="form-group mb-4">
-                    <textarea v-model="formData.courseDescription"
+                    <label for="courseDescription" class="mb-2">Course Description</label>
+                    <textarea v-model="formData.courseDescription" id="courseDescription" title="Course Description"
                         :class="{ 'form-control': true, 'border-0': !v$?.formData.courseDescription?.$error, 'shadow-sm': true, 'px-4': true, 'field': true, 'is-invalid': v$?.formData.courseDescription?.$error }"
                         placeholder="Course Description" style="height: 200px" @input="limitCourseDescription"
                         required></textarea>

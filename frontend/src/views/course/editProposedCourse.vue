@@ -8,15 +8,19 @@
 
       <form @submit.prevent="submitForm">
         <div class="form-group mt-5 mb-4">
+          <label for="courseName" class="mb-2">Course Name</label>
           <input v-model="course_name"
             type="text"
             placeholder="Course Name"
+            id="courseName"
             class="form-control border-0 shadow-sm px-4 field mb-3" required
           />
         </div>
         <div class="form-group">
+          <label for="courseCategory" class="mb-2">Course Category</label>
           <dropdown-field
             v-model="category"
+            id="ourseCategory"
             :default-placeholder="'Course Category'"
           >
             <option
@@ -29,8 +33,10 @@
           </dropdown-field>
         </div>
         <div class="form-group">
+          <label for="courseDescription" class="mb-2">Course Description</label>
           <textarea
             v-model="course_desc"
+            id="courseDescription"
             class="form-control border-0 shadow-sm px-4 field"
             :placeholder="descPlaceholder"
             style="height: 200px"
