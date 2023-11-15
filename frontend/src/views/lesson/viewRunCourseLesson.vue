@@ -1,9 +1,9 @@
 <template>
   <div>
     <div class="container pt-5 col-12 d-flex mb-3 w-100">
-        <h5 v-if="lessons && lessons.length > 0" class="col m-auto">All Lessons for {{ lessons[0].run_Name }} </h5>
+        <h5 v-if="runcourse_Name" class="col m-auto">All Lessons for {{ runcourse_Name }} </h5>
         <h5 v-else>All Lessons</h5>
-        <button v-if="userRole === 'Admin' && lessons && lessons.length > 0 && !isEndDatePassed(lessons[0].run_course.run_Enddate)" class="btn btn-primary" @click="goToCreateLesson(lessons.rcourse_ID)">Add Lesson(s)</button>
+        <button v-if="userRole === 'Admin' && lessons && (lessons.length === 0 || (lessons.length > 0 && !isEndDatePassed(lessons[0].run_course.run_Enddate)))" class="btn btn-primary" @click="goToCreateLesson(lessons.rcourse_ID)">Add Lesson(s)</button>
     </div>
 
     <div class="container col-12 ">
@@ -65,6 +65,7 @@ import { VueAwesomePaginate } from 'vue-awesome-paginate';
 import CommonService from "@/api/services/CommonService.js";
 import LessonService from "@/api/services/LessonService.js";
 import UserService from "@/api/services/UserService.js";
+import runCourseService from "@/api/services/runCourseService.js";
 import courseDateTime from "@/components/course/courseDateTime.vue";
 import courseAction from '@/components/course/courseAction.vue';
 import DefaultModal from "@/components/DefaultModal.vue";
@@ -98,6 +99,7 @@ export default {
   data() {
     return {
       lessons: [],
+      runcourse_Name: "",
       sortColumn: '',
       sortDirection: 'asc',
       selectedCourse: null,
@@ -135,6 +137,7 @@ export default {
       try {
         const { id: course_ID } = this.$route.params;
         this.course_ID = course_ID
+        
         let response = await LessonService.getRunCourseById(course_ID)
         if (response.code == 200) {
           this.lessons = response.lessons
@@ -206,6 +209,14 @@ export default {
     const user_ID = await UserService.getUserID();
     const role = await UserService.getUserRole(user_ID);
     this.userRole = role;
+
+    const runcourse_id = this.$route.params.id;
+    const runcourse_info = await runCourseService.getRunCourseById(runcourse_id);
+        
+    if (runcourse_info) {
+      this.runcourse_Name = runcourse_info.run_Name;
+    }
+
     this.loadData()
   },
   

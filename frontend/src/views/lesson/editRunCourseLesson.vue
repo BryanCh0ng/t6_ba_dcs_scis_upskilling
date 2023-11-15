@@ -136,6 +136,7 @@ export default {
         this.lesson_ID = this.$route.params.id;
         await this.fetchLessonData(this.lesson_ID);
     },
+    
     methods: {
         convertDate,
         convertTime,

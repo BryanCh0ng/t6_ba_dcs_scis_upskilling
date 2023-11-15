@@ -4,7 +4,7 @@
             <h2 class="text-center mb-4">Add lesson(s) for {{ runcourse_Name }}</h2>
             <h5 class="text-center mb-4">From {{ convertDate(runcourse_Startdate) }} ({{ convertTime(runcourse_Starttime) }} - {{ convertTime(runcourse_Endtime) }}) to {{ convertDate(runcourse_Enddate) }} ({{ convertTime(runcourse_Starttime) }} - {{ convertTime(runcourse_Endtime) }})</h5>
             
-            <div id="lesson_list">
+            <div id="lesson_list" v-if="current_lessons_list && current_lessons_list.length > 0">
                 <h5>Existing Lesson</h5>
                 <div class="table-responsive">
                     <table class="table bg-white">
