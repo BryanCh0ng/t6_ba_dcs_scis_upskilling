@@ -159,6 +159,7 @@
                       <a href="" @click.prevent="sort('proposed_Date', 'proposed')" class="text-decoration-none text-dark">Proposed Date <sort-icon :sortColumn="sortColumn === 'proposed_Date'" :sortDirection="getSortDirection('proposed_Date')"/></a></th>
                   <th scope="col">
                     <a href="" @click.prevent="sort('pcourse_Status', 'proposed')" class="text-decoration-none text-dark">Status <sort-icon :sortColumn="sortColumn === 'pcourse_Status'" :sortDirection="getSortDirection('pcourse_Status')"/></a></th>
+                  <th scope="col">Rejection Reason</th>
                   <th scope="col">Course Details</th>
                   <th scope="col">Action(s)</th>
                 </tr>
@@ -173,6 +174,14 @@
                   </td>
                   <td class="pl-0 border-top">
                     <course-status :status="proposed_course.pcourse_Status"></course-status>
+                  </td>
+                  <td class="rejection_reason">
+                    <div v-if="proposed_course.reason == NULL">
+                      -
+                    </div>
+                    <div v-else>
+                      {{ proposed_course.reason }}
+                    </div>
                   </td>
                   <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(proposed_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                   <td v-if="proposed_course.pcourse_Status == 'Pending'">
