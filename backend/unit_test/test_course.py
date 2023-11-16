@@ -1,6 +1,5 @@
 import unittest
 import flask_testing
-import json
 
 import os
 import sys
@@ -9,6 +8,9 @@ sys.path.append(parent_dir)
 
 from app import app, db
 from core_features.course import *
+
+### if someone tries this code and there are errors, its likely due to time changes
+### this code works fine on 17/11/2023 02:00:00 , so can try freezing it to this time
 
 class TestCourse(flask_testing.TestCase):
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
@@ -342,15 +344,44 @@ class TestGetAllCoursesFilterSearch(TestCourse):
             self.assertEqual(response['message'], "There is no such course")
 
 # there are two classes DeleteCourse, so it calls the runcourse version
-# class TestDeleteCourse(TestCourse):
-#     def test_delete_course_success(self):
-#         request_body = {"course_id": 2}
-#         with self.app.test_request_context(json=request_body):
-#             session['user_ID'] = 1
-#             response = DeleteCourse().delete()
+class TestDeleteCourse(TestCourse):
+    def test_delete_course_success(self):
+        self.lesson1 = Lesson(
+            rcourse_ID = 2,
+            lesson_Date = datetime.strptime('2023-12-01', '%Y-%m-%d').date(),
+            lesson_Starttime = datetime.strptime('12:00:00', '%H:%M:%S').time(),
+            lesson_Endtime = datetime.strptime('15:00:00', '%H:%M:%S').time()
+        )
+        db.session.add(self.lesson1)
+        request_body = {"rcourse_ID": 2}
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            self.assertEqual(len(RunCourse.query.all()), 3)
+            self.assertEqual(len(Lesson.query.all()), 1)
+            response = DeleteCourse().delete()
 
-#             self.assertEqual(response[1], 200, response[0])
-#             self.assertEqual(response[0], {"message":"Course successfully deleted"})
+            self.assertEqual(len(RunCourse.query.all()), 2)
+            self.assertEqual(len(Lesson.query.all()), 0)
+            self.assertEqual(response[1], 200)
+            self.assertEqual(response[0], {"message":"Run Course and the associated lessons have been successfully deleted."})
+
+    def test_delete_course_not_admin(self):
+        request_body = {"rcourse_ID": 2}
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 2
+            response = DeleteCourse().delete()
+
+            self.assertEqual(response[1], 404)
+            self.assertEqual(response[0], {"message":"Unathorized Access, Failed to delete run course"})
+
+    def test_delete_course_no_runcourse(self):
+        request_body = {"rcourse_ID": 10}
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            response = DeleteCourse().delete()
+
+            self.assertEqual(response[1], 404)
+            self.assertEqual(response[0], {"Message":"There is no such run course"})
 
 
 class TestGetCourse(TestCourse):
@@ -1297,10 +1328,582 @@ class TestDeactivateCourse(TestCourse):
             )
             self.assertEqual(res['code'], 200)
             self.assertEqual(res['message'], "Course has been deactivated")
+
+    def test_deactivate_course_with_closed_runcourse_success(self):
+        setattr(self.course2, 'course_Status', 'Active')
+        setattr(self.runCourse1, 'runcourse_Status', 'Closed')
+        course_ID = 2
+        request_body = {
+            "course_id": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            self.assertEqual(Course.query.filter_by(course_ID=course_ID).first().json(), {
+                    'course_Desc': 'Learn python development', 
+                    'course_ID': 2, 
+                    'course_Name': 'Python Fundamentals', 
+                    'course_Status': 'Active', 
+                    'coursecat_ID': 1
+                }
+            )
+            response = DeactivateCourse().post()
+            res = response.get_json()
             
+            self.assertEqual(Course.query.filter_by(course_ID=course_ID).first().json(), {
+                    'course_Desc': 'Learn python development', 
+                    'course_ID': 2, 
+                    'course_Name': 'Python Fundamentals', 
+                    'course_Status': 'Inactive', 
+                    'coursecat_ID': 1
+                }
+            )
+            self.assertEqual(res['code'], 200)
+            self.assertEqual(res['message'], "Course has been canceled or deactivated")
+
+    def test_deactivate_course_with_ongoing_runcourse_success(self):
+        setattr(self.course2, 'course_Status', 'Active')
+        setattr(self.runCourse1, 'runcourse_Status', 'Ongoing')
+        course_ID = 2
+        request_body = {
+            "course_id": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            self.assertEqual(Course.query.filter_by(course_ID=course_ID).first().json(), {
+                    'course_Desc': 'Learn python development', 
+                    'course_ID': 2, 
+                    'course_Name': 'Python Fundamentals', 
+                    'course_Status': 'Active', 
+                    'coursecat_ID': 1
+                }
+            )
+            response = DeactivateCourse().post()
+            res = response.get_json()
+            
+            self.assertEqual(Course.query.filter_by(course_ID=course_ID).first().json(), {
+                    'course_Desc': 'Learn python development', 
+                    'course_ID': 2, 
+                    'course_Name': 'Python Fundamentals', 
+                    'course_Status': 'Inactive', 
+                    'coursecat_ID': 1
+                }
+            )
+            self.assertEqual(RunCourse.query.filter_by(course_ID=course_ID).first().json()['runcourse_Status'], 'Closed')
+            self.assertEqual(res['code'], 200)
+            self.assertEqual(res['message'], "Course has been canceled or deactivated")
+            
+    def test_deactivate_course_not_admin(self):
+        setattr(self.course2, 'course_Status', 'Active')
+        setattr(self.runCourse1, 'runcourse_Status', 'Closed')
+        course_ID = 2
+        request_body = {
+            "course_id": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 2
+            response = DeactivateCourse().post()
+            
+            self.assertEqual(response[1], 404)
+            self.assertEqual(response[0]['message'], "Unathorized Access, Failed to deactivate course")
+
+    def test_deactivate_course_not_active(self):
+        course_ID = 2
+        request_body = {
+            "course_id": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            response = DeactivateCourse().post()
+            res = response.get_json()
+            
+            self.assertEqual(res['code'], 400)
+            self.assertEqual(res['message'], "Course is not active, cannot be canceled")
 
 
+class TestRetireCourse(TestCourse):
+    def test_retire_course_success(self):
+        setattr(self.course2, 'course_Status', 'Inactive')
+        setattr(self.runCourse1, 'runcourse_Status', 'Closed')
+        course_ID = 2
+        request_body = {
+            "course_id": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            self.assertEqual(Course.query.filter_by(course_ID=course_ID).first().json()['course_Status'], 'Inactive')
+            response = RetireCourse().post()
+            res = response.get_json()
 
+            self.assertEqual(Course.query.filter_by(course_ID=course_ID).first().json()['course_Status'], 'Retired')
+            self.assertEqual(res['code'], 200)
+            self.assertEqual(res['message'], "Course has been retired")
+
+    def test_retire_course_not_admin(self):
+        setattr(self.course2, 'course_Status', 'Inactive')
+        setattr(self.runCourse1, 'runcourse_Status', 'Closed')
+        course_ID = 2
+        request_body = {
+            "course_id": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 2
+            response = RetireCourse().post()
+
+            self.assertEqual(response[1], 404)
+            self.assertEqual(response[0]['message'], "Unathorized Access, Failed to retire course")
+            
+    def test_retire_course_open_runcourses(self):
+        setattr(self.course2, 'course_Status', 'Inactive')
+        course_ID = 2
+        request_body = {
+            "course_id": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            response = RetireCourse().post()
+            res = response.get_json()
+
+            self.assertEqual(res['code'], 400)
+            self.assertEqual(res['message'], "Course cannot be retired")
+
+    def test_retire_course_active_course(self):
+        course_ID = 2
+        request_body = {
+            "course_id": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            response = RetireCourse().post()
+            res = response.get_json()
+
+            self.assertEqual(res['code'], 400)
+            self.assertEqual(res['message'], "There is no such run course to retire")
+
+    def test_retire_course_nonexisting_course(self):
+        course_ID = 10
+        request_body = {
+            "course_id": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            response = RetireCourse().post()
+            res = response.get_json()
+
+            self.assertEqual(res['code'], 404)
+            self.assertEqual(res['message'], "There is no such run course")
+
+
+class TestActivateCourse(TestCourse):
+    def test_activate_course_success(self):
+        setattr(self.course2, 'course_Status', 'Inactive')
+        setattr(self.runCourse1, 'runcourse_Status', 'Closed')
+        course_ID = 2
+        request_body = {
+            "course_id": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            self.assertEqual(Course.query.filter_by(course_ID=course_ID).first().json()['course_Status'], 'Inactive')
+            response = ActivateCourse().post()
+            res = response.get_json()
+
+            self.assertEqual(Course.query.filter_by(course_ID=course_ID).first().json()['course_Status'], 'Active')
+            self.assertEqual(res['code'], 200)
+            self.assertEqual(res['message'], "Course has been activated")
+
+    def test_activate_course_not_admin(self):
+        setattr(self.course2, 'course_Status', 'Inactive')
+        setattr(self.runCourse1, 'runcourse_Status', 'Closed')
+        course_ID = 2
+        request_body = {
+            "course_id": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 2
+            response = ActivateCourse().post()
+
+            self.assertEqual(response[1], 404)
+            self.assertEqual(response[0]['message'], "Unathorized Access, Failed to activate course")
+            
+    def test_activate_course_open_runcourses(self):
+        setattr(self.course2, 'course_Status', 'Inactive')
+        course_ID = 2
+        request_body = {
+            "course_id": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            response = ActivateCourse().post()
+            res = response.get_json()
+
+            self.assertEqual(res['code'], 400)
+            self.assertEqual(res['message'], "Course cannot be activated because not all run courses are closed")
+
+    def test_activate_course_active_course(self):
+        course_ID = 2
+        request_body = {
+            "course_id": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            response = ActivateCourse().post()
+            res = response.get_json()
+
+            self.assertEqual(res['code'], 400)
+            self.assertEqual(res['message'], "There is no such run course to activate")
+
+    def test_activate_course_nonexisting_course(self):
+        course_ID = 10
+        request_body = {
+            "course_id": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            response = ActivateCourse().post()
+            res = response.get_json()
+
+            self.assertEqual(res['code'], 404)
+            self.assertEqual(res['message'], "There is no such run course")
+
+
+class TestAddInterest(TestCourse):
+    def test_add_interest_success(self):
+        self.proposedCourse2 = ProposedCourse(
+            pcourse_ID = 2,
+            submitted_By = 2,
+            course_ID = 2,
+            pcourse_Status = 'Approved',
+            action_Done_By = 1,
+            reason = "?",  
+            proposed_Date = datetime.strptime('2023-09-01', '%Y-%m-%d').date(),
+            voteCount = 18
+        )
+        db.session.add(self.proposedCourse2)
+        request_body = {
+            "vote_ID": 1,
+            "user_ID": 2
+        }
+        with self.app.test_request_context(json=request_body):
+            self.assertEqual(len(Interest.query.all()), 1)
+            response = AddInterest().post()
+
+            self.assertEqual(response[1], 200)
+            self.assertEqual(len(Interest.query.all()), 2)
+            self.assertEqual(response[0]['message'], "Express Interest Successfully! Please refer to your profile to find out the status of the course.")
+
+
+class TestDeleteInterest(TestCourse):
+    def test_delete_interest_success(self):
+        setattr(self.interest1, 'vote_ID', 1)
+        self.proposedCourse2 = ProposedCourse(
+            pcourse_ID = 2,
+            submitted_By = 2,
+            course_ID = 2,
+            pcourse_Status = 'Approved',
+            action_Done_By = 1,
+            reason = "?",  
+            proposed_Date = datetime.strptime('2023-09-01', '%Y-%m-%d').date(),
+            voteCount = 18
+        )
+        db.session.add(self.proposedCourse2)
+        request_body = {
+            "vote_ID": 1,
+            "user_ID": 2
+        }
+        with self.app.test_request_context(json=request_body):
+            self.assertEqual(len(Interest.query.all()), 1)
+            response = DeleteInterest().post()
+
+            self.assertEqual(response[1], 200)
+            self.assertEqual(len(Interest.query.all()), 0)
+            self.assertEqual(response[0]['message'], "Unvote Interest Successfully! Please refer to View Course page to find out more courses.")
+
+
+class TestUpdateVoteStatus(TestCourse):
+    def test_update_vote_status_success(self):
+        course_ID = 2
+        request_body = {
+            "course_ID": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            self.assertEqual(VoteCourse.query.filter_by(course_ID=course_ID).first().json()['vote_Status'], 'ongoing')
+            response = UpdateVoteStatus().put()
+            
+            self.assertEqual(VoteCourse.query.filter_by(course_ID=course_ID).first().json()['vote_Status'], 'Not Offered')
+            self.assertEqual(response[1], 200)
+            self.assertEqual(response[0]['message'], "You have delete the course successfully. Please refer to 'Deleted Course' Tab.")
+
+    def test_update_vote_status_not_admin(self):
+        course_ID = 2
+        request_body = {
+            "course_ID": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 2
+            self.assertEqual(VoteCourse.query.filter_by(course_ID=course_ID).first().json()['vote_Status'], 'ongoing')
+            response = UpdateVoteStatus().put()
+            
+            self.assertEqual(VoteCourse.query.filter_by(course_ID=course_ID).first().json()['vote_Status'], 'ongoing')
+            self.assertEqual(response[1], 404)
+            self.assertEqual(response[0]['message'], "Unathorized Access, Failed to reject proposed course")
+
+    def test_update_vote_status_no_votecourse(self):
+        course_ID = 10
+        request_body = {
+            "course_ID": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            response = UpdateVoteStatus().put()
+            
+            self.assertEqual(response[1], 404)
+            self.assertEqual(response[0]['message'], "VoteCourse record not found for the specified course")
+
+    
+class TestCloseVoteCourse(TestCourse):
+    def test_close_vote_course_success(self):
+        course_ID = 2
+        request_body = {
+            "course_ID": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            self.assertEqual(VoteCourse.query.filter_by(course_ID=course_ID).first().json()['vote_Status'], 'ongoing')
+            response = CloseVoteCourse().put()
+            
+            self.assertEqual(VoteCourse.query.filter_by(course_ID=course_ID).first().json()['vote_Status'], 'Closed')
+            self.assertEqual(response[1], 200)
+            self.assertEqual(response[0]['message'], "You have closed the course. The course is not available for voting now.")
+
+    def test_close_vote_course_not_admin(self):
+        course_ID = 2
+        request_body = {
+            "course_ID": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 2
+            self.assertEqual(VoteCourse.query.filter_by(course_ID=course_ID).first().json()['vote_Status'], 'ongoing')
+            response = CloseVoteCourse().put()
+            
+            self.assertEqual(VoteCourse.query.filter_by(course_ID=course_ID).first().json()['vote_Status'], 'ongoing')
+            self.assertEqual(response[1], 404)
+            self.assertEqual(response[0]['message'], "Unathorized Access, Failed to close vote course")
+
+    def test_close_vote_course_no_votecourse(self):
+        course_ID = 10
+        request_body = {
+            "course_ID": course_ID
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 1
+            response = CloseVoteCourse().put()
+            
+            self.assertEqual(response[1], 404)
+            self.assertEqual(response[0]['message'], "VoteCourse record not found for the specified course")
+
+
+class TestAdminUpdateRunCourse(TestCourse):
+    def test_admin_update_runcourse_success(self):
+        request_body = {
+            "course_Name": "Firebase Basics",
+            "course_Desc": "Learn some firebase",
+            "coursecat_ID": 1
+        }
+        with self.app.test_request_context(json=request_body):
+            course_ID = 1
+            session['user_ID'] = 1
+            self.assertEqual(Course.query.filter_by(course_ID=course_ID).first().json(), {
+                        'course_Desc': 'Learn how to mine databases', 
+                        'course_ID': 1, 
+                        'course_Name': 'Database Mining', 
+                        'course_Status': 'Inactive', 
+                        'coursecat_ID': 1
+                    })
+            response = AdminUpdateRunCourse().put(course_ID)
+            res = response.get_json()
+
+            self.assertEqual(Course.query.filter_by(course_ID=course_ID).first().json(), {
+                        'course_Desc': 'Learn some firebase', 
+                        'course_ID': 1, 
+                        'course_Name': 'Firebase Basics', 
+                        'course_Status': 'Inactive', 
+                        'coursecat_ID': 1
+                    })
+            self.assertEqual(res["code"], 200)
+            self.assertEqual(res['message'], "course updated successfully")
+
+    def test_admin_update_runcourse_not_admin(self):
+        request_body = {
+            "course_Name": "Firebase Basics",
+            "course_Desc": "Learn some firebase",
+            "coursecat_ID": 1
+        }
+        with self.app.test_request_context(json=request_body):
+            course_ID = 1
+            session['user_ID'] = 2
+
+            response = AdminUpdateRunCourse().put(course_ID)
+
+            self.assertEqual(response[1], 404)
+            self.assertEqual(response[0]['message'], "Unathorized Access, Failed to create course")
+
+    def test_admin_update_runcourse_not_found(self):
+        request_body = {
+            "course_Name": "Firebase Basics",
+            "course_Desc": "Learn some firebase",
+            "coursecat_ID": 1
+        }
+        with self.app.test_request_context(json=request_body):
+            course_ID = 10
+            session['user_ID'] = 1
+            response = AdminUpdateRunCourse().put(course_ID)
+            res = response[0].get_json()
+
+            self.assertEqual(res["code"], 404)
+            self.assertEqual(res['message'], "course not found")
+
+
+class TestGetUserCourses(TestCourse):
+    def test_get_user_courses_success(self):
+        setattr(self.registration1, 'reg_Status', 'Enrolled')
+        request_body = {
+            "course_name": "Management Communication in Python",
+            "coursecat_id": 2
+        }
+        with self.app.test_request_context(json=request_body):
+            response = GetUserCourses().get(2)
+            res = response.get_json()
+            
+            self.assertEqual(res['code'], 200)
+            self.assertEqual(len(res['data']), 1)
+            self.assertEqual(res['data'][0]['course_Name'], "Management Communication in Python")
+            
+    def test_get_user_courses_with_attendance(self):
+        setattr(self.registration1, 'reg_Status', 'Enrolled')
+        self.lesson1 = Lesson(
+            rcourse_ID = 2,
+            lesson_Date = datetime.strptime('2023-12-01', '%Y-%m-%d').date(),
+            lesson_Starttime = datetime.strptime('12:00:00', '%H:%M:%S').time(),
+            lesson_Endtime = datetime.strptime('15:00:00', '%H:%M:%S').time()
+        )
+        self.lesson2 = Lesson(
+            rcourse_ID = 2,
+            lesson_Date = datetime.strptime('2023-12-03', '%Y-%m-%d').date(),
+            lesson_Starttime = datetime.strptime('12:00:00', '%H:%M:%S').time(),
+            lesson_Endtime = datetime.strptime('15:00:00', '%H:%M:%S').time()
+        )
+        self.lesson3 = Lesson(
+            rcourse_ID = 2,
+            lesson_Date = datetime.strptime('2023-12-05', '%Y-%m-%d').date(),
+            lesson_Starttime = datetime.strptime('12:00:00', '%H:%M:%S').time(),
+            lesson_Endtime = datetime.strptime('15:00:00', '%H:%M:%S').time()
+        )
+        self.lesson4 = Lesson(
+            rcourse_ID = 2,
+            lesson_Date = datetime.strptime('2023-12-07', '%Y-%m-%d').date(),
+            lesson_Starttime = datetime.strptime('12:00:00', '%H:%M:%S').time(),
+            lesson_Endtime = datetime.strptime('15:00:00', '%H:%M:%S').time()
+        )
+        self.attendanceRecord1 = AttendanceRecord(
+            attrecord_ID = 1,
+            lesson_ID = 1,
+            status = 'Present',
+            reason = "",
+            attrecord_Status = 'Submitted',
+            user_ID = 2
+        )
+        self.attendanceRecord2 = AttendanceRecord(
+            attrecord_ID = 2,
+            lesson_ID = 2,
+            status = 'Absent',
+            reason = "sick",
+            attrecord_Status = 'Submitted',
+            user_ID = 2
+        )
+        self.attendanceRecord3 = AttendanceRecord(
+            attrecord_ID = 3,
+            lesson_ID = 4,
+            status = 'Present',
+            reason = "",
+            attrecord_Status = 'Submitted',
+            user_ID = 2
+        )
+        db.session.add(self.lesson1)
+        db.session.add(self.lesson2)
+        db.session.add(self.lesson3)
+        db.session.add(self.lesson4)
+        db.session.add(self.attendanceRecord1)
+        db.session.add(self.attendanceRecord2)
+        db.session.add(self.attendanceRecord3)
+
+        request_body = {
+        }
+        with self.app.test_request_context(json=request_body):
+            response = GetUserCourses().get(2)
+            res = response.get_json()
+            
+            self.assertEqual(res['code'], 200)
+            self.assertEqual(len(res['data']), 1)
+            self.assertEqual(res['data'][0]['course_Name'], "Management Communication in Python")
+            self.assertEqual(res['data'][0]['attendance_rate'], 75)
+
+
+class TestGetStudentName(TestCourse):
+    def test_get_student_name_success(self):
+        request_body = {
+            "course_id": 1
+        }
+        with self.app.test_request_context(json=request_body):
+            response = GetStudentName().get()
+            res = response.get_json()
+
+            self.assertEqual(res['code'], 200)
+            self.assertEqual(res['data'], "Database Mining")
+
+    def test_get_student_name_not_found(self):
+        request_body = {
+            "course_id": 10
+        }
+        with self.app.test_request_context(json=request_body):
+            response = GetStudentName().get()
+            res = response.get_json()
+
+            self.assertEqual(res['code'], 404)
+            self.assertEqual(res['message'], "Course not found")
+
+
+class TestIsCourseCompleted(TestCourse):
+    def test_is_course_completed_success(self):
+        setattr(self.registration1, "reg_Status", 'Enrolled')
+        setattr(self.runCourse2, 'run_Enddate', datetime.strptime('2023-11-11', '%Y-%m-%d').date())
+        request_body = {
+            "rcourse_id": 2
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 2
+            response = IsCourseCompleted().get()
+            res = response.get_json()
+
+            self.assertEqual(res['code'], 200)
+            self.assertEqual(res['isCourseCompleted'], True)
+            self.assertEqual(res['isFeedbackDone'], False)
+
+    def test_is_course_completed_not_completed(self):
+        setattr(self.registration1, "reg_Status", 'Enrolled')
+        setattr(self.runCourse2, 'run_Enddate', datetime.strptime('2023-11-11', '%Y-%m-%d').date())
+        request_body = {
+            "rcourse_id": 3
+        }
+        with self.app.test_request_context(json=request_body):
+            session['user_ID'] = 2
+            response = IsCourseCompleted().get()
+            res = response.get_json()
+
+            self.assertEqual(res['code'], 200)
+            self.assertEqual(res['isCourseCompleted'], False)
+            self.assertEqual(res['isFeedbackDone'], False)
+    # cant test feedbackdone true cos of db.session.close() in the method in course.py
 
 
 
