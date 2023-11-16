@@ -2,7 +2,7 @@
     <div>
       <label v-if="qnNum !== undefined" class="mb-1">{{ qnNum }}. {{ label }}</label>
       <label v-else class="mb-1">{{ label }}</label>
-      <div v-for="option in options" :key="option.id">
+      <div v-for="option in options" :key="option.id" @click="selectOption(option.position)">
         <input
         type="radio"
         :name="label"
@@ -33,6 +33,11 @@
     return {
       selectedOption: this.value || '', 
       };
+    },
+    methods: {
+      selectOption(position) {
+        this.selectedOption = position;
+      },
     },
     watch: {
       selectedOption(newValue) {

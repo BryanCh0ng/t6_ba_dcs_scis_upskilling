@@ -2541,7 +2541,12 @@ INSERT INTO registration VALUES
     (169, 18, 51, 'Enrolled'),
     (170, 18, 52, 'Enrolled'),
     (171, 18, 53, 'Enrolled'),
-    (172, 18, 56, 'Enrolled');
+    (172, 18, 56, 'Enrolled'),
+    (173, 5, 40, 'Enrolled'),
+    (184, 3, 51, 'Enrolled'),
+    (185, 3, 52, 'Enrolled'),
+    (186, 3, 53, 'Enrolled'),
+    (187, 3, 56, 'Enrolled');
 
 
 

@@ -3,7 +3,7 @@
     <label v-if="qnNum !== undefined" class="mb-1">{{ qnNum }}. {{ label }}</label>
     <label v-else class="mb-1">{{ label }}</label>
     <ul class='likert'>
-      <li v-for="option in options" :key="option.id">
+      <li v-for="option in options" :key="option.id" @click="selectOption(option.position)">
         <input :disabled="disabled" :checked="sOption == option.position" type="radio" :name="label" :value="option.position"  v-model="selectedOption">
         <label>{{ option.option }}</label>
       </li>
@@ -28,6 +28,11 @@ export default {
     return {
       selectedOption: null
     }
+  },
+  methods: {
+    selectOption(position) {
+      this.selectedOption = position;
+    },
   },
   watch: {
     selectedOption(newValue) {

@@ -16,11 +16,11 @@
 
         <div class="form-group row" v-for="(element, key) in common_questions" :key="key">
           <text-area-field :disabled="disabled" :placeholder="element.answer" v-if="element.selectedInputType=='Text Field'"  class="mb-5" :label="element.question" :qnNum="templateData.length+key+1" @input="updateAnswer"></text-area-field>
-          <likert-scale-field :disabled="disabled" :sOption="element.answer" v-else-if="element.selectedInputType=='Likert Scale'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="templateData.length+key+1" @input="updateCommonLikert"></likert-scale-field> 
+          <likert-scale-field :disabled="disabled" :sOption="element.answer" v-else-if="element.selectedInputType=='Likert Scale'" class="mb-4" :options="element.inputOptions" :label="element.question" :qnNum="templateData.length+key+1" @input="updateAnswer"></likert-scale-field> 
         </div>
   
         <div class="row">
-          <div class="col-12 form-group">
+          <div class="col-12 form-group pb-5">
             <button type="button" :disabled="disabled" :title="disabled ? 'Unable to submit, please ensure that all fields have been filled.' : ''" class="btn btn-edit shadow-sm w-100 mt-5" @click="submit">
               Submit
             </button>
@@ -196,10 +196,17 @@ export default {
         'data': this.templateData,
         'common_questions_data': this.common_questions
       }
+      console.log(data)
       const isAnyAnswerBlank = this.templateData.some((element) => {
+        if (element.answer == undefined) {
+          return true
+        }
         return !element.answer.toString().trim();
       });
       const isCommonAnswerBlank = this.common_questions.some((element) => {
+        if (element.answer == undefined) {
+          return true
+        }
         return !element.answer.toString().trim();
       });
       if (!isAnyAnswerBlank && !isCommonAnswerBlank) {
@@ -223,7 +230,7 @@ export default {
             this.submitError = true
             this.showAlert = true;
             this.title = "Submit Feedback Fail";
-            this.message = error.response.data.message.toString();
+            this.message = "Submit Feedback Error";
             this.buttonType = "danger"
         }
       } else {
@@ -246,13 +253,15 @@ export default {
         this.templateData[index]['answer'] = answer.value;
       } else {
         if (answer.value != undefined) {
-          this.common_questions[1]['answer'] = answer.value;
+          if (index == this.templateData.length+1) {
+            this.common_questions[1]['answer'] = answer.value;
+          } else {
+            this.common_questions[0]['answer'] = answer.value;
+          }
+          console.log(this.common_questions)
         }
       }
     },
-    updateCommonLikert(answer) {
-      this.common_questions[0]['answer'] = answer.value;
-    }
   },
   async created() {
     const user_ID = await UserService.getUserID();
