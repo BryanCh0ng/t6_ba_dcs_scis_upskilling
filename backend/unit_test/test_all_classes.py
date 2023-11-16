@@ -287,48 +287,53 @@ class TestRegistration(unittest.TestCase):
 class TestLesson(unittest.TestCase):
     def test_json(self):
         lesson = Lesson(
-            lesson_ID = 1,
-            reg_ID = 1,
+            rcourse_ID = 1,
             lesson_Date = '2023-07-10',
-            lesson_Time = '12:00:00'
+            lesson_Starttime = '12:00:00',
+            lesson_Endtime = '15:00:00'
         )
 
         self.assertEqual(lesson.json(), {
-                "lesson_ID": 1,
-                "reg_ID": 1,
+                "lesson_ID": None,
+                "rcourse_ID": 1,
                 "lesson_Date": '2023-07-10',
-                "lesson_Time": '12:00:00'
+                "lesson_Starttime": '12:00:00',
+                "lesson_Endtime": '15:00:00'
             }
         )
     
-class TestAttendenceRecord(unittest.TestCase):
+class TestAttendanceRecord(unittest.TestCase):
     def test_json(self):
-        attendenceRecord = AttendenceRecord(
+        attendanceRecord = AttendanceRecord(
             attrecord_ID = 1,
             lesson_ID = 1,
             status = 'Present',
             reason = None,
-            attrecord_Status = 'Submitted'
+            attrecord_Status = 'Submitted',
+            user_ID = 1
         )
 
-        self.assertEqual(attendenceRecord.json(), {
+        self.assertEqual(attendanceRecord.json(), {
                 "attrecord_ID": 1,
                 "lesson_ID": 1,
                 "status": 'Present',
                 "reason": None,
-                "attrecord_Status": 'Submitted'
+                "attrecord_Status": 'Submitted',
+                "user_ID": 1
             }
         )
     
 class TestBlacklist(unittest.TestCase):
     def test_json(self):
         blacklist = Blacklist(
-            user_ID = 7
+            user_ID = 7,
+            blacklist_Datetime = "2023-10-25 17:00:00"
         )
 
         self.assertEqual(blacklist.json(), {
                 "blacklist_ID": None,
-                "user_ID": 7
+                "user_ID": 7,
+                "blacklist_Datetime": "2023-10-25 17:00:00"
             }
         )
     
