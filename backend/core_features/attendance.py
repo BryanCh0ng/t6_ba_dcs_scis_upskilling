@@ -203,3 +203,61 @@ class updateAttendanceByLessonId(Resource):
             return jsonify({"code": 500, "message": "Failed " + str(e)}), 500
 
 
+get_attendance_rate = api.parser()
+get_attendance_rate.add_argument("rcourse_id", help="Enter rcourse id")
+@api.route("/get_attendance_rate")
+@api.doc(description="Get Attendance Rate")
+class getAttendanceRate(Resource):
+    @api.expect(get_attendance_rate)
+    def get(self):
+        try:
+            user_role = common.getUserRole()
+            user_id = common.getUserID()
+            if (user_role) != 'Student':
+                return {"code": 400, "message": "Unauthorized Access, Attendance Rate can only apply to student(s)"}, 400
+            
+            rcourse_id = get_attendance_rate.parse_args().get("rcourse_id")
+            current_date = datetime.now().date()
+            run_courses = db.session.query(RunCourse).join(
+                Registration, Registration.rcourse_ID == RunCourse.rcourse_ID
+            ).filter(
+                Registration.user_ID == user_id,
+                Registration.reg_Status == "Enrolled",
+                RunCourse.run_Startdate <= current_date,
+                RunCourse.rcourse_ID == rcourse_id
+            ).all()
+
+            if run_courses:
+                for run_course in run_courses:
+                    lessons = db.session.query(Lesson).filter(Lesson.rcourse_ID == run_course.rcourse_ID).all()
+                    total_lessons = len(lessons)
+
+                    attendance_records = db.session.query(AttendanceRecord).filter(
+                        AttendanceRecord.user_ID == user_id,
+                        AttendanceRecord.lesson_ID.in_([lesson.lesson_ID for lesson in lessons])
+                    ).all()
+
+                    valid_reason_keywords = ["sick", "doctor appointment", "medical leave", "family emergency", "mc", "personal reasons", "hospitalized"]
+
+                    missed_lessons_without_valid_reason = 0
+
+                    for record in attendance_records:
+                        if record.status == 'Absent':
+                            if not record.reason or record.reason.strip().lower not in valid_reason_keywords:
+                                missed_lessons_without_valid_reason += 1
+                
+                if total_lessons > 0:
+                    attendance_rate = (total_lessons - missed_lessons_without_valid_reason) / total_lessons * 100
+                    print(attendance_rate)
+                    # Check if the attendance rate is below 70%
+                    if attendance_rate <= 70:
+                        return {"code": 200, "message": "Your attendance Rate for this course is below 70%, you are not eligible to submit feedback.", "attendanceRatePassed": False}, 200
+                
+                    return {"code": 200, "attendanceRatePassed": True}, 200
+            
+            return {"code": 400, "message": "An error has occurred while retrieving student attendance rate"}, 400
+        
+ 
+        except Exception as e:
+            return {"code": 500, "message":  "Failed " + str(e)}, 500
+       

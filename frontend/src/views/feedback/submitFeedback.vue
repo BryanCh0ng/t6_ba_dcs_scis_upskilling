@@ -52,7 +52,8 @@ import DefaultModal from "@/components/DefaultModal.vue";
 import UserService from "@/api/services/UserService.js";
 import CourseService from "@/api/services/CourseService.js";
 import FeedbackService from "@/api/services/FeedbackService.js";
-  
+import AttendanceService from "@/api/services/AttendanceService.js";
+
 export default {
   components: {
     TextField,
@@ -76,7 +77,8 @@ export default {
       submitError: false,
       disabled: false,
       common_questions: [],
-      headingTitle: ""
+      headingTitle: "",
+      eligibleToSubmitFeedback: false
     }
   },
   methods: {
@@ -86,9 +88,42 @@ export default {
       const currentDateTime = new Date();
       return currentDateTime >= feedbackStartDate && currentDateTime <= feedbackEndDate;
     },
+    async checkAttendaceRate() {
+      try {
+        const course_id = this.$route.params.id;
+        let attendance_response = await AttendanceService.getAttendanceRate(course_id);
+        console.log(attendance_response)
+        if (attendance_response.code == 200) {
+          this.eligibleToSubmitFeedback = attendance_response.attendanceRatePassed
+          if (!this.eligibleToSubmitFeedback) {
+            this.disabled = true;
+            this.showAlert = true;
+            this.haveError = true
+            this.title = "Submit Feedback Fail";
+            this.message = attendance_response.message
+            this.buttonType = "danger"
+          }
+        } else {
+          this.disabled = true;
+          this.showAlert = true;
+          this.haveError = true
+          this.title = "Submit Feedback Fail";
+          this.message = attendance_response.message
+          this.buttonType = "danger"
+        }
+      } catch (error) {
+        this.disabled = true;
+        this.showAlert = true;
+        this.haveError = true
+        this.title = "Submit Feedback Fail";
+        this.message = "Submit Feedback Fail";
+        this.buttonType = "danger"
+      }
+    }, 
     async loadData() {
       try {
         const course_id = this.$route.params.id;
+        this.checkAttendaceRate()
         this.course = await RunCourseService.getRunCourseById(course_id);
         const withinFeedbackPeriod = this.isWithinFeedbackPeriod(this.course.feedback_Startdate, this.course.feedback_Starttime, this.course.feedback_Enddate, this.course.feedback_Endtime)
         if (!withinFeedbackPeriod) {
@@ -209,6 +244,14 @@ export default {
         }
         return !element.answer.toString().trim();
       });
+      if (!this.eligibleToSubmitFeedback) {
+        this.disabled = true;
+        this.showAlert = true;
+        this.haveError = true
+        this.title = "Submit Feedback Fail";
+        this.message = "Attendance Rate below 70%, not eligible to submit feedback.";
+        this.buttonType = "danger"
+      }
       if (!isAnyAnswerBlank && !isCommonAnswerBlank) {
         try{
           const response = await FeedbackService.postStudentFeedback(data)

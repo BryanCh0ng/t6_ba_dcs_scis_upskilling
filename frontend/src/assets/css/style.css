@@ -67,8 +67,8 @@ body {
 }
 
 .btn-info, .btn-info:hover, .btn-info:focus, .btn-info:focus, .btn-info:active{
-  background-color: teal;
-  border-color: teal;
+  background-color: teal !important;
+  border-color: teal !important;
 }
 
 .btn:hover {

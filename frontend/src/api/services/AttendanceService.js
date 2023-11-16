@@ -27,6 +27,16 @@ class AttendanceService extends BaseApiService {
           return this.handleError(error);
       }
     }
+
+    async getAttendanceRate(rcourse_id) {
+      try {
+        let response = await axiosClient.get("/attendance/get_attendance_rate", { params: { rcourse_id: rcourse_id } });
+        console.log(response)
+        return response.data
+      } catch (error) {
+        return this.handleError(error);
+        }
+    }
 }
 
 export default new AttendanceService();
