@@ -318,6 +318,15 @@ export default {
         this.coachesID = user_ID;
         this.coachesIDs.push(parseInt(user_ID));
         this.coachesIDs = JSON.stringify(this.coachesIDs);
+      } else if (window.history.state.back === "/instructorTrainerViewProfile") {
+        this.currentPage = "coach";
+        document.title = "Feedback Analysis | Upskilling Engagement System";
+        this.coachesID = user_ID;
+        this.coachesIDs.push(parseInt(user_ID));
+        this.coachesIDs = JSON.stringify(this.coachesIDs);
+        this.runcourseID = this.$route.params.id;
+        this.runcourseIDs.push(parseInt(this.$route.params.id));
+        this.runcourseIDs = JSON.stringify(this.runcourseIDs);
       } else if(lastPart === "viewDashboard" && role === "Admin") {
         document.title = "Dashboard | Upskilling Engagement System";
       }

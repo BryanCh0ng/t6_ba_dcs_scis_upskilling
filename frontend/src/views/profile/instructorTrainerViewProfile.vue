@@ -175,9 +175,9 @@
                     </td>
                     <td><a class="text-nowrap text-dark text-decoration-underline view-course-details"  @click="openModal(conducted_course)" data-bs-toggle="modal" data-bs-target="#course_details_modal">View Course Details</a></td>
                     <td>
-                      <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(course.rcourse_ID)">View Lessons</a>
+                      <a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="viewLessons(conducted_course.rcourse_ID)">View Lessons</a>
                     </td>
-                    <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToRunCourseFeedbackAnalysis(conducted_course.rcourse_ID)">View Feedback Analysis</a></td>
+                    <td><a class="text-nowrap text-dark text-decoration-underline view-feedback-analysis" @click="goToRunCourseInstructorFeedbackAnalysis(conducted_course.rcourse_ID)">View Feedback Analysis</a></td>
                     
                     </tr>
                 </tbody>
@@ -440,7 +440,9 @@ export default {
     goToRunCourseFeedbackAnalysis(courseID) {
       this.$router.push({ name: 'viewRunCourseFeedbackAnalysis', params: {id: courseID}});
     },
-
+    goToRunCourseInstructorFeedbackAnalysis(courseID) {
+      this.$router.push({ name: 'viewRunCourseFeedbackAnalysis', params: {id: courseID}});
+    },
     async loadData() {
       try {
           const user_ID = await UserService.getUserID();
