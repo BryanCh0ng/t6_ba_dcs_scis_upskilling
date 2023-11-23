@@ -117,6 +117,9 @@ To run the frontend of the project, follow these steps:
 2. Navigate to the "frontend" directory using the `cd` command:
    ```bash
    cd frontend
+3. To run the frontend use this command: 
+     ```bash
+   npm run serve 
 
 ## Running the Backend
 To run the backend of the project, follow these steps:
@@ -124,3 +127,6 @@ To run the backend of the project, follow these steps:
 2. Navigate to the "backend" directory using the `cd` command:
    ```bash
    cd backend
+3. To run the backend use this command: 
+     ```bash
+   python app.py
